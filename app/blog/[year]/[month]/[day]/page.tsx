@@ -1,0 +1,231 @@
+import { CodeBlock } from "@/components/code/code-block";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { getProblem, getSolutions } from "@/lib/data";
+import { cn, formatDate } from "@/lib/utils";
+import { ChevronLeft, Cpu, ExternalLink, HardDrive } from "lucide-react";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+
+export default async function ProblemPage({
+  params,
+}: {
+  params: Promise<{ year: string; month: string; day: string }>;
+}) {
+  const { year, month, day } = await params;
+  const problem = await getProblem(year, month, day);
+  const solutions = await getSolutions(year, month, day);
+
+  if (!problem) notFound();
+
+  return (
+    <div className="flex flex-col h-screen max-h-screen overflow-hidden">
+      {/* Header */}
+      <header className="border-b px-6 py-4 flex items-center justify-between shrink-0">
+        <div className="flex items-center gap-4">
+          <Link
+            href="/"
+            className="p-2 hover:bg-accent rounded-full transition-colors"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </Link>
+          <div>
+            <h1 className="text-xl font-bold leading-none">{problem.title}</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              {formatDate(problem.date)}
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <Badge
+            variant={
+              problem.difficulty === "Easy"
+                ? "secondary"
+                : problem.difficulty === "Medium"
+                  ? "default"
+                  : "destructive"
+            }
+          >
+            {problem.difficulty}
+          </Badge>
+          <a
+            href={problem.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs flex items-center gap-1 text-muted-foreground hover:text-primary transition-colors"
+          >
+            LeetCode <ExternalLink className="w-3 h-3" />
+          </a>
+        </div>
+      </header>
+
+      {/* Content */}
+      <main className="flex-1 flex overflow-hidden">
+        {/* Left Column: Description */}
+        <section className="w-1/2 min-h-0 flex flex-col border-r overflow-hidden">
+          <div className="p-4 border-b bg-muted/30 shrink-0">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+              Description
+            </h2>
+          </div>
+
+          <ScrollArea className="min-h-0 flex-1">
+            <div className="p-6">
+              <div
+                className="prose dark:prose-invert max-w-none prose-sm sm:prose-base prose-pre:bg-muted prose-pre:text-foreground"
+                dangerouslySetInnerHTML={{ __html: problem.description }}
+              />
+            </div>
+          </ScrollArea>
+        </section>
+
+        {/* Right Column: Solutions */}
+        <section className="w-1/2 flex flex-col overflow-hidden">
+          <div className="p-4 border-b bg-muted/30 shrink-0">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+              Solutions
+            </h2>
+          </div>
+
+          {solutions.length > 0 ? (
+            <Tabs
+              defaultValue={`${solutions[0].author}-0`}
+              className="flex-1 flex flex-col overflow-hidden"
+            >
+              <div className="px-4 py-2 border-b bg-muted/10 shrink-0 overflow-x-auto">
+                <TabsList className="h-9 justify-start bg-transparent p-0 gap-2">
+                  {solutions.map((s, index) => (
+                    <TabsTrigger
+                      key={`${s.author}-${index}`}
+                      value={`${s.author}-${index}`}
+                      className="data-[state=active]:bg-background data-[state=active]:shadow-sm border rounded-md px-4"
+                    >
+                      {s.author}{" "}
+                      {solutions.filter((sol) => sol.author === s.author)
+                        .length > 1
+                        ? `#${solutions.slice(0, index + 1).filter((sol) => sol.author === s.author).length}`
+                        : ""}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+              </div>
+
+              <div className="flex-1 overflow-hidden">
+                {solutions.map((s, index) => (
+                  <TabsContent
+                    key={`${s.author}-${index}`}
+                    value={`${s.author}-${index}`}
+                    className="h-full m-0 p-0 overflow-hidden outline-none"
+                  >
+                    <ScrollArea className="h-full">
+                      <div className="p-6 space-y-6">
+                        {s.explanation && (
+                          <div className="space-y-2">
+                            <h3 className="text-sm font-semibold">
+                              Explanation
+                              {s.explanationSource === "AI" &&
+                                " (AI-generated)"}
+                            </h3>
+                            <Card className="p-4 bg-muted/20 border-none">
+                              <p className="text-sm text-muted-foreground leading-relaxed">
+                                {s.explanation}
+                              </p>
+                            </Card>
+                          </div>
+                        )}
+
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-medium">
+                              Language:{" "}
+                              <Badge variant="outline" className="capitalize">
+                                {s.language}
+                              </Badge>
+                              {s.date && (
+                                <span className="ml-2 text-xs text-muted-foreground">
+                                  ({formatDate(s.date)})
+                                </span>
+                              )}
+                            </span>
+                            {s.status && (
+                              <Badge
+                                className={cn(
+                                  "font-bold",
+                                  s.status === "DONE" &&
+                                    "bg-green-500 hover:bg-green-600",
+                                  (s.status === "TLE" || s.status === "MLE") &&
+                                    "bg-yellow-500 hover:bg-yellow-600 text-black",
+                                  s.status === "FAILED" &&
+                                    "bg-red-500 hover:bg-red-600",
+                                )}
+                              >
+                                {s.status}
+                              </Badge>
+                            )}
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-4 py-2">
+                            {s.cpuUsage !== undefined && (
+                              <div className="space-y-1">
+                                <div className="flex items-center justify-between text-xs">
+                                  <span className="flex items-center gap-1 text-muted-foreground">
+                                    <Cpu className="w-3 h-3" /> CPU Performance
+                                  </span>
+                                  <span className="font-medium">
+                                    {s.cpuUsage?.toFixed(2)}%
+                                  </span>
+                                </div>
+                                <Progress
+                                  value={s.cpuUsage}
+                                  className="h-1.5"
+                                />
+                              </div>
+                            )}
+                            {s.memoryUsage !== undefined && (
+                              <div className="space-y-1">
+                                <div className="flex items-center justify-between text-xs">
+                                  <span className="flex items-center gap-1 text-muted-foreground">
+                                    <HardDrive className="w-3 h-3" /> Memory
+                                    Performance
+                                  </span>
+                                  <span className="font-medium">
+                                    {s.memoryUsage?.toFixed(2)}%
+                                  </span>
+                                </div>
+                                <Progress
+                                  value={s.memoryUsage}
+                                  className="h-1.5"
+                                />
+                              </div>
+                            )}
+                          </div>
+
+                          <CodeBlock code={s.code} language={s.language} />
+                        </div>
+                      </div>
+                    </ScrollArea>
+                  </TabsContent>
+                ))}
+              </div>
+            </Tabs>
+          ) : (
+            <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-muted/5">
+              <div className="max-w-xs space-y-2">
+                <p className="font-semibold text-muted-foreground">
+                  No solutions yet
+                </p>
+                <p className="text-xs text-muted-foreground/60">
+                  Be the first to contribute a solution for this daily
+                  challenge!
+                </p>
+              </div>
+            </div>
+          )}
+        </section>
+      </main>
+    </div>
+  );
+}

@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} cost\n * @return {number}\n */\nvar minimumCost = function(cost) {\n    cost.sort((a, b) => b - a);\n\n    let sum = 0;\n\n    for (let i = 0; i < cost.length; i++) {\n        if (i % 3 !== 2) {\n            sum += cost[i];\n        }\n    }\n\n    return sum;\n};\n",
+    "language": "javascript",
+    "explanation": "This code calculates the minimum cost to buy a group of items under a \"buy two, get one free\" deal, where you want to get the most expensive items possible for free. It first sorts the item prices from most expensive to cheapest so that the items can be grouped in threes. Then, it loops through this sorted list and adds up the prices, but cleverly skips adding every third item (at index 2, 5, 8, and so on) because those are the free ones you get with your purchase. Finally, it returns the total sum of the paid items.",
+    "explanationSource": "AI",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 80.95,
+    "date": "2026-06-01T08:07:37.000Z"
+  }
+]
