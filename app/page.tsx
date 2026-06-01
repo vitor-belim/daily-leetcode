@@ -16,10 +16,13 @@ export default async function HomePage() {
     <div className="max-w-4xl mx-auto p-8">
       <header className="mb-12">
         <h1 className="text-4xl font-bold tracking-tight">
-          LeetCode Daily Blog
+          LeetCode Daily Challenges
         </h1>
+        <h2 className="text-2xl font-bold tracking-tight text-muted-foreground">
+          by Vítor Belim
+        </h2>
         <p className="text-muted-foreground mt-2">
-          Tracking daily challenges and community solutions.
+          Tracking daily challenges and solutions.
         </p>
       </header>
 
