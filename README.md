@@ -8,6 +8,8 @@ A web application that tracks and displays daily LeetCode challenges and the sol
 
 > **Disclaimer**: Most of this application's code was generated or assisted by AI.
 
+## Follow my progress here: [https://daily-leetcode-gamma.vercel.app/](https://daily-leetcode-gamma.vercel.app/)
+
 ## 🚀 Overview
 
 This project automatically fetches the LeetCode "Question of the Day" and allows users to view descriptions and browse solutions. It uses a file-based data system (JSON) to store problem details and solution implementations.
