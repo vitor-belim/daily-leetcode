@@ -6,7 +6,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { getLatestDailies } from "@/lib/data";
-import { formatDate } from "@/lib/utils";
 import Link from "next/link";
 
 export default async function HomePage() {
@@ -45,9 +44,7 @@ export default async function HomePage() {
                           <CardTitle className="text-xl group-hover:text-primary transition-colors">
                             {problem.title}
                           </CardTitle>
-                          <CardDescription>
-                            {formatDate(problem.date)}
-                          </CardDescription>
+                          <CardDescription>{problem.date}</CardDescription>
                         </div>
                         <Badge
                           variant={

@@ -1,0 +1,46 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} landStartTime\n * @param {number[]} landDuration\n * @param {number[]} waterStartTime\n * @param {number[]} waterDuration\n * @return {number}\n */\nvar earliestFinishTime = function(landStartTime, landDuration, waterStartTime, waterDuration) {\n    let m = landStartTime.length;\n    let n = waterStartTime.length;\n    let res = Infinity;\n\n    let minl = Infinity;\n    for (let i = 0; i < m; i++) {\n        minl = Math.min(minl, landStartTime[i] + landDuration[i]);\n    }\n\n    let minw = Infinity;\n    for (let i = 0; i < n; i++) {\n        minw = Math.min(minw, waterStartTime[i] + waterDuration[i]);\n        res = Math.min(res, Math.max(minl, waterStartTime[i]) + waterDuration[i]);\n    }\n\n    for (let i = 0; i < m; i++) {\n        res = Math.min(res, Math.max(minw, landStartTime[i]) + landDuration[i]);\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "explanation": "This code calculates the earliest possible time to complete a two-step sequence consisting of one land task and one water task, where one task must finish before the other can begin. To find the fastest schedule, the code first calculates the absolute earliest time any land task can finish, and then determines how quickly each water task could finish if it had to wait for that land task to complete (or start at its own scheduled time if that is later). It then performs the reverse scenario: it finds the earliest finishing water task and calculates the completion times for all land tasks waiting on it. Finally, it compares all of these combinations and returns the absolute minimum completion time possible.",
+    "explanationSource": "AI",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 48.72,
+    "date": "2026-06-02T09:08:00.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} landStartTime\n * @param {number[]} landDuration\n * @param {number[]} waterStartTime\n * @param {number[]} waterDuration\n * @return {number}\n */\nvar earliestFinishTime = function(landStartTime, landDuration, waterStartTime, waterDuration) {\n    let m = landStartTime.length;\n    let n = waterStartTime.length;\n    let res = Infinity;\n\n    for (let i = 0; i < m; i++) {\n        const ls = landStartTime[i];\n        const ld = landDuration[i];\n        const ldur = ls + ld;\n\n        if (ldur >= res) continue;\n\n        for (let j = 0; j < n; j++) {\n            const ws = waterStartTime[j];\n            const wd = waterDuration[j];\n            const wdur = ws + wd;\n\n            if (wdur >= res) continue;\n\n            res = Math.min(res, Math.max(ldur, ws) + wd, Math.max(wdur, ls) + ld);\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "explanation": "This code finds the earliest possible time to complete a combined sequence of one \"land\" task and one \"water\" task. By pairing up every available land task with every water task, the code calculates how long they would take if run one after the other in both possible orders (land first, then water, and vice versa). Since the second task in the sequence cannot start until the first one is finished *and* its own scheduled start time has arrived, the code calculates the waiting times and finds the total completion time for each scenario. Ultimately, it keeps track of and returns the absolute quickest finish time found among all pairs, using smart shortcuts to skip calculations if a single task is already slower than the best combined time found so far.",
+    "explanationSource": "AI",
+    "status": "DONE",
+    "cpuUsage": 64.1,
+    "memoryUsage": 61.54,
+    "date": "2026-06-02T08:58:17.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} landStartTime\n * @param {number[]} landDuration\n * @param {number[]} waterStartTime\n * @param {number[]} waterDuration\n * @return {number}\n */\nvar earliestFinishTime = function(landStartTime, landDuration, waterStartTime, waterDuration) {\n    let m = landStartTime.length;\n    let n = waterStartTime.length;\n    let res = Infinity;\n\n    for (let i = 0; i < m; i++) {\n        const ls = landStartTime[i];\n        const ld = landDuration[i];\n\n        if (ls + ld >= res) continue;\n\n        for (let j = 0; j < n; j++) {\n            const ws = waterStartTime[j];\n            const wd = waterDuration[j];\n\n            if (ws + wd >= res) continue;\n\n            res = Math.min(res, Math.max(ls + ld, ws) + wd, Math.max(ws + wd, ls) + ld);\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "explanation": "This function finds the quickest overall finish time to complete a combination of one land task and one water task, which must be performed one after the other. It loops through every possible pair of land and water tasks, calculating the total time it would take to finish both depending on which one you do first (ensuring the second task can only start after the first one is done and its own scheduled start time has arrived). To save time, the code skips any task combination that is already guaranteed to be slower than the best time found so far, and ultimately returns the earliest possible finish time.",
+    "explanationSource": "AI",
+    "status": "DONE",
+    "cpuUsage": 64.1,
+    "memoryUsage": 25.64,
+    "date": "2026-06-02T08:54:45.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} landStartTime\n * @param {number[]} landDuration\n * @param {number[]} waterStartTime\n * @param {number[]} waterDuration\n * @return {number}\n */\nvar earliestFinishTime = function(landStartTime, landDuration, waterStartTime, waterDuration) {\n    let m = landStartTime.length;\n    let n = waterStartTime.length;\n    let res = Infinity;\n\n    for (let i = 0; i < m; i++) {\n        const ls = landStartTime[i];\n        const ld = landDuration[i];\n\n        for (let j = 0; j < n; j++) {\n            const ws = waterStartTime[j];\n            const wd = waterDuration[j];\n\n            res = Math.min(res, Math.max(ls + ld, ws) + wd, Math.max(ws + wd, ls) + ld);\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "explanation": "This function finds the earliest possible time to complete a combination of one land task and one water task chosen from two lists of options. It loops through every possible pair of land and water tasks and, for each pair, calculates the fastest way to complete them both by comparing two scenarios: completing the land task first followed by the water task, versus completing the water task first followed by the land task. In each scenario, a task cannot start until its own designated start time has arrived and the previous task has finished. By checking all combinations and scheduling orders, the function ultimately returns the absolute quickest finish time possible.",
+    "explanationSource": "AI",
+    "status": "DONE",
+    "cpuUsage": 30.77,
+    "memoryUsage": 69.23,
+    "date": "2026-06-02T08:52:02.000Z"
+  }
+]

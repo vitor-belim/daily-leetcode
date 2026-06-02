@@ -34,9 +34,7 @@ export default async function ProblemPage({
           </Link>
           <div>
             <h1 className="text-xl font-bold leading-none">{problem.title}</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              {formatDate(problem.date)}
-            </p>
+            <p className="text-sm text-muted-foreground mt-1">{problem.date}</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
