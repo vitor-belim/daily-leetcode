@@ -5,6 +5,7 @@ import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getProblem, getSolutions } from "@/lib/data";
+import { markdownToHtml } from "@/lib/markdown";
 import { cn, formatDate } from "@/lib/utils";
 import { ChevronLeft, Cpu, ExternalLink, HardDrive } from "lucide-react";
 import Link from "next/link";
@@ -45,6 +46,13 @@ export default async function ProblemPage({
                 : problem.difficulty === "Medium"
                   ? "default"
                   : "destructive"
+            }
+            className={
+              problem.difficulty === "Easy"
+                ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400"
+                : problem.difficulty === "Medium"
+                  ? "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400"
+                  : ""
             }
           >
             {problem.difficulty}
@@ -128,9 +136,12 @@ export default async function ProblemPage({
                                 " (AI-generated)"}
                             </h3>
                             <Card className="p-4 bg-muted/20 border-none">
-                              <p className="text-sm text-muted-foreground leading-relaxed">
-                                {s.explanation}
-                              </p>
+                              <div
+                                className="text-sm text-muted-foreground leading-relaxed prose dark:prose-invert max-w-none prose-sm"
+                                dangerouslySetInnerHTML={{
+                                  __html: markdownToHtml(s.explanation),
+                                }}
+                              />
                             </Card>
                           </div>
                         )}
