@@ -245,18 +245,13 @@ async function main() {
 
       const submissions =
         submissionListData.data.questionSubmissionList.submissions;
-      const acceptedSubmissions = submissions.filter(
-        (s: { statusDisplay?: string }) => s.statusDisplay === "Accepted",
-      );
 
-      if (acceptedSubmissions.length > 0) {
-        console.log(
-          `Found ${acceptedSubmissions.length} accepted submissions.`,
-        );
+      if (submissions.length > 0) {
+        console.log(`Found ${submissions.length} submissions.`);
 
         const solutionsMap = new Map();
 
-        for (const sub of acceptedSubmissions) {
+        for (const sub of submissions) {
           console.log(`Fetching details for submission: ${sub.id}`);
           const detailsData = await fetchLeetCode(SUBMISSION_DETAILS_QUERY, {
             submissionId: parseInt(sub.id),
@@ -274,6 +269,15 @@ async function main() {
             cpuUsage > existing.cpuUsage ||
             memoryUsage > existing.memoryUsage
           ) {
+            const status =
+              details.statusDisplay === "Accepted"
+                ? "DONE"
+                : details.statusDisplay === "Time Limit Exceeded"
+                  ? "TLE"
+                  : details.statusDisplay === "Memory Limit Exceeded"
+                    ? "MLE"
+                    : "FAILED";
+
             solutionsMap.set(code, {
               author: process.env.LEETCODE_USERNAME || "Vitor",
               code: code,
@@ -282,7 +286,7 @@ async function main() {
                 existing?.explanation ||
                 (await generateExplanation(sub.id, code)),
               explanationSource: "AI",
-              status: "DONE",
+              status: status,
               cpuUsage: existing
                 ? Math.max(existing.cpuUsage, cpuUsage)
                 : cpuUsage,
@@ -301,7 +305,7 @@ async function main() {
           (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
         );
       } else {
-        console.log("No accepted submissions found for this question.");
+        console.log("No submissions found for this question.");
       }
 
       const defaultSolutions =
