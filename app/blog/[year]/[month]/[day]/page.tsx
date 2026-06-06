@@ -134,7 +134,16 @@ export default async function ProblemPage({
                     <TabsTrigger
                       key={`${s.author}-${index}`}
                       value={`${s.author}-${index}`}
-                      className="data-[state=active]:bg-background data-[state=active]:shadow-sm border rounded-md px-4"
+                      className={cn(
+                        "shadow-sm border rounded-md px-4 gap-2 transition-all",
+                        s.status === "DONE" &&
+                          "bg-green-100 text-green-800 data-active:bg-green-200 dark:bg-green-900/30 dark:text-green-400 dark:data-active:bg-green-900/50",
+                        (s.status === "TLE" || s.status === "MLE") &&
+                          "bg-yellow-100 text-yellow-800 data-active:bg-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:data-active:bg-yellow-900/50",
+                        s.status === "FAILED" &&
+                          "bg-red-100 text-red-800 data-active:bg-red-200 dark:bg-red-900/30 dark:text-red-400 dark:data-active:bg-red-900/50",
+                        "data-active:ring-1 data-active:ring-primary/20 data-active:border-primary/30",
+                      )}
                     >
                       {s.author} {s.label}
                     </TabsTrigger>
