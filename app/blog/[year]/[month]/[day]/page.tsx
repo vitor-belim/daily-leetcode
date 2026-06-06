@@ -22,6 +22,33 @@ export default async function ProblemPage({
 
   if (!problem) notFound();
 
+  const authorMap = new Map<string, number>();
+
+  for (const s of solutions) {
+    authorMap.set(s.author, (authorMap.get(s.author) || 0) + 1);
+  }
+
+  for (const [author, total] of authorMap) {
+    if (total === 1) {
+      authorMap.delete(author);
+    }
+  }
+
+  const solutionsWithLabels = solutions.map((s) => {
+    const total = authorMap.get(s.author) || 0;
+    let label = "";
+
+    if (total > 0) {
+      authorMap.set(s.author, total - 1);
+      label = `#${total}`;
+    }
+
+    return {
+      ...s,
+      label,
+    };
+  });
+
   return (
     <div className="flex flex-col h-screen max-h-screen overflow-hidden">
       {/* Header */}
@@ -98,29 +125,25 @@ export default async function ProblemPage({
 
           {solutions.length > 0 ? (
             <Tabs
-              defaultValue={`${solutions[0].author}-0`}
+              defaultValue={`${solutionsWithLabels[0].author}-0`}
               className="flex-1 flex flex-col overflow-hidden"
             >
               <div className="px-4 py-2 border-b bg-muted/10 shrink-0 overflow-x-auto">
                 <TabsList className="h-9 justify-start bg-transparent p-0 gap-2">
-                  {solutions.map((s, index) => (
+                  {solutionsWithLabels.map((s, index) => (
                     <TabsTrigger
                       key={`${s.author}-${index}`}
                       value={`${s.author}-${index}`}
                       className="data-[state=active]:bg-background data-[state=active]:shadow-sm border rounded-md px-4"
                     >
-                      {s.author}{" "}
-                      {solutions.filter((sol) => sol.author === s.author)
-                        .length > 1
-                        ? `#${solutions.slice(0, index + 1).filter((sol) => sol.author === s.author).length}`
-                        : ""}
+                      {s.author} {s.label}
                     </TabsTrigger>
                   ))}
                 </TabsList>
               </div>
 
               <div className="flex-1 overflow-hidden">
-                {solutions.map((s, index) => (
+                {solutionsWithLabels.map((s, index) => (
                   <TabsContent
                     key={`${s.author}-${index}`}
                     value={`${s.author}-${index}`}
