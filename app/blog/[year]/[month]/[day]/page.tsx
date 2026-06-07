@@ -25,7 +25,8 @@ export default async function ProblemPage({
   const authorMap = new Map<string, number>();
 
   for (const s of solutions) {
-    authorMap.set(s.author, (authorMap.get(s.author) || 0) + 1);
+    const authorKey = `${s.author}@${s.date.slice(0, 10)}`;
+    authorMap.set(authorKey, (authorMap.get(authorKey) || 0) + 1);
   }
 
   for (const [author, total] of authorMap) {
@@ -35,11 +36,13 @@ export default async function ProblemPage({
   }
 
   const solutionsWithLabels = solutions.map((s) => {
-    const total = authorMap.get(s.author) || 0;
+    const authorKey = `${s.author}@${s.date.slice(0, 10)}`;
+
+    const total = authorMap.get(authorKey) || 0;
     let label = "";
 
     if (total > 0) {
-      authorMap.set(s.author, total - 1);
+      authorMap.set(authorKey, total - 1);
       label = `#${total}`;
     }
 
@@ -135,7 +138,7 @@ export default async function ProblemPage({
                       key={`${s.author}-${index}`}
                       value={`${s.author}-${index}`}
                       className={cn(
-                        "shadow-sm border rounded-md px-4 gap-2 transition-all",
+                        "shadow-sm border rounded-md px-4 transition-all flex flex-col gap-0 h-auto",
                         s.status === "DONE" &&
                           "bg-green-100 text-green-800 data-active:bg-green-200 dark:bg-green-900/30 dark:text-green-400 dark:data-active:bg-green-900/50",
                         (s.status === "TLE" || s.status === "MLE") &&
@@ -145,7 +148,12 @@ export default async function ProblemPage({
                         "data-active:ring-1 data-active:ring-primary/20 data-active:border-primary/30",
                       )}
                     >
-                      {s.author} {s.label}
+                      <span>
+                        {s.author} {s.label}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        {s.date.slice(0, 10)}
+                      </span>
                     </TabsTrigger>
                   ))}
                 </TabsList>

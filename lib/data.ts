@@ -18,7 +18,7 @@ export interface Solution {
   status?: "DONE" | "TLE" | "MLE" | "FAILED";
   cpuUsage?: number; // 0-100
   memoryUsage?: number; // 0-100
-  date?: string;
+  date: string;
 }
 
 const DATA_DIR = path.join(process.cwd(), "data");

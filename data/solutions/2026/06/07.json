@@ -1,0 +1,101 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for a binary tree node.\n * function TreeNode(val, left, right) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.left = (left===undefined ? null : left)\n *     this.right = (right===undefined ? null : right)\n * }\n */\n/**\n * @param {number[][]} descriptions\n * @return {TreeNode}\n */\nvar createBinaryTree = function(descriptions) {\n    const map = new Map();\n    const parentMap = new Map();\n\n    for (const [parent, child, isLeft] of descriptions) {\n        let parentNode = map.get(parent);\n        if (!parentNode) {\n            parentNode = new TreeNode(parent);\n            map.set(parent, parentNode);\n        }\n\n        let childNode = map.get(child);\n        if (!childNode) {\n            childNode = new TreeNode(child);\n            map.set(child, childNode);\n        }\n\n        if (isLeft) {\n            parentNode.left = childNode;\n        } else {\n            parentNode.right = childNode;\n        }\n        parentMap.set(child, parent);\n    }\n\n    let root = descriptions[0][0];\n\n    while (parentMap.has(root)) {\n        root = parentMap.get(root);\n    }\n\n    return map.get(root);\n};\n",
+    "language": "javascript",
+    "explanation": "This function builds a binary tree from a list of descriptions that specify how numbers are connected as parents and left or right children. It uses one map to create and store each unique tree node, linking the parents to their children as it processes the list, and a second map to keep track of who each child's parent is. After establishing all the connections, the code finds the absolute top of the tree (the root) by starting at an arbitrary node and tracing its lineage upward using the parent map until it reaches the only node that has no parent, ultimately returning that root node.",
+    "explanationSource": "AI",
+    "status": "DONE",
+    "cpuUsage": 93.75,
+    "memoryUsage": 71.88,
+    "date": "2026-06-07T08:43:43.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for a binary tree node.\n * function TreeNode(val, left, right) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.left = (left===undefined ? null : left)\n *     this.right = (right===undefined ? null : right)\n * }\n */\n/**\n * @param {number[][]} descriptions\n * @return {TreeNode}\n */\nvar createBinaryTree = function(descriptions) {\n    const map = new Map();\n    const parentMap = new Map();\n\n    for (const [parent, child, isLeft] of descriptions) {\n        let parentNode = map.get(parent);\n        let childNode = map.get(child);\n\n        if (!parentNode) {\n            parentNode = new TreeNode(parent);\n            map.set(parent, parentNode);\n        }\n        if (!childNode) {\n            childNode = new TreeNode(child);\n            map.set(child, childNode);\n        }\n\n        parentNode[isLeft ? 'left' : 'right'] = childNode;\n        parentMap.set(child, parent);\n    }\n\n    let root = descriptions[0][0];\n\n    while (parentMap.has(root)) {\n        root = parentMap.get(root);\n    }\n\n    return map.get(root);\n};\n",
+    "language": "javascript",
+    "explanation": "This code reconstructs a binary tree from a list of parent-child relationships by using two maps: one to store and link the actual tree nodes, and another to track which node is the parent of which child. It loops through the input data to create any missing nodes, connects them as left or right children based on the instructions, and records their parent-child connections. Finally, to find the top-level root of the completed tree, it starts with an arbitrary node and travels upwards through the parent tracker until it reaches the node that has no parent, returning that final root node.",
+    "explanationSource": "AI",
+    "status": "DONE",
+    "cpuUsage": 71.88,
+    "memoryUsage": 78.13,
+    "date": "2026-06-07T08:35:29.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for a binary tree node.\n * function TreeNode(val, left, right) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.left = (left===undefined ? null : left)\n *     this.right = (right===undefined ? null : right)\n * }\n */\n/**\n * @param {number[][]} descriptions\n * @return {TreeNode}\n */\nvar createBinaryTree = function(descriptions) {\n    const map = new Map();\n    const inboundMap = new Map();\n\n    for (const [parent, child, isLeft] of descriptions) {\n        let parentNode = map.get(parent);\n        let childNode = map.get(child);\n        let childCount = inboundMap.get(child);\n\n        if (!parentNode) {\n            parentNode = new TreeNode(parent);\n            map.set(parent, parentNode);\n            inboundMap.set(parent, 0);\n        }\n        if (!childNode) {\n            childNode = new TreeNode(child);\n            childCount = 0;\n            map.set(child, childNode);\n            inboundMap.set(child, 0);\n        }\n\n        parentNode[isLeft ? 'left' : 'right'] = childNode;\n        inboundMap.set(child, childCount + 1);\n    }\n\n    for (const [key, count] of inboundMap) {\n        if (count === 0) {\n            return map.get(key);\n        }\n    }\n\n    return null;\n};\n",
+    "language": "javascript",
+    "explanation": "This code reconstructs a binary tree from a list of parent-child relationships by using two maps: one to store and reuse the actual tree nodes, and another to keep track of how many parents each node has. As it loops through the input list, it creates the parent and child nodes (if they don't already exist), connects them as left or right children, and marks the child node as having a parent. Once all the connections are made, the code searches through the parent counts to find the single node that has zero parents, which it returns as the root of the newly completed binary tree.",
+    "explanationSource": "AI",
+    "status": "DONE",
+    "cpuUsage": 50,
+    "memoryUsage": 31.25,
+    "date": "2026-06-07T08:31:26.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for a binary tree node.\n * function TreeNode(val, left, right) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.left = (left===undefined ? null : left)\n *     this.right = (right===undefined ? null : right)\n * }\n */\n/**\n * @param {number[][]} descriptions\n * @return {TreeNode}\n */\nvar createBinaryTree = function(descriptions) {\n    const map = new Map();\n    const inboundMap = new Map();\n\n    for (const [parent, child, isLeft] of descriptions) {\n        if (!map.has(parent)) {\n            map.set(parent, new TreeNode(parent));\n            inboundMap.set(parent, 0);\n        }\n        if (!map.has(child)) {\n            map.set(child, new TreeNode(child));\n            inboundMap.set(child, 0);\n        }\n\n        map.get(parent)[isLeft ? 'left' : 'right'] = map.get(child);\n        inboundMap.set(child, (inboundMap.get(child) || 0) + 1);\n    }\n\n    for (const [key, count] of inboundMap) {\n        if (count === 0) {\n            return map.get(key);\n        }\n    }\n\n    return null;\n};\n",
+    "language": "javascript",
+    "explanation": "This JavaScript function reconstructs a binary tree from a list of parent-child relationships by using two maps: one to store the actual tree node objects and another to keep track of how many parents each node has. First, it loops through the relationships to create the nodes (if they don't already exist) and connects each parent to its child on the left or right side, while simultaneously marking that the child node has a parent. Finally, it searches through the tracker to find the single node that has zero parent connections—which represents the overall root of the tree—and returns it.",
+    "explanationSource": "AI",
+    "status": "DONE",
+    "cpuUsage": 34.38,
+    "memoryUsage": 34.38,
+    "date": "2026-06-07T08:26:05.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for a binary tree node.\n * function TreeNode(val, left, right) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.left = (left===undefined ? null : left)\n *     this.right = (right===undefined ? null : right)\n * }\n */\n/**\n * @param {number[][]} descriptions\n * @return {TreeNode}\n */\nvar createBinaryTree = function(descriptions) {\n    const map = {};\n    const withParent = {};\n\n    for (const desc of descriptions) {\n        if (!map[desc[0]]) {\n            map[desc[0]] = new TreeNode(desc[0]);\n        }\n        if (!map[desc[1]]) {\n            map[desc[1]] = new TreeNode(desc[1]);\n        }\n        map[desc[0]][desc[2] ? 'left' : 'right'] = map[desc[1]];\n\n        withParent[desc[1]] = 1;\n    }\n\n    for (const desc of descriptions) {\n        if (!withParent[desc[0]]) {\n            return map[desc[0]];\n        }\n    }\n\n    return null;\n};\n",
+    "language": "javascript",
+    "explanation": "This code reconstructs a binary tree from a list of instructions that describe parent-to-child relationships. It works by first creating a lookup dictionary of all the tree nodes, generating new nodes as needed and linking each parent node to its left or right child based on the instructions. While establishing these connections, the code also keeps track of which nodes are children by marking them as having a parent. Finally, it searches through the nodes to find the single unique node that does not have a parent, which must be the root of the entire tree, and returns it.",
+    "explanationSource": "AI",
+    "status": "DONE",
+    "cpuUsage": 6.25,
+    "memoryUsage": 100,
+    "date": "2024-07-15T07:47:29.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for a binary tree node.\n * function TreeNode(val, left, right) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.left = (left===undefined ? null : left)\n *     this.right = (right===undefined ? null : right)\n * }\n */\n/**\n * @param {number[][]} descriptions\n * @return {TreeNode}\n */\nvar createBinaryTree = function(descriptions) {\n    const map = {};\n    const withParent = new Set();\n\n    for (const desc of descriptions) {\n        if (!map[desc[0]]) {\n            map[desc[0]] = new TreeNode(desc[0]);\n        }\n        if (!map[desc[1]]) {\n            map[desc[1]] = new TreeNode(desc[1]);\n        }\n        map[desc[0]][desc[2] ? 'left' : 'right'] = map[desc[1]];\n\n        withParent.add(desc[1]);\n    }\n\n    for (const desc of descriptions) {\n        if (!withParent.has(desc[0])) {\n            return map[desc[0]];\n        }\n    }\n\n    return null;\n};\n",
+    "language": "javascript",
+    "explanation": "This code reconstructs a binary tree from a list of parent-child relationships by first creating a map to store and connect unique nodes based on whether they are designated as left or right children. As it builds these connections, it keeps track of all child nodes in a set to identify which nodes have parents. Finally, it loops through the data to find the single node that was never marked as a child—meaning it has no parent—which represents the root of the completed tree, and returns it.",
+    "explanationSource": "AI",
+    "status": "DONE",
+    "cpuUsage": 6.25,
+    "memoryUsage": 100,
+    "date": "2024-07-15T07:42:17.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for a binary tree node.\n * function TreeNode(val, left, right) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.left = (left===undefined ? null : left)\n *     this.right = (right===undefined ? null : right)\n * }\n */\n/**\n * @param {number[][]} descriptions\n * @return {TreeNode}\n */\nvar createBinaryTree = function(descriptions) {\n    const map = {};\n    const withParent = new Set();\n\n    for (let i = 0; i < descriptions.length; i++) {\n        const [parent, child, isLeft] = descriptions[i];\n\n        if (!map[parent]) {\n            map[parent] = new TreeNode(parent);\n        }\n        if (!map[child]) {\n            map[child] = new TreeNode(child);\n        }\n\n        map[parent][isLeft ? 'left' : 'right'] = map[child];\n\n        withParent.add(child);\n    }\n\n    for (const desc of descriptions) {\n        if (!withParent.has(desc[0])) {\n            return map[desc[0]];\n        }\n    }\n\n    return null;\n};\n",
+    "language": "javascript",
+    "explanation": "This code reconstructs a binary tree from a list of parent-child relationships by using a map (or dictionary) to create, store, and connect unique tree nodes. As it loops through the given data, it creates the parent and child nodes (ensuring no duplicates) and links them together as either a left or right branch, while simultaneously tracking all child nodes in a Set. Finally, it searches through the relationships one more time to find the ultimate root of the tree—which is identified as the only node that is a parent but never appears as a child—and returns that root node.",
+    "explanationSource": "AI",
+    "status": "DONE",
+    "cpuUsage": 6.25,
+    "memoryUsage": 100,
+    "date": "2024-07-15T07:39:55.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for a binary tree node.\n * function TreeNode(val, left, right) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.left = (left===undefined ? null : left)\n *     this.right = (right===undefined ? null : right)\n * }\n */\n/**\n * @param {number[][]} descriptions\n * @return {TreeNode}\n */\nvar createBinaryTree = function(descriptions) {\n    const arr = [];\n    const rootMap = {};\n\n    for (let i = 0; i < descriptions.length; i++) {\n        const [parent, child, isLeft] = descriptions[i];\n\n        if (!arr[parent]) {\n            arr[parent] = new TreeNode(parent);\n        }\n        if (!arr[child]) {\n            arr[child] = new TreeNode(child);\n        }\n        if (isLeft) {\n            arr[parent].left = arr[child];\n        } else {\n            arr[parent].right = arr[child];\n        }\n\n        rootMap[child] = false;\n        rootMap[parent] = rootMap[parent] === undefined ? true : rootMap[parent];\n    }\n\n    for (const key in rootMap) {\n        if (rootMap[key]) {\n            return arr[key];\n        }\n    }\n\n    return null;\n};\n",
+    "language": "javascript",
+    "explanation": "This code constructs a binary tree from a list of parent-child relationships by looping through the input to create and connect node objects. For each relationship, it checks if the parent and child nodes already exist in a storage array (creating them if they don't), and then links the child to the parent's left or right pointer based on the provided direction. At the same time, it uses a helper map (`rootMap`) to track potential root nodes: any node that is a child is flagged as `false` (since a root cannot have a parent), while parent nodes are initially flagged as `true`. Finally, the code searches this map to find the single node that remains flagged as `true` (meaning it has no parent), retrieves that complete node from storage, and returns it as the root of the fully assembled tree.",
+    "explanationSource": "AI",
+    "status": "DONE",
+    "cpuUsage": 6.25,
+    "memoryUsage": 100,
+    "date": "2024-07-15T07:27:44.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for a binary tree node.\n * function TreeNode(val, left, right) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.left = (left===undefined ? null : left)\n *     this.right = (right===undefined ? null : right)\n * }\n */\n/**\n * @param {number[][]} descriptions\n * @return {TreeNode}\n */\nvar createBinaryTree = function(descriptions) {\n    const arr = [];\n    const rootMap = {};\n\n    for (let i = 0; i < descriptions.length; i++) {\n        const [parent, child, isLeft] = descriptions[i];\n\n        if (!arr[parent]) {\n            arr[parent] = new TreeNode(parent);\n        }\n        if (!arr[child]) {\n            arr[child] = new TreeNode(child);\n        }\n        if (isLeft) {\n            arr[parent].left = arr[child];\n        } else {\n            arr[parent].right = arr[child];\n        }\n        rootMap[child] = false;\n        rootMap[parent] = rootMap[parent] === undefined ? true : rootMap[parent];\n    }\n\n    for (const key in rootMap) {\n        if (rootMap[key]) {\n            return arr[key];\n        }\n    }\n\n    return null;\n};\n",
+    "language": "javascript",
+    "explanation": "This JavaScript function reconstructs a binary tree from a list of parent-child relationships. It loops through the input list and uses an array to create and store unique tree nodes, linking them together as left or right children based on the instructions. While building these connections, the code also uses a tracking object (`rootMap`) to figure out which node is the overall root of the tree; it does this by marking any node that acts as a child as `false` (since a root can never have a parent) and parent nodes as potential roots (`true`). Finally, the function searches this tracking object to find the single node that remains marked as `true` (meaning it is a parent but never a child of any other node) and returns it as the root of the completed tree.",
+    "explanationSource": "AI",
+    "status": "DONE",
+    "cpuUsage": 6.25,
+    "memoryUsage": 100,
+    "date": "2024-07-15T07:25:02.000Z"
+  }
+]
