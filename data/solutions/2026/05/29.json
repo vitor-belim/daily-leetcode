@@ -7,7 +7,8 @@
     "explanationSource": "AI",
     "status": "DONE",
     "cpuUsage": 100,
-    "memoryUsage": 83.91
+    "memoryUsage": 83.91,
+    "date": "2026-05-29T00:00:00.000Z"
   },
   {
     "author": "Vitor (simple)",
@@ -17,6 +18,7 @@
     "explanationSource": "AI",
     "status": "DONE",
     "cpuUsage": 55.17,
-    "memoryUsage": 39.08
+    "memoryUsage": 39.08,
+    "date": "2026-05-29T00:00:00.000Z"
   }
 ]

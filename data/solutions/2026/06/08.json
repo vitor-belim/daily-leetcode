@@ -1,0 +1,68 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} pivot\n * @return {number[]}\n */\nvar pivotArray = function(nums, pivot) {\n    const n = nums.length;\n    const res = Array(n).fill(pivot);\n    let lo = 0;\n    let hi = n - 1;\n\n    for (let i = 0; i < n; i++) {\n        if (nums[i] < pivot) {\n            res[lo] = nums[i];\n            lo++;\n        }\n\n        const j = n - 1 - i;\n        if (nums[j] > pivot) {\n            res[hi] = nums[j];\n            hi--;\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "explanation": "This function rearranges an array of numbers so that all numbers smaller than a given \"pivot\" value move to the left, all numbers larger move to the right, and all numbers equal to the pivot stay in the middle—all while keeping their original relative order. It does this efficiently by first creating a new result array of the same size and filling it entirely with the pivot value. Then, it runs a single loop to look at the original array from both ends at the same time: numbers smaller than the pivot are placed into the new array starting from the far left (moving inward), while numbers larger than the pivot are placed starting from the far right (moving inward). Because the new array was already pre-filled with the pivot value, any untouched spaces in the middle naturally remain as pivots, resulting in a perfectly rearranged array.",
+    "explanationSource": "AI",
+    "status": "DONE",
+    "cpuUsage": 97.9,
+    "memoryUsage": 6.99,
+    "date": "2026-06-08T08:47:18.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} pivot\n * @return {number[]}\n */\nvar pivotArray = function(nums, pivot) {\n    const n = nums.length;\n    const res = Array(n);\n    let lo = 0;\n    let hi = n - 1;\n\n    for (let i = 0; i < n; i++) {\n        if (nums[i] < pivot) {\n            res[lo] = nums[i];\n            lo++;\n        }\n\n        const j = n - 1 - i;\n        if (nums[j] > pivot) {\n            res[hi] = nums[j];\n            hi--;\n        }\n    }\n\n    for (let i = lo; i <= hi; i++) {\n        res[i] = pivot;\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "explanation": "This code rearranges an array of numbers around a specific \"pivot\" value so that all numbers smaller than the pivot are grouped on the left, all numbers larger are on the right, and all numbers equal to the pivot are in the middle, all while keeping their original relative order. It achieves this efficiently by creating a new, empty array of the same size and using two pointers: one pointer starts at the left to place smaller numbers from left to right as it scans the original array forward, while another starts at the right to place larger numbers from right to left as it scans backward. Finally, it fills any remaining empty spaces in the middle of the new array with the pivot value itself and returns the newly organized array.",
+    "explanationSource": "AI",
+    "status": "DONE",
+    "cpuUsage": 93.01,
+    "memoryUsage": 6.99,
+    "date": "2026-06-08T08:46:43.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} pivot\n * @return {number[]}\n */\nvar pivotArray = function(nums, pivot) {\n    const lower = [];\n    const same = [];\n    const higher = [];\n\n    for (const num of nums) {\n        if (num < pivot) {\n            lower.push(num);\n        } else if (num === pivot) {\n            same.push(num);\n        } else {\n            higher.push(num);\n        }\n    }\n\n    return [...lower, ...same, ...higher];\n};\n",
+    "language": "javascript",
+    "explanation": "This code takes an array of numbers and rearranges them around a specific boundary value called a \"pivot.\" It works by sorting the numbers into three separate lists as it loops through the original array: one list for numbers smaller than the pivot, one for numbers equal to the pivot, and one for numbers larger than the pivot. Finally, it merges these three lists back together in that exact order (smaller, equal, then larger) and returns the newly arranged array, ensuring that the original relative order of the numbers is kept.",
+    "explanationSource": "AI",
+    "status": "DONE",
+    "cpuUsage": 78.32,
+    "memoryUsage": 42.66,
+    "date": "2026-06-08T08:33:42.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} pivot\n * @return {number[]}\n */\nvar pivotArray = function(nums, pivot) {\n    const lower = [];\n    const same = [];\n    const higher = [];\n\n    for (const num of nums) {\n        if (num < pivot) {\n            lower.push(num);\n        } else if (num === pivot) {\n            same.push(num);\n        } else {\n            higher.push(num);\n        }\n    }\n\n    return lower.concat(same).concat(higher);\n};\n",
+    "language": "javascript",
+    "explanation": "This JavaScript function rearranges a list of numbers by grouping them around a target value called a \"pivot.\" It works by creating three empty lists: one for numbers smaller than the pivot, one for numbers equal to the pivot, and one for numbers larger than the pivot. The code then loops through the input array, comparing each number to the pivot and sorting it into the appropriate list. Finally, it glues these three lists together in order—smaller numbers first, then equal numbers, and lastly larger numbers—and returns this newly combined array, successfully organizing the numbers while preserving their original relative order.",
+    "explanationSource": "AI",
+    "status": "DONE",
+    "cpuUsage": 76.22,
+    "memoryUsage": 60.84,
+    "date": "2026-06-08T08:33:01.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} pivot\n * @return {number[]}\n */\nvar pivotArray = function(nums, pivot) {\n    const pre = [];\n    const post = [];\n\n    for (let num of nums) {\n        if (num < pivot) {\n            pre.push(num);\n        } else if (num > pivot) {\n            post.push(num);\n        } else {\n            post.unshift(num);\n        }\n    }\n\n    return pre.concat(post);\n};\n",
+    "language": "javascript",
+    "explanation": "This code rearranges an array of numbers by grouping them around a target value called the `pivot` so that all smaller numbers come first, followed by equal numbers, and then larger numbers. It does this by creating two empty list containers: `pre` (for numbers smaller than the pivot) and `post` (for numbers larger than or equal to the pivot). As the code loops through the original array, it places smaller numbers at the end of `pre` and larger numbers at the end of `post`, while placing any numbers equal to the pivot at the very front of `post` (right before the larger numbers). Finally, it merges these two lists together and returns the combined, rearranged array.",
+    "explanationSource": "AI",
+    "status": "DONE",
+    "cpuUsage": 5.59,
+    "memoryUsage": 32.87,
+    "date": "2025-03-03T07:53:57.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} pivot\n * @return {number[]}\n */\nvar pivotArray = function(nums, pivot) {\n    const pre = [];\n    const pivots = [];\n    const post = [];\n\n    for (let num of nums) {\n        if (num < pivot) {\n            pre.push(num);\n        } else if (num > pivot) {\n            post.push(num);\n        } else {\n            pivots.push(num);\n        }\n    }\n\n    return pre.concat(pivots).concat(post);\n};\n",
+    "language": "javascript",
+    "explanation": "This code reorganizes a list of numbers by grouping them around a specific target value called a **pivot**. It creates three separate empty lists: one for numbers smaller than the pivot, one for numbers equal to the pivot, and one for numbers larger than the pivot. The code then loops through the original list, sorting each number into its correct group while preserving their original order. Finally, it merges these three groups back together in sequence—smaller numbers first, then the pivot values, and lastly the larger numbers—and returns this newly arranged list.",
+    "explanationSource": "AI",
+    "status": "DONE",
+    "cpuUsage": 77.62,
+    "memoryUsage": 37.76,
+    "date": "2025-03-03T07:52:56.000Z"
+  }
+]

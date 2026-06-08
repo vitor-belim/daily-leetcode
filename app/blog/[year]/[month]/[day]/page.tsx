@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getProblem, getSolutions } from "@/lib/data";
+import { getProblem, getSolutions, timeAgo } from "@/lib/data";
 import { markdownToHtml } from "@/lib/markdown";
 import { cn, formatDate } from "@/lib/utils";
 import { ChevronLeft, Cpu, ExternalLink, HardDrive } from "lucide-react";
@@ -131,7 +131,7 @@ export default async function ProblemPage({
               defaultValue={`${solutionsWithLabels[0].author}-0`}
               className="flex-1 flex flex-col overflow-hidden"
             >
-              <div className="px-4 py-2 border-b bg-muted/10 shrink-0 overflow-x-auto">
+              <div className="px-4 py-2 border-b bg-muted/10 shrink-0 overflow-x-auto overflow-y-hidden">
                 <TabsList className="h-9 justify-start bg-transparent p-0 gap-2">
                   {solutionsWithLabels.map((s, index) => (
                     <TabsTrigger
@@ -152,7 +152,7 @@ export default async function ProblemPage({
                         {s.author} {s.label}
                       </span>
                       <span className="text-xs text-muted-foreground">
-                        {s.date.slice(0, 10)}
+                        {timeAgo(s.date)}
                       </span>
                     </TabsTrigger>
                   ))}
