@@ -3,77 +3,70 @@
     "author": "Vitor",
     "code": "/**\n * @param {number} mass\n * @param {number[]} asteroids\n * @return {boolean}\n */\nvar asteroidsDestroyed = function(mass, asteroids) {\n    let stack = [];\n\n    for (let i = 0; i < asteroids.length; i++) {\n        if (mass >= asteroids[i]) {\n            mass += asteroids[i];\n        } else {\n            stack.push(asteroids[i]);\n        }\n    }\n\n    asteroids = stack;\n    stack = [];\n\n    for (let i = asteroids.length - 1; i >= 0; i--) {\n        if (mass >= asteroids[i]) {\n            mass += asteroids[i];\n        } else {\n            stack.push(asteroids[i]);\n        }\n    }\n\n    stack.sort((a, b) => a - b);\n\n    for (const ast of stack) {\n        if (mass < ast) {\n            return false;\n        }\n        mass += ast;\n    }\n\n    return true;\n};\n",
     "language": "javascript",
-    "explanation": "Use a two-pass approach to absorb smaller asteroids and then sort the remaining ones to process them greedily.",
-    "explanationSource": "AI",
     "status": "DONE",
     "cpuUsage": 100,
     "memoryUsage": 71.93,
-    "date": "2026-05-31T08:54:27.000Z"
+    "date": "2026-05-31T08:54:27.000Z",
+    "aiExplanation": "Use a two-pass approach to absorb smaller asteroids and then sort the remaining ones to process them greedily."
   },
   {
     "author": "Vitor",
     "code": "/**\n * @param {number} mass\n * @param {number[]} asteroids\n * @return {boolean}\n */\nvar asteroidsDestroyed = function(mass, asteroids) {\n    const pq = new PriorityQueue((a, b) => a - b);\n\n    for (const asteroid of asteroids) {\n        if (mass >= asteroid) {\n            mass += asteroid;\n        } else {\n            pq.push(asteroid);\n        }\n    }\n\n    while (pq.size() > 0) {\n        const cur = pq.pop();\n\n        if (mass < cur) {\n            return false;\n        }\n\n        mass += cur;\n    }\n\n    return true;\n};\n",
     "language": "javascript",
-    "explanation": "Use a min-priority queue to store asteroids that are currently too large. Process smaller asteroids immediately and then greedily pick the smallest from the queue.",
-    "explanationSource": "AI",
     "status": "DONE",
     "cpuUsage": 19.3,
     "memoryUsage": 5.26,
-    "date": "2026-05-31T08:47:09.000Z"
+    "date": "2026-05-31T08:47:09.000Z",
+    "aiExplanation": "Use a min-priority queue to store asteroids that are currently too large. Process smaller asteroids immediately and then greedily pick the smallest from the queue."
   },
   {
     "author": "Vitor",
     "code": "/**\n * @param {number} mass\n * @param {number[]} asteroids\n * @return {boolean}\n */\nvar asteroidsDestroyed = function(mass, asteroids) {\n    const pq = new PriorityQueue((a, b) => a - b);\n\n    for (const asteroid of asteroids) {\n        pq.push(asteroid);\n    }\n\n    while (pq.size() > 0) {\n        const cur = pq.pop();\n\n        if (mass < cur) {\n            return false;\n        }\n\n        mass += cur;\n    }\n\n    return true;\n};\n",
     "language": "javascript",
-    "explanation": "Store all asteroids in a min-priority queue and process them in increasing order of mass to maximize growth.",
-    "explanationSource": "AI",
     "status": "DONE",
     "cpuUsage": 5.26,
     "memoryUsage": 5.26,
-    "date": "2026-05-31T08:46:20.000Z"
+    "date": "2026-05-31T08:46:20.000Z",
+    "aiExplanation": "Store all asteroids in a min-priority queue and process them in increasing order of mass to maximize growth."
   },
   {
     "author": "Vitor",
     "code": "/**\n * @param {number} mass\n * @param {number[]} asteroids\n * @return {boolean}\n */\nvar asteroidsDestroyed = function(mass, asteroids) {\n    const stack = [];\n\n    for (let i = 0; i < asteroids.length; i++) {\n        while (stack.length > 0 && mass >= stack[stack.length - 1]) {\n            mass += stack.pop();\n        }\n\n        if (mass >= asteroids[i]) {\n            mass += asteroids[i];\n        } else if (stack.length === 0 || asteroids[i] < stack[stack.length - 1]) {\n            stack.push(asteroids[i]);\n        } else {\n            let left = 0;\n            let right = stack.length - 1;\n\n            while (left < right) {\n                const mid = Math.floor((left + right) / 2);\n\n                if (asteroids[i] < stack[mid]) {\n                    left = mid + 1;\n                } else {\n                    right = mid;\n                }\n            }\n\n            stack.splice(left, 0, asteroids[i]);\n        }\n    }\n\n    while (stack.length > 0 && mass >= stack[stack.length - 1]) {\n        mass += stack.pop();\n    }\n\n    return stack.length === 0;\n};\n",
     "language": "javascript",
-    "explanation": "Maintain a sorted stack of large asteroids and use binary search to keep it ordered. Absorb asteroids from the stack as the mass increases.",
-    "explanationSource": "AI",
     "status": "DONE",
     "cpuUsage": 5.26,
     "memoryUsage": 73.68,
-    "date": "2026-05-31T08:42:28.000Z"
+    "date": "2026-05-31T08:42:28.000Z",
+    "aiExplanation": "Maintain a sorted stack of large asteroids and use binary search to keep it ordered. Absorb asteroids from the stack as the mass increases."
   },
   {
     "author": "Vitor",
     "code": "/**\n * @param {number} mass\n * @param {number[]} asteroids\n * @return {boolean}\n */\nvar asteroidsDestroyed = function(mass, asteroids) {\n    const stack = [];\n\n    for (let i = 0; i < asteroids.length; i++) {\n        while (stack.length > 0 && mass >= stack[stack.length - 1]) {\n            mass += stack.pop();\n        }\n\n        if (mass >= asteroids[i]) {\n            mass += asteroids[i];\n        } else if (stack.length === 0 || asteroids[i] < stack[stack.length - 1]) {\n            stack.push(asteroids[i]);\n        } else {\n            for (let j = 0; j < stack.length; j++) {\n                if (asteroids[i] > stack[j]) {\n                    stack.splice(j, 0, asteroids[i]);\n                    break;\n                }\n            }\n        }\n    }\n\n    while (stack.length > 0 && mass >= stack[stack.length - 1]) {\n        mass += stack.pop();\n    }\n\n    return stack.length === 0;\n};\n",
     "language": "javascript",
-    "explanation": "Maintain a sorted stack of large asteroids using linear insertion. Absorb asteroids from the stack whenever the current mass allows it.",
-    "explanationSource": "AI",
     "status": "DONE",
     "cpuUsage": 5.26,
     "memoryUsage": 73.68,
-    "date": "2026-05-31T08:39:34.000Z"
+    "date": "2026-05-31T08:39:34.000Z",
+    "aiExplanation": "Maintain a sorted stack of large asteroids using linear insertion. Absorb asteroids from the stack whenever the current mass allows it."
   },
   {
     "author": "Vitor",
     "code": "/**\n * @param {number} mass\n * @param {number[]} asteroids\n * @return {boolean}\n */\nvar asteroidsDestroyed = function(mass, asteroids) {\n    const stack = [];\n\n    for (let i = 0; i < asteroids.length; i++) {\n        while (stack.length > 0 && mass > stack[stack.length - 1]) {\n            mass += stack.pop();\n        }\n\n        if (mass > asteroids[i]) {\n            mass += asteroids[i];\n        } else {\n            stack.push(asteroids[i]);\n        }\n    }\n\n    stack.sort((a, b) => a - b);\n\n    for (const ast of stack) {\n        if (mass < ast) {\n            return false;\n        }\n        mass += ast;\n    }\n\n    return true;\n};\n",
     "language": "javascript",
-    "explanation": "Iterate through asteroids, absorbing those smaller than current mass using a monotonic stack. Sort the remaining unprocessed asteroids and process them greedily.",
-    "explanationSource": "AI",
     "status": "DONE",
     "cpuUsage": 98.25,
     "memoryUsage": 7.02,
-    "date": "2026-05-31T08:29:09.000Z"
+    "date": "2026-05-31T08:29:09.000Z",
+    "aiExplanation": "Iterate through asteroids, absorbing those smaller than current mass using a monotonic stack. Sort the remaining unprocessed asteroids and process them greedily."
   },
   {
     "author": "Vitor",
     "code": "/**\n * @param {number} mass\n * @param {number[]} asteroids\n * @return {boolean}\n */\nvar asteroidsDestroyed = function(mass, asteroids) {\n    asteroids.sort((a, b) => a - b);\n\n    for (const asteroid of asteroids) {\n        if (asteroid > mass) {\n            return false;\n        }\n        mass += asteroid;\n    }\n\n    return true;\n};\n",
     "language": "javascript",
-    "explanation": "Sort all asteroids in ascending order and process them greedily to ensure the mass grows as much as possible before encountering larger asteroids.",
-    "explanationSource": "AI",
     "status": "DONE",
     "cpuUsage": 56.14,
     "memoryUsage": 71.93,
-    "date": "2026-05-31T08:22:20.000Z"
+    "date": "2026-05-31T08:22:20.000Z",
+    "aiExplanation": "Sort all asteroids in ascending order and process them greedily to ensure the mass grows as much as possible before encountering larger asteroids."
   }
 ]

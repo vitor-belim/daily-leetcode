@@ -13,8 +13,8 @@ export interface Solution {
   author: string;
   code: string;
   language: string;
-  explanation: string;
-  explanationSource?: "AI" | "manual";
+  aiExplanation?: string;
+  notes?: string;
   status?: "DONE" | "TLE" | "MLE" | "FAILED";
   cpuUsage?: number; // 0-100
   memoryUsage?: number; // 0-100

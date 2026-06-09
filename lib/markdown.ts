@@ -25,5 +25,5 @@ export function markdownToHtml(markdown: string): string {
   html = html.replace(/\n\n/g, "</p><p>");
   html = html.replace(/\n/g, "<br />");
 
-  return `<p>${html}</p>`;
+  return html;
 }

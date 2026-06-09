@@ -3,22 +3,21 @@
     "author": "Vitor",
     "code": "/**\n * @param {number[]} nums\n * @param {number} k\n * @return {number}\n */\nvar maxTotalValue = function(nums, k) {\n    const n = nums.length;\n    let min = nums[0];\n    let max = nums[0];\n\n    for (let i = 1; i < n; i++) {\n        if (nums[i] < min) {\n            min = nums[i];\n        } else if (nums[i] > max) {\n            max = nums[i];\n        }\n    }\n\n    return (max - min) * k;\n};\n",
     "language": "javascript",
-    "explanation": "This JavaScript function, `maxTotalValue`, finds the overall range of a list of numbers and multiplies it by a given number `k`. It works by first scanning through the input array `nums` to find both the smallest (minimum) and largest (maximum) values. To do this, it starts by assuming the first number in the list is both the minimum and maximum, and then loops through the rest of the numbers, updating these values whenever it encounters a smaller or larger number. Finally, the function subtracts the minimum value from the maximum value to get their difference, multiplies that difference by `k`, and returns the final result.",
-    "explanationSource": "AI",
     "status": "DONE",
     "cpuUsage": 100,
     "memoryUsage": 83.33,
-    "date": "2026-06-09T09:02:21.000Z"
+    "date": "2026-06-09T09:02:21.000Z",
+    "aiExplanation": "This JavaScript function, `maxTotalValue`, finds the overall range of a list of numbers and multiplies it by a given number `k`. It works by first scanning through the input array `nums` to find both the smallest (minimum) and largest (maximum) values. To do this, it starts by assuming the first number in the list is both the minimum and maximum, and then loops through the rest of the numbers, updating these values whenever it encounters a smaller or larger number. Finally, the function subtracts the minimum value from the maximum value to get their difference, multiplies that difference by `k`, and returns the final result."
   },
   {
     "author": "Vitor",
     "code": "/**\n * @param {number[]} nums\n * @param {number} k\n * @return {number}\n */\nvar maxTotalValue = function(nums, k) {\n    const n = nums.length;\n    const diff = [];\n\n    for (let i = 0; i < n - 1; i++) {\n        let min = nums[i];\n        let max = nums[i];\n\n        for (let j = i + 1; j < n; j++) {\n            if (nums[j] < min) min = nums[j];\n            else if (nums[j] > max) max = nums[j];\n\n            diff.push(max - min);\n        }\n    }\n\n    diff.sort((a, b) => b - a);\n\n    return diff.slice(0, k).reduce((acc, el) => acc + el, 0);\n};\n",
     "language": "javascript",
-    "explanation": "Solved the problem without noticing the line `the exact same subarray (...) can be chosen more than once`.\n\n**AI explanation**: This function calculates the sum of the `k` largest \"ranges\" (the difference between the maximum and minimum values) across all possible subarrays of the input list `nums`. It works by using nested loops to examine every possible sub-segment of the array, tracking the highest and lowest numbers within each segment, and saving the difference (maximum minus minimum) into a list. Finally, it sorts these collected differences in descending order, selects the top `k` largest values, and adds them together to return the final total.",
-    "explanationSource": "normal",
     "status": "FAILED",
     "cpuUsage": 0,
     "memoryUsage": 0,
-    "date": "2026-06-09T08:55:53.000Z"
+    "date": "2026-06-09T08:55:53.000Z",
+    "aiExplanation": "This function calculates the sum of the `k` largest \"ranges\" (the difference between the maximum and minimum values) across all possible subarrays of the input list `nums`. It works by using nested loops to examine every possible sub-segment of the array, tracking the highest and lowest numbers within each segment, and saving the difference (maximum minus minimum) into a list. Finally, it sorts these collected differences in descending order, selects the top `k` largest values, and adds them together to return the final total.",
+    "notes": "Solved the problem without noticing the line `the exact same subarray (...) can be chosen more than once`."
   }
 ]

@@ -3,33 +3,30 @@
     "author": "Vitor",
     "code": "/**\n * @param {number[]} nums\n * @return {number[]}\n */\nvar leftRightDifference = function(nums) {\n    let right = 0;\n\n    for (const num of nums) {\n        right += num;\n    }\n\n    const n = nums.length;\n    const res = Array(n);\n    let left = 0;\n\n    for (let i = 0; i < n; i++) {\n        right -= nums[i];\n        res[i] = Math.abs(left - right);\n        left += nums[i];\n    }\n\n    return res;\n};\n",
     "language": "javascript",
-    "explanation": "This code takes an array of numbers and creates a new array where each position contains the absolute difference between the sum of all numbers to its left and the sum of all numbers to its right. It begins by calculating the total sum of all the numbers in the array and storing it in a variable called `right`, while keeping a `left` sum tracker starting at zero. Then, it loops through the array one number at a time: it subtracts the current number from the `right` sum (so `right` only represents the numbers after it), calculates the absolute difference between the `left` and `right` sums for the final output, and then adds the current number to the `left` sum so it is ready for the next step.",
-    "explanationSource": "AI",
     "status": "DONE",
     "cpuUsage": 92.48,
     "memoryUsage": 62.83,
-    "date": "2026-06-06T08:13:56.000Z"
+    "date": "2026-06-06T08:13:56.000Z",
+    "aiExplanation": "This code takes an array of numbers and creates a new array where each position contains the absolute difference between the sum of all numbers to its left and the sum of all numbers to its right. It begins by calculating the total sum of all the numbers in the array and storing it in a variable called `right`, while keeping a `left` sum tracker starting at zero. Then, it loops through the array one number at a time: it subtracts the current number from the `right` sum (so `right` only represents the numbers after it), calculates the absolute difference between the `left` and `right` sums for the final output, and then adds the current number to the `left` sum so it is ready for the next step."
   },
   {
     "author": "Vitor",
     "code": "/**\n * @param {number[]} nums\n * @return {number[]}\n */\nvar leftRightDifference = function(nums) {\n    let right = 0;\n\n    for (const num of nums) {\n        right += num;\n    }\n\n    const res = Array(n);\n    let left = 0;\n\n    for (let i = 0; i < n; i++) {\n        right -= nums[i];\n        res[i] = Math.abs(left - right);\n        left += nums[i];\n    }\n\n    return res;\n};\n",
     "language": "javascript",
-    "explanation": "Refactored into different solution, but forgot to declare the variable `n` before submitting.",
-    "explanationSource": "manual",
     "status": "FAILED",
     "cpuUsage": 0,
     "memoryUsage": 0,
-    "date": "2026-06-06T08:13:29.000Z"
+    "date": "2026-06-06T08:13:29.000Z",
+    "notes": "Refactored into different solution, but forgot to declare the variable `n` before submitting."
   },
   {
     "author": "Vitor",
     "code": "/**\n * @param {number[]} nums\n * @return {number[]}\n */\nvar leftRightDifference = function(nums) {\n    const n = nums.length;\n    const left = Array(n);\n    const right = Array(n);\n    let ltotal = 0;\n    let rtotal = 0;\n\n    for (let i = 0; i < n; i++) {\n        left[i] = ltotal;\n        ltotal += nums[i];\n\n        const j = n - 1 - i;\n        right[j] = rtotal;\n        rtotal += nums[j];\n    }\n\n    const res = Array(n);\n\n    for (let i = 0; i < n; i++) {\n        res[i] = Math.abs(left[i] - right[i]);\n    }\n\n    return res;\n};\n",
     "language": "javascript",
-    "explanation": "This code takes an array of numbers and calculates the absolute difference between the sum of all elements to the left of each position and the sum of all elements to its right. To do this, it first uses a single loop to build two helper lists simultaneously: one that calculates the running total of numbers from left to right, and another that calculates the running total from right to left. Finally, it runs a second loop to subtract these two running totals at each index, converts any negative differences into positive numbers using `Math.abs`, and returns a new array containing these final difference values.",
-    "explanationSource": "AI",
     "status": "DONE",
     "cpuUsage": 92.48,
     "memoryUsage": 50.44,
-    "date": "2026-06-06T08:08:38.000Z"
+    "date": "2026-06-06T08:08:38.000Z",
+    "aiExplanation": "This code takes an array of numbers and calculates the absolute difference between the sum of all elements to the left of each position and the sum of all elements to its right. To do this, it first uses a single loop to build two helper lists simultaneously: one that calculates the running total of numbers from left to right, and another that calculates the running total from right to left. Finally, it runs a second loop to subtract these two running totals at each index, converts any negative differences into positive numbers using `Math.abs`, and returns a new array containing these final difference values."
   }
 ]

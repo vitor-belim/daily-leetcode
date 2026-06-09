@@ -3,22 +3,20 @@
     "author": "Vitor (optimized)",
     "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar minElement = function(nums) {\n    let min = Infinity;\n\n    for (let num of nums) {\n        let sum = 0;\n\n        while (num > 0 && sum < min) {\n            sum += num % 10;\n            num = Math.trunc(num / 10);\n        }\n\n        if (sum < min) {\n            min = sum;\n        }\n    }\n\n    return min;\n};",
     "language": "javascript",
-    "explanation": "Iterate through the numbers and calculate the sum of their digits. Keep track of the minimum sum found. Return the minimum sum.",
-    "explanationSource": "AI",
     "status": "DONE",
     "cpuUsage": 100,
     "memoryUsage": 83.91,
-    "date": "2026-05-29T00:00:00.000Z"
+    "date": "2026-05-29T00:00:00.000Z",
+    "aiExplanation": "Iterate through the numbers and calculate the sum of their digits. Keep track of the minimum sum found. Return the minimum sum."
   },
   {
     "author": "Vitor (simple)",
     "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar minElement = function(nums) {\n    let min = Infinity;\n\n    for (let num of nums) {\n        let sum = 0;\n\n        while (num > 0) {\n            sum += num % 10;\n            num = Math.floor(num / 10);\n        }\n\n        min = Math.min(min, sum);\n    }\n\n    return min;\n};",
     "language": "javascript",
-    "explanation": "Iterate through the numbers and calculate the sum of their digits. Keep track of the minimum sum found. Return the minimum sum.",
-    "explanationSource": "AI",
     "status": "DONE",
     "cpuUsage": 55.17,
     "memoryUsage": 39.08,
-    "date": "2026-05-29T00:00:00.000Z"
+    "date": "2026-05-29T00:00:00.000Z",
+    "aiExplanation": "Iterate through the numbers and calculate the sum of their digits. Keep track of the minimum sum found. Return the minimum sum."
   }
 ]

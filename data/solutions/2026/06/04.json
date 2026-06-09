@@ -3,11 +3,10 @@
     "author": "Vitor",
     "code": "/**\n * @param {number} num1\n * @param {number} num2\n * @return {number}\n */\nvar totalWaviness = function(num1, num2) {\n    let res = 0;\n\n    for (let i = num1; i <= num2; i++) {\n        res += calcWaviness(i);\n    }\n\n    return res;\n};\n\nconst calcWaviness = (num) => {\n    if (num < 100) {\n        return 0;\n    }\n\n    let res = 0;\n    let last2 = undefined;\n    let last1 = undefined;\n\n    while (num > 0) {\n        const rem = num % 10;\n\n        if (last1 !== undefined &&\n            last2 !== undefined && (\n                (rem > last1 && last1 < last2) ||\n                (rem < last1 && last1 > last2)\n            )\n        ) {\n            res++;\n        }\n\n        last2 = last1;\n        last1 = rem;\n        num = Math.floor(num / 10);\n    }\n\n    return res;\n};\n",
     "language": "javascript",
-    "explanation": "This code calculates a total \"waviness\" score for all whole numbers within a given range from `num1` to `num2` by counting how many times their digits form a \"zigzag\" or wave-like pattern. To achieve this, the main function loops through every number in the range and calls a helper function that analyzes each number's digits from right to left; this helper looks at every group of three consecutive digits and awards a point if the middle digit is either a \"peak\" (strictly larger than both of its neighbors, like 1-**5**-2) or a \"valley\" (strictly smaller than both of its neighbors, like 8-**3**-6). Finally, the code sums up these individual wave counts across the entire range of numbers and returns the grand total.",
-    "explanationSource": "AI",
     "status": "DONE",
     "cpuUsage": 91.3,
     "memoryUsage": 86.96,
-    "date": "2026-06-04T09:11:47.000Z"
+    "date": "2026-06-04T09:11:47.000Z",
+    "aiExplanation": "This code calculates a total \"waviness\" score for all whole numbers within a given range from `num1` to `num2` by counting how many times their digits form a \"zigzag\" or wave-like pattern. To achieve this, the main function loops through every number in the range and calls a helper function that analyzes each number's digits from right to left; this helper looks at every group of three consecutive digits and awards a point if the middle digit is either a \"peak\" (strictly larger than both of its neighbors, like 1-**5**-2) or a \"valley\" (strictly smaller than both of its neighbors, like 8-**3**-6). Finally, the code sums up these individual wave counts across the entire range of numbers and returns the grand total."
   }
 ]

@@ -7,7 +7,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getProblem, getSolutions, timeAgo } from "@/lib/data";
 import { markdownToHtml } from "@/lib/markdown";
 import { cn, formatDate } from "@/lib/utils";
-import { ChevronLeft, Cpu, ExternalLink, HardDrive } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronLeft,
+  Cpu,
+  ExternalLink,
+  HardDrive,
+} from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -168,21 +174,36 @@ export default async function ProblemPage({
                   >
                     <ScrollArea className="h-full">
                       <div className="p-6 space-y-6">
-                        {s.explanation && (
+                        {s.notes && (
                           <div className="space-y-2">
-                            <h3 className="text-sm font-semibold">
-                              Explanation
-                              {s.explanationSource === "AI" &&
-                                " (AI-generated)"}
-                            </h3>
-                            <Card className="p-4 bg-muted/20 border-none">
+                            <h3 className="text-sm font-semibold">Notes</h3>
+                            <Card className="p-4 bg-muted/20 border-none text-sm text-muted-foreground leading-relaxed prose dark:prose-invert max-w-none prose-sm">
                               <div
-                                className="text-sm text-muted-foreground leading-relaxed prose dark:prose-invert max-w-none prose-sm"
                                 dangerouslySetInnerHTML={{
-                                  __html: markdownToHtml(s.explanation),
+                                  __html: markdownToHtml(s.notes),
                                 }}
                               />
                             </Card>
+                          </div>
+                        )}
+
+                        {s.aiExplanation && (
+                          <div className="space-y-2">
+                            <details className="group">
+                              <summary className="flex items-center justify-between cursor-pointer list-none">
+                                <h3 className="text-sm font-semibold">
+                                  AI Explanation
+                                </h3>
+                                <ChevronDown className="w-4 h-4 text-muted-foreground transition-transform group-open:rotate-180" />
+                              </summary>
+                              <Card className="p-4 bg-muted/20 border-none mt-2 text-sm text-muted-foreground leading-relaxed prose dark:prose-invert max-w-none prose-sm">
+                                <div
+                                  dangerouslySetInnerHTML={{
+                                    __html: markdownToHtml(s.aiExplanation),
+                                  }}
+                                />
+                              </Card>
+                            </details>
                           </div>
                         )}
 

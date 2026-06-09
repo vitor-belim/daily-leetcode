@@ -282,10 +282,9 @@ async function main() {
               author: process.env.LEETCODE_USERNAME || "Vitor",
               code: code,
               language: details.lang.name,
-              explanation:
-                existing?.explanation ||
+              aiExplanation:
+                existing?.aiExplanation ||
                 (await generateExplanation(sub.id, code)),
-              explanationSource: "AI",
               status: status,
               cpuUsage: existing
                 ? Math.max(existing.cpuUsage, cpuUsage)
@@ -316,7 +315,7 @@ async function main() {
                 author: process.env.LEETCODE_USERNAME || "Vitor",
                 code: "",
                 language: "javascript",
-                explanation: "",
+                aiExplanation: "",
                 status: "DONE",
                 cpuUsage: 0,
                 memoryUsage: 0,
