@@ -131,8 +131,8 @@ export default async function ProblemPage({
               defaultValue={`${solutionsWithLabels[0].author}-0`}
               className="flex-1 flex flex-col overflow-hidden"
             >
-              <div className="px-4 py-2 border-b bg-muted/10 shrink-0 overflow-x-auto overflow-y-hidden">
-                <TabsList className="h-9 justify-start bg-transparent p-0 gap-2">
+              <div className="px-4 py-2 border-b bg-muted/10 shrink-0 overflow-x-auto">
+                <TabsList className="group-data-horizontal/tabs:h-auto justify-start bg-transparent p-0 gap-2">
                   {solutionsWithLabels.map((s, index) => (
                     <TabsTrigger
                       key={`${s.author}-${index}`}
