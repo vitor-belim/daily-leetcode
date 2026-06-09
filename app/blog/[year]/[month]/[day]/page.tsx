@@ -1,19 +1,18 @@
 import { CodeBlock } from "@/components/code/code-block";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getProblem, getSolutions, timeAgo } from "@/lib/data";
 import { markdownToHtml } from "@/lib/markdown";
 import { cn, formatDate } from "@/lib/utils";
-import {
-  ChevronDown,
-  ChevronLeft,
-  Cpu,
-  ExternalLink,
-  HardDrive,
-} from "lucide-react";
+import { ChevronLeft, Cpu, ExternalLink, HardDrive } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -174,37 +173,59 @@ export default async function ProblemPage({
                   >
                     <ScrollArea className="h-full">
                       <div className="p-6 space-y-6">
-                        {s.notes && (
-                          <div className="space-y-2">
-                            <h3 className="text-sm font-semibold">Notes</h3>
-                            <Card className="p-4 bg-muted/20 border-none text-sm text-muted-foreground leading-relaxed prose dark:prose-invert max-w-none prose-sm">
-                              <div
-                                dangerouslySetInnerHTML={{
-                                  __html: markdownToHtml(s.notes),
-                                }}
-                              />
-                            </Card>
-                          </div>
-                        )}
+                        {(s.notes || s.aiExplanation) && (
+                          <Accordion
+                            className="border rounded-lg px-4"
+                            defaultValue={
+                              s.notes
+                                ? ["notes"]
+                                : s.aiExplanation
+                                  ? ["ai-explanation"]
+                                  : []
+                            }
+                          >
+                            {s.notes && (
+                              <AccordionItem
+                                value="notes"
+                                className="border-b-0"
+                              >
+                                <AccordionTrigger className="hover:no-underline py-4">
+                                  <span className="text-sm font-semibold">
+                                    Notes
+                                  </span>
+                                </AccordionTrigger>
+                                <AccordionContent className="pb-4">
+                                  <div
+                                    className="text-sm text-muted-foreground leading-relaxed prose dark:prose-invert max-w-none prose-sm"
+                                    dangerouslySetInnerHTML={{
+                                      __html: markdownToHtml(s.notes),
+                                    }}
+                                  />
+                                </AccordionContent>
+                              </AccordionItem>
+                            )}
 
-                        {s.aiExplanation && (
-                          <div className="space-y-2">
-                            <details className="group">
-                              <summary className="flex items-center justify-between cursor-pointer list-none">
-                                <h3 className="text-sm font-semibold">
-                                  AI Explanation
-                                </h3>
-                                <ChevronDown className="w-4 h-4 text-muted-foreground transition-transform group-open:rotate-180" />
-                              </summary>
-                              <Card className="p-4 bg-muted/20 border-none mt-2 text-sm text-muted-foreground leading-relaxed prose dark:prose-invert max-w-none prose-sm">
-                                <div
-                                  dangerouslySetInnerHTML={{
-                                    __html: markdownToHtml(s.aiExplanation),
-                                  }}
-                                />
-                              </Card>
-                            </details>
-                          </div>
+                            {s.aiExplanation && (
+                              <AccordionItem
+                                value="ai-explanation"
+                                className="border-b-0"
+                              >
+                                <AccordionTrigger className="hover:no-underline py-4">
+                                  <span className="text-sm font-semibold">
+                                    AI Explanation
+                                  </span>
+                                </AccordionTrigger>
+                                <AccordionContent className="pb-4">
+                                  <div
+                                    className="text-sm text-muted-foreground leading-relaxed prose dark:prose-invert max-w-none prose-sm"
+                                    dangerouslySetInnerHTML={{
+                                      __html: markdownToHtml(s.aiExplanation),
+                                    }}
+                                  />
+                                </AccordionContent>
+                              </AccordionItem>
+                            )}
+                          </Accordion>
                         )}
 
                         <div className="space-y-2">
