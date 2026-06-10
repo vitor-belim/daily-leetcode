@@ -1,0 +1,23 @@
+[
+  {
+    "author": "Leetcode",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} k\n * @return {number}\n */\nconst maxTotalValue = (nums, k) => {\n    const n = nums.length;\n    const LUT = sparseTable(nums);\n    const pq = new PriorityQueue(([a], [b]) => b - a);\n    let res = 0;\n\n    for (let i = 0; i < n; i++) {\n        pq.enqueue([LUT.query(i, n), i, n]);\n    }\n\n    while (pq.front()[0] > 0 && k > 0) {\n        const [v, l, r] = pq.dequeue();\n        res += v;\n        pq.enqueue([LUT.query(l, r - 1), l, r - 1]);\n        k--;\n    }\n\n    return res;\n};\n\nconst sparseTable = nums => {\n    const n = nums.length;\n    const bitW = 32 - Math.clz32(n);\n    const min = Array.from({ length: bitW }, () => Array(n));\n    const max = Array.from({ length: bitW }, () => Array(n));\n\n    for (let i = 0; i < n; i++) {\n        min[0][i] = max[0][i] = nums[i];\n    }\n\n    for (let i = 1; i < bitW; i++) {\n        for (let j = 0; j + (1 << i) <= n; j++) {\n            min[i][j] = Math.min(min[i - 1][j], min[i - 1][j + (1 << (i - 1))]);\n            max[i][j] = Math.max(max[i - 1][j], max[i - 1][j + (1 << (i - 1))]);\n        }\n    }\n\n    return {\n        query: (left, right) => {\n            const k = 31 - Math.clz32(right - left);\n            return Math.max(max[k][left], max[k][right - (1 << k)]) -\n                Math.min(min[k][left], min[k][right - (1 << k)]);\n        }\n    };\n};\n",
+    "language": "javascript",
+    "aiExplanation": "This code efficiently finds the sum of the top `k` largest “value ranges” from subarrays, where a subarray’s value is its maximum number minus its minimum number. First, it builds a **sparse table**, which is a lookup structure that can quickly answer: “what is the max minus min in `nums[left...right)`?” Then, for every starting index `i`, it puts the value of the subarray from `i` to the end of the array into a max-priority queue, along with its left and right boundaries. The queue always gives the currently largest subarray value. Each time the code takes the largest value, it adds it to `res`, then shrinks that same subarray from the right by one position and puts the smaller version back into the queue, because that may still be one of the next best values. It repeats this until it has taken `k` values or there are no positive values left. In short, the sparse table makes range calculations fast, and the priority queue helps repeatedly pick the next biggest subarray max-min difference without generating and sorting every possible subarray value upfront.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 46.67,
+    "date": "2026-06-10T08:42:15.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} k\n * @return {number}\n */\nvar maxTotalValue = function(nums, k) {\n    const n = nums.length;\n    const diffs = [];\n\n    for (let i = 0; i < n; i++) {\n        let min = nums[i];\n        let max = nums[i];\n\n        for (let j = i + 1; j < n; j++) {\n            if (nums[j] < min) min = nums[j];\n            if (nums[j] > max) max = nums[j];\n\n            diffs.push(max - min);\n        }\n    }\n\n    diffs.sort((a, b) => b - a);\n\n    return diffs.slice(0, k).reduce((acc, el) => acc + el, 0);\n};\n",
+    "language": "javascript",
+    "notes": "I know this isn't an ideal solution, but it is technically correct. TLE at 305 out of 930 test cases.",
+    "aiExplanation": "This function finds the total of the **k largest differences** between the maximum and minimum values of all possible subarrays with length at least 2. It first loops through every possible starting index `i` in `nums`, then extends the subarray one element at a time using `j`, while keeping track of the smallest value `min` and largest value `max` seen so far in that subarray. For each subarray, it calculates `max - min` and stores that difference in the `diffs` array. After checking all subarrays, it sorts the differences from largest to smallest, takes the first `k` biggest ones, and adds them together using `reduce`. So, in simple terms, it looks at every possible group of consecutive numbers, measures how spread out each group is, and returns the sum of the top `k` biggest spreads.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-06-10T08:18:46.000Z"
+  }
+]
