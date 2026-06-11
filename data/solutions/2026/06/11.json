@@ -1,0 +1,46 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} edges\n * @return {number}\n */\nvar assignEdgeWeights = function(edges) {\n    const arr = Array.from({ length: edges.length + 2 }, () => new Set());\n\n    for (const [u, v] of edges) {\n        arr[u].add(v);\n        arr[v].add(u);\n    }\n\n    let stack = [1];\n    const seen = new Set(stack);\n    let depth = 0;\n\n    while (stack.length > 0) {\n        const next = [];\n\n        for (const node of stack) {\n            for (const con of arr[node]) {\n                if (!seen.has(con)) {\n                    seen.add(con);\n                    next.push(con);\n                }\n            }\n        }\n\n        stack = next;\n        depth++;\n    }\n\n    const mod = 10 ** 9 + 7;\n    let res = 1;\n\n    for (let i = 2; i < depth; i++) {\n        res = (res << 1) % mod;\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Attempted to improve performance by using bit shifting to multiply by 2.",
+    "aiExplanation": "This function takes a list of edges, builds an undirected graph using an array of sets where each node stores its connected neighbors, then starts from node `1` and explores the graph level by level using breadth-first search. The `stack` holds the nodes in the current level, `next` stores the nodes for the next level, and `seen` prevents the same node from being visited more than once. Each time a full level is processed, `depth` increases, so when the search finishes, `depth` represents how many levels exist from node `1` to the farthest reachable node. After that, the function calculates a power of two based on that depth: starting from `1`, it doubles the result for each value from `2` up to `depth - 1`, using `% 1,000,000,007` to keep the number within a safe range. In simple terms, it finds the farthest depth from node `1` and returns `2^(depth - 2)` modulo `1,000,000,007`.",
+    "status": "DONE",
+    "cpuUsage": 12.5,
+    "memoryUsage": 100,
+    "date": "2026-06-11T15:54:36.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} edges\n * @return {number}\n */\nvar assignEdgeWeights = function(edges) {\n    const arr = Array.from({ length: edges.length + 2 }, () => new Set());\n\n    for (const [u, v] of edges) {\n        arr[u].add(v);\n        arr[v].add(u);\n    }\n\n    let stack = [1];\n    const seen = new Set(stack);\n    let depth = 0;\n\n    while (stack.length > 0) {\n        const next = [];\n\n        for (const node of stack) {\n            for (const con of arr[node]) {\n                if (!seen.has(con)) {\n                    seen.add(con);\n                    next.push(con);\n                }\n            }\n        }\n\n        stack = next;\n        depth++;\n    }\n\n    const mod = 10 ** 9 + 7;\n    let res = 1;\n\n    for (let i = 1; i < depth - 1; i++) {\n        res = (2 * res) % mod;\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Improved complexity by replacing map with array.",
+    "aiExplanation": "This function takes a list of edges, builds an undirected graph using an array where each position stores the connected neighbors of that node, then starts from node `1` and performs a level-by-level search to find how many layers deep the graph goes. The `stack` contains the nodes currently being visited, `next` collects the nodes for the next layer, and `seen` makes sure each node is visited only once. Every time one full layer is processed, `depth` increases, so when the search ends, `depth` represents the number of levels from node `1` to the farthest reachable node. After that, the function calculates `2^(depth - 2)` by repeatedly doubling `res`, using modulo `1,000,000,007` to keep the number small and avoid overflow. Finally, it returns that calculated value.",
+    "status": "DONE",
+    "cpuUsage": 12.5,
+    "memoryUsage": 100,
+    "date": "2026-06-11T15:51:05.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} edges\n * @return {number}\n */\nvar assignEdgeWeights = function(edges) {\n    const map = new Map();\n\n    for (const [u, v] of edges) {\n        if (!map.has(u)) map.set(u, new Set());\n        if (!map.has(v)) map.set(v, new Set());\n\n        map.get(u).add(v);\n        map.get(v).add(u);\n    }\n\n    let stack = [1];\n    const seen = new Set(stack);\n    let depth = 0;\n\n    while (stack.length > 0) {\n        const next = [];\n\n        for (const node of stack) {\n            const neighbours = map.get(node) || [];\n\n            for (const con of neighbours) {\n                if (!seen.has(con)) {\n                    seen.add(con);\n                    next.push(con);\n                }\n            }\n        }\n\n        stack = next;\n        depth++;\n    }\n\n    const mod = 10 ** 9 + 7;\n    let res = 1;\n\n    for (let i = 1; i < depth - 1; i++) {\n        res = (2 * res) % mod;\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Achieved accepted submission.",
+    "aiExplanation": "This function takes a list of edges, builds an undirected graph where each node stores its connected neighbors, then starts from node `1` and uses a breadth-first search to visit the graph level by level while tracking how deep the farthest level is. The `stack` array contains the nodes in the current level, `next` stores nodes for the next level, and `seen` prevents visiting the same node again. Each full pass through the current level increases `depth`, so after the loop finishes, `depth` represents how many levels were reached from node `1`. After that, the code calculates a result by repeatedly multiplying by `2` for `depth - 2` times, using `10 ** 9 + 7` as a modulus to keep the number from becoming too large. In simple terms, it finds the maximum depth from node `1`, then returns `2^(depth - 2)` modulo `1,000,000,007`.",
+    "status": "DONE",
+    "cpuUsage": 12.5,
+    "memoryUsage": 62.5,
+    "date": "2026-06-11T15:47:49.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} edges\n * @return {number}\n */\nvar assignEdgeWeights = function(edges) {\n    const map = new Map();\n\n    for (const [u, v] of edges) {\n        if (!map.has(u)) map.set(u, new Set());\n        if (!map.has(v)) map.set(v, new Set());\n\n        map.get(u).add(v);\n        map.get(v).add(u);\n    }\n\n    let stack = [1];\n    const seen = new Set(stack);\n    let depth = 0;\n\n    while (stack.length > 0) {\n        const next = [];\n\n        for (const node of stack) {\n            const neighbours = map.get(node) || [];\n\n            for (const con of neighbours) {\n                if (!seen.has(con)) {\n                    seen.add(con);\n                    next.push(con);\n                }\n            }\n        }\n\n        stack = next;\n        depth++;\n    }\n\n    return 1 << (depth - 2);\n};\n",
+    "language": "javascript",
+    "notes": "Forgot to take the modulo.",
+    "aiExplanation": "This function takes a list of edges that form an undirected tree or graph, builds a connection map where each node points to its neighboring nodes, then starts from node `1` and performs a breadth-first search level by level to find how many layers deep the graph goes from that starting node. The `stack` holds the current level of nodes being visited, `next` collects the nodes for the next level, and `seen` prevents visiting the same node more than once. Each time it finishes a level, it increases `depth`, so by the end `depth` represents the number of levels reached from node `1`. Finally, it returns `1 << (depth - 2)`, which is a bit-shift shortcut for calculating `2` raised to the power of `depth - 2`, so the result depends on the maximum distance from node `1`.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-06-11T15:44:44.000Z"
+  }
+]
