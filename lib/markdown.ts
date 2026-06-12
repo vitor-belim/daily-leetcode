@@ -20,6 +20,21 @@ export function markdownToHtml(markdown: string): string {
   // Inline code
   html = html.replace(/`(.*?)`/g, "<code>$1</code>");
 
+  // Simple LaTeX-like math support
+  html = html.replace(
+    /\$2\^\{\\text\{distance\} - 1\}\$/g,
+    "2<sup>distance - 1</sup>",
+  );
+  html = html.replace(/\$2\^\{\\text\{distance\}\}\$/g, "2<sup>distance</sup>");
+  html = html.replace(/\$10\^9 \+ 7\$/g, "10<sup>9</sup> + 7");
+  html = html.replace(/\$10\^9\+7\$/g, "10<sup>9</sup> + 7");
+  html = html.replace(/\$10\^9\$/g, "10<sup>9</sup>");
+  html = html.replace(/\$2\^\{([^}]*)\}\$/g, "2<sup>$1</sup>");
+  html = html.replace(/\$2\^([^{}\s$]+)\$/g, "2<sup>$1</sup>");
+  html = html.replace(/\^\{([^}]*)\}/g, "<sup>$1</sup>");
+  html = html.replace(/\^([^{}\s$]+)/g, "<sup>$1</sup>");
+  html = html.replace(/\$(.*?)\$/g, "$1");
+
   // Line breaks
   html = html.replace(/\r\n/g, "\n");
   html = html.replace(/\n\n/g, "</p><p>");
