@@ -1,3 +1,5 @@
+"use server";
+
 import fs from "node:fs/promises";
 import path from "node:path";
 
@@ -23,7 +25,10 @@ export interface Solution {
 
 const DATA_DIR = path.join(process.cwd(), "data");
 
-export async function getLatestDailies(limit = 10): Promise<Problem[]> {
+export async function getLatestDailies(
+  limit = 10,
+  offset = 0,
+): Promise<{ problems: Problem[]; total: number; hasMore: boolean }> {
   const problemsDir = path.join(DATA_DIR, "problems");
   const problems: Problem[] = [];
 
@@ -49,9 +54,17 @@ export async function getLatestDailies(limit = 10): Promise<Problem[]> {
     console.error("Error reading problems:", error);
   }
 
-  return problems
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .slice(0, limit);
+  const sortedProblems = problems.sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+  );
+
+  const paginatedProblems = sortedProblems.slice(offset, offset + limit);
+
+  return {
+    problems: paginatedProblems,
+    total: sortedProblems.length,
+    hasMore: offset + limit < sortedProblems.length,
+  };
 }
 
 export async function getProblem(
@@ -92,29 +105,4 @@ export async function getSolutions(
   } catch {
     return [];
   }
-}
-
-export function timeAgo(date: Date | string): string {
-  const now = new Date();
-  const past = new Date(date);
-  const diffInSeconds = Math.floor((now.getTime() - past.getTime()) / 1000);
-
-  const units: { unit: Intl.RelativeTimeFormatUnit; seconds: number }[] = [
-    { unit: "year", seconds: 31536000 },
-    { unit: "month", seconds: 2592000 },
-    { unit: "day", seconds: 86400 },
-    { unit: "hour", seconds: 3600 },
-    { unit: "minute", seconds: 60 },
-    { unit: "second", seconds: 1 },
-  ];
-
-  for (const { unit, seconds } of units) {
-    if (diffInSeconds >= seconds || unit === "second") {
-      const count = Math.round(diffInSeconds / seconds);
-      const rtf = new Intl.RelativeTimeFormat("en", { numeric: "always" });
-      return rtf.format(-count, unit);
-    }
-  }
-
-  return "just now";
 }

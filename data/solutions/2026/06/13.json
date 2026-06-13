@@ -1,0 +1,23 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string[]} words\n * @param {number[]} weights\n * @return {string}\n */\nvar mapWordWeights = function(words, weights) {\n    let res = '';\n\n    for (const word of words) {\n        let sum = 0;\n\n        for (let j = 0; j < word.length; j++) {\n            sum += weights[word.charCodeAt(j) - 97];\n        }\n\n        res += String.fromCharCode(122 - (sum % 26));\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Attempt at better performance by removing unnecessary variable declarations and simplifying the code.",
+    "aiExplanation": "This JavaScript function takes an array of words and an array of numerical weights (one weight for each letter of the alphabet from 'a' to 'z') and converts them into a single, encoded string. It processes each word one by one by adding up the weights of all its individual letters to calculate a total score for that word. It then divides this total score by 26 to get the remainder, uses that remainder to count backward from the letter 'z' to select a new letter, and appends this new letter to a running result. Finally, it returns the completed string, which contains exactly one newly generated letter for each original word.",
+    "status": "DONE",
+    "cpuUsage": 95.79,
+    "memoryUsage": 91.58,
+    "date": "2026-06-13T08:58:48.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string[]} words\n * @param {number[]} weights\n * @return {string}\n */\nvar mapWordWeights = function(words, weights) {\n    let res = '';\n\n    for (const word of words) {\n        let sum = 0;\n\n        for (let j = 0; j < word.length; j++) {\n            const pos = word.charCodeAt(j) - 97;\n            sum += weights[pos];\n        }\n\n        const newCharCode = 25 - (sum % 26) + 97;\n        res += String.fromCharCode(newCharCode);\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "aiExplanation": "This JavaScript function takes an array of words and an array of letter weights to generate a new string where each word is compressed into a single lowercase letter. For every word in the input list, the code calculates a total score by adding up the custom numerical weights of each of its letters (with 'a' representing the first weight, 'b' the second, and so on). It then processes this total sum using basic math—limiting the value to the 26 letters of the alphabet, reversing its alphabetical position (so a higher sum results in a letter closer to 'a' and a lower sum closer to 'z'), converting that final number back into a character, and appending it to the final result string.",
+    "status": "DONE",
+    "cpuUsage": 45.26,
+    "memoryUsage": 64.21,
+    "date": "2026-06-13T08:55:21.000Z"
+  }
+]
