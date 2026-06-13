@@ -191,7 +191,7 @@ export default async function ProblemPage({
                               >
                                 <AccordionTrigger className="hover:no-underline py-4">
                                   <span className="text-sm font-semibold">
-                                    Notes
+                                    Developer Notes
                                   </span>
                                 </AccordionTrigger>
                                 <AccordionContent className="pb-4">

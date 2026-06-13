@@ -282,6 +282,7 @@ async function main() {
               author: process.env.LEETCODE_USERNAME || "Vitor",
               code: code,
               language: details.lang.name,
+              notes: "",
               aiExplanation:
                 existing?.aiExplanation ||
                 (await generateExplanation(sub.id, code)),
@@ -315,6 +316,7 @@ async function main() {
                 author: process.env.LEETCODE_USERNAME || "Vitor",
                 code: "",
                 language: "javascript",
+                notes: "",
                 aiExplanation: "",
                 status: "DONE",
                 cpuUsage: 0,
