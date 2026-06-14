@@ -1,0 +1,46 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for singly-linked list.\n * function ListNode(val, next) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.next = (next===undefined ? null : next)\n * }\n */\n/**\n * @param {ListNode} head\n * @return {number}\n */\nvar pairSum = function(head) {\n    let prev = null;\n    let slow = head;\n    let fast = head.next;\n\n    while (fast) {\n        const temp = slow.next;\n        slow.next = prev;\n        prev = slow;\n        slow = temp;\n        fast = fast.next ? fast.next.next : null;\n    }\n\n    let max = -Infinity;\n\n    while (prev && slow) {\n        max = Math.max(max, prev.val + slow.val);\n        prev = prev.next;\n        slow = slow.next;\n    }\n\n    return max;\n};\n",
+    "language": "javascript",
+    "notes": "The expected Linked List solution: single pass using turtle/hare strategy, reversing the first half of the list, and then adding pairs from the mid onwards.",
+    "aiExplanation": "This code finds the maximum \"twin sum\" of a linked list, which is the largest sum obtained by pairing nodes that are equally distant from the start and the end of the list (for example, pairing the first node with the last, the second with the second-to-last, and so on). It achieves this efficiently in two steps: first, it uses a fast-moving pointer to locate the middle of the list while simultaneously reversing the first half of the list along the way. Second, starting from the middle, it walks through both the reversed first half and the original second half at the same time, adding the values of each corresponding pair together to find and return the highest sum.",
+    "status": "DONE",
+    "cpuUsage": 96.53,
+    "memoryUsage": 92.36,
+    "date": "2026-06-14T08:41:06.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for singly-linked list.\n * function ListNode(val, next) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.next = (next===undefined ? null : next)\n * }\n */\n/**\n * @param {ListNode} head\n * @return {number}\n */\nvar pairSum = function(head) {\n    const arr = [];\n    \n    let node = head;\n    while (node) {\n        arr.push(node.val);\n        node = node.next;\n    }\n\n    const n = arr.length;\n    const len = n / 2;\n    let max = -Infinity;\n\n    for (let i = 0; i < len; i++) {\n        max = Math.max(max, arr[i] + arr[n - 1 - i]);\n    }\n\n    return max;\n};\n",
+    "language": "javascript",
+    "notes": "The dumb solution: one pass to collect values into array, a second half pass adding each pair.",
+    "aiExplanation": "This code finds the maximum \"twin sum\" in a linked list, where a twin pair consists of a node from the front of the list and its corresponding node from the back (for example, pairing the first node with the last node, and the second with the second-to-last). To do this, the function first loops through the entire linked list and copies all of its values into a standard array to make them easier to access. It then iterates through the first half of this array, adding each number to its matching partner from the opposite end, while continuously updating a variable to keep track of the largest sum found. Finally, it returns that maximum sum.",
+    "status": "DONE",
+    "cpuUsage": 31.94,
+    "memoryUsage": 17.36,
+    "date": "2026-06-14T08:32:02.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for singly-linked list.\n * function ListNode(val, next) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.next = (next===undefined ? null : next)\n * }\n */\n/**\n * @param {ListNode} head\n * @return {number}\n */\nvar pairSum = function(head) {\n    let slow = head;\n    let fast = head;\n    let last = null;\n\n    while (fast && fast.next) {\n        fast = fast.next.next;\n\n        const temp = slow.next;\n        slow.next = last;\n        last = slow;\n        slow = temp;\n    }\n\n    let max = -Infinity;\n\n    while (last && slow) {\n        max = Math.max(max, last.val + slow.val);\n\n        last = last.next;\n        slow = slow.next;\n    }\n\n    return max;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code finds the maximum \"twin sum\" in a linked list, where \"twins\" are pairs of nodes located at equal distances from the beginning and the end of the list (for example, pairing the first node with the last node, the second with the second-to-last, and so on). To do this efficiently without using extra memory, the code uses a fast and slow pointer to find the exact middle of the list while simultaneously reversing the pointer directions of the first half. Once the middle is reached, the code walks outward in both directions—using the reversed first half and the original second half—adding the values of each twin pair together and tracking the largest sum, which it ultimately returns.",
+    "status": "DONE",
+    "cpuUsage": 85.07,
+    "memoryUsage": 94.44,
+    "date": "2025-05-05T09:37:33.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for singly-linked list.\n * function ListNode(val, next) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.next = (next===undefined ? null : next)\n * }\n */\n/**\n * @param {ListNode} head\n * @return {number}\n */\nvar pairSum = function(head) {\n    let slow = head;\n    let fast = head.next;\n    let last = null;\n\n    while (fast && fast.next) {\n        const temp = slow.next;\n        slow.next = last;\n        last = slow;\n        slow = temp;\n\n        fast = fast.next.next;\n    }\n\n    const temp = slow.next;\n    slow.next = last;\n    last = slow;\n    slow = temp;\n\n    let max = -Infinity;\n\n    while (last && slow) {\n        max = Math.max(max, last.val + slow.val);\n\n        last = last.next;\n        slow = slow.next;\n    }\n\n    return max;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code finds the maximum \"twin sum\" in an even-length linked list, where \"twins\" are nodes at symmetrical positions from the start and end (like pairing the first node with the last, the second with the second-to-last, and so on). It accomplishes this in one pass by using a fast and slow pointer to locate the middle of the list while simultaneously reversing the first half of the list as it goes. Once the middle is reached, the list is split into two halves: the reversed first half and the original second half. Finally, the code traverses both halves together from the center outward, adding the paired values at each step to find and return the highest sum.",
+    "status": "DONE",
+    "cpuUsage": 85.07,
+    "memoryUsage": 94.44,
+    "date": "2025-05-05T09:35:04.000Z"
+  }
+]

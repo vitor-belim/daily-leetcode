@@ -139,9 +139,11 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+
   html {
     @apply font-sans;
   }
@@ -150,7 +152,35 @@
 .prose :where(code):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
   @apply p-0.5 bg-gray-200 dark:bg-gray-700 rounded-sm;
 
-  &:before, &:after {
+  &:before,
+  &:after {
     @apply content-none;
+  }
+}
+
+@media (min-width: 40rem) {
+  .sm\:prose-base {
+    :where(p):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+      margin-top: 0.5em;
+      margin-bottom: 0.5em;
+    }
+
+    :where(ol):not(:where([class~="not-prose"], [class~="not-prose"] *)),
+    :where(ul):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+      margin-top: 0.5em;
+      margin-bottom: 0.5em;
+      padding-inline-start: 1.625em;
+    }
+
+    :where(img):not(:where([class~="not-prose"], [class~="not-prose"] *)),
+    :where(picture):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+      margin-top: 1em;
+      margin-bottom: 1em;
+    }
+
+    :where(pre):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+      margin-top: 1em;
+      margin-bottom: 1em;
+    }
   }
 }
