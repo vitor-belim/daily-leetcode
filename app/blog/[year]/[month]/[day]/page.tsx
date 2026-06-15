@@ -309,8 +309,7 @@ export default async function ProblemPage({
                   No solutions yet
                 </p>
                 <p className="text-xs text-muted-foreground/60">
-                  Be the first to contribute a solution for this daily
-                  challenge!
+                  Vítor is probably working on it right now!
                 </p>
               </div>
             </div>

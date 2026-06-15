@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for singly-linked list.\n * function ListNode(val, next) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.next = (next===undefined ? null : next)\n * }\n */\n/**\n * @param {ListNode} head\n * @return {ListNode}\n */\nvar deleteMiddle = function(head) {\n    if (!head || !head.next) {\n        return null;\n    }\n\n    let prev = null;\n    let slow = head;\n    let fast = head;\n\n    while (fast && fast.next) {\n        prev = slow;\n        slow = slow.next;\n        fast = fast.next.next;\n    }\n\n    prev.next = slow.next;\n\n    return head;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This JavaScript function deletes the middle node of a singly-linked list. It first checks if the list is empty or has only one node, in which case it simply returns `null` because nothing is left after deletion. To find the middle node, it uses a \"fast and slow pointer\" strategy: a `slow` pointer moves forward one step at a time, while a `fast` pointer moves two steps at a time, and a `prev` pointer tracks the node right before `slow`. Because the fast pointer travels twice as quickly, by the time it reaches the very end of the list, the slow pointer will be positioned exactly at the middle node. The code then deletes this middle node by linking the `prev` node directly to the node *after* the `slow` node, effectively skipping and removing the middle node before returning the updated list.",
+    "status": "DONE",
+    "cpuUsage": 88.08,
+    "memoryUsage": 85.49,
+    "date": "2026-06-15T06:21:04.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for singly-linked list.\n * function ListNode(val, next) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.next = (next===undefined ? null : next)\n * }\n */\n/**\n * @param {ListNode} head\n * @return {ListNode}\n */\nvar deleteMiddle = function(head) {\n    const dummy = new ListNode(-1, head);\n\n    let slow = dummy;\n    let fast = dummy.next;\n\n    while (fast && fast.next) {\n        slow = slow.next;\n        fast = fast.next.next;\n    }\n\n    if (slow.next)\n        slow.next = slow.next.next;\n\n    return dummy.next;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This JavaScript function deletes the middle node of a linked list by using a clever \"fast and slow\" pointer technique. It starts by creating a temporary \"dummy\" node at the beginning of the list to safely handle lists of any size (even very short ones). Then, it sets up two pointers: a \"slow\" pointer that moves forward one node at a time, and a \"fast\" pointer that moves forward two nodes at a time. Because the fast pointer travels twice as quickly, by the time it reaches the very end of the list, the slow pointer will have stopped exactly one step *before* the middle node. Finally, the code deletes the middle node by changing the slow pointer's link to skip right over the middle node and connect directly to the node after it, returning the newly modified list.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 81.17,
+    "date": "2025-05-05T07:42:17.000Z"
+  }
+]
