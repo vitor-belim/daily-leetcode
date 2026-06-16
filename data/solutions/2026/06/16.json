@@ -1,0 +1,35 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {string}\n */\nvar processStr = function(s) {\n    let reversed = false;\n    let res = '';\n\n    for (const char of s) {\n        if (char === '*') {\n            if (reversed) {\n                res = res.slice(1);\n            } else {\n                res = res.slice(0, res.length - 1);\n            }\n        } else if (char === '#') {\n            res = res + res;\n        } else if (char === '%') {\n            reversed = !reversed;\n        } else {\n            if (reversed) {\n                res = char + res;\n            } else {\n                res += char;\n            }\n        }\n    }\n\n    return reversed ? res.split('').reverse().join('') : res;\n};\n",
+    "language": "javascript",
+    "notes": "Solution using a string.",
+    "aiExplanation": "This function processes an input string character-by-character to build a new string based on special command symbols. Regular letters are normally added to the end of the text, but encountering a percent sign (`%`) toggles a \"reversed\" mode that changes how the string is modified: in the normal state, new letters are added to the end and an asterisk (`*`) deletes the last letter, whereas in the reversed state, new letters are added to the front and an asterisk deletes the first letter. Additionally, encountering a hashtag (`#`) duplicates the entire accumulated text, and if the process finishes while still in the \"reversed\" state, the function reverses the final string one last time before returning it.",
+    "status": "DONE",
+    "cpuUsage": 81.48,
+    "memoryUsage": 74.07,
+    "date": "2026-06-16T06:47:38.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {string}\n */\nvar processStr = function(s) {\n    let reversed = false;\n    let res = [];\n\n    for (const char of s) {\n        if (char === '*') {\n            if (reversed) {\n                res.shift();\n            } else {\n                res.pop();\n            }\n        } else if (char === '#') {\n            res = res.concat(res);\n        } else if (char === '%') {\n            reversed = !reversed;\n        } else {\n            if (reversed) {\n                res.unshift(char);\n            } else {\n                res.push(char);\n            }\n        }\n    }\n\n    return (reversed ? res.reverse() : res).join('');\n};\n",
+    "language": "javascript",
+    "notes": "Solution using an array without actual reversing.",
+    "aiExplanation": "This JavaScript function processes an input string character by character to build a new text string, using three special symbols to modify the text as it is being created. Normal characters are simply added to the end of the text, but encountering a percent sign (`%`) toggles a \"reverse mode\" that flips this behavior, causing new characters to be added to the front instead. An asterisk (`*`) acts like a backspace, deleting the most recently added character (the last character in normal mode, or the first character in reverse mode), while a hashtag (`#`) instantly duplicates the entire accumulated text. After reading all characters, the function combines them into a single string—reversing the entire sequence at the very end if \"reverse mode\" is still active—and returns the final result.",
+    "status": "DONE",
+    "cpuUsage": 40.74,
+    "memoryUsage": 40.74,
+    "date": "2026-06-16T06:43:59.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {string}\n */\nvar processStr = function(s) {\n    let rev = false;\n    let res = [];\n\n    for (const char of s) {\n        if (char === '*') {\n            res.pop();\n        } else if (char === '#') {\n            res = res.concat(res);\n        } else if (char === '%') {\n            res = res.reverse();\n        } else {\n            res.push(char);\n        }\n    }\n\n    return res.join('');\n};\n",
+    "language": "javascript",
+    "notes": "Solution using an array.",
+    "aiExplanation": "This JavaScript function processes an input string character by character to build a new string based on specific commands. As it loops through the text, it adds regular letters to an accumulating list, but if it encounters a special symbol, it performs a unique action: an asterisk (`*`) acts like a backspace to delete the last character, a hashtag (`#`) duplicates all the text created up to that point, and a percent sign (`%`) reverses the order of the current text. Once it finishes reading the entire input string, it joins all the processed characters back together and returns the final modified text.",
+    "status": "DONE",
+    "cpuUsage": 51.85,
+    "memoryUsage": 48.15,
+    "date": "2026-06-16T06:32:29.000Z"
+  }
+]
