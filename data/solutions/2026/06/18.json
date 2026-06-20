@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} hour\n * @param {number} minutes\n * @return {number}\n */\nvar angleClock = function(hour, minutes) {\n    const betweenMinutes = minutes * 6;\n    const betweenHour = hour * 30 + (minutes / 2);\n    const diff = Math.abs(betweenMinutes - betweenHour);\n\n    return Math.min(diff, 360 - diff);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This JavaScript function calculates the smallest angle between the hour and minute hands on a traditional clock. First, it determines the minute hand's position in degrees by multiplying the minutes by 6 (since a full circle is 360 degrees and has 60 minutes). Next, it calculates the hour hand's position by multiplying the hour by 30 degrees, adding a tiny adjustment (0.5 degrees per minute) because the hour hand drifts slightly as minutes pass. After finding the absolute difference between these two positions, the function compares this angle to its opposite side ($360$ minus the difference) and returns the smaller value, ensuring the final output is always the shortest path between the two hands (180 degrees or less).",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 92.1,
+    "date": "2026-06-18T06:38:40.000Z"
+  }
+]

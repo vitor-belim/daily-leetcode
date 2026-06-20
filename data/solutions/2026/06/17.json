@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Leetcode",
+    "code": "/**\n * @param {string} s\n * @param {number} k\n * @return {character}\n */\nvar processStr = function(s, k) {\n    let len = 0;\n\n    for (const char of s) {\n        if (char === '*') {\n            if (len > 0) {\n                len--;\n            }\n        } else if (char === '#') {\n            len *= 2;\n        } else if (char === '%') {\n            // do nothing\n        } else {\n            len++;\n        }\n    }\n\n    if (k >= len) {\n        return '.';\n    }\n\n    for (let i = s.length - 1; i >= 0; i--) {\n        const char = s[i];\n\n        if (char === '*') {\n            len++;\n        } else if (char === '#') {\n            if (k > (len - 1) / 2) {\n                k -= Math.floor(len / 2);\n            }\n            len = Math.floor((len + 1) / 2);\n        } else if (char === '%') {\n            k = len - 1 - k;\n        } else {\n            if (k === len - 1) {\n                return char;\n            }\n            len--;\n        }\n    }\n\n    return '.';\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds the character at a specific index `k` in a virtual text that is dynamically built by interpreting the string `s` as a sequence of editing commands: normal letters append to the text, `*` acts as a backspace, `#` duplicates the text generated so far, and `%` reverses its order. To avoid the massive memory cost of actually building this potentially giant virtual text, the code first loops forward to calculate its final length. It then loops backward through the commands to reverse-engineer the operations, tracking and shifting the target index `k` backward step-by-step until it pinpoints and returns the exact physical character that lands at that position, returning `.` if the index is out of bounds.",
+    "status": "DONE",
+    "cpuUsage": 87.13,
+    "memoryUsage": 60.57,
+    "date": "2026-06-17T06:53:47.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @param {number} k\n * @return {character}\n */\nvar processStr = function(s, k) {\n    let res = '';\n    let reversed = false;\n\n    for (const char of s) {\n        if (char === '*') {\n            if (reversed) {\n                res = res.slice(1);\n            } else {\n                res = res.slice(0, res.length - 1);\n            }\n        } else if (char === '#') {\n            res = res + res;\n        } else if (char === '%') {\n            reversed = !reversed;\n        } else {\n            if (reversed) {\n                res = char + res;\n            } else {\n                res += char;\n            }\n        }\n    }\n\n    return (reversed ? res[res.length - 1 - k] : res[k]) || '.';\n};\n",
+    "language": "javascript",
+    "notes": "Got a 'RangeError: Invalid string length', solution is functionally correct.",
+    "aiExplanation": "This JavaScript function processes an input string `s` character-by-character to build a new text string, ultimately returning the character at a specific position `k` (or `.` if that position does not exist). It builds the string by treating normal letters as text to be added, while using three special symbols as commands: `%` toggles a \"reversed\" mode that switches whether new letters are added to the front or the back of the text; `*` acts as a backspace that deletes the most recently added letter from the active end; and `#` duplicates the entire text accumulated so far. Once the entire string has been processed, the function retrieves and returns the character at index `k`, automatically adjusting the direction of the lookup based on whether the final state of the text is reversed or normal.",
+    "status": "FAILED_CONSTRAINTS",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-06-17T06:32:46.000Z"
+  }
+]

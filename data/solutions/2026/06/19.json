@@ -1,0 +1,35 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} gain\n * @return {number}\n */\nvar largestAltitude = function(gain) {\n    let sum = 0;\n    let res = 0;\n\n    for (const g of gain) {\n        sum += g;\n        res = Math.max(res, sum);\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function calculates the highest altitude reached during a journey that starts at an altitude of 0. It takes an array of numbers called `gain`, which represents the climb or drop in height at each step of the trip. By starting at zero, the code loops through each of these changes one by one, adding them to a running total (`sum`) to track the current altitude, and uses `Math.max` to constantly update and store the highest peak reached so far (`res`). Once it has checked all the steps, it returns that highest recorded altitude.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 85.78,
+    "date": "2026-06-19T06:39:53.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} gain\n * @return {number}\n */\nvar largestAltitude = function(gain) {\n    let sum = 0;\n    let max = 0;\n\n    for (const g of gain) {\n        sum += g;\n\n        if (sum > max) {\n            max = sum;\n        }\n    }\n\n    return max;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code finds the highest altitude reached on a journey that starts at an altitude of 0. It takes an array of numbers representing the climbs and drops (the \"gains\") at each step of the trip, initializing both the current altitude (`sum`) and the highest recorded altitude (`max`) to 0. The code then loops through each altitude change one by one, updating the current altitude by adding the change to the running total. If this new current altitude is ever higher than the maximum altitude saved so far, it updates the maximum. Once it has processed every change in the journey, it returns that highest recorded altitude.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 53.13,
+    "date": "2025-05-01T09:59:20.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} gain\n * @return {number}\n */\nvar largestAltitude = function(gain) {\n    let sum = 0;\n    let max = 0;\n\n    for (const g of gain) {\n        sum += g;\n        max = Math.max(max, sum);\n    }\n\n    return max;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code finds the highest point reached during a journey that starts at an altitude of zero. It takes a list of altitude changes (called `gain`) and uses two variables: `sum` to keep track of the current height, and `max` to store the highest altitude reached so far. The code loops through each altitude change in the list, adds it to the current height, and immediately updates the `max` variable if this new height is the highest one yet. After checking all the changes, it returns the highest recorded peak.",
+    "status": "DONE",
+    "cpuUsage": 20.16,
+    "memoryUsage": 37.34,
+    "date": "2025-05-01T09:58:58.000Z"
+  }
+]

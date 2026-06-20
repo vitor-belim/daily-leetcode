@@ -150,6 +150,8 @@ export default async function ProblemPage({
                           "bg-yellow-100 text-yellow-800 data-active:bg-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:data-active:bg-yellow-900/50",
                         s.status === "FAILED" &&
                           "bg-red-100 text-red-800 data-active:bg-red-200 dark:bg-red-900/30 dark:text-red-400 dark:data-active:bg-red-900/50",
+                        s.status === "FAILED_CONSTRAINTS" &&
+                          "bg-orange-100 text-orange-800 data-active:bg-orange-200 dark:bg-orange-900/30 dark:text-orange-400 dark:data-active:bg-orange-900/50",
                         "data-active:ring-1 data-active:ring-primary/20 data-active:border-primary/30",
                       )}
                     >
@@ -251,9 +253,11 @@ export default async function ProblemPage({
                                     "bg-yellow-500 hover:bg-yellow-600 text-black",
                                   s.status === "FAILED" &&
                                     "bg-red-500 hover:bg-red-600",
+                                  s.status === "FAILED_CONSTRAINTS" &&
+                                    "bg-orange-500 hover:bg-orange-600",
                                 )}
                               >
-                                {s.status}
+                                {s.status.replace(/_/g, " ")}
                               </Badge>
                             )}
                           </div>

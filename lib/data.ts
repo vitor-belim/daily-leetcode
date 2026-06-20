@@ -17,7 +17,7 @@ export interface Solution {
   language: string;
   aiExplanation?: string;
   notes?: string;
-  status?: "DONE" | "TLE" | "MLE" | "FAILED";
+  status?: "DONE" | "TLE" | "MLE" | "FAILED" | "FAILED_CONSTRAINTS";
   cpuUsage?: number; // 0-100
   memoryUsage?: number; // 0-100
   date: string;
