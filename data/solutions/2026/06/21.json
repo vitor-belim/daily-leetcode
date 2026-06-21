@@ -1,0 +1,46 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} costs\n * @param {number} coins\n * @return {number}\n */\nvar maxIceCream = function(costs, coins) {\n    const n = costs.length;\n    let min = Infinity;\n    let max = -Infinity;\n    let total = 0;\n\n    for (const cost of costs) {\n        if (cost < min) min = cost;\n        if (cost > max) max = cost;\n        total += cost;\n    }\n\n    if (coins >= total) {\n        return n;\n    }\n\n    const arr = new Array(max - min + 1).fill(0);\n\n    for (const cost of costs) {\n        arr[cost - min]++;\n    }\n\n    let res = 0;\n\n    for (let cost = min; cost <= max; cost++) {\n        if (cost > coins) break;\n\n        const pos = cost - min;\n        if (arr[pos] === 0) continue;\n\n        const usableCoins = Math.min(Math.floor(coins / cost), arr[pos]);\n        coins -= usableCoins * cost;\n        res += usableCoins;\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Attempt at performance improvements #3.",
+    "aiExplanation": "This function calculates the maximum number of ice creams you can buy with a limited budget by prioritizing the cheapest ones first. It starts by checking if you have enough coins to buy all the ice creams at once, in which case it immediately returns the total count. If not, it groups and counts the ice creams by their prices (from cheapest to most expensive) and then greedily buys as many of the cheapest ice creams as possible, subtracting the cost from your remaining coins and keeping track of the total bought until you run out of money.",
+    "status": "DONE",
+    "cpuUsage": 86.36,
+    "memoryUsage": 6.82,
+    "date": "2026-06-21T07:49:19.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} costs\n * @param {number} coins\n * @return {number}\n */\nvar maxIceCream = function(costs, coins) {\n    const n = costs.length;\n    let min = Infinity;\n    let max = -Infinity;\n    let total = 0;\n\n    for (const cost of costs) {\n        if (cost < min) min = cost;\n        if (cost > max) max = cost;\n        total += cost;\n    }\n\n    if (coins >= total) {\n        return n;\n    }\n\n    const arr = new Array(max - min + 1).fill(0);\n\n    for (const cost of costs) {\n        arr[cost - min]++;\n    }\n\n    let res = 0;\n\n    for (let cost = min; cost <= max; cost++) {\n        if (cost > coins) break;\n\n        const coinsToUse = Math.min(Math.floor(coins / cost), arr[cost - min]);\n        coins -= coinsToUse * cost;\n        res += coinsToUse;\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Attempt at performance improvements #2.",
+    "aiExplanation": "This JavaScript function calculates the maximum number of ice creams you can buy with a limited budget by prioritizing the cheapest ones first. It starts by checking if you have enough money to buy every single ice cream, in which case it immediately returns the total count. If you don't have enough money for all of them, the code groups the ice creams by their prices from cheapest to most expensive, then goes through them in order and buys as many of the cheapest available ice creams as your remaining coins allow. By greedily purchasing the lowest-priced ice creams and subtracting their cost from your total coins, the function maximizes and returns the total number of ice creams you can successfully buy.",
+    "status": "DONE",
+    "cpuUsage": 70.45,
+    "memoryUsage": 6.82,
+    "date": "2026-06-21T07:42:45.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} costs\n * @param {number} coins\n * @return {number}\n */\nvar maxIceCream = function(costs, coins) {\n    const n = costs.length;\n    let min = Infinity;\n    let max = -Infinity;\n    let total = 0;\n\n    for (const cost of costs) {\n        min = Math.min(min, cost);\n        max = Math.max(max, cost);\n        total += cost;\n    }\n\n    if (coins >= total) {\n        return n;\n    }\n\n    const arr = new Array(max - min + 1).fill(0);\n\n    for (const cost of costs) {\n        arr[cost - min]++;\n    }\n\n    let res = 0;\n\n    for (let cost = min; cost <= max; cost++) {\n        if (cost > coins) break;\n\n        const pos = cost - min;\n        if (arr[pos] === 0) continue;\n\n        const coinsToUse = Math.min(Math.floor(coins / cost), arr[pos]);\n        coins -= coinsToUse * cost;\n        res += coinsToUse;\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Attempt at performance improvements #1.",
+    "aiExplanation": "This function calculates the maximum number of ice cream bars you can buy with a set budget of coins by prioritizing the cheapest options first. It first checks if your total coins are enough to buy every single ice cream, in which case it immediately returns the total count. If not, it uses an efficient counting method to group and count the ice creams by their prices from cheapest to most expensive. It then loops through these prices, buying as many of the cheapest available ice creams as your remaining budget allows, subtracting the spent coins and tracking the count, until you either run out of money or can no longer afford any more.",
+    "status": "DONE",
+    "cpuUsage": 70.45,
+    "memoryUsage": 6.82,
+    "date": "2026-06-21T07:40:34.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} costs\n * @param {number} coins\n * @return {number}\n */\nvar maxIceCream = function(costs, coins) {\n    const n = costs.length;\n    let min = Infinity;\n    let max = -Infinity;\n\n    for (const cost of costs) {\n        min = Math.min(min, cost);\n        max = Math.max(max, cost);\n    }\n\n    const arr = new Array(max - min + 1).fill(0);\n\n    for (const cost of costs) {\n        arr[cost - min]++;\n    }\n\n    let res = 0;\n\n    for (let i = 0; i < arr.length; i++) {\n        if (arr[i] === 0) continue;\n\n        const cost = min + i;\n        if (cost > coins) break;\n\n        const coinsToUse = Math.min(Math.floor(coins / cost), arr[i]);\n        coins -= coinsToUse * cost;\n        res += coinsToUse;\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Initial implementation - counting sort (as requested by exercise) with min/max to optimize for performance.",
+    "aiExplanation": "This code calculates the maximum number of ice creams you can buy with a limited budget by prioritizing the cheapest ones first to get the most value for your money. Instead of using a traditional sorting method, it finds the lowest and highest ice cream prices to build a frequency list, counting exactly how many ice creams exist at each price point. It then loops through these prices starting from the cheapest, calculating how many ice creams of that specific price you can afford with your remaining coins, subtracting that cost from your total budget, and adding the purchased amount to your running total. The process automatically stops when you run out of money or when the next cheapest ice cream is too expensive, successfully returning the maximum number of ice creams purchased.",
+    "status": "DONE",
+    "cpuUsage": 70.45,
+    "memoryUsage": 6.82,
+    "date": "2026-06-21T07:29:25.000Z"
+  }
+]
