@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} text\n * @return {number}\n */\nvar maxNumberOfBalloons = function(text) {\n    let b = 0;\n    let a = 0;\n    let l = 0;\n    let o = 0;\n    let n = 0;\n\n    for (const char of text) {\n        if (char === 'b') b++;\n        else if (char === 'a') a++;\n        else if (char === 'l') l++;\n        else if (char === 'o') o++;\n        else if (char === 'n') n++;\n    }\n\n    return Math.min(\n        b,\n        a,\n        Math.floor(l / 2),\n        Math.floor(o / 2),\n        n,\n    );\n};\n",
+    "language": "javascript",
+    "notes": "Attempted solution using a static solution, looking for better performance.",
+    "aiExplanation": "This JavaScript function calculates the maximum number of times you can spell the word **\"balloon\"** using the letters from a given text. It first loops through the input text to count how many times the letters 'b', 'a', 'l', 'o', and 'n' appear. Since spelling \"balloon\" requires two 'l's and two 'o's (but only one of 'b', 'a', and 'n'), the code divides the total counts of 'l' and 'o' by two and rounds down. Finally, it returns the smallest of these adjusted counts, because the rarest letter acts as the limiting factor for how many complete words you can actually make.",
+    "status": "DONE",
+    "cpuUsage": 77.31,
+    "memoryUsage": 35,
+    "date": "2026-06-22T06:30:41.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} text\n * @return {number}\n */\nvar maxNumberOfBalloons = function(text) {\n    const arr = Array(26).fill(0);\n\n    for (let i = 0; i < text.length; i++) {\n        arr[text.charCodeAt(i) - 97]++;\n    }\n\n    return Math.min(\n        arr['b'.charCodeAt(0) - 97],\n        arr['a'.charCodeAt(0) - 97],\n        Math.floor(arr['l'.charCodeAt(0) - 97] / 2),\n        Math.floor(arr['o'.charCodeAt(0) - 97] / 2),\n        arr['n'.charCodeAt(0) - 97],\n    );\n};\n",
+    "language": "javascript",
+    "notes": "Solved in a dynamic way, best for when target word can change.",
+    "aiExplanation": "This function calculates how many times you can spell the word \"balloon\" using the letters from a given text. First, it counts how often each lowercase letter appears in the input text by storing their frequencies in a 26-slot array (one slot for each letter of the alphabet). Since spelling \"balloon\" requires one 'b', one 'a', one 'n', but *two* 'l's and *two* 'o's, the code divides the total counts of 'l' and 'o' by two. Finally, it uses `Math.min` to find the smallest of these adjusted counts, which represents the bottleneck and tells you the maximum number of complete \"balloon\" words you can successfully form.",
+    "status": "DONE",
+    "cpuUsage": 77.31,
+    "memoryUsage": 63.08,
+    "date": "2026-06-22T06:27:32.000Z"
+  }
+]
