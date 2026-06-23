@@ -1,0 +1,35 @@
+[
+  {
+    "author": "Leetcode",
+    "code": "/**\n * @param {number} n\n * @param {number} l\n * @param {number} r\n * @return {number}\n */\nvar zigZagArrays = function (n, l, r) {\n    const dp0 = new Array(r + 1).fill(0);\n    const dp1 = new Array(r + 1).fill(0);\n    const sum0 = new Array(r + 2).fill(0);\n    const sum1 = new Array(r + 2).fill(0);\n    const MOD = 10 ** 9 + 7;\n\n    for (let i = l; i <= r; i++) {\n        dp0[i] = dp1[i] = 1;\n        sum0[i] = sum1[i] = i - l + 1;\n    }\n\n    for (let i = 1; i < n; i++) {\n        for (let j = l; j <= r; j++) {\n            dp0[j] = (sum1[r] - sum1[j] + MOD) % MOD;\n            dp1[j] = sum0[j - 1];\n        }\n\n        sum0[l] = dp0[l];\n        sum1[l] = dp1[l];\n\n        for (let j = l + 1; j <= r; j++) {\n            sum0[j] = (sum0[j - 1] + dp0[j]) % MOD;\n            sum1[j] = (sum1[j - 1] + dp1[j]) % MOD;\n        }\n    }\n\n    return (sum0[r] + sum1[r]) % MOD;\n};\n",
+    "language": "javascript",
+    "notes": "Too much of a complicated question for breakfast.",
+    "aiExplanation": "This code counts how many zigzag arrays of length `n` can be made using numbers from `l` to `r`, where each next number must alternate between going up and going down. It uses dynamic programming instead of trying every possible array one by one. `dp0[j]` represents the number of valid arrays ending at number `j` where the next movement should come from a larger previous number, while `dp1[j]` represents the number of valid arrays ending at `j` where the previous movement came from a smaller number. The `sum0` and `sum1` arrays store running prefix sums so the code can quickly count all valid previous choices without looping over every previous number each time. At the start, every single number from `l` to `r` is a valid array of length `1`, so both `dp0` and `dp1` are initialized to `1`. Then, for each additional position in the array, the code updates the counts: `dp0[j]` counts ways to place `j` after a larger number, and `dp1[j]` counts ways to place `j` after a smaller number. Because the number of possible arrays can be very large, results are taken modulo `10^9 + 7`. Finally, it returns the total number of valid zigzag arrays by adding all counts from both direction states.",
+    "status": "DONE",
+    "cpuUsage": 85.71,
+    "memoryUsage": 14.29,
+    "date": "2026-06-23T16:08:33.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @param {number} l\n * @param {number} r\n * @return {number}\n */\nvar zigZagArrays = function(n, l, r) {\n    let res = 0;\n\n    const pickNext = (count, last, dir) => {\n        if (count === n) return 1;\n\n        let sum = 0;\n\n        for (let i = l; i <= r; i++) {\n            if (i === last || (last && ((dir === 'desc' && i > last) || (dir === 'asc' && i < last)))) continue;\n\n            sum += pickNext(count + 1, i, !i || !last ? null : i > last ? 'desc' : 'asc');\n        }\n\n        return sum;\n    };\n\n    return pickNext(0, null, null);\n};\n",
+    "language": "javascript",
+    "notes": "Achieved TLE as expected, 149 / 921 testcases passed.",
+    "aiExplanation": "This code counts how many arrays of length `n` can be made using numbers from `l` to `r` while following a zigzag pattern, meaning the numbers must alternate direction: after going up, the next valid move must go down, and after going down, the next valid move must go up. The recursive helper `pickNext(count, last, dir)` tries to choose the next number: `count` is how many numbers have already been picked, `last` is the previous number, and `dir` remembers the previous direction. If `count === n`, a full valid array has been built, so it returns `1`. For each possible number `i` from `l` to `r`, the code skips it if it is the same as `last`, or if it would continue in the same direction instead of zigzagging. Then it recursively counts all arrays that can be formed after choosing `i`, updating the direction based on whether the new number is greater or smaller than `last`. Finally, `pickNext(0, null, null)` starts the process with no numbers chosen yet, and the returned value is the total number of valid zigzag arrays.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-06-23T07:06:16.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @param {number} l\n * @param {number} r\n * @return {number}\n */\nvar zigZagArrays = function(n, l, r) {\n    let res = 0;\n\n    const pickNext = (count, last, avoid) => {\n        if (count === n) return 1;\n\n        count++;\n        let sum = 0;\n\n        for (let i = l; i <= r; i++) {\n            if (i === last || i === avoid) continue;\n\n            sum += pickNext(count, i, i === last + 1 ? i + 1 : i === last - 1 ? i - 1 : -1);\n        }\n\n        return sum;\n    };\n\n    return pickNext(0, -1, -1);\n};\n",
+    "language": "javascript",
+    "notes": "Mistakenly thought only three consecutive numbers weren't allowed (n, n + 1, n + 2).",
+    "aiExplanation": "This code counts how many arrays of length `n` can be built using numbers from `l` to `r` where neighboring values must not be the same, and the array must avoid continuing in the same “step-by-1” direction for three numbers in a row. The helper function `pickNext(count, last, avoid)` recursively chooses the next number: `count` tracks how many numbers have been picked, `last` is the previous number, and `avoid` is a number that should not be picked next because it would continue a pattern like `1, 2, 3` or `3, 2, 1`. If `count === n`, it means a valid array has been completed, so it returns `1`. Otherwise, it tries every number from `l` to `r`, skips numbers equal to `last` or `avoid`, and recursively counts all valid continuations. The `avoid` value is updated only when the new number is exactly one more or one less than `last`, so the code blocks straight consecutive runs like `4, 5, 6` or `4, 3, 2`. Finally, `pickNext(0, -1, -1)` starts the process with no previous number and no avoided number, returning the total count.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-06-23T06:48:42.000Z"
+  }
+]
