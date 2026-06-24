@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Leetcode",
+    "code": "/**\n * @param {number} n\n * @param {number} l\n * @param {number} r\n * @return {number}\n */\nvar zigZagArrays = function (n, l, r) {\n    const MOD = 1000000007n;\n    const k = r - l + 1;\n\n    if (k <= 0) return 0;\n\n    let m = Array.from({ length: k }, (_, i) =>\n        Array.from({ length: k }, (_, j) => (i + j + 1 < k ? 1n : 0n))\n    );\n\n    let res = Array(k).fill(1n);\n    n -= 1;\n\n    function matMul(a, b) {\n        const sz = a.length;\n        const c = Array.from({ length: sz }, () => Array(sz).fill(0n));\n\n        for (let i = 0; i < sz; i++) {\n            for (let k = 0; k < sz; k++) {\n                if (a[i][k] === 0n) continue;\n\n                for (let j = 0; j < sz; j++) {\n                    c[i][j] = (c[i][j] + a[i][k] * b[k][j]) % MOD;\n                }\n            }\n        }\n\n        return c;\n    }\n\n    function vecMatMul(v, mat) {\n        const sz = v.length;\n        const res = Array(sz).fill(0n);\n\n        for (let j = 0; j < sz; j++) {\n            for (let i = 0; i < sz; i++) {\n                res[j] = (res[j] + v[i] * mat[i][j]) % MOD;\n            }\n        }\n\n        return res;\n    }\n\n    while (n > 0) {\n        if (n & 1) res = vecMatMul(res, m);\n\n        m = matMul(m, m);\n        n >>= 1;\n    }\n\n    const total = res.reduce((a, b) => (a + b) % MOD, 0n);\n\n    return Number((total * 2n) % MOD);\n};\n",
+    "language": "javascript",
+    "notes": "A more complicated version of yesterday's problem. Way too much for breakfast.",
+    "aiExplanation": "This code calculates the total number of valid \"zigzag\" arrays of length `n` using numbers within the range `[l, r]`, using a highly efficient technique called matrix exponentiation to handle very large values of `n` quickly. It first creates a transition matrix that represents which numbers are allowed to follow one another to maintain the alternating \"zigzag\" pattern. By repeatedly squaring this matrix and multiplying it by a starting list of possibilities (using binary exponentiation), the code rapidly computes the number of valid sequences in logarithmic time instead of counting them one by one. Finally, it sums up the total combinations, multiplies the result by two to account for both starting directions of the zigzag (either starting with a step up or a step down), and returns the final answer modulo 1,000,000,007 to prevent integer overflow.",
+    "status": "DONE",
+    "cpuUsage": 25,
+    "memoryUsage": 75,
+    "date": "2026-06-24T06:34:32.000Z"
+  }
+]
