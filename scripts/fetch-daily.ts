@@ -123,33 +123,6 @@ async function fetchLeetCode(query: string, variables: unknown = {}) {
   return response.json();
 }
 
-async function generateExplanation(id: string, code: string) {
-  // Generate explanation using AI prompt
-  console.log(`Generating explanation for submission ${id}...`);
-  let explanation = "";
-
-  try {
-    if (process.env.GEMINI_API_KEY) {
-      const { GoogleGenerativeAI } = await import("@google/generative-ai");
-      const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-      const model = genAI.getGenerativeModel({
-        model: "gemini-3.5-flash",
-      });
-      const prompt = `explain the following code in a simple way, using a single paragraph: \n\n${code}`;
-      const result = await model.generateContent(prompt);
-      explanation = result.response.text().trim();
-    } else {
-      console.warn(
-        "GEMINI_API_KEY not found. Skipping explanation generation.",
-      );
-    }
-  } catch (e) {
-    console.error("Failed to generate explanation:", e);
-  }
-
-  return explanation;
-}
-
 async function main() {
   try {
     console.log("Verifying authentication...");
@@ -283,9 +256,7 @@ async function main() {
               code: code,
               language: details.lang.name,
               notes: "",
-              aiExplanation:
-                existing?.aiExplanation ||
-                (await generateExplanation(sub.id, code)),
+              aiExplanation: "",
               status: status,
               cpuUsage: existing
                 ? Math.max(existing.cpuUsage, cpuUsage)
@@ -336,6 +307,7 @@ async function main() {
     } else {
       console.log(`Solutions file already exists at ${solutionsFilePath}`);
     }
+    process.exit(0);
   } catch (error) {
     console.error("Error fetching daily challenge:", error);
     process.exit(1);
