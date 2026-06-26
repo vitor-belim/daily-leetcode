@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Leetcode",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number}\n */\nvar countMajoritySubarrays = function(nums, target) {\n    const n = nums.length;\n    const dp = new Array(n * 2 + 1).fill(0);\n    dp[n] = 1;\n    let pos = n;\n    let sum = 0;\n    let res = 0;\n\n    for (let i = 0; i < n; i++) {\n        if (nums[i] === target) {\n            sum += dp[pos];\n            pos++;\n        } else {\n            pos--;\n            sum -= dp[pos];\n        }\n\n        dp[pos]++;\n        res += sum;\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Too hard of a question for breakfast, doesn't really add much to yesterday's version.",
+    "aiExplanation": "This solution uses a **prefix balance technique** to count subarrays where `target` is the majority element. It maintains a running `pos` (balance) centered at index `n` in a `dp` array — for each element in `nums`, `pos` is incremented if the element equals `target` and decremented otherwise. The `dp` array tracks how many prefixes have reached each balance value, and `sum` accumulates the count of previous prefixes with a **strictly lower** balance than the current one (meaning `target` appeared more often from that prefix to now). When `target` is encountered, `dp[pos]` is added to `sum` before advancing `pos` (those positions become strictly lower); when a non-target is encountered, `dp[pos]` is subtracted from `sum` after retreating `pos` (those positions are no longer strictly lower). After each update, `dp[pos]++` records the current prefix state, and `res += sum` adds the count of valid subarrays ending at index `i`.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 66.67,
+    "date": "2026-06-26T06:47:48.000Z"
+  }
+]
