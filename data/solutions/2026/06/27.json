@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar maximumLength = function(nums) {\n    const map = new Map();\n\n    for (const num of nums) {\n        map.set(num, (map.get(num) || 0) + 1);\n    }\n\n    let ones = map.get(1) || 1;\n\n    if (ones % 2 === 0) {\n        ones--;\n    }\n\n    let res = ones;\n\n    for (const [i, c] of map) {\n        if (i === 1) continue;\n\n        let num = i;\n        let count = c;\n        let turns = 1;\n\n        while (count > 1) {\n            num = num * num;\n            count = map.get(num) || 0;\n            turns++;\n        }\n\n        if (count === 0) turns--;\n\n        res = Math.max(res, 2 * turns - 1);\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Same as the best solution available.",
+    "aiExplanation": "This solution finds the longest subsequence where each element is the **square** of the previous one. It starts by counting the frequency of every number using a `Map`. The number `1` is a special case — since `1² = 1`, a chain of 1s is always valid but must have **odd length** (so you can't pick a value that \"doesn't fit\"), so if the count of 1s is even, it decrements by 1. For every other starting number `i`, it follows the squaring chain (`i → i² → i⁴ → ...`), advancing as long as the next squared value appears **more than once** in the map (meaning it can serve as both an intermediate and an endpoint). The variable `turns` counts the depth of this chain, and if the final value has 0 occurrences, it backtracks one step. The maximum subsequence length for a chain of depth `turns` is `2 * turns - 1`, and the overall answer is the maximum across all starting values.",
+    "status": "DONE",
+    "cpuUsage": 90.91,
+    "memoryUsage": 36.36,
+    "date": "2026-06-27T08:44:40.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar maximumLength = function(nums) {\n    const map = new Map();\n\n    for (const num of nums) {\n        map.set(num, (map.get(num) || 0) + 1);\n    }\n\n    let ones = map.get(1) || 1;\n\n    if (ones % 2 === 0) {\n        ones--;\n    }\n\n    let res = ones;\n\n    for (const [i, c] of map) {\n        if (i === 1) continue;\n\n        let num = i;\n        let count = c;\n        let turns = 1;\n\n        while (count > 1) {\n            num = Math.pow(num, Math.pow(2, turns));\n            count = map.get(num) || 0;\n            turns++;\n        }\n\n        res = Math.max(res, 2 * turns - 1);\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "I got the squaring completely wrong, but somehow was able to produce multiple correct solutions. #insert-bike-fall-meme",
+    "aiExplanation": "This is a **failed attempt** at the same squaring-chain problem, and it breaks in the chain traversal step. Instead of simply squaring `num` at each step (`num = num * num`), it uses `Math.pow(num, Math.pow(2, turns))` — which computes `num^(2^turns)` relative to the **current** (already-squared) value. This causes the chain to skip levels: after the first step it correctly lands on `i²`, but the second step produces `i⁸` instead of the correct `i⁴`, completely missing values in between and yielding wrong results. It's also missing the `if (count === 0) turns--` correction from the working solution, which would over-count the chain depth when the final squared value doesn't exist in the array at all.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-06-27T08:32:01.000Z"
+  }
+]
