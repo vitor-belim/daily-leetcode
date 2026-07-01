@@ -4,7 +4,7 @@ If no date is provided, use today's date from the `currentDate` context variable
 
 1. Parse the date into year (YYYY), month (MM), and day (DD).
 2. Read the solutions file at `data/solutions/YYYY/MM/DD.json`.
-3. For each solution in the array, send the prompt below using the solution's `code` field, then write the result into that solution's `aiExplanation` field.
+3. Run through each solution in the array in reverse order, sending the prompt below using the solution's `code` field, and then writing the result into that solution's `aiExplanation` field.
 4. After processing all solutions, write the updated array back to the same file.
 
 Prompt to run per solution:

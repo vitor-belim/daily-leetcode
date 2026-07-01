@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} arr\n * @return {number}\n */\nvar maximumElementAfterDecrementingAndRearranging = function(arr) {\n    const n = arr.length;\n    const dp = new Array(n + 1).fill(0);\n\n    for (const num of arr) {\n        dp[Math.min(num, n)]++;\n    }\n\n    let res = n;\n    let cur = 0;\n\n    for (let i = n; i >= 1; i--) {\n        if (dp[i] > 0) {\n            cur += dp[i] - 1;\n            continue;\n        }\n\n        if (cur > 0) {\n            cur--;\n        } else {\n            res--;\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Solution using linear time. Although worse than before, it would be much better with more extensive tests.",
+    "aiExplanation": "This solution uses a **frequency counting** approach to find the maximum achievable element after rearranging. It first caps all values at `n` (the array length, since no result can exceed it) and counts how many numbers fall into each bucket using a `dp` array. Then it scans from `n` down to `1`, tracking a \"surplus\" counter `cur`: when a bucket has multiple elements, the extras are banked into `cur` to fill future gaps; when a bucket is empty, it either spends a banked surplus (`cur--`) or must lower the result (`res--`). The final value of `res` is the maximum element achievable.",
+    "status": "DONE",
+    "cpuUsage": 11.11,
+    "memoryUsage": 11.11,
+    "date": "2026-06-28T09:36:09.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} arr\n * @return {number}\n */\nvar maximumElementAfterDecrementingAndRearranging = function(arr) {\n    arr.sort((a, b) => a - b);\n\n    let pos = 0;\n\n    for (const num of arr) {\n        if (num > pos) {\n            pos++;\n        }\n    }\n\n    return pos;\n};\n",
+    "language": "javascript",
+    "notes": "Solution using sort.",
+    "aiExplanation": "This solution takes a clean **greedy** approach: it sorts `arr` in ascending order, then iterates through the numbers while tracking the current maximum achievable position `pos`. For each element, if it is **greater than** `pos`, `pos` is incremented — the intuition being that a larger number can always be decremented down to fill the next consecutive slot. Since we only care whether each number is *capable* of reaching `pos + 1` (not its exact value), sorting ensures we greedily assign the smallest eligible number to each slot, and `pos` at the end is the maximum element we can achieve.",
+    "status": "DONE",
+    "cpuUsage": 94.44,
+    "memoryUsage": 61.11,
+    "date": "2026-06-28T09:24:09.000Z"
+  }
+]

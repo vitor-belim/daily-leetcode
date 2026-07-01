@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string[]} patterns\n * @param {string} word\n * @return {number}\n */\nvar numOfStrings = function(patterns, word) {\n    let res = 0;\n\n    for (const pattern of patterns) {\n        if (word.includes(pattern)) {\n            res++;\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Naive solution using `String.prototype.includes()`.",
+    "aiExplanation": "This solution iterates through each `pattern` in `patterns` and uses JavaScript's built-in `String.prototype.includes()` to check whether `word` contains that pattern as a **substring**, incrementing a counter `res` for each match. It's a clean, concise approach that delegates all substring-search logic to the native method, and simply returns the total count of patterns found within `word`.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 93.06,
+    "date": "2026-06-29T07:28:36.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string[]} patterns\n * @param {string} word\n * @return {number}\n */\nvar numOfStrings = function(patterns, word) {\n    const set = new Set();\n\n    for (let i = 0; i < word.length; i++) {\n        let s = '';\n\n        for (let j = i; j < word.length; j++) {\n            s += word[j];\n            set.add(s);\n        }\n    }\n\n    let res = 0;\n\n    for (const pattern of patterns) {\n        if (set.has(pattern)) {\n            res++;\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Solution using a set for all possible substrings.",
+    "aiExplanation": "This solution pre-computes **all possible substrings** of `word` upfront and stores them in a `Set` for O(1) lookups. Two nested loops handle the generation: the outer loop picks each starting index `i`, and the inner loop builds every substring starting there by appending characters one at a time (`s += word[j]`) and inserting each into `set`. Once the set is built, each `pattern` is checked with `set.has(pattern)` in constant time, making this approach particularly efficient when the `patterns` array is large relative to `word`.",
+    "status": "DONE",
+    "cpuUsage": 5.56,
+    "memoryUsage": 5.56,
+    "date": "2026-06-29T07:15:55.000Z"
+  }
+]

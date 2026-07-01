@@ -1,0 +1,35 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar numberOfSubstrings = function(s) {\n    const n = s.length;\n    const dp = new Array(26).fill(0);\n    let res = 0;\n    let left = 0;\n\n    for (let right = 0; right < n; right++) {\n        dp[s.charCodeAt(right) - 97]++;\n\n        while (dp[0] > 0 && dp[1] > 0 && dp[2] > 0) {\n            res += n - right;\n\n            dp[s.charCodeAt(left) - 97]--;\n            left++;\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Sliding window using character counting.",
+    "aiExplanation": "This is a **sliding window** approach that counts substrings containing at least one `'a'`, `'b'`, and `'c'`. It uses a `dp` array of 26 slots (one per lowercase letter) to track character frequencies, expanding a `right` pointer across the string. Whenever `dp[0]`, `dp[1]`, and `dp[2]` (representing `'a'`, `'b'`, `'c'`) are all greater than zero, every extension of the current window to the right also satisfies the condition, so it adds `n - right` to the result. Then it **shrinks the window from the left** by decrementing the count of `s[left]` and advancing `left`, repeating until the condition no longer holds.",
+    "status": "DONE",
+    "cpuUsage": 78.28,
+    "memoryUsage": 62.12,
+    "date": "2026-06-30T07:05:39.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar numberOfSubstrings = function(s) {\n    const n = s.length;\n    let a = 0;\n    let b = 0;\n    let c = 0;\n    let res = 0;\n    let left = 0;\n\n    for (let right = 0; right < n; right++) {\n        if (s[right] === 'a') {\n            a++;\n        } else if (s[right] === 'b') {\n            b++;\n        } else if (s[right] === 'c') {\n            c++;\n        }\n\n        while (a > 0 && b > 0 && c > 0) {\n            res += n - right;\n\n            if (s[left] === 'a') {\n                a--;\n            } else if (s[left] === 'b') {\n                b--;\n            } else if (s[left] === 'c') {\n                c--;\n            }\n            left++;\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Sliding window using 3 counting variables.",
+    "aiExplanation": "This is the same **sliding window** algorithm but uses three individual counters (`a`, `b`, `c`) instead of an array. It expands the `right` pointer, incrementing the appropriate counter based on the current character using `if/else if` checks. When all three counters are positive, the window is valid and every substring extending further right is also valid, so it adds `n - right` to the result; it then **contracts from the left**, decrementing the relevant counter until the window is no longer valid.",
+    "status": "DONE",
+    "cpuUsage": 83.84,
+    "memoryUsage": 85.86,
+    "date": "2026-06-30T07:02:31.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar numberOfSubstrings = function(s) {\n    let a = 0;\n    let b = 0;\n    let c = 0;\n    let left = 0;\n    let res = 0;\n\n    for (let i = 0; i < s.length; i++) {\n        switch (s[i]) {\n            case 'a': a++; break;\n            case 'b': b++; break;\n            case 'c': c++; break;\n        }\n\n        while (a && b && c) {\n            res += s.length - i;\n\n            switch (s[left]) {\n                case 'a': a--; break;\n                case 'b': b--; break;\n                case 'c': c--; break;\n            }\n            left++;\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is the same **sliding window** algorithm as the previous solutions, but uses `switch` statements instead of `if/else if` chains for character matching. It maintains three counters (`a`, `b`, `c`) and a `left` pointer. As the `right` pointer advances, it increments the matching counter; once all three are non-zero, it adds `s.length - i` to the result (counting all valid extensions to the right) and then **shrinks the left boundary** via another `switch` until the window no longer contains all three characters.",
+    "status": "DONE",
+    "cpuUsage": 73.23,
+    "memoryUsage": 18.69,
+    "date": "2025-03-11T08:08:42.000Z"
+  }
+]
