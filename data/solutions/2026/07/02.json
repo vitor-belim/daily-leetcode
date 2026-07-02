@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} grid\n * @param {number} health\n * @return {boolean}\n */\nvar findSafeWalk = function(grid, health) {\n    const m = grid.length;\n    const n = grid[0].length;\n\n    let stack = [[0, 0, health]];\n    const seen = Array.from({ length: m }, () => Array(n).fill(-1));\n\n    while (stack.length > 0) {\n        const next = [];\n\n        for (let [r, c, hp] of stack) {\n            if (r < 0 || r >= m || c < 0 || c >= n || seen[r][c] >= hp) continue;\n\n            seen[r][c] = hp;\n\n            if (grid[r][c] === 1) {\n                hp--;\n\n                if (hp === 0) continue;\n            }\n\n            if (r === m - 1 && c === n - 1) {\n                return true;\n            }\n\n            next.push(\n                [r + 1, c, hp],\n                [r, c + 1, hp],\n                [r - 1, c, hp],\n                [r, c - 1, hp],\n            );\n        }\n\n        stack = next;\n    }\n\n    return false;\n};\n",
+    "language": "javascript",
+    "notes": "Simple BFS, only revisiting cells when reaching them with more health than previously.",
+    "aiExplanation": "This function performs a **BFS (breadth-first search)** from the top-left corner to the bottom-right corner of the `grid`, tracking remaining `health` as it moves through each cell; whenever it steps onto a cell containing `1`, it loses one point of health, and if health hits `0` that path is abandoned. It processes the grid **level by level** (using a `stack`/`next` array as the current BFS frontier) and uses a `seen` matrix to prune revisits — a cell is only revisited if the new path reaches it with **more health** than a previous visit (`seen[r][c] >= hp` skips it). As soon as it reaches the bottom-right cell (`r === m - 1 && c === n - 1`) with health remaining, it returns `true`; if the frontier empties out without reaching the destination, it returns `false`.",
+    "status": "DONE",
+    "cpuUsage": 51.72,
+    "memoryUsage": 75.86,
+    "date": "2026-07-02T07:01:49.000Z"
+  }
+]
