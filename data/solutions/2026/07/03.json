@@ -1,0 +1,35 @@
+[
+  {
+    "author": "Leetcode",
+    "code": "/**\n * @param {number[][]} edges\n * @param {boolean[]} online\n * @param {number} k\n * @return {number}\n */\nvar findMaxPathScore = function (edges, online, k) {\n    const n = online.length;\n    const g = Array.from({ length: n }, () => []);\n    let l = Infinity,\n        r = 0;\n\n    for (const [u, v, w] of edges) {\n        if (!online[u] || !online[v]) {\n            continue;\n        }\n        g[u].push([v, w]);\n        l = Math.min(l, w);\n        r = Math.max(r, w);\n    }\n\n    const check = (mid) => {\n        const memo = new Array(n).fill(-1);\n\n        const dfs = (u) => {\n            if (u === n - 1) {\n                return 0;\n            }\n            if (memo[u] !== -1) {\n                return memo[u];\n            }\n\n            let res = Infinity;\n            for (const [v, w] of g[u]) {\n                if (w >= mid) {\n                    res = Math.min(res, dfs(v) + w);\n                }\n            }\n            memo[u] = res;\n            return res;\n        };\n\n        return dfs(0) <= k;\n    };\n\n    if (!check(l)) {\n        return -1;\n    }\n\n    while (l <= r) {\n        const mid = (l + r) >> 1;\n        if (check(mid)) {\n            l = mid + 1;\n        } else {\n            r = mid - 1;\n        }\n    }\n    return r;\n};\n",
+    "language": "javascript",
+    "notes": "Binary search on possible answer, nice trick.",
+    "aiExplanation": "This solution uses **binary search on the answer** to efficiently find the maximum possible value of the smallest edge weight along a path from node `0` to node `n - 1`, given a total cost limit `k`; it first builds a graph from `edges`, skipping any edge that touches an offline node, and finds the range of possible edge weights (`l` to `r`); then, for a candidate threshold `mid`, the `check` function uses **DFS with memoization** to find the cheapest path from node `0` to the destination using only edges with weight `>= mid`, returning whether that cheapest cost fits within `k`; by binary-searching over `mid`, the code narrows in on the highest threshold that still allows a valid path within budget, returning that value as the answer, or `-1` if even the smallest threshold has no valid path.",
+    "status": "DONE",
+    "cpuUsage": 96.43,
+    "memoryUsage": 53.57,
+    "date": "2026-07-03T08:34:59.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} edges\n * @param {boolean[]} online\n * @param {number} k\n * @return {number}\n */\nvar findMaxPathScore = function(edges, online, k) {\n    const n = online.length;\n    const arr = Array.from({ length: n }, () => new Map());\n\n    for (const [u, v, cost] of edges) {\n        if (online[u]) {\n            arr[u].set(v, cost);\n        }\n    }\n\n    let stack = [[0, 0, Infinity]];\n    let res = -Infinity;\n\n    while (stack.length > 0) {\n        const next = [];\n\n        for (const [node, cost, min] of stack) {\n            if (node === n - 1) {\n                res = Math.max(res, min);\n                continue;\n            }\n\n            for (const [con, edge] of arr[node]) {\n                const cc = cost + edge;\n                if (cc <= k) {\n                    next.push([con, cc, Math.min(min, edge)]);\n                }\n            }\n        }\n\n        stack = next;\n    }\n\n    return res === -Infinity ? -1 : res;\n};\n",
+    "language": "javascript",
+    "notes": "Achieved TLE as expected, 517 / 637 testcases passed.",
+    "aiExplanation": "This code searches for the **best possible path** from node `0` to the last node (`n - 1`) in a graph, where each edge has a cost, but only edges starting from an `online` node are allowed; it explores the graph **level by level** (a breadth-first search), tracking for every path the total `cost` spent so far and the `min` (smallest) edge weight used along the way, and only continues down paths whose cost stays within the budget `k`; once a path reaches the destination, its `min` value becomes a candidate answer, and the function ultimately returns the **largest such minimum edge weight** among all valid paths, or `-1` if no path succeeds — though this brute-force exploration of every possible path is what causes it to time out (`TLE`) on larger inputs.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-07-03T08:31:49.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} edges\n * @param {boolean[]} online\n * @param {number} k\n * @return {number}\n */\nvar findMaxPathScore = function(edges, online, k) {\n    const n = online.length;\n    const arr = Array.from({ length: n }, () => new Map());\n\n    for (const [u, v, cost] of edges) {\n        if (online[u]) {\n            arr[u].set(v, cost);\n        }\n    }\n\n    let stack = [[0, 0, Infinity]];\n    let res = -Infinity;\n\n    while (stack.length > 0) {\n        const next = [];\n\n        for (const [node, cost, min] of stack) {\n            if (node === n - 1) {\n                res = Math.max(res, min);\n                continue;\n            }\n\n            for (const [con, edge] of arr[node]) {\n                const cc = cost + edge;\n                if (cc <= k) {\n                    next.push([con, cc, Math.min(min, edge)]);\n                }\n            }\n        }\n\n        stack = next;\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Forgot to check for invalid paths.",
+    "aiExplanation": "This code performs a **breadth-first search** over a graph, exploring node `0` layer by layer while keeping track of the accumulated `cost` and the **smallest edge weight** (`min`) seen so far along each path; whenever it reaches the last node (`n - 1`), it records that path's minimum edge weight as a candidate answer, and after exploring all paths whose total cost stays within `k`, it returns the largest of those minimum edge weights (`res`) — though if no valid path is found, it incorrectly returns `-Infinity` instead of `-1`.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-07-03T08:30:47.000Z"
+  }
+]

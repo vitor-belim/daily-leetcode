@@ -1,0 +1,57 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @param {number[][]} roads\n * @return {number}\n */\nvar minScore = function(n, roads) {\n    const map = new Map();\n    const arr = new Array(n + 1).fill(Infinity);\n\n    for (let i = 1; i <= n; i++) {\n        map.set(i, new Set());\n    }\n\n    for (const [a, b, dist] of roads) {\n        map.get(a).add(b);\n        map.get(b).add(a);\n\n        arr[a] = Math.min(arr[a], dist);\n        arr[b] = Math.min(arr[b], dist);\n    }\n\n    const seen = Array(n + 1).fill(false);\n    seen[1] = true;\n\n    const dfs = (node) => {\n        let min = arr[node];\n\n        for (const con of map.get(node)) {\n            if (!seen[con]) {\n                seen[con] = true;\n                min = Math.min(min, dfs(con));\n            }\n        }\n\n        return min;\n    };\n\n    return dfs(1);\n};\n",
+    "language": "javascript",
+    "notes": "Good enough solution for around 45 minutes of free time. An optimal solution for this problem would be using the **union-find** algorithm.",
+    "aiExplanation": "This function builds an **adjacency map** of the graph and, for each node, stores its smallest connected edge weight in the `arr` array. It then performs a **recursive DFS** starting at node `1`, marking each visited node in `seen`, and at every call returns the minimum between the current node's edge weight and the results of recursing into all of its unvisited neighbors — ultimately giving the smallest road weight reachable from node `1`.",
+    "status": "DONE",
+    "cpuUsage": 80,
+    "memoryUsage": 64,
+    "date": "2026-07-04T10:11:24.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @param {number[][]} roads\n * @return {number}\n */\nvar minScore = function(n, roads) {\n    const map = new Map();\n    const arr = new Array(n + 1).fill(Infinity);\n\n    for (let i = 1; i <= n; i++) {\n        map.set(i, new Set());\n    }\n\n    for (const [a, b, dist] of roads) {\n        map.get(a).add(b);\n        map.get(b).add(a);\n\n        arr[a] = Math.min(arr[a], dist);\n        arr[b] = Math.min(arr[b], dist);\n    }\n\n    let stack = [1];\n    const seen = Array(n + 1).fill(false);\n    seen[1] = true;\n\n    while (stack.length > 0) {\n        const next = [];\n\n        for (const node of stack) {\n            const set = map.get(node);\n\n            for (const con of set) {\n                if (!seen[con]) {\n                    seen[con] = true;\n                    next.push(con);\n                }\n            }\n        }\n\n        stack = next;\n    }\n\n    let res = arr[1];\n\n    for (let i = 2; i <= n; i++) {\n        if (seen[i]) {\n            res = Math.min(res, arr[i]);\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution builds an **adjacency map** of the rooms and stores each node's minimum edge weight in the `arr` array. It runs a **BFS** starting from node `1`, using a `stack`/`next` pair to visit all reachable nodes level by level while marking them in the `seen` array; only after the whole graph has been traversed does it loop through every `seen` node and compute `res` as the minimum of all their `arr` values, returning the smallest road weight reachable from node `1`.",
+    "status": "DONE",
+    "cpuUsage": 72,
+    "memoryUsage": 44,
+    "date": "2026-07-04T09:53:06.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @param {number[][]} roads\n * @return {number}\n */\nvar minScore = function(n, roads) {\n    const map = new Map();\n    const arr = new Array(n + 1).fill(Infinity);\n\n    for (let i = 1; i <= n; i++) {\n        map.set(i, new Set());\n    }\n\n    for (const [a, b, dist] of roads) {\n        map.get(a).add(b);\n        map.get(b).add(a);\n\n        arr[a] = Math.min(arr[a], dist);\n        arr[b] = Math.min(arr[b], dist);\n    }\n\n    let stack = [1];\n    let res = arr[1];\n    const seen = Array(n + 1).fill(false);\n    seen[1] = true;\n\n    while (stack.length > 0) {\n        const next = [];\n\n        for (const node of stack) {\n            res = Math.min(res, arr[node]);\n\n            const set = map.get(node);\n\n            for (const con of set) {\n                if (!seen[con]) {\n                    seen[con] = true;\n                    next.push(con);\n                }\n            }\n        }\n\n        stack = next;\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function builds an **adjacency map** of connected rooms and tracks the minimum edge weight at each node in the `arr` array. It performs a **BFS** from node `1` using a `stack`/`next` pair, marking nodes as `seen` to avoid revisiting them, and updates `res` with the minimum edge weight as soon as each node is processed (rather than after the traversal), finally returning the smallest road weight found while exploring from node `1`.",
+    "status": "DONE",
+    "cpuUsage": 84,
+    "memoryUsage": 20,
+    "date": "2026-07-04T09:49:07.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @param {number[][]} roads\n * @return {number}\n */\nvar minScore = function(n, roads) {\n    const map = new Map();\n    const arr = new Array(n + 1).fill(Infinity);\n\n    for (let i = 1; i <= n; i++) {\n        map.set(i, new Set());\n    }\n\n    for (const [a, b, dist] of roads) {\n        map.get(a).add(b);\n        map.get(b).add(a);\n\n        arr[a] = Math.min(arr[a], dist);\n        arr[b] = Math.min(arr[b], dist);\n    }\n\n    let stack = [1];\n    let res = arr[1];\n\n    while (stack.length > 0) {\n        const next = [];\n\n        for (const node of stack) {\n            res = Math.min(res, arr[node]);\n\n            const set = map.get(node);\n\n            for (const con of set) {\n                next.push(con);\n                map.get(con).delete(node);\n            }\n\n            set.clear();\n        }\n\n        stack = next;\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution builds an **adjacency map** between rooms and records the smallest edge weight touching each node in the `arr` array. It then runs a **BFS** starting from node `1`, using a `stack`/`next` pattern to advance level by level; instead of a separate `seen` array, it prevents revisits by **deleting each edge from both directions** (`map.get(con).delete(node)`) and clearing the current node's connection set right after processing it, while continuously updating `res` with the minimum edge weight seen so far — returning the smallest road weight reachable from node `1`.",
+    "status": "DONE",
+    "cpuUsage": 32,
+    "memoryUsage": 8,
+    "date": "2026-07-04T09:47:36.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @param {number[][]} roads\n * @return {number}\n */\nvar minScore = function(n, roads) {\n    const map = new Map();\n    const arr = new Array(n + 1).fill(Infinity);\n\n    for (let i = 1; i <= n; i++) {\n        map.set(i, new Set());\n    }\n\n    for (const [a, b, dist] of roads) {\n        map.get(a).add(b);\n        map.get(b).add(a);\n\n        arr[a] = Math.min(arr[a], dist);\n        arr[b] = Math.min(arr[b], dist);\n    }\n\n    let stack = [1];\n    let res = arr[1];\n\n    while (stack.length > 0) {\n        const next = [];\n\n        for (const node of stack) {\n            const set = map.get(node);\n\n            for (const con of set) {\n                next.push(con);\n                res = Math.min(res, arr[node]);\n            }\n\n            set.clear();\n        }\n\n        stack = next;\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function builds an **adjacency map** of the graph and, for each node, tracks the smallest edge weight touching it in the `arr` array. Starting from node `1`, it performs a **BFS** using a `stack`/`next` pair to process nodes level by level; for every edge it visits, it clears the node's connection set (so it's never revisited) and updates `res` with the minimum between the current result and that node's minimum edge weight, ultimately returning the smallest road weight reachable from node `1`.",
+    "status": "DONE",
+    "cpuUsage": 48,
+    "memoryUsage": 8,
+    "date": "2026-07-04T09:41:20.000Z"
+  }
+]
