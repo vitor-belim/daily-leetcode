@@ -101,7 +101,10 @@ export async function getSolutions(
       `${day}.json`,
     );
     const content = await fs.readFile(filePath, "utf8");
-    return JSON.parse(content);
+    return JSON.parse(content).sort(
+      (a: Solution, b: Solution) =>
+        new Date(b.date).getTime() - new Date(a.date).getTime(),
+    );
   } catch {
     return [];
   }

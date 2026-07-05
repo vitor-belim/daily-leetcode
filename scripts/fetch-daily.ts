@@ -1,3 +1,4 @@
+import { Solution } from "@/lib/data";
 import { config } from "dotenv";
 import fs from "fs";
 import path from "path";
@@ -206,7 +207,7 @@ async function main() {
     }
 
     if (!fs.existsSync(solutionsFilePath)) {
-      let fetchedSolutions = [];
+      let fetchedSolutions: Solution[] = [];
 
       console.log("Fetching your submissions for this question...");
       const submissionListData = await fetchLeetCode(SUBMISSION_LIST_QUERY, {
@@ -222,7 +223,7 @@ async function main() {
       if (submissions.length > 0) {
         console.log(`Found ${submissions.length} submissions.`);
 
-        const solutionsMap = new Map();
+        const solutionsMap = new Map<string, Solution>();
 
         for (const sub of submissions) {
           console.log(`Fetching details for submission: ${sub.id}`);
@@ -239,8 +240,8 @@ async function main() {
 
           if (
             !existing ||
-            cpuUsage > existing.cpuUsage ||
-            memoryUsage > existing.memoryUsage
+            cpuUsage > (existing.cpuUsage || 0) ||
+            memoryUsage > (existing.memoryUsage || 0)
           ) {
             const status =
               details.statusDisplay === "Accepted"
@@ -259,10 +260,10 @@ async function main() {
               aiExplanation: "",
               status: status,
               cpuUsage: existing
-                ? Math.max(existing.cpuUsage, cpuUsage)
+                ? Math.max(existing.cpuUsage || 0, cpuUsage)
                 : cpuUsage,
               memoryUsage: existing
-                ? Math.max(existing.memoryUsage, memoryUsage)
+                ? Math.max(existing.memoryUsage || 0, memoryUsage)
                 : memoryUsage,
               date: new Date(parseInt(sub.timestamp) * 1000).toISOString(),
             });
@@ -271,9 +272,9 @@ async function main() {
 
         fetchedSolutions = Array.from(solutionsMap.values());
 
-        // Sort by date descending (latest first)
+        // Sort by date ascending (oldest first)
         fetchedSolutions.sort(
-          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+          (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
         );
       } else {
         console.log("No submissions found for this question.");
