@@ -1,0 +1,35 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} intervals\n * @return {number}\n */\nvar removeCoveredIntervals = function(intervals) {\n    intervals.sort((a, b) => a[0] === b[0] ? b[1] - a[1] : a[0] - b[0]);\n\n    let res = intervals.length;\n    let maxEnd = -Infinity;\n\n    for (const interval of intervals) {\n        if (interval[1] < maxEnd) {\n            res--;\n        }\n        maxEnd = Math.max(maxEnd, interval[1]);\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Minor mistake on < vs <=.",
+    "aiExplanation": "This code first **sorts** the `intervals` by their start value, breaking ties by putting the interval with the *larger* end value first, then scans through them while tracking `maxEnd` (the largest end seen so far) and decrements a `res` counter whenever the current interval's end is *strictly less than* `maxEnd`; however, since an interval whose end **equals** `maxEnd` is also fully covered by a previous one, using `<` instead of `<=` causes it to miss those cases and undercount removed intervals.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-07-06T07:46:57.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} intervals\n * @return {number}\n */\nvar removeCoveredIntervals = function(intervals) {\n    intervals.sort((a, b) => a[0] === b[0] ? b[1] - a[1] : a[0] - b[0]);\n\n    let res = intervals.length;\n    let maxEnd = -Infinity;\n\n    for (const interval of intervals) {\n        if (interval[1] <= maxEnd) {\n            res--;\n        }\n        maxEnd = Math.max(maxEnd, interval[1]);\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Intuition, looking for first acceptance.",
+    "aiExplanation": "This code **sorts** the `intervals` by start value (and by descending end value for ties), then iterates through them tracking the largest end seen so far in `maxEnd`; each time an interval's end is **less than or equal to** `maxEnd`, it means that interval is fully covered by a previous one, so the `res` counter (initialized to the total count) is decremented, ultimately returning the number of intervals that remain **uncovered**.",
+    "status": "DONE",
+    "cpuUsage": 53.19,
+    "memoryUsage": 61.7,
+    "date": "2026-07-06T07:47:46.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} intervals\n * @return {number}\n */\nvar removeCoveredIntervals = function(intervals) {\n    intervals.sort((a, b) => a[0] === b[0] ? b[1] - a[1] : a[0] - b[0]);\n\n    let maxEnd = -Infinity;\n    let res = 0;\n\n    for (const interval of intervals) {\n        if (interval[1] > maxEnd) {\n            maxEnd = interval[1];\n            res++;\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Code cleanup, not enough tests to accurately measure performance.",
+    "aiExplanation": "This code **sorts** the `intervals` by start value (breaking ties by putting the longer interval first), then walks through them while tracking `maxEnd`; whenever the current interval's end is **greater than** `maxEnd`, that interval is not covered by any previous one, so it updates `maxEnd` and increments the `res` counter, meaning `res` ends up counting only the intervals that are **not covered** by another interval in the list.",
+    "status": "DONE",
+    "cpuUsage": 29.79,
+    "memoryUsage": 36.17,
+    "date": "2026-07-06T07:49:51.000Z"
+  }
+]
