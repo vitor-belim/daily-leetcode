@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @return {number}\n */\nvar sumAndMultiply = function(n) {\n    let x = 0;\n    let sum = 0;\n    let count = 0;\n\n    while (n > 0) {\n        const rem = n % 10;\n        if (rem > 0) {\n            x += rem * Math.pow(10, count);\n            sum += rem;\n            count++;\n        }\n        n = Math.floor(n / 10);\n    }\n\n    return x * sum;\n};\n",
+    "language": "javascript",
+    "notes": "Could have potentially improved by keeping a `pow10` variable (with `*= 10` on every iteration) and avoiding the `Math.pow` call.",
+    "aiExplanation": "This function iterates over the digits of `n` from right to left using `% 10` and `Math.floor(n / 10)`, **skipping any zero digits** entirely; for each non-zero digit it appends it to a new number `x` (built up via `count` as a power-of-ten position tracker) and adds it to a running `sum`, then finally returns the product `x * sum`.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 67.86,
+    "date": "2026-07-07T06:49:59.000Z"
+  }
+]
