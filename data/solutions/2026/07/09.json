@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @param {number[]} nums\n * @param {number} maxDiff\n * @param {number[][]} queries\n * @return {boolean[]}\n */\nvar pathExistenceQueries = function(n, nums, maxDiff, queries) {\n    const res = [];\n\n    for (const [u, v] of queries) {\n        let con = true;\n\n        for (let i = Math.min(u, v); i < Math.max(u, v); i++) {\n            if (Math.abs(nums[i] - nums[i + 1]) > maxDiff) {\n                con = false;\n                break;\n            }\n        }\n\n        res.push(con);\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "'Dumb' solution for quick approval.",
+    "aiExplanation": "This is a **brute-force** approach: for each query `[u, v]`, it walks every index between `min(u, v)` and `max(u, v)` and checks whether each adjacent pair of numbers differs by more than `maxDiff`; if any adjacent gap is too big, the path is marked unreachable (`con = false`). It's correct but works query-by-query in `O(n)` time each, so it's slower and less scalable than a solution that precomputes connectivity once up front.",
+    "status": "DONE",
+    "cpuUsage": 5.22,
+    "memoryUsage": 95.77,
+    "date": "2026-07-09T07:12:52.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @param {number[]} nums\n * @param {number} maxDiff\n * @param {number[][]} queries\n * @return {boolean[]}\n */\nvar pathExistenceQueries = function (n, nums, maxDiff, queries) {\n    const groups = Array(n).fill(0);\n    let curr = 0;\n\n    for (let i = 1; i < n; i++) {\n        if (nums[i] - nums[i - 1] > maxDiff) {\n            curr++;\n        }\n        groups[i] = curr;\n    }\n\n    const res = [];\n\n    for (const [u, v] of queries) {\n        res.push(groups[u] === groups[v]);\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Because nums are pre-sorted, it's possible to attribute groups first before querying. Much more efficient.",
+    "aiExplanation": "This is a smarter **grouping (union-find-like) approach**: in a single pass through `nums`, it assigns each index to a `groups` bucket, starting a **new group** every time the gap to the previous number exceeds `maxDiff` (since that breaks the connecting path). Two indices can then reach each other if and only if they landed in the **same group**, so each query becomes an `O(1)` lookup (`groups[u] === groups[v]`) instead of rescanning a range — turning the whole algorithm from `O(n)` per query into `O(n)` total preprocessing plus `O(1)` per query.",
+    "status": "DONE",
+    "cpuUsage": 46.27,
+    "memoryUsage": 41.29,
+    "date": "2026-07-09T07:15:49.000Z"
+  }
+]

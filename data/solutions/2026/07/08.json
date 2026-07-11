@@ -1,0 +1,46 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @param {number[][]} queries\n * @return {number[]}\n */\nvar sumAndMultiply = function(s, queries) {\n    const dp = Array(s.length + 1).fill(0);\n\n    for (let i = 0; i < s.length; i++) {\n        dp[i + 1] = dp[i] + Number(s[i]);\n    }\n\n    const res = [];\n    const MOD = 10 ** 9 + 7;\n\n    for (const [l, r] of queries) {\n        const x = Number(s.slice(l, r + 1).replace(/0/g, ''));\n        const sum = dp[r + 1] - dp[l];\n        res.push((x * sum) % MOD);\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution first builds a **prefix-sum array** `dp` where `dp[i]` holds the running total of all digits in `s` up to index `i-1`, so the sum of digits in any range `[l, r]` can be computed instantly as `dp[r+1] - dp[l]`. For each query, it takes the substring `s[l..r]`, **strips out zeros** with `replace(/0/g, '')`, converts what's left to a `Number`, and multiplies that by the digit-sum of the range, taking the result `mod 1e9+7`. It fails because converting a long digit string directly to a plain JavaScript `Number` loses precision once the value exceeds `Number.MAX_SAFE_INTEGER`, so large substrings produce an incorrect concatenated value before the multiplication even happens.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-07-08T06:48:19.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @param {number[][]} queries\n * @return {number[]}\n */\nvar sumAndMultiply = function(s, queries) {\n    const dp = Array(s.length + 1).fill(0);\n\n    for (let i = 0; i < s.length; i++) {\n        dp[i + 1] = dp[i] + Number(s[i]);\n    }\n\n    const res = [];\n    const MOD = 10 ** 9 + 7;\n\n    for (const [l, r] of queries) {\n        const x = Number(s.slice(l, r + 1).replace(/0/g, ''));\n        const sum = dp[r + 1] - dp[l];\n        res.push(((x % MOD) * sum) % MOD);\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is nearly identical to the first attempt: it uses a **prefix-sum array** `dp` to get the digit-sum of any range in O(1), then for each query strips zeros from the substring, converts it to a `Number`, and now takes `x % MOD` *before* multiplying by `sum`. This still fails because the bug isn't in the modulo step — it's that `Number(s.slice(l, r + 1).replace(/0/g, ''))` already loses precision for long digit strings before `% MOD` is ever applied, so `x` itself is wrong for large inputs.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-07-08T06:51:08.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @param {number[][]} queries\n * @return {number[]}\n */\nvar sumAndMultiply = function(s, queries) {\n    const dp = Array(s.length + 1).fill(0);\n\n    for (let i = 0; i < s.length; i++) {\n        dp[i + 1] = dp[i] + Number(s[i]);\n    }\n\n    const res = [];\n    const MOD = 10n ** 9n + 7n;\n\n    for (const [l, r] of queries) {\n        const x = BigInt(s.slice(l, r + 1).replace(/0/g, ''));\n        const sum = BigInt(dp[r + 1] - dp[l]);\n        res.push(Number(((x % MOD) * sum) % MOD));\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Happy with a TLE, 508 / 523 testcases passed.",
+    "aiExplanation": "This version fixes the precision bug by switching to **`BigInt`**: it still uses a `dp` prefix-sum array for digit sums, but now converts the zero-stripped substring with `BigInt(...)` and does the multiplication and modulo (`MOD = 10n ** 9n + 7n`) using big-integer arithmetic so large numbers stay exact. It gets the right answer but times out because, for every query, it re-slices and re-parses a potentially very long substring of `s` and strips its zeros from scratch — with many queries on a long string, this repeated `O(n)` work per query becomes too slow overall.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-07-08T06:53:43.000Z"
+  },
+  {
+    "author": "Leetcode",
+    "code": "const MAX_N = 100_000;\nconst MOD = 10n ** 9n + 7n;\nconst pow10 = new Array(MAX_N + 1);\n\npow10[0] = 1n;\nfor (let i = 1; i <= MAX_N; i++) {\n    pow10[i] = (pow10[i - 1] * 10n) % MOD;\n}\n\n/**\n * @param {string} s\n * @param {number[][]} queries\n * @return {number[]}\n */\nvar sumAndMultiply = function(s, queries) {\n    const dpX = Array(s.length + 1).fill(0n);\n    const dpSum = Array(s.length + 1).fill(0n);\n    const dpLen = Array(s.length + 1).fill(0n);\n\n    for (let i = 0; i < s.length; i++) {\n        const cur = BigInt(s[i]);\n        dpX[i + 1] = cur > 0 ? (dpX[i] * 10n + cur) % MOD : dpX[i];\n        dpSum[i + 1] = dpSum[i] + cur;\n        dpLen[i + 1] = dpLen[i] + (cur > 0 ? 1n : 0n);\n    }\n\n    const res = [];\n\n    for (const [l, r] of queries) {\n        const len = dpLen[r + 1] - dpLen[l];\n        const x = (dpX[r + 1] - ((dpX[l] * pow10[len]) % MOD) + MOD) % MOD;\n        const sum = dpSum[r + 1] - dpSum[l];\n        res.push(Number((x * sum) % MOD));\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "I didn't fully understand the math that went into this solution, nor did I have the time to really look at it.",
+    "aiExplanation": "This accepted solution avoids re-scanning substrings entirely by precomputing three **prefix arrays** in one pass over `s`: `dpSum` (running digit sum), `dpLen` (running count of *non-zero* digits), and `dpX` (the value you'd get by concatenating all non-zero digits so far, kept modulo `1e9+7` using `BigInt`). It also precomputes `pow10`, powers of 10 mod `MOD`, up front. For each query `[l, r]`, it finds how many non-zero digits lie before `l` (`dpLen[l]`) to know how far to \"shift\" `dpX[l]` with `pow10[len]`, then subtracts that shifted prefix from `dpX[r+1]` to isolate the concatenated value for just the `[l, r]` range — turning what used to be `O(n)` per query into **`O(1)`**, which is why it now runs fast enough to pass.",
+    "status": "DONE",
+    "cpuUsage": 10.64,
+    "memoryUsage": 55,
+    "date": "2026-07-08T07:45:27.000Z"
+  }
+]

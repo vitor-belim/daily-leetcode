@@ -1,0 +1,57 @@
+[
+  {
+    "author": "Leetcode",
+    "code": "/**\n * @param {number} n\n * @param {number[][]} edges\n * @return {number}\n */\nvar countCompleteComponents = function(n, edges) {\n    let graph = Array.from({ length: n }, () => []);\n    let visited = new Array(n).fill(false);\n\n    for (let [u, v] of edges) {\n        graph[u].push(v);\n        graph[v].push(u);\n    }\n\n    const dfs = (node, components) => {\n        visited[node] = true;\n        components.push(node);\n\n        for (let neighbor of graph[node]) {\n            if (!visited[neighbor]) {\n                dfs(neighbor, components);\n            }\n        }\n    };\n\n    let res = 0;\n    \n    for (let i = 0; i < n; i++) {\n        if (visited[i]) {\n            continue;\n        }\n\n        let components = [];\n        dfs(i, components);\n\n        const isComplete = components.every(node => graph[node].length === components.length - 1);\n\n        if (isComplete) {\n            res++;\n        }\n    }\n    \n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution builds an **adjacency list** and then runs a **DFS** from every unvisited node to collect all the nodes belonging to its connected component into a `components` array. A component is *complete* if it behaves like a full clique — every node inside it must be directly connected to **all other nodes** in that component, which is checked with `graph[node].length === components.length - 1` (each node's degree equals the component size minus one). The DFS visits each node once overall, so the whole approach runs in linear time relative to the number of nodes and edges.",
+    "status": "DONE",
+    "cpuUsage": 88.64,
+    "memoryUsage": 100,
+    "date": "2025-03-22T08:40:00.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @param {number[][]} edges\n * @return {number}\n */\nvar countCompleteComponents = function(n, edges) {\n    const arr = Array.from({ length: n }, () => new Set());\n\n    for (const [u, v] of edges) {\n        arr[u].add(v);\n        arr[v].add(u);\n    }\n\n    const seen = Array(n).fill(undefined);\n\n    const dfs = (pos) => {\n        if (seen[pos] !== undefined) return seen[pos];\n\n        seen[pos] = true;\n\n        for (const con of arr[pos]) {\n            if (arr[con].size !== arr[pos].size || !arr[con].has(pos) || !dfs(con)) {\n                seen[pos] = false;\n                return seen[pos];\n            }\n        }\n\n        seen[pos] = true;\n        return seen[pos];\n    };\n\n    let res = 0;\n\n    for (let i = 0; i < n; i++) {\n        if (seen[i] === undefined && dfs(i)) {\n            res++;\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This attempt tries to check completeness **without** first fully collecting each component: it builds an adjacency map of `Set`s and recursively checks, for the current node and each neighbor, whether they have the **same degree**, are mutually connected, and pass the same recursive check. The bug is in the memoization — `seen[pos]` is set to `true` *before* the neighbor checks run (to guard against infinite recursion on cycles), but if a later check fails it's flipped to `false` and returned immediately without correcting any earlier calls that had already read the premature `true`, so partially-explored nodes can be judged complete or incomplete based on stale, inconsistent state rather than the true shape of their component.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-07-11T08:16:29.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @param {number[][]} edges\n * @return {number}\n */\nvar countCompleteComponents = function(n, edges) {\n    const arr = Array.from({ length: n }, () => new Set());\n\n    for (let i = 0; i < n; i++) {\n        arr[i].add(i);\n    }\n\n    for (const [u, v] of edges) {\n        arr[u].add(v);\n        arr[v].add(u);\n    }\n\n    const dp = Array(n);\n\n    for (let i = 0; i < n; i++) {\n        dp[i] = [...arr[i]].sort((a, b) => a - b).toString();\n    }\n\n    const seen = Array(n).fill(undefined);\n\n    const dfs = (pos) => {\n        if (seen[pos] !== undefined) return seen[pos];\n\n        let val = true;\n\n        for (const con of arr[pos]) {\n            if (dp[pos] !== dp[con]) {\n                val = false;\n                break;\n            }\n        }\n\n        for (const con of arr[pos]) {\n            seen[con] = val;\n        }\n\n        seen[pos] = val;\n        return seen[pos];\n    };\n\n    let res = 0;\n\n    for (let i = 0; i < n; i++) {\n        if (seen[i] === undefined && dfs(i)) {\n            res++;\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses a clever shortcut: for each node it builds a **signature** `dp[i]` — its own index plus all its neighbors, sorted and joined into a string. In a *complete* component (a clique), every node's neighbor set (including itself) is exactly the **same set**, equal to the whole component's vertex list, so all nodes in a complete component share an identical signature string. The `dfs` for a node just compares its own signature against every neighbor's signature; if they all match, the node (and, since they must all match too, its neighbors) are marked complete in one shot, avoiding a separate traversal to gather component membership. This turns the completeness check into a simple **string-equality comparison** per edge instead of counting degrees against a collected component size.",
+    "status": "DONE",
+    "cpuUsage": 9.09,
+    "memoryUsage": 29.55,
+    "date": "2026-07-11T08:27:56.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @param {number[][]} edges\n * @return {number}\n */\nvar countCompleteComponents = function(n, edges) {\n    const arr = Array.from({ length: n }, (_, i) => new Set([i]));\n\n    for (const [u, v] of edges) {\n        arr[u].add(v);\n        arr[v].add(u);\n    }\n\n    const dp = Array(n);\n\n    for (let i = 0; i < n; i++) {\n        dp[i] = [...arr[i]].sort((a, b) => a - b).toString();\n    }\n\n    const seen = Array(n).fill(undefined);\n\n    const dfs = (pos) => {\n        if (seen[pos] !== undefined) return seen[pos];\n\n        seen[pos] = [...arr[pos]].every(con => dp[con] === dp[pos]);\n\n        for (const con of arr[pos]) {\n            seen[con] = seen[pos];\n        }\n\n        return seen[pos];\n    };\n\n    let res = 0;\n\n    for (let i = 0; i < n; i++) {\n        if (seen[i] === undefined && dfs(i)) {\n            res++;\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is a tidied-up version of the previous solution using the same **signature-matching** trick: each node's `dp` value is a sorted, stringified set of itself plus its direct neighbors, and a component is complete exactly when every node in it shares the identical signature (since a clique's per-node neighbor set equals the whole component). The `dfs` function condenses the check into a single `.every(...)` expression comparing `dp[con] === dp[pos]` for all neighbors, then propagates that same `true`/`false` result to every neighbor in one pass, so each component is resolved with minimal recomputation.",
+    "status": "DONE",
+    "cpuUsage": 9.09,
+    "memoryUsage": 36.36,
+    "date": "2026-07-11T08:34:41.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @param {number[][]} edges\n * @return {number}\n */\nvar countCompleteComponents = function(n, edges) {\n    const arr = Array.from({ length: n }, () => new Set());\n\n    for (const [u, v] of edges) {\n        arr[u].add(v);\n        arr[v].add(u);\n    }\n\n    const seen = Array(n).fill(false);\n\n    const dfs = (pos, components) => {\n        seen[pos] = true;\n        components.push(pos);\n\n        for (const con of arr[pos]) {\n            if (!seen[con]) {\n                dfs(con, components);\n            }\n        }\n    };\n\n    let res = 0;\n\n    for (let i = 0; i < n; i++) {\n        if (seen[i]) continue;\n\n        const components = [];\n\n        dfs(i, components);\n\n        if (components.every(con => arr[con].size === components.length - 1)) {\n            res++;\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "This was POTD a year ago in May. At the time, I copy/pasted a solution from Leetcode. Today I tried 2 different strategies, getting acceptance in both. It feels good to see progress.",
+    "aiExplanation": "This solution goes back to the more direct **DFS + degree-check** approach: it builds an adjacency map of `Set`s, then for each unvisited node runs a DFS to collect every node in its connected `components` list, and finally checks whether every node's degree (`arr[con].size`) equals `components.length - 1` — the condition for a clique, where each node must connect to all others in the component. It's functionally the same idea as the very first attempt, just rewritten with `Set`-based adjacency instead of arrays, and remains a clear, easy-to-follow `O(V + E)` solution.",
+    "status": "DONE",
+    "cpuUsage": 43.18,
+    "memoryUsage": 61.36,
+    "date": "2026-07-11T09:12:43.000Z"
+  }
+]
