@@ -1,0 +1,90 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} arr\n * @return {number[]}\n */\nvar arrayRankTransform = function(arr) {\n    const objs = arr\n        .map((el, i) => ({ el, i}))\n        .sort((a, b) => a.el - b.el);\n\n    let rank = 0;\n    let last = null;\n\n    for (const { el, i } of objs) {\n        if (last === null || el !== last) {\n            last = el;\n            rank++;\n        }\n\n        arr[i] = rank;\n    }\n\n    return arr;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function pairs each array element with its original index, **sorts** those pairs by value, then walks through the sorted list assigning an incrementing `rank` — only bumping the rank when the current value differs from the previous one (so equal values share a rank) — and writes that rank back into the original array at the element's saved index, ultimately returning the mutated `arr` as the rank-transformed result.",
+    "status": "DONE",
+    "cpuUsage": 5.26,
+    "memoryUsage": 100,
+    "date": "2024-10-02T06:40:50.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} arr\n * @return {number[]}\n */\nvar arrayRankTransform = function(arr) {\n    const sorted = arr.slice().sort((a, b) => a - b);\n    const map = new Map();\n\n    for (const num of sorted) {\n        if (!map.has(num)) {\n            map.set(num, map.size + 1);\n        }\n    }\n\n    return arr.map(num => map.get(num));\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function first makes a **sorted copy** of the array, then builds a `Map` that assigns each *distinct* value a rank equal to how many unique values had been recorded before it (using `map.size + 1`), which naturally skips duplicates since `has` guards against overwriting; finally it produces the result by mapping the original array through that lookup, so each number is replaced with its precomputed rank.",
+    "status": "DONE",
+    "cpuUsage": 52.63,
+    "memoryUsage": 75.19,
+    "date": "2026-07-12T08:57:38.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} arr\n * @return {number[]}\n */\nvar arrayRankTransform = function(arr) {\n    const n = arr.length;\n    const positions = Array.from({ length: n }, (_, i) => i);\n\n    positions.sort((a, b) => arr[a] - arr[b]);\n\n    const res = Array(n);\n    let pos = 0;\n\n    for (let i = 0; i < n; i++) {\n        if (arr[positions[i]] !== arr[positions[i - 1]]) {\n            pos++;\n        }\n        res[positions[i]] = pos;\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function builds an array of **indices** `0..n-1` and sorts those indices by the value they point to in `arr`, effectively getting the sort order without moving the original data; it then scans the sorted indices, incrementing a `pos` counter whenever the referenced value differs from the previous one, and stores that counter into a new `res` array at each original index, returning `res` as the ranked output.",
+    "status": "DONE",
+    "cpuUsage": 51.13,
+    "memoryUsage": 100,
+    "date": "2026-07-12T09:13:16.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} arr\n * @return {number[]}\n */\nvar arrayRankTransform = function(arr) {\n    const n = arr.length;\n    const positions = Array.from({ length: n }, (_, i) => ({ num: arr[i], pos: i }));\n\n    positions.sort((a, b) => a.num - b.num);\n\n    let rank = 1;\n    arr[positions[0].pos] = 1;\n\n    for (let i = 1; i < n; i++) {\n        if (positions[i].num !== positions[i - 1].num) {\n            rank++;\n        }\n        arr[positions[i].pos] = rank;\n    }\n\n    return arr;\n};\n",
+    "language": "javascript",
+    "notes": "Empty array test! -_-",
+    "aiExplanation": "This function pairs each value with its original position, **sorts** those pairs by value, then hardcodes the very first sorted position's rank to `1` before looping through the rest and bumping `rank` whenever the value changes from the previous one, writing each rank back into `arr` at its original position; the bug is that it unconditionally accesses `positions[0]` without checking if the array is empty, so it **throws** on an empty input instead of returning an empty array.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-07-12T09:19:25.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} arr\n * @return {number[]}\n */\nvar arrayRankTransform = function(arr) {\n    const n = arr.length;\n    const positions = Array.from({ length: n }, (_, i) => ({ num: arr[i], pos: i }));\n\n    positions.sort((a, b) => a.num - b.num);\n\n    let rank = 1;\n    if (positions.length > 0) {\n        arr[positions[0].pos] = 1;\n    }\n\n    for (let i = 1; i < n; i++) {\n        if (positions[i].num !== positions[i - 1].num) {\n            rank++;\n        }\n        arr[positions[i].pos] = rank;\n    }\n\n    return arr;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is the fixed version of the previous attempt: it pairs each value with its original position, **sorts** the pairs by value, and now guards the initial rank assignment with `if (positions.length > 0)` so an empty array no longer crashes; it then loops through the remaining sorted pairs, incrementing `rank` whenever the value differs from the one before it, and writes each rank back into `arr` at the value's original position before returning `arr`.",
+    "status": "DONE",
+    "cpuUsage": 34.59,
+    "memoryUsage": 31.58,
+    "date": "2026-07-12T09:20:25.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} arr\n * @return {number[]}\n */\nvar arrayRankTransform = function(arr) {\n    let temp = 0;\n\n    const ranks = arr\n        .map((num, pos) => ({ num, pos }))\n        .sort((a, b) => a.num - b.num)\n        .forEach((obj, pos, list) => {\n            if (pos === 0 || list[pos].num !== list[pos - 1].num) {\n                temp++;\n            }\n\n            arr[obj.pos] = temp;\n\n            return obj;\n        });\n\n    return arr;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function chains `map`, `sort`, and `forEach` to pair each value with its original position, order those pairs by value, and then iterate the sorted list while incrementing a `temp` counter whenever it's the first element or the value differs from the previous one, writing that counter back into `arr` at the value's original position; the `forEach` return value is meaningless (its result, `ranks`, is never used) since the real output is the mutated `arr` returned at the end.",
+    "status": "DONE",
+    "cpuUsage": 62.41,
+    "memoryUsage": 75.19,
+    "date": "2026-07-12T09:41:06.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} arr\n * @return {number[]}\n */\nvar arrayRankTransform = function(arr) {\n    let rank = 0;\n\n    const ranks = arr\n        .map((num, pos) => ({ num, pos }))\n        .sort((a, b) => a.num - b.num)\n        .forEach((obj, pos, list) => {\n            if (pos === 0 || list[pos].num !== list[pos - 1].num) {\n                rank++;\n            }\n\n            arr[obj.pos] = rank;\n        });\n\n    return arr;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "A near-identical cleanup of the previous solution: it pairs each value with its original position, **sorts** by value, then walks the sorted pairs with `forEach`, bumping a `rank` counter on the first element or whenever the value changes, and writes that rank into `arr` at the original position; the unused `ranks` constant (the `forEach` call itself returns `undefined`) is dead code left over from chaining, and the real work happens through the side effect of mutating `arr` before it's returned.",
+    "status": "DONE",
+    "cpuUsage": 78.95,
+    "memoryUsage": 74.44,
+    "date": "2026-07-12T09:55:17.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} arr\n * @return {number[]}\n */\nvar arrayRankTransform = function(arr) {\n    const sorted = arr\n        .map((num, pos) => ({ num, pos }))\n        .sort((a, b) => a.num - b.num);\n\n    let rank = 1;\n\n    for (let i = 0; i < arr.length; i++) {\n        if (i > 0 && sorted[i].num > sorted[i - 1].num) {\n            rank++;\n        }\n\n        arr[sorted[i].pos] = rank;\n    }\n\n    return arr;\n};\n",
+    "language": "javascript",
+    "notes": "Tried a bunch of different solutions, confirmed performance is not being measured accurately. Also, it hurts to look at my own code from 2 years ago.",
+    "aiExplanation": "This function pairs each value with its original position, **sorts** the pairs by value, and starts `rank` at `1` (rather than `0`, avoiding a separate first-element check); it then loops through the sorted list, incrementing `rank` only when the current value is strictly greater than the previous one, and writes that rank back into `arr` at the value's original position, returning the mutated `arr` as the final rank-transformed array.",
+    "status": "DONE",
+    "cpuUsage": 36.09,
+    "memoryUsage": 31.58,
+    "date": "2026-07-12T10:02:07.000Z"
+  }
+]
