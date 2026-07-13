@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} low\n * @param {number} high\n * @return {number[]}\n */\nvar sequentialDigits = function(low, high) {\n    const res = new Set();\n\n    const dfs = (num) => {\n        if (num > high) return;\n\n        if (num >= low) {\n            res.add(num);\n        }\n\n        const lastDigit = num % 10;\n\n        if (lastDigit === 9) return;\n\n        num = num * 10 + (lastDigit + 1);\n\n        dfs(num);\n    };\n\n    for (let i = 1; i <= 9; i++) {\n        dfs(i);\n    }\n\n    return [...res].sort((a, b) => a - b);\n};\n",
+    "language": "javascript",
+    "notes": "A Set was likely not necessary. Also, using BFS could have improved performance by not having to sort at the end. Since performance is already at 100%, no further optimizations were made.",
+    "aiExplanation": "This code finds all **sequential-digit numbers** (like `123` or `2345`, where each digit is exactly one more than the previous) that fall within the `[low, high]` range. It uses a recursive helper, `dfs`, that starts from each single digit `1` through `9` and repeatedly appends the next consecutive digit (e.g., `1` → `12` → `123` → ...), adding any number that lands within `[low, high]` to a `Set` (to avoid duplicates), and stopping once the number exceeds `high` or its last digit is `9` (since no larger sequential number can be formed). Finally, it converts the set into an array and sorts it numerically in ascending order before returning it.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 81.82,
+    "date": "2026-07-13T06:41:34.000Z"
+  }
+]
