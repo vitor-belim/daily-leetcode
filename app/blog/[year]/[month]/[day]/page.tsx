@@ -6,13 +6,21 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getProblem, getSolutions } from "@/lib/data";
+import { getAdjacentDates, getProblem, getSolutions } from "@/lib/data";
 import { markdownToHtml } from "@/lib/markdown";
-import { cn, formatDate, timeAgo } from "@/lib/utils";
-import { ChevronLeft, Cpu, ExternalLink, HardDrive } from "lucide-react";
+import { cn, formatDate, formatLongDate, timeAgo } from "@/lib/utils";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Cpu,
+  ExternalLink,
+  HardDrive,
+  House,
+} from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -26,6 +34,8 @@ export default async function ProblemPage({
   const solutions = await getSolutions(year, month, day);
 
   if (!problem) notFound();
+
+  const { prev, next } = await getAdjacentDates(`${year}-${month}-${day}`);
 
   const authorMap = new Map<string, number>();
 
@@ -60,20 +70,54 @@ export default async function ProblemPage({
   return (
     <div className="flex flex-col h-screen max-h-screen overflow-hidden">
       {/* Header */}
-      <header className="border-b px-6 py-4 flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-4">
+      <header className="border-b px-6 py-4 grid grid-cols-3 items-center shrink-0">
+        <div className="flex items-center">
           <Link
             href="/"
             className="p-2 hover:bg-accent rounded-full transition-colors"
           >
-            <ChevronLeft className="w-5 h-5" />
+            <House className="w-5 h-5" />
           </Link>
-          <div>
-            <h1 className="text-xl font-bold leading-none">{problem.title}</h1>
-            <p className="text-sm text-muted-foreground mt-1">{problem.date}</p>
+        </div>
+
+        <div className="flex flex-col items-center">
+          <h1 className="text-xl font-bold leading-none">{problem.title}</h1>
+          <div className="flex items-center gap-1 mt-1">
+            <Button
+              variant="ghost"
+              size="icon-xs"
+              className="rounded-full"
+              disabled={!prev}
+              nativeButton={!prev}
+              render={
+                prev ? (
+                  <Link href={`/blog/${prev.split("-").join("/")}`} />
+                ) : undefined
+              }
+            >
+              <ChevronLeft className="w-3 h-3" strokeWidth={1.5} />
+            </Button>
+            <p className="text-sm text-muted-foreground text-center whitespace-nowrap min-w-[22ch]">
+              {formatLongDate(problem.date)}
+            </p>
+            <Button
+              variant="ghost"
+              size="icon-xs"
+              className="rounded-full"
+              disabled={!next}
+              nativeButton={!next}
+              render={
+                next ? (
+                  <Link href={`/blog/${next.split("-").join("/")}`} />
+                ) : undefined
+              }
+            >
+              <ChevronRight className="w-3 h-3" strokeWidth={1.5} />
+            </Button>
           </div>
         </div>
-        <div className="flex items-center gap-3">
+
+        <div className="flex items-center justify-end gap-3">
           <Badge
             variant={
               problem.difficulty === "Easy"

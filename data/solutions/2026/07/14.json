@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Leetcode",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar subsequencePairCount = function (nums) {\n    const MOD = 1_000_000_007;\n    const max = Math.max(...nums);\n\n    const gcd = (a, b) => {\n        while (b !== 0) {\n            [a, b] = [b, a % b];\n        }\n        return a;\n    };\n\n    let dp = Array.from({ length: max + 1 }, () => new Array(max + 1).fill(0));\n    dp[0][0] = 1;\n\n    for (const num of nums) {\n        const ndp = Array.from({ length: max + 1 }, () => new Array(max + 1).fill(0));\n\n        for (let j = 0; j <= max; j++) {\n            const divisor1 = gcd(j, num);\n            const dpRow = dp[j];\n            const ndpRow = ndp[j];\n            const ndpD1Row = ndp[divisor1];\n\n            for (let k = 0; k <= max; k++) {\n                const val = dpRow[k];\n                if (val === 0) continue;\n\n                const divisor2 = gcd(k, num);\n                ndpRow[k] = (ndpRow[k] + val) % MOD;\n                ndpD1Row[k] = (ndpD1Row[k] + val) % MOD;\n                ndpRow[divisor2] = (ndpRow[divisor2] + val) % MOD;\n            }\n        }\n\n        dp = ndp;\n    }\n\n    let ans = 0;\n\n    for (let j = 1; j <= max; j++) {\n        ans = (ans + dp[j][j]) % MOD;\n    }\n\n    return ans;\n};\n",
+    "language": "javascript",
+    "notes": "Couldn't think of a solution, running late for work.",
+    "aiExplanation": "This solution uses **dynamic programming** to count how many ways you can split `nums` into two non-empty disjoint subsequences that share the same `gcd`. It maintains a 2D table `dp[j][k]`, where the value at `dp[j][k]` is the number of ways to build two subsequences so far whose running GCDs are `j` and `k` respectively (`0` meaning that subsequence is still empty). For each number in the array, it builds a fresh table `ndp` by considering three choices per existing state: leave the number out entirely, add it to the first subsequence (updating its GCD via the `gcd` helper), or add it to the second subsequence — accumulating counts modulo `1_000_000_007` to avoid overflow. After processing every number, the answer is the sum of `dp[j][j]` for all `j` from `1` to the maximum value, since those are the cases where both subsequences ended up with the *same* non-zero GCD.",
+    "status": "DONE",
+    "cpuUsage": 71.14,
+    "memoryUsage": 77.11,
+    "date": "2026-07-14T06:58:16.000Z"
+  }
+]

@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar gcdSum = function(nums) {\n    const n = nums.length;\n    const prefixGcd = Array(n);\n    let max = -Infinity;\n\n    for (let i = 0; i < n; i++) {\n        max = Math.max(max, nums[i]);\n        prefixGcd[i] = gcd(nums[i], max);\n    }\n\n    let arr = prefixGcd.slice().sort((a, b) => a - b);\n    const halfLen = Math.floor(arr.length / 2);\n    let res = 0;\n\n    for (let i = 0; i < halfLen; i++) {\n        res += gcd(arr[arr.length - 1 - i], arr[i]);\n    }\n\n    return res;\n};\n\nconst gcd = (a, b) => {\n    while (b !== 0) {\n        [a, b] = [b, a % b];\n    }\n    return a;\n};\n",
+    "language": "javascript",
+    "notes": "Straightforward solution.",
+    "aiExplanation": "This solution first builds a `prefixGcd` array where each entry is the **greatest common divisor** of the current number and the running maximum seen so far (using the Euclidean-algorithm `gcd` helper). It then makes a sorted copy of that array with `.slice().sort(...)`, and pairs up the smallest and largest remaining values from opposite ends (`arr[i]` with `arr[arr.length - 1 - i]`), summing the `gcd` of each pair for the first half of the array to produce the final result.",
+    "status": "DONE",
+    "cpuUsage": 65.92,
+    "memoryUsage": 44.32,
+    "date": "2026-07-16T06:59:52.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar gcdSum = function(nums) {\n    const n = nums.length;\n    const prefixGcd = Array(n);\n    let max = -Infinity;\n\n    for (let i = 0; i < n; i++) {\n        max = Math.max(max, nums[i]);\n        prefixGcd[i] = gcd(nums[i], max);\n    }\n\n    prefixGcd.sort((a, b) => a - b);\n\n    const halfLen = Math.floor(prefixGcd.length / 2);\n    let res = 0;\n\n    for (let i = 0; i < halfLen; i++) {\n        res += gcd(prefixGcd[prefixGcd.length - 1 - i], prefixGcd[i]);\n    }\n\n    return res;\n};\n\nconst gcd = (a, b) => {\n    while (b !== 0) {\n        [a, b] = [b, a % b];\n    }\n    return a;\n};\n",
+    "language": "javascript",
+    "notes": "Attempt at better performance.",
+    "aiExplanation": "This is a minor variation of the same approach: it builds the `prefixGcd` array (each entry being the **greatest common divisor** of a number and the running maximum before it), but instead of copying the array before sorting, it sorts `prefixGcd` **in place** to save memory. It then pairs the smallest and largest values from opposite ends of the sorted array and sums their `gcd` across the first half to compute the final result.",
+    "status": "DONE",
+    "cpuUsage": 58.35,
+    "memoryUsage": 54.57,
+    "date": "2026-07-16T07:02:11.000Z"
+  }
+]

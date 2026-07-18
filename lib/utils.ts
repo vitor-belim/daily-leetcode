@@ -16,6 +16,35 @@ export function formatDate(date: string | Date) {
   return `${year}-${month}-${day} ${hours}:${minutes}`;
 }
 
+const MONTH_NAMES = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+function ordinalSuffix(day: number) {
+  if (day % 10 === 1 && day % 100 !== 11) return "st";
+  if (day % 10 === 2 && day % 100 !== 12) return "nd";
+  if (day % 10 === 3 && day % 100 !== 13) return "rd";
+  return "th";
+}
+
+export function formatLongDate(date: string) {
+  const [year, month, day] = date.split("-").map(Number);
+  const monthName = MONTH_NAMES[month - 1];
+
+  return `${monthName} ${day}${ordinalSuffix(day)}, ${year}`;
+}
+
 export function timeAgo(date: Date | string): string {
   const now = new Date();
   const past = new Date(date);

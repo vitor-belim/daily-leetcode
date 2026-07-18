@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @return {number}\n */\nvar gcdOfOddEvenSums = function(n) {\n    let a = n * n;\n    let b = a + n;\n\n    while (b !== 0) {\n        [a, b] = [b, a % b];\n    }\n\n    return a;\n};\n",
+    "language": "javascript",
+    "notes": "The programmer approach.",
+    "aiExplanation": "This solution relies on the fact that the sum of the first `n` **odd** numbers is always `n * n`, and the sum of the first `n` **even** numbers is `n * n + n`, so it computes those two sums directly (`a` and `b`) instead of looping over the numbers. It then finds their **greatest common divisor** using the classic *Euclidean algorithm*: repeatedly replacing `(a, b)` with `(b, a % b)` via array destructuring until `b` becomes `0`, at which point `a` holds the final GCD that gets returned.",
+    "status": "DONE",
+    "cpuUsage": 22.08,
+    "memoryUsage": 12.47,
+    "date": "2026-07-15T06:52:24.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @return {number}\n */\nvar gcdOfOddEvenSums = function(n) {\n    return n;\n};\n",
+    "language": "javascript",
+    "notes": "The mathematician approach.",
+    "aiExplanation": "This is a **closed-form shortcut** that skips any computation entirely: since the sum of the first `n` odd numbers is `n * n` and the sum of the first `n` even numbers is `n * n + n`, their `gcd` always simplifies mathematically to just `n`, so the function returns `n` directly.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 85.62,
+    "date": "2026-07-15T06:54:28.000Z"
+  }
+]

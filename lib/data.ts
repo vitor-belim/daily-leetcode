@@ -67,6 +67,42 @@ export async function getLatestDailies(
   };
 }
 
+function shiftDate(date: string, days: number): string {
+  const dateTimestamp = Date.parse(date);
+  const addedTime = 1000 * 60 * 60 * 24 * days;
+  const shifted = new Date(dateTimestamp + addedTime);
+  return shifted.toISOString().slice(0, 10);
+}
+
+async function dateExists(date: string): Promise<boolean> {
+  const [year, month, day] = date.split("-");
+  const filePath = path.join(DATA_DIR, "problems", year, month, `${day}.json`);
+
+  try {
+    await fs.access(filePath);
+    return true;
+  } catch {}
+
+  return false;
+}
+
+export async function getAdjacentDates(
+  date: string,
+): Promise<{ prev: string | null; next: string | null }> {
+  const prevDate = shiftDate(date, -1);
+  const nextDate = shiftDate(date, 1);
+
+  const [prevExists, nextExists] = await Promise.all([
+    dateExists(prevDate),
+    dateExists(nextDate),
+  ]);
+
+  return {
+    prev: prevExists ? prevDate : null,
+    next: nextExists ? nextDate : null,
+  };
+}
+
 export async function getProblem(
   year: string,
   month: string,

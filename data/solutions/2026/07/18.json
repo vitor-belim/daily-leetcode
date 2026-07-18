@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar findGCD = function(nums) {\n    let min = Infinity;\n    let max = -Infinity;\n\n    for (const num of nums) {\n        min = Math.min(min, num);\n        max = Math.max(max, num);\n    }\n\n    return gcd(max, min);\n};\n\nconst gcd = (a, b) => {\n    while (b !== 0) {\n        [a, b] = [b, a % b];\n    }\n    return a;\n};\n",
+    "language": "javascript",
+    "notes": "The simplest possible GCD problem. Should have been the first in this GCD problems' week.",
+    "aiExplanation": "This solution finds the **greatest common divisor** of an array by first scanning through `nums` to find the `min` and `max` values, then computing the `gcd` of just those two numbers using the classic *Euclidean algorithm* (repeatedly replacing `(a, b)` with `(b, a % b)` until `b` is `0`) — a clever shortcut, since the GCD of the smallest and largest numbers in the array is always equal to the GCD of the entire array.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 5.29,
+    "date": "2026-07-18T08:57:09.000Z"
+  }
+]

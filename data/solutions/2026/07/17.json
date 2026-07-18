@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number[]} queries\n * @return {number[]}\n */\nvar gcdValues = function(nums, queries) {\n    const n = nums.length;\n    const pairs = [];\n\n    for (let i = 0; i < n; i++) {\n        for (let j = i + 1; j < n; j++) {\n            pairs.push(gcd(nums[i], nums[j]));\n        }\n    }\n\n    pairs.sort((a, b) => a - b);\n\n    const res = [];\n\n    for (const query of queries) {\n        res.push(pairs[query]);\n    }\n\n    return res;\n};\n\nconst gcd = (a, b) => {\n    while (b !== 0) {\n        [a, b] = [b, a % b];\n    }\n    return a;\n};\n",
+    "language": "javascript",
+    "notes": "Expected TLE, 713 / 721 testcases passed.",
+    "aiExplanation": "This **brute-force** approach computes the `gcd` of *every possible pair* of numbers in `nums` using nested loops, collects them all into a `pairs` array, and sorts that array in ascending order. It then answers each query by directly indexing into the sorted `pairs` array — a straightforward but `O(n²)`-pair-generating strategy that becomes too slow (or memory-heavy) for large inputs, which is why this attempt failed.",
+    "status": "FAILED_CONSTRAINTS",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-07-17T07:03:10.000Z"
+  },
+  {
+    "author": "Leetcode",
+    "code": "/**\n * @param {number[]} nums\n * @param {number[]} queries\n * @return {number[]}\n */\nvar gcdValues = function (nums, queries) {\n    const m = Math.max(...nums);\n    const cnt = new Array(m + 1).fill(0);\n    for (const num of nums) {\n        cnt[num]++;\n    }\n    for (let i = 1; i <= m; i++) {\n        for (let j = i * 2; j <= m; j += i) {\n            cnt[i] += cnt[j];\n        }\n    }\n    for (let i = 1; i <= m; i++) {\n        cnt[i] = Math.floor((cnt[i] * (cnt[i] - 1)) / 2);\n    }\n    for (let i = m; i >= 1; i--) {\n        for (let j = i * 2; j <= m; j += i) {\n            cnt[i] -= cnt[j];\n        }\n    }\n    for (let i = 1; i <= m; i++) {\n        cnt[i] += cnt[i - 1];\n    }\n    const ans = [];\n    for (let q of queries) {\n        q++;\n        let left = 1,\n            right = m;\n        while (left < right) {\n            const mid = Math.floor((left + right) / 2);\n            if (cnt[mid] >= q) {\n                right = mid;\n            } else {\n                left = mid + 1;\n            }\n        }\n        ans.push(left);\n    }\n    return ans;\n};\n",
+    "language": "javascript",
+    "notes": "A GCD problem that doesn't even use the GCD function: i.e. a problem for mathematicians.",
+    "aiExplanation": "This solution avoids generating pairs directly by counting, for every value `i` up to the max, how many numbers in `nums` are **multiples** of `i` (using a *divisor-sieve* technique similar to the Sieve of Eratosthenes). From that multiple count it derives, via `Math.floor((cnt[i] * (cnt[i] - 1)) / 2)`, how many pairs have `i` as a **common** divisor, then subtracts out the pairs already counted for larger multiples of `i` (inclusion-exclusion, done in a descending loop) so that `cnt[i]` ends up meaning \"pairs whose GCD is *exactly* `i`\". A running prefix sum then lets it answer each query with **binary search**, quickly finding the smallest GCD value `mid` such that enough pairs have a GCD `≤ mid` to cover the requested rank.",
+    "status": "DONE",
+    "cpuUsage": 40,
+    "memoryUsage": 80,
+    "date": "2026-07-17T07:08:16.000Z"
+  }
+]
