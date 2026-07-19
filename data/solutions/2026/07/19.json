@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {string}\n */\nvar smallestSubsequence = function(s) {\n    const set = new Set(s);\n    const freq = Array(26).fill(0);\n    let res = 'z'.repeat(set.size);\n\n    const dfs = (i, j, cur) => {\n        if (cur.length === set.size) {\n            if (cur < res) {\n                res = cur;\n            }\n            return;\n        }\n        if (i > j) {\n            return;\n        }\n\n        const pos = s.charCodeAt(i) - 97;\n\n        if (freq[pos] === 0) {\n            dfs(i + 1, j, cur);\n            return;\n        }\n\n        const count = freq[pos];\n\n        freq[pos] = 0;\n        dfs(i + 1, j, cur + s[i]);\n\n        if (count > 1) {\n            freq[pos] = count - 1;\n            dfs(i + 1, j, cur);\n        }\n\n        freq[pos] = count;\n    };\n\n    for (let right = 0; right < s.length; right++) {\n        const pos = s.charCodeAt(right) - 97;\n        freq[pos]++;\n    }\n\n    dfs(0, s.length - 1, '');\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "TLE expected, 34 / 68 testcases passed.",
+    "aiExplanation": "This solution uses **brute-force backtracking (DFS)** to try every possible way of picking or skipping each character while scanning the string, tracking how many of each letter remain (`freq`) so it never picks a letter it can no longer include later; whenever it builds a subsequence containing all distinct letters exactly once (`cur.length === set.size`), it compares it to the best result found so far (`res`) and keeps the lexicographically smallest one — an approach that explores an exponential number of branches and is why it times out (`TLE`) on larger inputs.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-07-19T09:01:00.000Z"
+  },
+  {
+    "author": "Vitor + Leetcode",
+    "code": "/**\n * @param {string} s\n * @return {string}\n */\nvar smallestSubsequence = function(s) {\n    const freq = Array(26).fill(0);\n\n    for (let i = 0; i < s.length; i++) {\n        const pos = s.charCodeAt(i) - 97;\n        freq[pos]++;\n    }\n\n    const seen = Array(26).fill(false);\n    const stack = [];\n\n    for (let i = 0; i < s.length; i++) {\n        const pos = s.charCodeAt(i) - 97;\n\n        if (!seen[pos]) {\n            while (stack[stack.length - 1] > s[i] && freq[stack[stack.length - 1].charCodeAt(0) - 97] > 0) {\n                seen[stack[stack.length - 1].charCodeAt(0) - 97] = false;\n                stack.pop();\n            }\n            seen[pos] = true;\n            stack.push(s[i]);\n        }\n\n        freq[pos]--;\n    }\n\n    return stack.join('');\n};\n",
+    "language": "javascript",
+    "notes": "Based on editorial's strategy.",
+    "aiExplanation": "This solution uses a **greedy monotonic stack** to build the smallest possible subsequence containing each distinct letter exactly once: it first counts how many times each letter appears (`freq`), then scans the string while maintaining a `stack` of chosen letters and a `seen` set to avoid duplicates — for each new letter not yet on the stack, it pops any larger letters off the top of the stack as long as those letters still appear later in the string (`freq[...] > 0`), ensuring the result stays as lexicographically small as possible, before pushing the current letter and decrementing its remaining count.",
+    "status": "DONE",
+    "cpuUsage": 59.18,
+    "memoryUsage": 59.18,
+    "date": "2026-07-19T09:34:46.000Z"
+  }
+]
