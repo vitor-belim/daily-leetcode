@@ -33,7 +33,7 @@
     "date": "2026-07-24T06:57:07.000Z"
   },
   {
-    "author": "Vitor",
+    "author": "Leetcode",
     "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar uniqueXorTriplets = function(nums) {\n    const maxi = 2048;\n\n    const pairXor = new Array(maxi).fill(false);\n    const tripletXor = new Array(maxi).fill(false);\n\n    const n = nums.length;\n\n    for (let i = 0; i < n; i++) {\n        for (let j = i; j < n; j++) {\n            pairXor[nums[i] ^ nums[j]] = true;\n        }\n    }\n\n    for (let x = 0; x < maxi; x++) {\n        if (!pairXor[x]) continue;\n\n        for (const value of nums) {\n            tripletXor[x ^ value] = true;\n        }\n    }\n\n    return tripletXor.reduce((count, value) => count + (value ? 1 : 0), 0);\n};\n",
     "language": "javascript",
     "notes": "",

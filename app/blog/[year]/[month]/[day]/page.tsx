@@ -10,9 +10,11 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getAdjacentDates, getProblem, getSolutions } from "@/lib/data";
+import { getAdjacentDates, getProblem } from "@/lib/problems-repo";
+import { getSolutions } from "@/lib/solutions-repo";
 import { markdownToHtml } from "@/lib/markdown";
-import { cn, formatDate, formatLongDate, timeAgo } from "@/lib/utils";
+import { formatDate, formatLongDate, timeAgo } from "@/lib/date-display";
+import { cn } from "@/lib/utils";
 import {
   ChevronLeft,
   ChevronRight,

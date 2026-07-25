@@ -1,5 +1,5 @@
 import { DailyList } from "@/components/daily-list";
-import { getLatestDailies } from "@/lib/data";
+import { getLatestDailies } from "@/lib/actions";
 
 export default async function HomePage() {
   const { problems, hasMore } = await getLatestDailies(10);

@@ -8,7 +8,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getLatestDailies, Problem } from "@/lib/data";
+import { getLatestDailies } from "@/lib/actions";
+import { Problem } from "@/lib/types";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
