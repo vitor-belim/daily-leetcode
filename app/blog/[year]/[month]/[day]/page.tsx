@@ -1,3 +1,4 @@
+import { SplitPanels } from "@/components/blog/split-panels";
 import { CodeBlock } from "@/components/code/code-block";
 import {
   Accordion,
@@ -72,7 +73,7 @@ export default async function ProblemPage({
   return (
     <div className="flex flex-col h-screen max-h-screen overflow-hidden">
       {/* Header */}
-      <header className="border-b px-6 py-4 grid grid-cols-3 items-center shrink-0">
+      <header className="border-b px-3 py-3 sm:px-6 sm:py-4 grid grid-cols-3 items-center gap-2 shrink-0">
         <div className="flex items-center">
           <Link
             href="/"
@@ -82,8 +83,10 @@ export default async function ProblemPage({
           </Link>
         </div>
 
-        <div className="flex flex-col items-center">
-          <h1 className="text-xl font-bold leading-none">{problem.title}</h1>
+        <div className="flex flex-col items-center min-w-0">
+          <h1 className="text-sm sm:text-xl font-bold leading-tight sm:leading-none text-center line-clamp-2 sm:line-clamp-1">
+            {problem.title}
+          </h1>
           <div className="flex items-center gap-1 mt-1">
             <Button
               variant="ghost"
@@ -99,7 +102,7 @@ export default async function ProblemPage({
             >
               <ChevronLeft className="w-3 h-3" strokeWidth={1.5} />
             </Button>
-            <p className="text-sm text-muted-foreground text-center whitespace-nowrap min-w-[22ch]">
+            <p className="text-[11px] sm:text-sm text-muted-foreground text-center whitespace-nowrap min-w-[14ch] sm:min-w-[22ch]">
               {formatLongDate(problem.date)}
             </p>
             <Button
@@ -119,7 +122,7 @@ export default async function ProblemPage({
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-3">
+        <div className="flex items-center justify-end gap-2 sm:gap-3">
           <Badge
             variant={
               problem.difficulty === "Easy"
@@ -144,227 +147,228 @@ export default async function ProblemPage({
             rel="noopener noreferrer"
             className="text-xs flex items-center gap-1 text-muted-foreground hover:text-primary transition-colors"
           >
-            LeetCode <ExternalLink className="w-3 h-3" />
+            <span className="hidden sm:inline">LeetCode</span>
+            <ExternalLink className="w-3 h-3" />
           </a>
         </div>
       </header>
 
       {/* Content */}
-      <main className="flex-1 flex overflow-hidden">
-        {/* Left Column: Description */}
-        <section className="w-1/2 min-h-0 flex flex-col border-r overflow-hidden">
-          <div className="p-4 border-b bg-muted/30 shrink-0">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-              Description
-            </h2>
-          </div>
+      <main className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+        <SplitPanels
+          left={{
+            title: "Description",
+            className: "border-b lg:border-b-0 lg:border-r",
+            content: (
+              <ScrollArea className="min-h-0 flex-1">
+                <div className="p-6">
+                  <div
+                    className="prose dark:prose-invert max-w-none prose-sm sm:prose-base prose-pre:bg-muted prose-pre:text-foreground"
+                    dangerouslySetInnerHTML={{ __html: problem.description }}
+                  />
+                </div>
+              </ScrollArea>
+            ),
+          }}
+          right={{
+            title: "Solutions",
+            content:
+              solutions.length > 0 ? (
+                <Tabs
+                  defaultValue={`${solutionsWithLabels[0].author}-0`}
+                  className="flex-1 flex flex-col overflow-hidden"
+                >
+                  <div className="px-4 py-2 border-b bg-muted/10 shrink-0 overflow-x-auto">
+                    <TabsList className="group-data-horizontal/tabs:h-auto justify-start bg-transparent p-0 gap-2">
+                      {solutionsWithLabels.map((s, index) => (
+                        <TabsTrigger
+                          key={`${s.author}-${index}`}
+                          value={`${s.author}-${index}`}
+                          className={cn(
+                            "shadow-sm border rounded-md px-4 transition-all flex flex-col gap-0 h-auto",
+                            s.status === "DONE" &&
+                              "bg-green-100 text-green-800 data-active:bg-green-200 dark:bg-green-900/30 dark:text-green-400 dark:data-active:bg-green-900/50",
+                            (s.status === "TLE" || s.status === "MLE") &&
+                              "bg-yellow-100 text-yellow-800 data-active:bg-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:data-active:bg-yellow-900/50",
+                            s.status === "FAILED" &&
+                              "bg-red-100 text-red-800 data-active:bg-red-200 dark:bg-red-900/30 dark:text-red-400 dark:data-active:bg-red-900/50",
+                            s.status === "FAILED_CONSTRAINTS" &&
+                              "bg-orange-100 text-orange-800 data-active:bg-orange-200 dark:bg-orange-900/30 dark:text-orange-400 dark:data-active:bg-orange-900/50",
+                            "data-active:ring-1 data-active:ring-primary/20 data-active:border-primary/30",
+                          )}
+                        >
+                          <span>
+                            {s.author} {s.label}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {timeAgo(s.date)}
+                          </span>
+                        </TabsTrigger>
+                      ))}
+                    </TabsList>
+                  </div>
 
-          <ScrollArea className="min-h-0 flex-1">
-            <div className="p-6">
-              <div
-                className="prose dark:prose-invert max-w-none prose-sm sm:prose-base prose-pre:bg-muted prose-pre:text-foreground"
-                dangerouslySetInnerHTML={{ __html: problem.description }}
-              />
-            </div>
-          </ScrollArea>
-        </section>
-
-        {/* Right Column: Solutions */}
-        <section className="w-1/2 flex flex-col overflow-hidden">
-          <div className="p-4 border-b bg-muted/30 shrink-0">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-              Solutions
-            </h2>
-          </div>
-
-          {solutions.length > 0 ? (
-            <Tabs
-              defaultValue={`${solutionsWithLabels[0].author}-0`}
-              className="flex-1 flex flex-col overflow-hidden"
-            >
-              <div className="px-4 py-2 border-b bg-muted/10 shrink-0 overflow-x-auto">
-                <TabsList className="group-data-horizontal/tabs:h-auto justify-start bg-transparent p-0 gap-2">
-                  {solutionsWithLabels.map((s, index) => (
-                    <TabsTrigger
-                      key={`${s.author}-${index}`}
-                      value={`${s.author}-${index}`}
-                      className={cn(
-                        "shadow-sm border rounded-md px-4 transition-all flex flex-col gap-0 h-auto",
-                        s.status === "DONE" &&
-                          "bg-green-100 text-green-800 data-active:bg-green-200 dark:bg-green-900/30 dark:text-green-400 dark:data-active:bg-green-900/50",
-                        (s.status === "TLE" || s.status === "MLE") &&
-                          "bg-yellow-100 text-yellow-800 data-active:bg-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:data-active:bg-yellow-900/50",
-                        s.status === "FAILED" &&
-                          "bg-red-100 text-red-800 data-active:bg-red-200 dark:bg-red-900/30 dark:text-red-400 dark:data-active:bg-red-900/50",
-                        s.status === "FAILED_CONSTRAINTS" &&
-                          "bg-orange-100 text-orange-800 data-active:bg-orange-200 dark:bg-orange-900/30 dark:text-orange-400 dark:data-active:bg-orange-900/50",
-                        "data-active:ring-1 data-active:ring-primary/20 data-active:border-primary/30",
-                      )}
-                    >
-                      <span>
-                        {s.author} {s.label}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {timeAgo(s.date)}
-                      </span>
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
-              </div>
-
-              <div className="flex-1 overflow-hidden">
-                {solutionsWithLabels.map((s, index) => (
-                  <TabsContent
-                    key={`${s.author}-${index}`}
-                    value={`${s.author}-${index}`}
-                    className="h-full m-0 p-0 overflow-hidden outline-none"
-                  >
-                    <ScrollArea className="h-full">
-                      <div className="p-6 space-y-6">
-                        {(s.notes || s.aiExplanation) && (
-                          <Accordion
-                            className="border rounded-lg px-4"
-                            defaultValue={
-                              s.notes
-                                ? ["notes"]
-                                : s.aiExplanation
-                                  ? ["ai-explanation"]
-                                  : []
-                            }
-                          >
-                            {s.notes && (
-                              <AccordionItem
-                                value="notes"
-                                className="border-b-0"
+                  <div className="flex-1 overflow-hidden">
+                    {solutionsWithLabels.map((s, index) => (
+                      <TabsContent
+                        key={`${s.author}-${index}`}
+                        value={`${s.author}-${index}`}
+                        className="h-full m-0 p-0 overflow-hidden outline-none"
+                      >
+                        <ScrollArea className="h-full">
+                          <div className="p-6 space-y-6">
+                            {(s.notes || s.aiExplanation) && (
+                              <Accordion
+                                className="border rounded-lg px-4"
+                                defaultValue={
+                                  s.notes
+                                    ? ["notes"]
+                                    : s.aiExplanation
+                                      ? ["ai-explanation"]
+                                      : []
+                                }
                               >
-                                <AccordionTrigger className="hover:no-underline py-4">
-                                  <span className="text-sm font-semibold">
-                                    Developer Notes
-                                  </span>
-                                </AccordionTrigger>
-                                <AccordionContent className="pb-4">
-                                  <div
-                                    className="text-sm text-muted-foreground leading-relaxed prose dark:prose-invert max-w-none prose-sm"
-                                    dangerouslySetInnerHTML={{
-                                      __html: markdownToHtml(s.notes),
-                                    }}
-                                  />
-                                </AccordionContent>
-                              </AccordionItem>
-                            )}
-
-                            {s.aiExplanation && (
-                              <AccordionItem
-                                value="ai-explanation"
-                                className="border-b-0"
-                              >
-                                <AccordionTrigger className="hover:no-underline py-4">
-                                  <span className="text-sm font-semibold">
-                                    AI Explanation
-                                  </span>
-                                </AccordionTrigger>
-                                <AccordionContent className="pb-4">
-                                  <div
-                                    className="text-sm text-muted-foreground leading-relaxed prose dark:prose-invert max-w-none prose-sm"
-                                    dangerouslySetInnerHTML={{
-                                      __html: markdownToHtml(s.aiExplanation),
-                                    }}
-                                  />
-                                </AccordionContent>
-                              </AccordionItem>
-                            )}
-                          </Accordion>
-                        )}
-
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium">
-                              Language:{" "}
-                              <Badge variant="outline" className="capitalize">
-                                {s.language}
-                              </Badge>
-                              {s.date && (
-                                <span className="ml-2 text-xs text-muted-foreground">
-                                  ({formatDate(s.date)})
-                                </span>
-                              )}
-                            </span>
-                            {s.status && (
-                              <Badge
-                                className={cn(
-                                  "font-bold",
-                                  s.status === "DONE" &&
-                                    "bg-green-500 hover:bg-green-600",
-                                  (s.status === "TLE" || s.status === "MLE") &&
-                                    "bg-yellow-500 hover:bg-yellow-600 text-black",
-                                  s.status === "FAILED" &&
-                                    "bg-red-500 hover:bg-red-600",
-                                  s.status === "FAILED_CONSTRAINTS" &&
-                                    "bg-orange-500 hover:bg-orange-600",
+                                {s.notes && (
+                                  <AccordionItem
+                                    value="notes"
+                                    className="border-b-0"
+                                  >
+                                    <AccordionTrigger className="hover:no-underline py-4">
+                                      <span className="text-sm font-semibold">
+                                        Developer Notes
+                                      </span>
+                                    </AccordionTrigger>
+                                    <AccordionContent className="pb-4">
+                                      <div
+                                        className="text-sm text-muted-foreground leading-relaxed prose dark:prose-invert max-w-none prose-sm"
+                                        dangerouslySetInnerHTML={{
+                                          __html: markdownToHtml(s.notes),
+                                        }}
+                                      />
+                                    </AccordionContent>
+                                  </AccordionItem>
                                 )}
-                              >
-                                {s.status.replace(/_/g, " ")}
-                              </Badge>
-                            )}
-                          </div>
 
-                          <div className="grid grid-cols-2 gap-4 py-2">
-                            {s.cpuUsage !== undefined && (
-                              <div className="space-y-1">
-                                <div className="flex items-center justify-between text-xs">
-                                  <span className="flex items-center gap-1 text-muted-foreground">
-                                    <Cpu className="w-3 h-3" /> CPU Performance
-                                  </span>
-                                  <span className="font-medium">
-                                    {s.cpuUsage?.toFixed(2)}%
-                                  </span>
-                                </div>
-                                <Progress
-                                  value={s.cpuUsage}
-                                  className="h-1.5"
-                                />
-                              </div>
+                                {s.aiExplanation && (
+                                  <AccordionItem
+                                    value="ai-explanation"
+                                    className="border-b-0"
+                                  >
+                                    <AccordionTrigger className="hover:no-underline py-4">
+                                      <span className="text-sm font-semibold">
+                                        AI Explanation
+                                      </span>
+                                    </AccordionTrigger>
+                                    <AccordionContent className="pb-4">
+                                      <div
+                                        className="text-sm text-muted-foreground leading-relaxed prose dark:prose-invert max-w-none prose-sm"
+                                        dangerouslySetInnerHTML={{
+                                          __html: markdownToHtml(
+                                            s.aiExplanation,
+                                          ),
+                                        }}
+                                      />
+                                    </AccordionContent>
+                                  </AccordionItem>
+                                )}
+                              </Accordion>
                             )}
-                            {s.memoryUsage !== undefined && (
-                              <div className="space-y-1">
-                                <div className="flex items-center justify-between text-xs">
-                                  <span className="flex items-center gap-1 text-muted-foreground">
-                                    <HardDrive className="w-3 h-3" /> Memory
-                                    Performance
-                                  </span>
-                                  <span className="font-medium">
-                                    {s.memoryUsage?.toFixed(2)}%
-                                  </span>
-                                </div>
-                                <Progress
-                                  value={s.memoryUsage}
-                                  className="h-1.5"
-                                />
-                              </div>
-                            )}
-                          </div>
 
-                          <CodeBlock code={s.code} language={s.language} />
-                        </div>
-                      </div>
-                    </ScrollArea>
-                  </TabsContent>
-                ))}
-              </div>
-            </Tabs>
-          ) : (
-            <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-muted/5">
-              <div className="max-w-xs space-y-2">
-                <p className="font-semibold text-muted-foreground">
-                  No solutions yet
-                </p>
-                <p className="text-xs text-muted-foreground/60">
-                  Vítor is probably working on it right now!
-                </p>
-              </div>
-            </div>
-          )}
-        </section>
+                            <div className="space-y-2">
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm font-medium">
+                                  Language:{" "}
+                                  <Badge
+                                    variant="outline"
+                                    className="capitalize"
+                                  >
+                                    {s.language}
+                                  </Badge>
+                                  {s.date && (
+                                    <span className="ml-2 text-xs text-muted-foreground">
+                                      ({formatDate(s.date)})
+                                    </span>
+                                  )}
+                                </span>
+                                {s.status && (
+                                  <Badge
+                                    className={cn(
+                                      "font-bold",
+                                      s.status === "DONE" &&
+                                        "bg-green-500 hover:bg-green-600",
+                                      (s.status === "TLE" ||
+                                        s.status === "MLE") &&
+                                        "bg-yellow-500 hover:bg-yellow-600 text-black",
+                                      s.status === "FAILED" &&
+                                        "bg-red-500 hover:bg-red-600",
+                                      s.status === "FAILED_CONSTRAINTS" &&
+                                        "bg-orange-500 hover:bg-orange-600",
+                                    )}
+                                  >
+                                    {s.status.replace(/_/g, " ")}
+                                  </Badge>
+                                )}
+                              </div>
+
+                              <div className="grid grid-cols-2 gap-4 py-2">
+                                {s.cpuUsage !== undefined && (
+                                  <div className="space-y-1">
+                                    <div className="flex items-center justify-between text-xs">
+                                      <span className="flex items-center gap-1 text-muted-foreground">
+                                        <Cpu className="w-3 h-3" /> CPU
+                                        Performance
+                                      </span>
+                                      <span className="font-medium">
+                                        {s.cpuUsage?.toFixed(2)}%
+                                      </span>
+                                    </div>
+                                    <Progress
+                                      value={s.cpuUsage}
+                                      className="h-1.5"
+                                    />
+                                  </div>
+                                )}
+                                {s.memoryUsage !== undefined && (
+                                  <div className="space-y-1">
+                                    <div className="flex items-center justify-between text-xs">
+                                      <span className="flex items-center gap-1 text-muted-foreground">
+                                        <HardDrive className="w-3 h-3" /> Memory
+                                        Performance
+                                      </span>
+                                      <span className="font-medium">
+                                        {s.memoryUsage?.toFixed(2)}%
+                                      </span>
+                                    </div>
+                                    <Progress
+                                      value={s.memoryUsage}
+                                      className="h-1.5"
+                                    />
+                                  </div>
+                                )}
+                              </div>
+
+                              <CodeBlock code={s.code} language={s.language} />
+                            </div>
+                          </div>
+                        </ScrollArea>
+                      </TabsContent>
+                    ))}
+                  </div>
+                </Tabs>
+              ) : (
+                <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-muted/5">
+                  <div className="max-w-xs space-y-2">
+                    <p className="font-semibold text-muted-foreground">
+                      No solutions yet
+                    </p>
+                    <p className="text-xs text-muted-foreground/60">
+                      Vítor is probably working on it right now!
+                    </p>
+                  </div>
+                </div>
+              ),
+          }}
+        />
       </main>
     </div>
   );
