@@ -1,0 +1,46 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar maxActiveSectionsAfterTrade = function(s) {\n    s = '1' + s + '1';\n\n    const stack = [];\n    let count = 0;\n    let ones = 0;\n\n    for (let i = 0; i < s.length; i++) {\n        if (s[i] === '1') {\n            ones++;\n        }\n\n        if (i > 0 && s[i] !== s[i - 1]) {\n            stack.push([s[i - 1], count]);\n            count = 1;\n        } else {\n            count++;\n        }\n    }\n\n    stack.push(['1', count]);\n\n    let max = 0;\n\n    for (let i = 1; i < stack.length - 1; i++) {\n        if (stack[i][0] === '1') {\n            max = Math.max(max, stack[i - 1][1] + stack[i + 1][1]);\n        }\n    }\n\n    return ones - 2 + max;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution pads the string with `'1'` sentinels on both ends, then does a **run-length encoding** pass, building a `stack` of `[character, runLength]` pairs while counting the total number of `1`s (`ones`). It then scans the internal `1`-runs and, for each isolated `'1'` sitting between two zero-runs, checks whether **flipping that single `1`** would merge the adjacent zero-runs, tracking the largest combined run found. The final answer is `ones - 2` (to remove the two sentinel `1`s) plus that best possible merge.",
+    "status": "DONE",
+    "cpuUsage": 24.38,
+    "memoryUsage": 28.78,
+    "date": "2026-07-21T07:06:38.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar maxActiveSectionsAfterTrade = function(s) {\n    const n = s.length;\n    const prefixSum = Array(n + 1).fill(0);\n    const suffixSum = Array(n + 1).fill(0);\n    let ones = 0;\n\n    for (let i = 0; i < n; i++) {\n        if (s[i] === '0') {\n            if (s[i] === s[i - 1]) {\n                prefixSum[i + 1] = prefixSum[i] + 1;\n            } else {\n                prefixSum[i + 1] = 1;\n            }\n        } else {\n            prefixSum[i + 1] = prefixSum[i];\n            ones++;\n        }\n\n        const j = n - 1 - i;\n\n        if (s[j] === '0') {\n            if (s[j] === s[j + 1]) {\n                suffixSum[j] = suffixSum[j + 1] + 1;\n            } else {\n                suffixSum[j] = 1;\n            }\n        } else {\n            suffixSum[j] = suffixSum[j + 1];\n        }\n    }\n\n    let maxZeros = 0;\n\n    for (let i = 0; i < n; i++) {\n        if (prefixSum[i] > 0 && suffixSum[i] > 0) {\n            maxZeros = Math.max(maxZeros, prefixSum[i] + suffixSum[i]);\n        }\n    }\n\n    return ones + maxZeros;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This attempt builds `prefixSum` and `suffixSum` arrays tracking the length of the **contiguous run of `0`s** ending at (or starting from) each index, alongside a running count of `1`s. It then looks for the position with the largest `prefixSum[i] + suffixSum[i]` where both are positive, treating that as the best pair of zero-runs a single flipped `1` could join, and returns `ones + maxZeros`. It **fails** because it never handles the edge case where the string has no `1`s at all, letting `maxZeros` and `ones` combine into a wrong result.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-07-21T07:37:48.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar maxActiveSectionsAfterTrade = function(s) {\n    const n = s.length;\n    const prefixSum = Array(n + 1).fill(0);\n    const suffixSum = Array(n + 1).fill(0);\n    let ones = 0;\n\n    for (let i = 0; i < n; i++) {\n        if (s[i] === '0') {\n            if (s[i] === s[i - 1]) {\n                prefixSum[i + 1] = prefixSum[i] + 1;\n            } else {\n                prefixSum[i + 1] = 1;\n            }\n        } else {\n            prefixSum[i + 1] = prefixSum[i];\n            ones++;\n        }\n\n        const j = n - 1 - i;\n\n        if (s[j] === '0') {\n            if (s[j] === s[j + 1]) {\n                suffixSum[j] = suffixSum[j + 1] + 1;\n            } else {\n                suffixSum[j] = 1;\n            }\n        } else {\n            suffixSum[j] = suffixSum[j + 1];\n        }\n    }\n\n    if (ones === 0) return 0;\n\n    let maxZeros = 0;\n\n    for (let i = 0; i < n; i++) {\n        if (prefixSum[i] > 0 && suffixSum[i] > 0) {\n            maxZeros = Math.max(maxZeros, prefixSum[i] + suffixSum[i]);\n        }\n    }\n\n    return ones + maxZeros;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is the same **prefix/suffix zero-run** technique as before, now adding an early `return 0` when the string contains no `1`s at all. It still **fails**, though, because when scanning for the best `prefixSum[i] + suffixSum[i]` pair it never verifies that position `i` is actually a `1` character, so it can wrongly merge two zero-runs that aren't separated by a flippable `1`.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-07-21T07:45:10.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar maxActiveSectionsAfterTrade = function(s) {\n    const n = s.length;\n    const prefixSum = Array(n + 2).fill(0);\n    const suffixSum = Array(n + 2).fill(0);\n    let ones = 0;\n\n    for (let i = 0; i < n; i++) {\n        if (s[i] === '0') {\n            if (s[i] === s[i - 1]) {\n                prefixSum[i + 1] = prefixSum[i] + 1;\n            } else {\n                prefixSum[i + 1] = 1;\n            }\n        } else {\n            prefixSum[i + 1] = prefixSum[i];\n            ones++;\n        }\n\n        const j = n - 1 - i;\n\n        if (s[j] === '0') {\n            if (s[j] === s[j + 1]) {\n                suffixSum[j + 1] = suffixSum[j + 2] + 1;\n            } else {\n                suffixSum[j + 1] = 1;\n            }\n        } else {\n            suffixSum[j + 1] = suffixSum[j + 2];\n        }\n    }\n\n    if (ones === 0) return 0;\n\n    let maxZeros = 0;\n\n    for (let i = 1; i <= n; i++) {\n        if (prefixSum[i] > 0 && suffixSum[i] > 0 && s[i - 1] === '1') {\n            maxZeros = Math.max(maxZeros, prefixSum[i] + suffixSum[i]);\n        }\n    }\n\n    return ones + maxZeros;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This corrected version refines the **prefix/suffix zero-run** technique by 1-indexing the `prefixSum`/`suffixSum` arrays and, crucially, checking `s[i - 1] === '1'` before combining them, so a merge is only counted when it's genuinely centered on a `1` character between two zero-runs. It returns `0` immediately if the string has no `1`s, otherwise it returns the total `ones` count plus the best combined zero-run length found this way.",
+    "status": "DONE",
+    "cpuUsage": 24.84,
+    "memoryUsage": 29.61,
+    "date": "2026-07-21T07:51:47.000Z"
+  }
+]

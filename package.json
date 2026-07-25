@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "fetch-daily": "tsx scripts/fetch-daily.ts"
+    "fetch-daily": "tsx scripts/fetch-daily.ts",
+    "backfill": "tsx scripts/backfill.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",

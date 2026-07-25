@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar uniqueXorTriplets = function(nums) {\n    const n = nums.length;\n    const set = new Set();\n\n    for (let i = 0; i < n; i++) {\n        for (let j = i; j < n; j++) {\n            for (let k = j; k < n; k++) {\n                set.add(nums[i] ^ nums[j] ^ nums[k]);\n            }\n        }\n    }\n\n    return set.size;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is a **brute-force** solution that tries every triplet of indices `(i, j, k)` with `i <= j <= k`, computes the **XOR** of the three corresponding values, and adds each result to a `Set` to automatically discard duplicates, finally returning the set's size as the count of unique XOR values. It runs in `O(n^3)` time, which is too slow and causes a **time limit exceeded**.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-07-23T07:20:04.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar uniqueXorTriplets = function (nums) {\n    const n = nums.length;\n\n    if (n <= 2) {\n        return n;\n    }\n\n    let ans = 1;\n\n    while (ans <= n) {\n        ans <<= 1;\n    }\n\n    return ans;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution skips computing any XOR values directly and instead relies on a **mathematical shortcut**: since any triplet from `nums` can XOR together to produce every value up to the next power of two above `n` (once there are enough elements to combine), the answer is simply `n` itself when there are 2 or fewer numbers, or otherwise the **smallest power of two greater than or equal to `n`**, found by left-shifting `ans` until it exceeds `n`.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 77.74,
+    "date": "2026-07-23T07:24:15.000Z"
+  }
+]

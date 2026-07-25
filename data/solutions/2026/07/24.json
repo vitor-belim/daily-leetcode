@@ -1,0 +1,46 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar uniqueXorTriplets = function(nums) {\n    const n = nums.length;\n    const set = new Set();\n\n    for (let j = 0; j < n; j++) {\n        for (let k = j; k < n; k++) {\n            set.add(nums[j] ^ nums[k]);\n        }\n    }\n\n    const overallSet = new Set();\n\n    for (let i = 0; i < n; i++) {\n        for (const val of set) {\n            overallSet.add(nums[i] ^ val);\n        }\n    }\n\n    return overallSet.size;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution first collects every **pairwise XOR** value `nums[j] ^ nums[k]` (including `j === k`) into a `set` using a nested loop, then combines each element of `nums` with every value already stored in that set to build a second `overallSet` of all possible **triplet XOR** results, finally returning its size; the issue is that the inner set can hold close to `n^2` distinct values, so combining it with every element of `nums` again pushes the total work toward `O(n^3)`, which is too slow and causes the **TLE**.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-07-24T06:50:35.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar uniqueXorTriplets = function(nums) {\n    const n = nums.length;\n    const pairSet = new Set();\n\n    for (let j = 0; j < n; j++) {\n        for (let k = j + 1; k < n; k++) {\n            pairSet.add(nums[j] ^ nums[k]);\n        }\n    }\n\n    const seen = new Set();\n\n    for (const num of nums) {\n        for (const pair of pairSet) {\n            seen.add(num ^ pair);\n        }\n    }\n\n    return seen.size;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This attempt only fills `pairSet` with XOR values from **strictly distinct** index pairs (`k` starts at `j + 1`), skipping the case `j === k`; because a valid triplet allows `i <= j <= k`, this drops triplets where two of the three chosen elements are the same array position, and with a single-element array the inner loop never runs at all, so `pairSet` stays empty and the function incorrectly returns `0`, which is why it **fails**.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-07-24T06:56:36.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar uniqueXorTriplets = function(nums) {\n    const n = nums.length;\n\n    if (n === 1) {\n        return 1;\n    }\n\n    const pairSet = new Set();\n\n    for (let j = 0; j < n; j++) {\n        for (let k = j + 1; k < n; k++) {\n            pairSet.add(nums[j] ^ nums[k]);\n        }\n    }\n\n    const seen = new Set();\n\n    for (const num of nums) {\n        for (const pair of pairSet) {\n            seen.add(num ^ pair);\n        }\n    }\n\n    return seen.size;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This version patches the previous bug by special-casing `n === 1` (returning `1` immediately), and otherwise builds `pairSet` from strictly distinct pairs before combining it with each element of `nums` into a `seen` set of triplet XOR results; while now correct, the algorithm still costs `O(n^2)` to build `pairSet` and then up to `O(n * n^2)` to combine it with every element, so the overall `O(n^3)` behavior remains too slow for large inputs and results in a **TLE**.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-07-24T06:57:07.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar uniqueXorTriplets = function(nums) {\n    const maxi = 2048;\n\n    const pairXor = new Array(maxi).fill(false);\n    const tripletXor = new Array(maxi).fill(false);\n\n    const n = nums.length;\n\n    for (let i = 0; i < n; i++) {\n        for (let j = i; j < n; j++) {\n            pairXor[nums[i] ^ nums[j]] = true;\n        }\n    }\n\n    for (let x = 0; x < maxi; x++) {\n        if (!pairXor[x]) continue;\n\n        for (const value of nums) {\n            tripletXor[x ^ value] = true;\n        }\n    }\n\n    return tripletXor.reduce((count, value) => count + (value ? 1 : 0), 0);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This accepted solution exploits the fact that XOR results are bounded (values up to `1500` fit within `maxi = 2048`), so instead of using `Set` objects it marks reachable XOR values with fixed-size **boolean arrays**: `pairXor` records every achievable pairwise XOR in `O(n^2)`, and then `tripletXor` is filled by combining each *possible* pairwise XOR value (only `maxi` of them, not `n^2`) with every element of `nums`, giving an `O(n^2 + maxi * n)` runtime that comfortably fits within the limits, and the final answer is just the count of `true` entries in `tripletXor`.",
+    "status": "DONE",
+    "cpuUsage": 60,
+    "memoryUsage": 50,
+    "date": "2026-07-24T06:58:58.000Z"
+  }
+]

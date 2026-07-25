@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @return {number}\n */\nvar maxProduct = function(n) {\n    let max = 1;\n    let res = 0;\n\n    while (n > 0) {\n        const rem = n % 10;\n        res = Math.max(res, rem * max);\n        max = Math.max(max, rem);\n        n = Math.floor(n / 10);\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function, `maxProduct`, finds the **largest product of two digits** within a number `n` by looping through its digits one at a time using `n % 10` (to get the last digit) and `n = Math.floor(n / 10)` (to remove it). On each iteration, it multiplies the current digit `rem` by `max` (the largest digit seen *so far*) to update `res`, the best product found; however, since `max` starts at `1` instead of `0`, the very first digit gets multiplied by `1` rather than being skipped, which can produce an incorrect result when the number contains a `0` digit.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-07-25T07:45:08.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @return {number}\n */\nvar maxProduct = function(n) {\n    let max = 0;\n    let res = 0;\n\n    while (n > 0) {\n        const rem = n % 10;\n        res = Math.max(res, rem * max);\n        max = Math.max(max, rem);\n        n = Math.floor(n / 10);\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function, `maxProduct`, finds the **largest product of two digits** in a number `n` by repeatedly extracting its last digit with `n % 10` and stripping it off with `n = Math.floor(n / 10)`. At each step, it first checks whether multiplying the current digit (`rem`) by the largest digit seen *so far* (`max`, correctly initialized to `0`) beats the best product found so far (`res`), then updates `max` if the current digit is a new largest; by the time all digits are processed, `res` holds the maximum product of any two digits in the number.",
+    "status": "DONE",
+    "cpuUsage": 80.85,
+    "memoryUsage": 25.53,
+    "date": "2026-07-25T07:45:31.000Z"
+  }
+]
