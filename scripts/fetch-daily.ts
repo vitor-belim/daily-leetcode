@@ -23,7 +23,8 @@ async function main() {
     console.log(`Authenticated as ${username}`);
 
     const args = process.argv.slice(2);
-    const targetDate = args[0]; // Format: YYYY-MM-DD
+    const problemOnly = args.includes("--problem-only");
+    const targetDate = args.find((arg) => !arg.startsWith("--")); // Format: YYYY-MM-DD
 
     const dailyQuestion = targetDate
       ? await fetchChallengeForDate(targetDate)
@@ -58,6 +59,11 @@ async function main() {
     const filePath = problemFilePath(date);
     writeJsonFile(filePath, problemData);
     console.log(`Successfully wrote data to ${filePath}`);
+
+    if (problemOnly) {
+      console.log("Problem-only mode: skipping submission fetch.");
+      process.exit(0);
+    }
 
     const solutionsFilePath = solutionFilePath(date);
 
