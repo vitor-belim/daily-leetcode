@@ -1,0 +1,46 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar maximumProduct = function(nums) {\n    let min1 = Infinity;\n    let min2 = Infinity;\n    let max1 = -Infinity;\n    let max2 = -Infinity;\n    let max3 = -Infinity;\n\n    for (const num of nums) {\n        if (num < min1) {\n            min2 = min1;\n            min1 = num;\n        } else if (num < min2) {\n            min2 = num;\n        }\n\n        if (num > max1) {\n            max3 = max2;\n            max2 = max1;\n            max1 = num;\n        } else if (num > max2) {\n            max3 = max2;\n            max2 = num;\n        } else if (num > max3) {\n            max3 = num;\n        }\n    }\n\n    return Math.max(min1 * min2, max2 * max3) * max1;\n};\n",
+    "language": "javascript",
+    "notes": "Error due to math simplification.",
+    "aiExplanation": "This function finds the **maximum product of three numbers** in a single pass by tracking the two smallest values (`min1`, `min2`) and the three largest values (`max1`, `max2`, `max3`) as it iterates through `nums`, then returns `Math.max(min1 * min2, max2 * max3) * max1` — comparing the product of the two smallest (which could be negative and thus positive when multiplied) against the product of the second and third largest, and combining whichever is bigger with the overall largest number `max1`.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-07-26T08:46:45.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar maximumProduct = function(nums) {\n    let min1 = Infinity;\n    let min2 = Infinity;\n    let max1 = -Infinity;\n    let max2 = -Infinity;\n    let max3 = -Infinity;\n\n    for (const num of nums) {\n        if (num < min1) {\n            min2 = min1;\n            min1 = num;\n        } else if (num < min2) {\n            min2 = num;\n        }\n\n        if (num > max1) {\n            max3 = max2;\n            max2 = max1;\n            max1 = num;\n        } else if (num > max2) {\n            max3 = max2;\n            max2 = num;\n        } else if (num > max3) {\n            max3 = num;\n        }\n    }\n\n    if (max1 < 0) {\n        return max1 * max2 * max3;\n    }\n\n    return Math.max(min1 * min2, max2 * max3) * max1;\n};\n",
+    "language": "javascript",
+    "notes": "Should be the fastest possible solution.",
+    "aiExplanation": "This function finds the **maximum product of three numbers** in a single pass by tracking the two smallest values (`min1`, `min2`) and the three largest values (`max1`, `max2`, `max3`), then handles two cases: if the largest value `max1` is negative (meaning **all** numbers are negative), it returns the product of the three largest (least negative) numbers `max1 * max2 * max3`; otherwise it returns `Math.max(min1 * min2, max2 * max3) * max1`, picking whichever of the two smallest or second/third largest numbers yields a bigger product when multiplied by the overall largest number.",
+    "status": "DONE",
+    "cpuUsage": 85.27,
+    "memoryUsage": 54.46,
+    "date": "2026-07-26T08:52:04.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar maximumProduct = function(nums) {\n    nums.sort((a, b) => a - b);\n\n    const n = nums.length;\n\n    if (nums[n - 1] < 0) {\n        return nums[n - 1] * nums[n - 2] * nums[n - 3];\n    }\n\n    return nums[n - 1] * Math.max(nums[n - 2] * nums[n - 3], nums[0] * nums[1]);\n};\n",
+    "language": "javascript",
+    "notes": "Attempt using sort.",
+    "aiExplanation": "This function finds the **maximum product of three numbers** by first sorting `nums` in ascending order, then checking if the largest number `nums[n-1]` is negative (meaning **all** numbers are negative), in which case it returns the product of the three largest (least negative) values; otherwise it returns the largest number multiplied by whichever is bigger — the product of the two next-largest numbers (`nums[n-2] * nums[n-3]`) or the product of the two smallest numbers (`nums[0] * nums[1]`), since two negatives can multiply into a large positive.",
+    "status": "DONE",
+    "cpuUsage": 69.64,
+    "memoryUsage": 31.7,
+    "date": "2026-07-26T08:58:29.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar maximumProduct = function(nums) {\n    let min1 = Infinity;\n    let max1 = -Infinity;\n    let min2 = Infinity;\n    let max2 = -Infinity;\n    let res = -Infinity;\n\n    for (const num of nums) {\n        if (min2 < Infinity) {\n            res = Math.max(res, num * min2, num * max2);\n        }\n\n        if (min1 < Infinity) {\n            const multMin = num * min1;\n            const multMax = num * max1;\n\n            min2 = Math.min(min2, multMin, multMax);\n            max2 = Math.max(max2, multMin, multMax);\n        }\n\n        min1 = Math.min(min1, num);\n        max1 = Math.max(max1, num);\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Fastest time achieved, but likely due to small amount of tests.",
+    "aiExplanation": "This function finds the **maximum product of three numbers** in a single pass by maintaining running values for the best product of *two* numbers seen so far — `min2` (smallest two-number product) and `max2` (largest two-number product) — alongside the smallest (`min1`) and largest (`max1`) single number seen so far; for each new number it first updates the answer `res` by multiplying it with `min2` or `max2` (completing a triple), then updates `min2`/`max2` using the current number combined with `min1`/`max1` (extending to a new pair), and finally updates `min1`/`max1` with the current number, so the three-number product is built incrementally as the array is scanned once.",
+    "status": "DONE",
+    "cpuUsage": 97.77,
+    "memoryUsage": 94.2,
+    "date": "2026-07-26T09:14:29.000Z"
+  }
+]

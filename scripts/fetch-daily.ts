@@ -1,6 +1,10 @@
 import type { Solution } from "@/lib/types";
-import fs from "fs";
-import { problemFilePath, solutionFilePath, writeJsonFile } from "@/lib/paths";
+import {
+  problemFilePath,
+  solutionFileExists,
+  solutionFilePath,
+  writeJsonFile,
+} from "@/lib/paths";
 import {
   verifyAuthentication,
   fetchTodayChallenge,
@@ -57,7 +61,7 @@ async function main() {
 
     const solutionsFilePath = solutionFilePath(date);
 
-    if (fs.existsSync(solutionsFilePath)) {
+    if (solutionFileExists(date)) {
       console.log(`Solutions file already exists at ${solutionsFilePath}`);
       process.exit(0);
     }

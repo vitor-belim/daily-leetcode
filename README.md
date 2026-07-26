@@ -18,7 +18,7 @@ This project automatically fetches the LeetCode "Question of the Day" and allows
 
 - **Framework**: [Next.js](https://nextjs.org/) (App Router)
 - **Language**: [TypeScript](https://www.typescriptlang.org/)
-- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/) & [Radix UI](https://www.radix-ui.com/)
+- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/), [Base UI](https://base-ui.com/) (primary primitives) & [Radix UI](https://www.radix-ui.com/) (`Progress`)
 - **Components**: [Shadcn UI](https://ui.shadcn.com/)
 - **Syntax Highlighting**: [Shiki](https://shiki.style/)
 - **AI Integration**: the `/explain` Claude Code command (generates solution explanations)
@@ -79,7 +79,7 @@ This project automatically fetches the LeetCode "Question of the Day" and allows
 | `npm run fetch-daily` | Fetches the current LeetCode daily challenge and your latest accepted submission. |
 | `npm run backfill` | Finds missing days in `data/` and backfills them via `fetch-daily` + the `/explain` command. |
 
-See [`scripts/README.md`](scripts/README.md) for details on both CLI scripts, required env vars, and their invariants.
+See [`scripts/README.md`](scripts/README.md) for details on both CLI scripts and required env vars.
 
 ### Fetching Daily Challenge
 
@@ -120,5 +120,4 @@ npm run test       # Vitest — covers nearly all of lib/, see scripts/README.md
 
 - [ ] Implement automated CI/CD for fetching daily challenges.
 - [ ] Add tests for `lib/leetcode-api.ts` (needs network mocking) — the last untested module besides the intentionally-trivial `lib/actions.ts`.
-- [ ] Improve UI for mobile responsiveness.
 - [ ] Add support for multiple programming languages in solutions.

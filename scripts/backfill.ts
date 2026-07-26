@@ -1,20 +1,11 @@
-import fs from "fs";
-import { execFileSync } from "child_process";
-import type { Solution } from "@/lib/types";
-import { solutionFilePath } from "@/lib/paths";
 import { collectFilledDates, getMissingDates } from "@/lib/archive";
+import { solutionFileExists, solutionFilePath } from "@/lib/paths";
+import type { Solution } from "@/lib/types";
+import { execFileSync } from "child_process";
+import fs from "fs";
 
-const EXPLAIN_BATCH_SIZE = 4;
 const FETCH_TIMEOUT_MS = 2 * 60 * 1000;
 const EXPLAIN_TIMEOUT_MS = 10 * 60 * 1000;
-
-function chunk<T>(items: T[], size: number): T[][] {
-  const chunks: T[][] = [];
-  for (let i = 0; i < items.length; i += size) {
-    chunks.push(items.slice(i, i + size));
-  }
-  return chunks;
-}
 
 function fetchDate(date: string) {
   console.log(`\n=== ${date}: fetch-daily ===`);
@@ -24,21 +15,22 @@ function fetchDate(date: string) {
   });
 }
 
-function explainDates(dates: string[]) {
-  console.log(`\n=== explain: ${dates.join(", ")} ===`);
+function explainDate(date: string) {
+  console.log(`\n=== explain: ${date} ===`);
   execFileSync(
     "claude",
-    ["-p", `/explain ${dates.join(" ")}`, "--permission-mode", "acceptEdits"],
+    ["-p", `/explain ${date}`, "--permission-mode", "acceptEdits"],
     { stdio: "inherit", timeout: EXPLAIN_TIMEOUT_MS },
   );
 }
 
 function isExplainComplete(date: string): boolean {
-  const filePath = solutionFilePath(date);
-  if (!fs.existsSync(filePath)) return false;
+  if (!solutionFileExists(date)) return false;
 
   try {
-    const solutions: Solution[] = JSON.parse(fs.readFileSync(filePath, "utf8"));
+    const solutions: Solution[] = JSON.parse(
+      fs.readFileSync(solutionFilePath(date), "utf8"),
+    );
     return (
       solutions.length > 0 &&
       solutions.every((s) => (s.aiExplanation || "").trim().length > 0)
@@ -67,42 +59,42 @@ function main() {
     return;
   }
 
-  console.log(`Missing days (${missingDates.length}): ${missingDates.join(", ")}`);
+  console.log(
+    `Missing days (${missingDates.length}): ${missingDates.join(", ")}`,
+  );
 
-  const fetchedDates: string[] = [];
   const failedDates = new Set<string>();
 
   for (const date of missingDates) {
     try {
       fetchDate(date);
-      fetchedDates.push(date);
-    } catch (error) {
-      console.error(`\nfetch-daily failed for ${date}: ${(error as Error).message}`);
-      failedDates.add(date);
-    }
-  }
-
-  if (fetchedDates.length === 0) {
-    console.error("\nNo days were fetched successfully, skipping explain step.");
-    process.exit(1);
-  }
-
-  for (const batch of chunk(fetchedDates, EXPLAIN_BATCH_SIZE)) {
-    try {
-      explainDates(batch);
     } catch (error) {
       console.error(
-        `\nexplain failed for ${batch.join(", ")}: ${(error as Error).message}`,
+        `\nfetch-daily failed for ${date}: ${(error as Error).message}`,
       );
-      for (const date of batch) failedDates.add(date);
+      failedDates.add(date);
       continue;
     }
 
-    for (const date of batch) {
-      if (!isExplainComplete(date)) {
-        console.error(`\nexplain did not produce explanations for ${date}`);
-        failedDates.add(date);
-      }
+    if (!solutionFileExists(date)) {
+      console.log(`\n${date}: no solutions file yet, skipping explain.`);
+      failedDates.add(date);
+      continue;
+    }
+
+    try {
+      explainDate(date);
+    } catch (error) {
+      console.error(
+        `\nexplain failed for ${date}: ${(error as Error).message}`,
+      );
+      failedDates.add(date);
+      continue;
+    }
+
+    if (!isExplainComplete(date)) {
+      console.error(`\nexplain did not produce explanations for ${date}`);
+      failedDates.add(date);
     }
   }
 

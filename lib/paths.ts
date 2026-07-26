@@ -17,6 +17,10 @@ export function solutionFilePath(date: string, root: string = SOLUTIONS_ROOT): s
   return datePartsToPath(root, date);
 }
 
+export function solutionFileExists(date: string, root: string = SOLUTIONS_ROOT): boolean {
+  return fs.existsSync(solutionFilePath(date, root));
+}
+
 export function writeJsonFile(filePath: string, value: unknown): void {
   const dirPath = path.dirname(filePath);
   if (!fs.existsSync(dirPath)) {
