@@ -7,6 +7,11 @@ LOG_TAG="[daily-leetcode]"
 
 cd "$REPO_DIR"
 
+GH_PUSH_USER="vitor-belim"
+GH_ORIGINAL_USER="vitor-belim-ovyo"
+gh auth switch --hostname github.com --user "$GH_PUSH_USER" >/dev/null
+trap 'gh auth switch --hostname github.com --user "$GH_ORIGINAL_USER" >/dev/null' EXIT
+
 export NVM_DIR="$HOME/.nvm"
 # shellcheck source=/dev/null
 source "$NVM_DIR/nvm.sh"
