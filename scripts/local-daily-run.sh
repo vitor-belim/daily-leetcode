@@ -1,6 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
+export PATH="/usr/local/bin:$PATH"
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(dirname "$SCRIPT_DIR")"
 LOG_TAG="[daily-leetcode]"
