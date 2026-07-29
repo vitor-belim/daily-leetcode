@@ -22,7 +22,7 @@ nvm use default
 git pull --ff-only
 
 set +e
-npm run fetch-daily -- --problem-only
+npm run fetch-daily -- "$@" --problem-only
 FETCH_STATUS=$?
 set -e
 
