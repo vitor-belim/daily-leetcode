@@ -24,7 +24,6 @@ describe("formatDateUTC / parseDateUTC", () => {
   });
 
   it("handles a leap-year Feb 29 correctly", () => {
-    // 2028 is a leap year.
     const date = parseDateUTC("2028-02-28");
     date.setUTCDate(date.getUTCDate() + 1);
     expect(formatDateUTC(date)).toBe("2028-02-29");
@@ -47,6 +46,7 @@ describe("isValidCalendarDate", () => {
   });
 
   it("accepts Feb 29 on a leap year", () => {
+    // 2028 is a leap year.
     expect(isValidCalendarDate("2028-02-29")).toBe(true);
   });
 

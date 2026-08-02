@@ -52,7 +52,7 @@ describe("getProblem / getAdjacentDates / getLatestDailiesData", () => {
   }
 
   function writeProblem(root: string, date: string, data: unknown) {
-    const [y, m, d] = date.split("-");
+    const [y = "", m = "", d = ""] = date.split("-");
     fs.mkdirSync(path.join(root, y, m), { recursive: true });
     fs.writeFileSync(
       path.join(root, y, m, `${d}.json`),
@@ -158,6 +158,24 @@ describe("getProblem / getAdjacentDates / getLatestDailiesData", () => {
       const result = await getLatestDailiesData(10, 0, root);
       expect(result.total).toBe(2);
       expect(result.problems.map((p) => p.date)).toEqual(["2026-07-19"]);
+    });
+
+    it("advances nextOffset by dates consumed, not problems returned", async () => {
+      const root = makeFixture();
+      writeProblem(root, "2026-07-19", { date: "2026-07-19" });
+      writeProblem(root, "2026-07-20", "{not json");
+      writeProblem(root, "2026-07-21", { date: "2026-07-21" });
+
+      // Page of 2 consumes 07-21 and the broken 07-20 but returns 1 problem;
+      // paging from nextOffset must land on 07-19 without re-serving 07-21.
+      const first = await getLatestDailiesData(2, 0, root);
+      expect(first.problems.map((p) => p.date)).toEqual(["2026-07-21"]);
+      expect(first.nextOffset).toBe(2);
+      expect(first.hasMore).toBe(true);
+
+      const second = await getLatestDailiesData(2, first.nextOffset, root);
+      expect(second.problems.map((p) => p.date)).toEqual(["2026-07-19"]);
+      expect(second.hasMore).toBe(false);
     });
 
     it("ignores a stray non-date file", async () => {

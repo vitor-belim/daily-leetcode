@@ -1,6 +1,6 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
+import { DifficultyBadge } from "@/components/difficulty-badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -17,19 +17,26 @@ import { useState } from "react";
 interface DailyListProps {
   initialProblems: Problem[];
   initialHasMore: boolean;
+  initialNextOffset: number;
 }
 
-export function DailyList({ initialProblems, initialHasMore }: DailyListProps) {
+export function DailyList({
+  initialProblems,
+  initialHasMore,
+  initialNextOffset,
+}: DailyListProps) {
   const [problems, setProblems] = useState<Problem[]>(initialProblems);
   const [hasMore, setHasMore] = useState(initialHasMore);
+  const [nextOffset, setNextOffset] = useState(initialNextOffset);
   const [isLoading, setIsLoading] = useState(false);
 
   async function loadMore() {
     setIsLoading(true);
     try {
-      const result = await getLatestDailies(10, problems.length);
+      const result = await getLatestDailies(10, nextOffset);
       setProblems((prev) => [...prev, ...result.problems]);
       setHasMore(result.hasMore);
+      setNextOffset(result.nextOffset);
     } catch (error) {
       console.error("Failed to load more dailies:", error);
     } finally {
@@ -67,24 +74,7 @@ export function DailyList({ initialProblems, initialHasMore }: DailyListProps) {
                       </CardTitle>
                       <CardDescription>{problem.date}</CardDescription>
                     </div>
-                    <Badge
-                      variant={
-                        problem.difficulty === "Easy"
-                          ? "secondary"
-                          : problem.difficulty === "Medium"
-                            ? "default"
-                            : "destructive"
-                      }
-                      className={
-                        problem.difficulty === "Easy"
-                          ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400"
-                          : problem.difficulty === "Medium"
-                            ? "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400"
-                            : ""
-                      }
-                    >
-                      {problem.difficulty}
-                    </Badge>
+                    <DifficultyBadge difficulty={problem.difficulty} />
                   </div>
                 </CardHeader>
               </Card>

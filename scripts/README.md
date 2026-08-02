@@ -28,6 +28,8 @@ Fetches one day's LeetCode daily challenge — title, difficulty, description, l
 
 Fetches your submissions for one day's challenge and writes `data/solutions/YYYY/MM/DD.json`.
 
+Note that this fetches **every submission you have ever made to that problem**, not just the ones from the challenge day itself — if you solved the problem two years before it came up as a daily, those old submissions are included too (with their original timestamps). Fetching is capped at the 200 most recent submissions per problem; anything older is left out with a warning.
+
 Never overwrites an existing solutions file. If you haven't solved the day yet:
 
 - while the day is still in progress, no solutions file is written at all, so the day is retried on a later run instead of being marked done;

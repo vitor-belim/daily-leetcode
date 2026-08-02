@@ -49,6 +49,12 @@ describe("timeAgo", () => {
     expect(timeAgo("2026-07-25T12:00:00.000Z")).toBe("5 minutes ago");
   });
 
+  it("floors partial units instead of rounding up", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-07-25T12:01:30.000Z"));
+    expect(timeAgo("2026-07-25T12:00:00.000Z")).toBe("1 minute ago");
+  });
+
   it("reports days ago", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-07-25T12:00:00.000Z"));

@@ -1,6 +1,12 @@
 import { describe, it, expect } from "vitest";
-import { buildProblem, normalizeLink, titleSlugFromLink } from "./problems";
+import {
+  buildProblem,
+  normalizeLink,
+  sanitizeDescription,
+  titleSlugFromLink,
+} from "./problems";
 import type { DailyChallenge } from "./leetcode-api";
+import { Difficulty } from "./types";
 
 const challenge: DailyChallenge = {
   date: "2026-08-02",
@@ -9,7 +15,7 @@ const challenge: DailyChallenge = {
     questionFrontendId: "877",
     title: "Stone Game",
     titleSlug: "stone-game",
-    difficulty: "Medium",
+    difficulty: Difficulty.Medium,
   },
 };
 
@@ -56,11 +62,45 @@ describe("titleSlugFromLink", () => {
   });
 });
 
+describe("sanitizeDescription", () => {
+  it("keeps the tags LeetCode descriptions actually use", () => {
+    const html =
+      '<p>Given <code>nums</code>:</p><pre>x<sup>2</sup></pre>' +
+      '<img src="https://assets.leetcode.com/a.png" alt="tree" style="width:100px" />' +
+      '<a href="https://leetcode.com/x" target="_blank">link</a>';
+    expect(sanitizeDescription(html)).toBe(html);
+  });
+
+  it("strips scripts and event handlers", () => {
+    expect(
+      sanitizeDescription('<p onclick="steal()">hi</p><script>steal()</script>'),
+    ).toBe("<p>hi</p>");
+  });
+
+  it("strips javascript: URLs", () => {
+    expect(sanitizeDescription('<a href="javascript:steal()">x</a>')).toBe(
+      "<a>x</a>",
+    );
+  });
+
+  it("drops editor metadata attributes like data-*", () => {
+    expect(sanitizeDescription('<p data-start="1" data-end="9">hi</p>')).toBe(
+      "<p>hi</p>",
+    );
+  });
+});
+
 describe("buildProblem", () => {
+  it("sanitizes the description", () => {
+    expect(
+      buildProblem(challenge, "<p>hi</p><script>steal()</script>").description,
+    ).toBe("<p>hi</p>");
+  });
+
   it("maps a challenge and its description into a Problem", () => {
     expect(buildProblem(challenge, "<p>Alice and Bob…</p>")).toEqual({
       title: "Stone Game",
-      difficulty: "Medium",
+      difficulty: Difficulty.Medium,
       description: "<p>Alice and Bob…</p>",
       link: "https://leetcode.com/problems/stone-game/",
       date: "2026-08-02",

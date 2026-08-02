@@ -47,7 +47,6 @@ describe("collectFilledDates", () => {
     const root = makeFixture();
     fs.mkdirSync(path.join(root, "2026", "07"), { recursive: true });
     fs.writeFileSync(path.join(root, "2026", "07", "20.json"), "{}");
-    // Empty newest month — should not prevent finding the earlier day.
     fs.mkdirSync(path.join(root, "2026", "08"), { recursive: true });
 
     expect(collectFilledDates(root)).toEqual(["2026-07-20"]);
@@ -76,5 +75,9 @@ describe("getMissingDates", () => {
     const filled = ["2026-07-20"];
     const today = new Date(Date.UTC(2026, 6, 20));
     expect(getMissingDates(filled, today)).toEqual([]);
+  });
+
+  it("returns an empty array for an empty input (no range to scan)", () => {
+    expect(getMissingDates([], new Date(Date.UTC(2026, 6, 22)))).toEqual([]);
   });
 });

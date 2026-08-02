@@ -1,8 +1,22 @@
 import fs from "fs";
 import path from "path";
+import {
+  formatDateUTC,
+  isValidCalendarDate,
+  parseDateUTC,
+  todayUTC,
+} from "./dates";
 import { PROBLEMS_ROOT } from "./paths";
-import { formatDateUTC, parseDateUTC, todayUTC, isValidCalendarDate } from "./dates";
 
+/**
+ * Scans a `YYYY/MM/DD.json` archive tree and lists every day that has a
+ * file, ignoring entries that don't match the naming convention or don't
+ * form a real calendar date.
+ *
+ * @param root The archive root to scan (defaults to `data/problems`).
+ * @returns The filled days as sorted-ascending `YYYY-MM-DD` strings; empty
+ *   when the root doesn't exist.
+ */
 export function collectFilledDates(root: string = PROBLEMS_ROOT): string[] {
   if (!fs.existsSync(root)) return [];
 
@@ -34,16 +48,26 @@ export function collectFilledDates(root: string = PROBLEMS_ROOT): string[] {
   return dates.sort();
 }
 
-// Precondition: filledDates must be non-empty (indexes [0] as the range
-// start) and does not need to be pre-sorted here since callers already
-// receive it sorted from collectFilledDates. Callers must guard the
-// empty-array case themselves before calling this.
+/**
+ * Finds the days missing from a filled-dates list, scanning from the first
+ * filled day through today inclusive. Input does not need to be pre-sorted
+ * beyond its first element being the range start, which is how
+ * `collectFilledDates` returns it.
+ *
+ * @param filledDates The days that already have data, sorted ascending.
+ * @param today The scan end (defaults to the current UTC day).
+ * @returns The missing days as ascending `YYYY-MM-DD` strings; empty when
+ *   `filledDates` is empty (no range to scan).
+ */
 export function getMissingDates(
   filledDates: string[],
   today: Date = todayUTC(),
 ): string[] {
+  const rangeStart = filledDates[0];
+  if (rangeStart === undefined) return [];
+
   const filledSet = new Set(filledDates);
-  const cursor = parseDateUTC(filledDates[0]);
+  const cursor = parseDateUTC(rangeStart);
 
   const missingDates: string[] = [];
   while (cursor <= today) {

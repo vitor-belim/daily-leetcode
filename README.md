@@ -78,7 +78,7 @@ This project automatically fetches the LeetCode "Question of the Day" and allows
 | `npm run test` | Runs the Vitest suite (covers nearly all of `lib/` — see [`scripts/README.md`](scripts/README.md)). |
 | `npm run fetch-daily` | Fetches both halves of a day: `fetch-problem` followed by `fetch-solution`. |
 | `npm run fetch-problem` | Fetches a day's LeetCode daily challenge into `data/problems/`. |
-| `npm run fetch-solution` | Fetches your submissions for a day's challenge into `data/solutions/`. |
+| `npm run fetch-solution` | Fetches your submissions for a day's challenge into `data/solutions/` — all submissions ever made to that problem, not just that day's. |
 | `npm run backfill` | Finds days in `data/` missing a problem or solutions and backfills them via `fetch-problem`/`fetch-solution` + the `/explain` command. |
 
 See [`scripts/README.md`](scripts/README.md) for details on all CLI scripts and required env vars.
@@ -106,6 +106,7 @@ All three take the same optional date argument, and default to today if none is 
 - `data/`: JSON storage for problem descriptions and solutions.
   - `problems/YYYY/MM/DD.json`: Daily challenge metadata.
   - `solutions/YYYY/MM/DD.json`: Your solution implementation and AI explanation.
+  - Read at request time via dynamically built paths, which output file tracing can't reliably discover — `outputFileTracingIncludes` in `next.config.ts` ships them with serverless deploys explicitly. Don't remove that entry.
 - `lib/`: Shared utilities, TypeScript types, and data access, split by responsibility rather than bundled into one "data" file:
   - `actions.ts`: the only `"use server"` file left — a thin wrapper around `problems-repo.ts` for the one function (`getLatestDailies`) actually called from a Client Component.
   - `problems-repo.ts` / `solutions-repo.ts`: plain (non-`"use server"`) data-access modules for reading `data/problems`/`data/solutions` — used directly by Server Components, never client-reachable, so they're safe to unit test with fixture directories.

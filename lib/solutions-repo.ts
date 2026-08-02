@@ -3,6 +3,16 @@ import type { Solution } from "./types";
 import { solutionFilePath, SOLUTIONS_ROOT } from "./paths";
 import { isValidCalendarDate } from "./dates";
 
+/**
+ * Reads the archived solutions for one day.
+ *
+ * @param year The four-digit year.
+ * @param month The two-digit month.
+ * @param day The two-digit day.
+ * @param root The solutions root (defaults to `data/solutions`).
+ * @returns The day's solutions sorted newest-first; empty when the date is
+ *   invalid, the file is missing, or it fails to parse.
+ */
 export async function getSolutions(
   year: string,
   month: string,

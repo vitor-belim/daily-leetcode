@@ -1,5 +1,6 @@
 import { SplitPanels } from "@/components/blog/split-panels";
 import { CodeBlock } from "@/components/code/code-block";
+import { DifficultyBadge } from "@/components/difficulty-badge";
 import {
   Accordion,
   AccordionContent,
@@ -15,6 +16,7 @@ import { getAdjacentDates, getProblem } from "@/lib/problems-repo";
 import { getSolutions } from "@/lib/solutions-repo";
 import { markdownToHtml } from "@/lib/markdown";
 import { formatDate, formatLongDate, timeAgo } from "@/lib/date-display";
+import { SolutionStatus } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import {
   ChevronLeft,
@@ -72,7 +74,6 @@ export default async function ProblemPage({
 
   return (
     <div className="flex flex-col h-screen max-h-screen overflow-hidden">
-      {/* Header */}
       <header className="border-b px-3 py-3 sm:px-6 sm:py-4 grid grid-cols-3 items-center gap-2 shrink-0">
         <div className="flex items-center">
           <Link
@@ -123,24 +124,7 @@ export default async function ProblemPage({
         </div>
 
         <div className="flex items-center justify-end gap-2 sm:gap-3">
-          <Badge
-            variant={
-              problem.difficulty === "Easy"
-                ? "secondary"
-                : problem.difficulty === "Medium"
-                  ? "default"
-                  : "destructive"
-            }
-            className={
-              problem.difficulty === "Easy"
-                ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400"
-                : problem.difficulty === "Medium"
-                  ? "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400"
-                  : ""
-            }
-          >
-            {problem.difficulty}
-          </Badge>
+          <DifficultyBadge difficulty={problem.difficulty} />
           <a
             href={problem.link}
             target="_blank"
@@ -153,7 +137,6 @@ export default async function ProblemPage({
         </div>
       </header>
 
-      {/* Content */}
       <main className="flex-1 flex flex-col lg:flex-row overflow-hidden">
         <SplitPanels
           left={{
@@ -175,7 +158,7 @@ export default async function ProblemPage({
             content:
               solutions.length > 0 ? (
                 <Tabs
-                  defaultValue={`${solutionsWithLabels[0].author}-0`}
+                  defaultValue={`${solutionsWithLabels[0]?.author ?? ""}-0`}
                   className="flex-1 flex flex-col overflow-hidden"
                 >
                   <div className="px-4 py-2 border-b bg-muted/10 shrink-0 overflow-x-auto">
@@ -186,13 +169,14 @@ export default async function ProblemPage({
                           value={`${s.author}-${index}`}
                           className={cn(
                             "shadow-sm border rounded-md px-4 transition-all flex flex-col gap-0 h-auto",
-                            s.status === "DONE" &&
+                            s.status === SolutionStatus.Done &&
                               "bg-green-100 text-green-800 data-active:bg-green-200 dark:bg-green-900/30 dark:text-green-400 dark:data-active:bg-green-900/50",
-                            (s.status === "TLE" || s.status === "MLE") &&
+                            (s.status === SolutionStatus.TimeLimitExceeded ||
+                              s.status === SolutionStatus.MemoryLimitExceeded) &&
                               "bg-yellow-100 text-yellow-800 data-active:bg-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:data-active:bg-yellow-900/50",
-                            s.status === "FAILED" &&
+                            s.status === SolutionStatus.Failed &&
                               "bg-red-100 text-red-800 data-active:bg-red-200 dark:bg-red-900/30 dark:text-red-400 dark:data-active:bg-red-900/50",
-                            s.status === "FAILED_CONSTRAINTS" &&
+                            s.status === SolutionStatus.FailedConstraints &&
                               "bg-orange-100 text-orange-800 data-active:bg-orange-200 dark:bg-orange-900/30 dark:text-orange-400 dark:data-active:bg-orange-900/50",
                             "data-active:ring-1 data-active:ring-primary/20 data-active:border-primary/30",
                           )}
@@ -294,14 +278,16 @@ export default async function ProblemPage({
                                   <Badge
                                     className={cn(
                                       "font-bold",
-                                      s.status === "DONE" &&
+                                      s.status === SolutionStatus.Done &&
                                         "bg-green-500 hover:bg-green-600",
-                                      (s.status === "TLE" ||
-                                        s.status === "MLE") &&
+                                      (s.status ===
+                                        SolutionStatus.TimeLimitExceeded ||
+                                        s.status ===
+                                          SolutionStatus.MemoryLimitExceeded) &&
                                         "bg-yellow-500 hover:bg-yellow-600 text-black",
-                                      s.status === "FAILED" &&
+                                      s.status === SolutionStatus.Failed &&
                                         "bg-red-500 hover:bg-red-600",
-                                      s.status === "FAILED_CONSTRAINTS" &&
+                                      s.status === SolutionStatus.FailedConstraints &&
                                         "bg-orange-500 hover:bg-orange-600",
                                     )}
                                   >

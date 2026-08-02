@@ -39,8 +39,6 @@ function isExplainComplete(date: string): boolean {
     const solutions: Solution[] = JSON.parse(
       fs.readFileSync(solutionFilePath(date), "utf8"),
     );
-    // An empty array is a settled day that was never solved, not an
-    // unfinished one — there is nothing left to explain.
     return solutions.every((s) => (s.aiExplanation || "").trim().length > 0);
   } catch {
     return false;
@@ -91,9 +89,6 @@ function main() {
       }
     }
 
-    // A date can have its problem already archived but no solutions yet, so
-    // this runs independently of the fetch above instead of re-fetching the
-    // problem just to reach the solutions.
     if (!solutionFileExists(date)) {
       try {
         fetchSolution(date);
@@ -106,16 +101,12 @@ function main() {
       }
 
       if (!solutionFileExists(date)) {
-        // Only reachable for a day still in progress; a day that is over gets
-        // an empty solutions file written instead.
         console.log(`\n${date}: not solved yet, skipping explain.`);
         failedDates.add(date);
         continue;
       }
     }
 
-    // The fetch above can settle a day outright by writing an empty solutions
-    // file, leaving nothing for `/explain` to do.
     if (isExplainComplete(date)) {
       console.log(`\n${date}: no solutions to explain, skipping.`);
       continue;

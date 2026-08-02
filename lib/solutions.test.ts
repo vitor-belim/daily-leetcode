@@ -1,24 +1,28 @@
 import { describe, it, expect } from "vitest";
-import type { Solution } from "./types";
+import { SolutionStatus, type Solution } from "./types";
 import { statusFromDisplay, score, buildSolution, dedupeSolutions } from "./solutions";
 import type { SubmissionListItem, SubmissionDetails } from "./leetcode-api";
 
 describe("statusFromDisplay", () => {
   it("maps Accepted to DONE", () => {
-    expect(statusFromDisplay("Accepted")).toBe("DONE");
+    expect(statusFromDisplay("Accepted")).toBe(SolutionStatus.Done);
   });
 
   it("maps Time Limit Exceeded to TLE", () => {
-    expect(statusFromDisplay("Time Limit Exceeded")).toBe("TLE");
+    expect(statusFromDisplay("Time Limit Exceeded")).toBe(
+      SolutionStatus.TimeLimitExceeded,
+    );
   });
 
   it("maps Memory Limit Exceeded to MLE", () => {
-    expect(statusFromDisplay("Memory Limit Exceeded")).toBe("MLE");
+    expect(statusFromDisplay("Memory Limit Exceeded")).toBe(
+      SolutionStatus.MemoryLimitExceeded,
+    );
   });
 
   it("defaults anything else (e.g. Wrong Answer) to FAILED", () => {
-    expect(statusFromDisplay("Wrong Answer")).toBe("FAILED");
-    expect(statusFromDisplay("Runtime Error")).toBe("FAILED");
+    expect(statusFromDisplay("Wrong Answer")).toBe(SolutionStatus.Failed);
+    expect(statusFromDisplay("Runtime Error")).toBe(SolutionStatus.Failed);
   });
 });
 
@@ -28,7 +32,10 @@ describe("score", () => {
   });
 
   it("treats missing usage fields as 0", () => {
-    expect(score(makeSolution({ cpuUsage: undefined, memoryUsage: undefined }))).toBe(0);
+    const solution = makeSolution({});
+    delete solution.cpuUsage;
+    delete solution.memoryUsage;
+    expect(score(solution)).toBe(0);
   });
 });
 
@@ -56,7 +63,7 @@ describe("buildSolution", () => {
 
     expect(solution.code).toBe("var x = 1;");
     expect(solution.language).toBe("javascript");
-    expect(solution.status).toBe("DONE");
+    expect(solution.status).toBe(SolutionStatus.Done);
     expect(solution.cpuUsage).toBe(91.31);
     expect(solution.memoryUsage).toBe(30.12);
     expect(solution.notes).toBe("");
@@ -69,14 +76,14 @@ describe("dedupeSolutions", () => {
   it("keeps the higher-scoring submission wholesale for duplicate code, without splicing fields", () => {
     const lower = makeSolution({
       code: "same code",
-      status: "FAILED",
+      status: SolutionStatus.Failed,
       cpuUsage: 50,
       memoryUsage: 10,
       date: "2026-01-01T00:00:00.000Z",
     });
     const higher = makeSolution({
       code: "same code",
-      status: "DONE",
+      status: SolutionStatus.Done,
       cpuUsage: 20,
       memoryUsage: 80,
       date: "2026-01-02T00:00:00.000Z",
@@ -107,7 +114,7 @@ function makeSolution(overrides: Partial<Solution>): Solution {
     language: "javascript",
     notes: "",
     aiExplanation: "",
-    status: "DONE",
+    status: SolutionStatus.Done,
     cpuUsage: 0,
     memoryUsage: 0,
     date: "2026-01-01T00:00:00.000Z",

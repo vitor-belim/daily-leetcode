@@ -1,9 +1,9 @@
-import { problemFilePath, writeJsonFile } from "@/lib/paths";
 import {
-  verifyAuthentication,
-  resolveDailyChallenge,
   fetchQuestionContent,
+  resolveDailyChallenge,
+  verifyAuthentication,
 } from "@/lib/leetcode-api";
+import { problemFilePath, writeJsonFile } from "@/lib/paths";
 import { buildProblem } from "@/lib/problems";
 
 async function main() {
@@ -13,7 +13,7 @@ async function main() {
     console.log(`Authenticated as ${username}`);
 
     const args = process.argv.slice(2);
-    const targetDate = args.find((arg) => !arg.startsWith("--")); // Format: YYYY-MM-DD
+    const targetDate = args.find((arg) => !arg.startsWith("--"));
 
     const dailyQuestion = await resolveDailyChallenge(targetDate);
 

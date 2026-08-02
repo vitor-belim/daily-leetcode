@@ -1,20 +1,20 @@
-import type { Problem, Solution } from "@/lib/types";
+import { formatDateUTC, isPastDateUTC, todayUTC } from "@/lib/dates";
+import {
+  fetchAllSubmissions,
+  fetchSubmissionDetails,
+  resolveDailyChallenge,
+  throttleSubmissionRequest,
+  verifyAuthentication,
+} from "@/lib/leetcode-api";
 import {
   problemFilePath,
   solutionFileExists,
   solutionFilePath,
   writeJsonFile,
 } from "@/lib/paths";
-import {
-  verifyAuthentication,
-  resolveDailyChallenge,
-  fetchAllSubmissions,
-  fetchSubmissionDetails,
-  throttleSubmissionRequest,
-} from "@/lib/leetcode-api";
-import { buildSolution, dedupeSolutions } from "@/lib/solutions";
 import { titleSlugFromLink } from "@/lib/problems";
-import { formatDateUTC, isPastDateUTC, todayUTC } from "@/lib/dates";
+import { buildSolution, dedupeSolutions } from "@/lib/solutions";
+import type { Problem, Solution } from "@/lib/types";
 import fs from "fs";
 
 interface Target {
@@ -33,9 +33,6 @@ function slugFromProblemFile(date: string): string | null {
   }
 }
 
-// The problem file already carries the slug, so the usual case (problem
-// fetched earlier, solutions still pending) needs no challenge lookup at all.
-// Only a date with no problem file on disk falls back to the API.
 async function resolveTarget(
   targetDate: string | undefined,
 ): Promise<Target | null> {
@@ -64,7 +61,7 @@ async function main() {
     console.log(`Authenticated as ${username}`);
 
     const args = process.argv.slice(2);
-    const targetDate = args.find((arg) => !arg.startsWith("--")); // Format: YYYY-MM-DD
+    const targetDate = args.find((arg) => !arg.startsWith("--"));
 
     const target = await resolveTarget(targetDate);
 
@@ -87,9 +84,6 @@ async function main() {
     const submissions = await fetchAllSubmissions(titleSlug);
 
     if (submissions.length === 0) {
-      // A day still in progress can still be solved, so leave it unwritten to
-      // be retried. Once the day is over, record the empty result so it isn't
-      // re-fetched forever.
       if (isPastDateUTC(date)) {
         writeJsonFile(solutionsFilePath, []);
         console.log(

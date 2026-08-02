@@ -1,4 +1,5 @@
 import { config } from "dotenv";
+import type { Difficulty } from "./types";
 
 config();
 
@@ -8,13 +9,19 @@ const SUBMISSION_PAGE_SIZE = 20;
 const MAX_SUBMISSION_PAGES = 10;
 const SUBMISSION_REQUEST_DELAY_MS = 200;
 
+/**
+ * Reads a required environment variable.
+ *
+ * @param name The variable name.
+ * @returns The variable's value.
+ * @throws When the variable is unset or empty.
+ */
 function requireEnv(name: string): string {
   const value = process.env[name];
   if (!value) {
-    console.error(
+    throw new Error(
       `${name} environment variable is not set. Add it to .env before running this script.`,
     );
-    process.exit(1);
   }
   return value;
 }
@@ -107,13 +114,15 @@ const AUTHENTICATION_QUERY = `
   }
 `;
 
+/** Summary fields LeetCode returns for a question in challenge listings. */
 export interface LeetCodeQuestionSummary {
   questionFrontendId: string;
   title: string;
   titleSlug: string;
-  difficulty: "Easy" | "Medium" | "Hard";
+  difficulty: Difficulty;
 }
 
+/** One daily challenge as returned by the daily and calendar queries. */
 export interface DailyChallenge {
   date: string;
   link: string;
@@ -129,9 +138,10 @@ interface CalendarResponse {
 }
 
 interface ContentResponse {
-  data: { question: { content: string } };
+  data: { question: { content: string } | null };
 }
 
+/** One row of the authenticated user's submission list for a question. */
 export interface SubmissionListItem {
   id: string;
   statusDisplay: string;
@@ -152,6 +162,7 @@ interface SubmissionListResponse {
   };
 }
 
+/** Detailed fields LeetCode returns for a single submission. */
 export interface SubmissionDetails {
   runtimePercentile: number;
   memoryPercentile: number;
@@ -162,7 +173,7 @@ export interface SubmissionDetails {
 }
 
 interface SubmissionDetailsResponse {
-  data: { submissionDetails: SubmissionDetails };
+  data: { submissionDetails: SubmissionDetails | null };
 }
 
 interface AuthResponse {
@@ -173,10 +184,23 @@ interface GraphQLError {
   message: string;
 }
 
+/**
+ * Resolves after a delay.
+ *
+ * @param ms The delay in milliseconds.
+ * @returns A promise resolving after the delay.
+ */
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+/**
+ * Builds the authenticated request headers from the LeetCode session
+ * cookies in the environment.
+ *
+ * @returns The headers for a LeetCode GraphQL request.
+ * @throws When LEETCODE_SESSION or LEETCODE_CSRFTOKEN is unset.
+ */
 function buildHeaders(): Record<string, string> {
   const session = requireEnv("LEETCODE_SESSION");
   const csrfToken = requireEnv("LEETCODE_CSRFTOKEN");
@@ -189,6 +213,15 @@ function buildHeaders(): Record<string, string> {
   };
 }
 
+/**
+ * Executes one authenticated GraphQL request against LeetCode.
+ *
+ * @param query The GraphQL query string.
+ * @param variables The query variables.
+ * @returns The parsed response typed as T.
+ * @throws On a non-2xx HTTP status, on GraphQL errors in the response, or
+ *   when the response carries neither data nor errors.
+ */
 async function fetchLeetCode<T>(
   query: string,
   variables: Record<string, unknown> = {},
@@ -206,7 +239,10 @@ async function fetchLeetCode<T>(
     );
   }
 
-  const json = (await response.json()) as T & { errors?: GraphQLError[] };
+  const json = (await response.json()) as T & {
+    errors?: GraphQLError[];
+    data?: unknown;
+  };
 
   if (json.errors && json.errors.length > 0) {
     throw new Error(
@@ -214,27 +250,51 @@ async function fetchLeetCode<T>(
     );
   }
 
+  if (json.data == null) {
+    throw new Error(
+      "GraphQL response contained no data (and no errors) — the query may be malformed or the session invalid.",
+    );
+  }
+
   return json;
 }
 
+/**
+ * Verifies that the configured session cookies are signed in.
+ *
+ * @returns The authenticated username.
+ * @throws When the session is invalid or expired.
+ */
 export async function verifyAuthentication(): Promise<string> {
   const authData = await fetchLeetCode<AuthResponse>(AUTHENTICATION_QUERY);
   if (!authData.data.userStatus.isSignedIn) {
     console.warn(
       "Authentication failed: LEETCODE_SESSION or LEETCODE_CSRFTOKEN is invalid or expired.",
     );
-    // noinspection ExceptionCaughtLocallyJS
     throw new Error("Authentication failed");
   }
   return authData.data.userStatus.username;
 }
 
+/**
+ * Fetches the currently active daily challenge.
+ *
+ * @returns Today's daily challenge.
+ */
 export async function fetchTodayChallenge(): Promise<DailyChallenge> {
   console.log("Fetching today's daily challenge...");
   const dailyData = await fetchLeetCode<DailyQuestionResponse>(DAILY_QUERY);
   return dailyData.data.activeDailyCodingChallengeQuestion;
 }
 
+/**
+ * Fetches the daily challenge for a specific date via that month's
+ * challenge calendar.
+ *
+ * @param targetDate The day as `YYYY-MM-DD`.
+ * @returns The challenge for that date, or undefined when the calendar has
+ *   no entry for it.
+ */
 export async function fetchChallengeForDate(
   targetDate: string,
 ): Promise<DailyChallenge | undefined> {
@@ -249,8 +309,14 @@ export async function fetchChallengeForDate(
   );
 }
 
-// Both fetch scripts take an optional date argument with the same meaning:
-// a given date goes through the month calendar, no date means "today".
+/**
+ * Resolves a daily challenge with the shared date-argument semantics of the
+ * fetch scripts: a given date goes through the month calendar, no date means
+ * "today".
+ *
+ * @param targetDate The day as `YYYY-MM-DD`, or undefined for today.
+ * @returns The challenge, or undefined when a given date has no entry.
+ */
 export async function resolveDailyChallenge(
   targetDate?: string,
 ): Promise<DailyChallenge | undefined> {
@@ -259,13 +325,33 @@ export async function resolveDailyChallenge(
     : fetchTodayChallenge();
 }
 
+/**
+ * Fetches a question's description HTML.
+ *
+ * @param titleSlug The question slug, e.g. "stone-game".
+ * @returns The raw description HTML.
+ * @throws When no question exists for the slug.
+ */
 export async function fetchQuestionContent(titleSlug: string): Promise<string> {
   const contentData = await fetchLeetCode<ContentResponse>(CONTENT_QUERY, {
     titleSlug,
   });
-  return contentData.data.question.content;
+  const question = contentData.data.question;
+  if (!question) {
+    throw new Error(`No question found for slug "${titleSlug}"`);
+  }
+  return question.content;
 }
 
+/**
+ * Fetches every submission the authenticated user has ever made for a
+ * question — not just the ones from the day it was the daily challenge.
+ * Pagination stops after MAX_SUBMISSION_PAGES pages (currently 10 x 20 =
+ * 200 submissions); anything older is left out with a warning.
+ *
+ * @param titleSlug The question slug.
+ * @returns The submissions, newest first as returned by LeetCode.
+ */
 export async function fetchAllSubmissions(
   titleSlug: string,
 ): Promise<SubmissionListItem[]> {
@@ -294,9 +380,22 @@ export async function fetchAllSubmissions(
     }
   }
 
+  if (hasNext) {
+    console.warn(
+      `Stopped after ${MAX_SUBMISSION_PAGES} pages (${submissions.length} submissions) for "${titleSlug}"; older submissions were not fetched.`,
+    );
+  }
+
   return submissions;
 }
 
+/**
+ * Fetches the details of one submission.
+ *
+ * @param submissionId The submission's id.
+ * @returns The submission details.
+ * @throws When no details exist for the id.
+ */
 export async function fetchSubmissionDetails(
   submissionId: string,
 ): Promise<SubmissionDetails> {
@@ -304,9 +403,19 @@ export async function fetchSubmissionDetails(
     SUBMISSION_DETAILS_QUERY,
     { submissionId: parseInt(submissionId, 10) },
   );
-  return detailsData.data.submissionDetails;
+  const details = detailsData.data.submissionDetails;
+  if (!details) {
+    throw new Error(`No details found for submission ${submissionId}`);
+  }
+  return details;
 }
 
+/**
+ * Waits the standard delay between successive submission requests, to avoid
+ * hammering the API.
+ *
+ * @returns A promise resolving after the delay.
+ */
 export async function throttleSubmissionRequest(): Promise<void> {
   await sleep(SUBMISSION_REQUEST_DELAY_MS);
 }

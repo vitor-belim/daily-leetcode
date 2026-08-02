@@ -20,7 +20,7 @@ describe("getSolutions", () => {
   }
 
   function writeSolutions(root: string, date: string, data: unknown) {
-    const [y, m, d] = date.split("-");
+    const [y = "", m = "", d = ""] = date.split("-");
     fs.mkdirSync(path.join(root, y, m), { recursive: true });
     fs.writeFileSync(
       path.join(root, y, m, `${d}.json`),
