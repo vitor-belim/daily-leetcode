@@ -1,0 +1,57 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {boolean}\n */\nvar predictTheWinner = function(nums) {\n    const dfs = (left, right, factor, sum) => {\n        if (left > right) {\n            return sum >= 0;\n        }\n\n        factor *= -1;\n\n        if (factor > 0) {\n            return dfs(left + 1, right, factor, sum + nums[left] * factor) &&\n                dfs(left, right - 1, factor, sum + nums[right] * factor);\n        }\n\n        return dfs(left + 1, right, factor, sum + nums[left] * factor) ||\n            dfs(left, right - 1, factor, sum + nums[right] * factor);\n    };\n\n    return dfs(0, nums.length - 1, 1, 0);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code tries to solve the **Predict the Winner** game by recursively exploring picks from either end of `nums` (`left` or `right`), using a `factor` that flips sign on every call to add or subtract the chosen number from a running `sum`, meant to represent the two players alternately maximizing their own advantage; the branches are combined with `&&` when `factor` is positive and `||` when negative, and the base case returns whether the final `sum` is non-negative — but this combinator logic is backwards for a player choosing their *best* move (which only needs one good branch, not both), which is why this attempt is marked as **FAILED**.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-08-01T07:55:45.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {boolean}\n */\nvar predictTheWinner = function(nums) {\n    const dfs = (left, right, factor, sum) => {\n        if (left > right) {\n            return sum >= 0;\n        }\n\n        factor *= -1;\n\n        if (factor > 0) {\n            return dfs(left + 1, right, factor, sum + nums[left] * factor) ||\n                dfs(left, right - 1, factor, sum + nums[right] * factor);\n        }\n\n        return dfs(left + 1, right, factor, sum + nums[left] * factor) &&\n            dfs(left, right - 1, factor, sum + nums[right] * factor);\n    };\n\n    return dfs(0, nums.length - 1, -1, 0);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code solves the **Predict the Winner** game with recursive backtracking over two pointers, `left` and `right`, using a `factor` (starting at `-1` and flipping sign each call) to alternately add or subtract the picked number (`nums[left]` or `nums[right]`) from a running `sum`, which tracks the score difference between the two optimally-playing players; when `factor` is positive it takes the `||` of the two choices since the current player only needs one favorable path to win, and when negative it takes the `&&` since the opponent is assumed to always respond optimally, with the function ultimately returning whether the final `sum` is non-negative (meaning the first player wins or ties).",
+    "status": "DONE",
+    "cpuUsage": 35,
+    "memoryUsage": 8.33,
+    "date": "2026-08-01T07:57:00.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {boolean}\n */\nvar predictTheWinner = function(nums) {\n    const memo = new Map();\n\n    const dfs = (left, right, factor, sum) => {\n        const memoKey = [left, right, factor, sum].toString();\n        if (memo.has(memoKey)) {\n            return memo.get(memoKey);\n        }\n\n        if (left > right) {\n            memo.set(memoKey, sum >= 0);\n            return memo.get(memoKey);\n        }\n\n        factor *= -1;\n\n        let res;\n        if (factor > 0) {\n            res = dfs(left + 1, right, factor, sum + nums[left] * factor) ||\n                dfs(left, right - 1, factor, sum + nums[right] * factor);\n        } else {\n            res = dfs(left + 1, right, factor, sum + nums[left] * factor) &&\n                dfs(left, right - 1, factor, sum + nums[right] * factor);\n        }\n\n        memo.set(memoKey, res);\n        return memo.get(memoKey);\n    };\n\n    return dfs(0, nums.length - 1, -1, 0);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is the same alternating min/max recursion as the previous solution, but adds **memoization** via a `Map` keyed on the stringified `[left, right, factor, sum]` tuple, so before doing any work `dfs` checks whether that exact state has already been solved and returns the cached boolean instead of recomputing it, storing each new result in the map before returning — trading extra memory for avoiding redundant recursive calls.",
+    "status": "DONE",
+    "cpuUsage": 33.33,
+    "memoryUsage": 6.67,
+    "date": "2026-08-01T08:02:31.000Z"
+  },
+  {
+    "author": "Leetcode",
+    "code": "/**\n * @param {number[]} nums\n * @return {boolean}\n */\nvar predictTheWinner = function (nums) {\n    const memo = new Map();\n\n    const dfs = (left, right) => {\n        if (left > right) return 0;\n        if (left === right) return nums[left];\n\n        const key = left + ':' + right;\n        if (memo.has(key)) return memo.get(key);\n\n        const best = Math.max(\n            nums[left] - dfs(left + 1, right),\n            nums[right] - dfs(left, right - 1),\n        );\n\n        memo.set(key, best);\n        return best;\n    };\n\n    return dfs(0, nums.length - 1) >= 0;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution reframes the problem around the **maximum score difference** the current player can achieve over their opponent: `dfs(left, right)` picks either `nums[left]` or `nums[right]` and subtracts the opponent's best possible outcome on the remaining subarray (`nums[left] - dfs(left + 1, right)` vs. `nums[right] - dfs(left, right - 1)`), taking whichever is larger via `Math.max`; results are memoized in a `Map` keyed by `\"left:right\"` to avoid recomputing overlapping subproblems, and the first player wins or ties whenever this maximum difference is non-negative.",
+    "status": "DONE",
+    "cpuUsage": 53.33,
+    "memoryUsage": 15,
+    "date": "2026-08-01T08:14:06.000Z"
+  },
+  {
+    "author": "Leetcode",
+    "code": "/**\n * @param {number[]} nums\n * @return {boolean}\n */\nvar predictTheWinner = function (nums) {\n    const n = nums.length;\n\n    if (n % 2 === 0) return true;\n\n    const dp = Array(n).fill(0);\n\n    for (let i = n - 1; i >= 0; i--) {\n        dp[i] = nums[i];\n\n        for (let j = i + 1; j < n; j++) {\n            dp[j] = Math.max(\n                nums[i] - dp[j],\n                nums[j] - dp[j - 1],\n            );\n        }\n    }\n\n    return dp[n - 1] >= 0;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution converts the same score-difference idea into an efficient **bottom-up dynamic programming** approach using a single 1D array `dp`, where `dp[j]` is progressively updated to hold the best achievable score difference for the subarray between the current `i` and `j` via `Math.max(nums[i] - dp[j], nums[j] - dp[j - 1])`, iterating `i` from right to left and `j` from `i + 1` onward so each cell reuses previously computed values in place; it also short-circuits by immediately returning `true` when `nums` has an even length, since the first player is always guaranteed to win in that case, and otherwise returns whether `dp[n - 1]` is non-negative.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 95,
+    "date": "2026-08-01T08:24:35.000Z"
+  }
+]

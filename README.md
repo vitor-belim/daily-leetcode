@@ -76,18 +76,27 @@ This project automatically fetches the LeetCode "Question of the Day" and allows
 | `npm run lint` | Runs ESLint for code quality checks. |
 | `npm run typecheck` | Runs the TypeScript compiler in `--noEmit` mode. |
 | `npm run test` | Runs the Vitest suite (covers nearly all of `lib/` — see [`scripts/README.md`](scripts/README.md)). |
-| `npm run fetch-daily` | Fetches the current LeetCode daily challenge and your latest accepted submission. |
-| `npm run backfill` | Finds missing days in `data/` and backfills them via `fetch-daily` + the `/explain` command. |
+| `npm run fetch-daily` | Fetches both halves of a day: `fetch-problem` followed by `fetch-solution`. |
+| `npm run fetch-problem` | Fetches a day's LeetCode daily challenge into `data/problems/`. |
+| `npm run fetch-solution` | Fetches your submissions for a day's challenge into `data/solutions/`. |
+| `npm run backfill` | Finds days in `data/` missing a problem or solutions and backfills them via `fetch-problem`/`fetch-solution` + the `/explain` command. |
 
-See [`scripts/README.md`](scripts/README.md) for details on both CLI scripts and required env vars.
+See [`scripts/README.md`](scripts/README.md) for details on all CLI scripts and required env vars.
 
 ### Fetching Daily Challenge
 
-You can fetch a specific date by passing an argument:
+To fetch both halves of a day at once:
 ```bash
 npm run fetch-daily -- 2026-06-01
 ```
-If no date is provided, it defaults to today.
+
+The two halves are also separate scripts, so a day whose problem is already archived can have its solutions pulled without re-fetching the problem:
+```bash
+npm run fetch-problem -- 2026-06-01
+npm run fetch-solution -- 2026-06-01
+```
+
+All three take the same optional date argument, and default to today if none is provided.
 
 ## 📂 Project Structure
 
@@ -101,11 +110,11 @@ If no date is provided, it defaults to today.
   - `actions.ts`: the only `"use server"` file left — a thin wrapper around `problems-repo.ts` for the one function (`getLatestDailies`) actually called from a Client Component.
   - `problems-repo.ts` / `solutions-repo.ts`: plain (non-`"use server"`) data-access modules for reading `data/problems`/`data/solutions` — used directly by Server Components, never client-reachable, so they're safe to unit test with fixture directories.
   - `dates.ts`, `paths.ts`, `archive.ts`, `types.ts`: shared between the app and the CLI scripts.
-  - `leetcode-api.ts`, `solutions.ts`: CLI-only (LeetCode API client, submission-to-`Solution` mapping).
+  - `leetcode-api.ts`, `problems.ts`, `solutions.ts`: CLI-only (LeetCode API client, challenge-to-`Problem` mapping, submission-to-`Solution` mapping).
   - `utils.ts` (`cn`, pinned by `components.json`), `date-display.ts` (local-time display formatting), `markdown.ts` (markdown/LaTeX-ish → HTML).
 
   See [`scripts/README.md`](scripts/README.md) for the CLI-facing modules.
-- `scripts/`: CLI entrypoints (`fetch-daily.ts`, `backfill.ts`); their logic lives in `lib/` alongside the app's own modules.
+- `scripts/`: CLI entrypoints (`fetch-problem.ts`, `fetch-solution.ts`, `backfill.ts`); their logic lives in `lib/` alongside the app's own modules.
 - `public/`: Static assets.
 
 ## 🧪 Tests

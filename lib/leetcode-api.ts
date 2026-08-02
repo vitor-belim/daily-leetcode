@@ -249,6 +249,16 @@ export async function fetchChallengeForDate(
   );
 }
 
+// Both fetch scripts take an optional date argument with the same meaning:
+// a given date goes through the month calendar, no date means "today".
+export async function resolveDailyChallenge(
+  targetDate?: string,
+): Promise<DailyChallenge | undefined> {
+  return targetDate
+    ? fetchChallengeForDate(targetDate)
+    : fetchTodayChallenge();
+}
+
 export async function fetchQuestionContent(titleSlug: string): Promise<string> {
   const contentData = await fetchLeetCode<ContentResponse>(CONTENT_QUERY, {
     titleSlug,

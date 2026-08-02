@@ -33,6 +33,11 @@ export function isValidCalendarDate(dateStr: string): boolean {
   );
 }
 
+// True once `date`'s UTC day is over, i.e. nothing new can land on it.
+export function isPastDateUTC(date: string, today: Date = todayUTC()): boolean {
+  return date < formatDateUTC(today);
+}
+
 export function shiftDateUTC(date: string, days: number): string {
   const shifted = parseDateUTC(date);
   shifted.setUTCDate(shifted.getUTCDate() + days);

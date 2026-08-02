@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @param {number} k\n * @return {string}\n */\nvar smallestPalindrome = function(s, k) {\n    const freq = Array(26).fill(0);\n    const halfLen = Math.floor(s.length / 2);\n\n    for (let i = 0; i < halfLen; i++) {\n        freq[s.charCodeAt(i) - 97]++;\n    }\n\n    const mid = s.length & 1 ? s[(s.length - 1) / 2] : '';\n    const res = [];\n\n    const dfs = (left, right) => {\n        if (left.length + mid.length + right.length === s.length) {\n            res.push(left + mid + right);\n            return;\n        }\n\n        for (let i = 0; i < 26; i++) {\n            if (freq[i] > 0) {\n                freq[i]--;\n\n                const char = String.fromCharCode(i + 97);\n                dfs(left + char, char + right);\n\n                if (res.length >= k) {\n                    return;\n                }\n\n                freq[i]++;\n            }\n        }\n    };\n    dfs('', '');\n\n    return res[k - 1] || '';\n};\n",
+    "language": "javascript",
+    "notes": "Expected TLE, 285 / 812 testcases passed.",
+    "aiExplanation": "This solution builds the **smallest palindrome permutation of `s` at index `k`** by brute-force **backtracking**: it counts how many of each letter appears in the first half of `s`, then recursively tries letters in alphabetical order to build matching `left`/`right` halves (plus a fixed middle character for odd lengths), pushing every valid palindrome it forms into `res` until it has collected `k` of them; since it generates palindromes one at a time in order rather than computing positions mathematically, this approach is too slow and results in a **TLE (Time Limit Exceeded)** for large inputs.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-07-29T07:51:55.000Z"
+  },
+  {
+    "author": "Leetcode",
+    "code": "/**\n * @param {string} s\n * @param {number} k\n * @return {string}\n */\nvar smallestPalindrome = function (s, k) {\n    const C = (n, m, kLimit) => {\n        let res = 1;\n        m = Math.min(m, n - m);\n\n        for (let i = 1; i <= m; i++) {\n            res = (res * (n - i + 1)) / i;\n            if (res > kLimit) {\n                return kLimit + 1;\n            }\n        }\n        return res;\n    };\n\n    const partition = Math.floor(s.length / 2);\n    const bucket = new Int32Array(26);\n\n    for (let i = 0; i < partition; i++) {\n        bucket[s.charCodeAt(i) - 97] += 1;\n    }\n\n    const permutations = (rem) => {\n        let ways = 1;\n        for (let i = 0; i < 26; i++) {\n            if (bucket[i] === 0) {\n                continue;\n            }\n\n            ways *= C(rem, bucket[i], k);\n            if (ways > k) {\n                break;\n            }\n            rem -= bucket[i];\n        }\n        return ways;\n    };\n\n    let left = \"\";\n    let startIndex = 1;\n\n    for (let pos = 0; pos < partition; pos++) {\n        for (let i = 0; i < 26; i++) {\n            if (bucket[i] === 0) {\n                continue;\n            }\n\n            bucket[i] -= 1;\n\n            const ways = permutations(partition - pos - 1);\n            if (startIndex + ways > k) {\n                left += String.fromCharCode(i + 97);\n                break;\n            }\n\n            bucket[i] += 1;\n            startIndex += ways;\n        }\n    }\n\n    if (left.length < partition) {\n        return \"\";\n    }\n\n    const mid = s.length % 2 !== 0 ? s[partition] : \"\";\n    const right = left.split(\"\").reverse().join(\"\");\n\n    return left + mid + right;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is an optimized version that finds the **k-th smallest palindrome directly using combinatorics** instead of generating every palindrome: it counts letter frequencies in the first half of `s`, then for each position builds the answer character by character, using a `C` (combination/multinomial count) helper to calculate how many palindromes would result from placing each candidate letter (in alphabetical order) — if that count is large enough to reach the target `k`, it commits to that letter and moves on, otherwise it skips ahead by that count and tries the next letter; this lets it \"jump\" straight to the correct answer without enumerating all permutations, making it dramatically faster and avoiding the **TLE** from the previous approach.",
+    "status": "DONE",
+    "cpuUsage": 89.81,
+    "memoryUsage": 74.45,
+    "date": "2026-07-29T07:54:38.000Z"
+  }
+]

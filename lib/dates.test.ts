@@ -5,6 +5,7 @@ import {
   todayUTC,
   isValidCalendarDate,
   shiftDateUTC,
+  isPastDateUTC,
 } from "./dates";
 
 describe("formatDateUTC / parseDateUTC", () => {
@@ -81,5 +82,33 @@ describe("shiftDateUTC", () => {
   it("handles leap-year Feb 29 in both directions", () => {
     expect(shiftDateUTC("2028-02-28", 1)).toBe("2028-02-29");
     expect(shiftDateUTC("2028-03-01", -1)).toBe("2028-02-29");
+  });
+});
+
+describe("isPastDateUTC", () => {
+  const today = parseDateUTC("2026-08-02");
+
+  it("is false for today", () => {
+    expect(isPastDateUTC("2026-08-02", today)).toBe(false);
+  });
+
+  it("is true for any earlier day", () => {
+    expect(isPastDateUTC("2026-08-01", today)).toBe(true);
+    expect(isPastDateUTC("2025-12-31", today)).toBe(true);
+  });
+
+  it("is false for a future day", () => {
+    expect(isPastDateUTC("2026-08-03", today)).toBe(false);
+  });
+
+  it("compares by UTC day, ignoring the time on `today`", () => {
+    const lateInTheDay = new Date("2026-08-02T23:59:59.000Z");
+    expect(isPastDateUTC("2026-08-02", lateInTheDay)).toBe(false);
+    expect(isPastDateUTC("2026-08-01", lateInTheDay)).toBe(true);
+  });
+
+  it("orders correctly across month and year boundaries", () => {
+    expect(isPastDateUTC("2026-07-31", parseDateUTC("2026-08-01"))).toBe(true);
+    expect(isPastDateUTC("2026-01-01", parseDateUTC("2025-12-31"))).toBe(false);
   });
 });

@@ -16,3 +16,4 @@ ${code}
 ### Important:
 - Preserve all other fields in each solution object exactly as they are.
 - Write the file's final JSON with 2-space indentation.
+- The explanation text may reference code containing double quotes (e.g. string literals or object keys). Ensure the file you write is valid JSON — escape any `"` characters inside `aiExplanation` (as `\"`) so the string doesn't break out early.

@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} word\n * @return {number}\n */\nvar minimumPushes = function(word) {\n    const freq = Array(26).fill(0);\n\n    for (let i = 0; i < word.length; i++) {\n        freq[word.charCodeAt(i) - 97]++;\n    }\n\n    freq.sort((a, b) => b - a);\n\n    let sum = 0;\n\n    for (let i = 0; i < 26; i++) {\n        sum += freq[i] * (Math.floor(i / 8) + 1);\n    }\n\n    return sum;\n};\n",
+    "language": "javascript",
+    "notes": "Didn't notice the problem statements said 'a string word containing DISTINCT lowercase English letters', so implemented general case.",
+    "aiExplanation": "This function figures out the **minimum number of key presses** to type `word` on a keypad where each key can hold multiple letters. It first builds a frequency count of each letter in the word, then **sorts those counts in descending order** so the most frequent letters are assigned to keys needing the fewest presses (each key holds up to 8 letters, via `Math.floor(i / 8) + 1`), and finally sums `frequency * presses` for every letter to get the total minimum pushes.",
+    "status": "DONE",
+    "cpuUsage": 15.06,
+    "memoryUsage": 13.99,
+    "date": "2026-07-30T07:30:20.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} word\n * @return {number}\n */\nvar minimumPushes = function(word) {\n    let sum = 0;\n\n    for (let i = 0; i < word.length; i++) {\n        sum += Math.floor(i / 8) + 1;\n    }\n\n    return sum;\n};\n",
+    "language": "javascript",
+    "notes": "Removed frequency counting, simplified where possible.",
+    "aiExplanation": "This version loops through each character position `i` in `word` and adds `Math.floor(i / 8) + 1` to a running total — meaning it counts the required key presses **based purely on each letter's position in the string** (grouping every 8 characters onto the same key), rather than on how frequently each letter occurs, and returns that summed total.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 72.26,
+    "date": "2026-07-30T07:35:48.000Z"
+  }
+]

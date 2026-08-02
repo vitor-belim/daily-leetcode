@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {string}\n */\nvar smallestPalindrome = function(s) {\n    const freq = Array(26).fill(0);\n\n    for (let i = 0; i < s.length; i++) {\n        freq[s.charCodeAt(i) - 97]++;\n    }\n\n    let left = '';\n    let mid = '';\n    let right = '';\n\n    for (let i = 0; i < 26; i++) {\n        const char = String.fromCharCode(97 + i);\n\n        if (freq[i] & 1) {\n            freq[i]--;\n            mid = char;\n        }\n\n        if (freq[i] > 0) {\n            const chars = char.repeat(freq[i] / 2);\n\n            left = left + chars;\n            right = chars + right;\n        }\n    }\n\n    return left + mid + right;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function counts how many times each lowercase letter appears in the string using a 26-slot frequency array, then rebuilds the **smallest possible palindrome** from those letters: it walks the alphabet from `a` to `z`, and if a letter's count is odd it peels off one copy to become the single `mid` character (only one letter can occupy the center of a palindrome), then takes whatever count remains, splits it in half, and appends that half to `left` while prepending it to `right` so the two sides mirror each other — finally returning `left + mid + right`, which puts the alphabetically smallest letters closest to the edges for the smallest lexicographic result.",
+    "status": "DONE",
+    "cpuUsage": 92.04,
+    "memoryUsage": 91.08,
+    "date": "2026-07-28T07:31:47.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {string}\n */\nvar smallestPalindrome = function(s) {\n    const freq = Array(26).fill(0);\n    const halfLen = Math.floor(s.length / 2);\n\n    for (let i = 0; i < halfLen; i++) {\n        freq[s.charCodeAt(i) - 97]++;\n    }\n\n    let left = '';\n    let right = '';\n\n    for (let i = 0; i < 26; i++) {\n        if (freq[i] === 0) {\n            continue;\n        }\n\n        const char = String.fromCharCode(97 + i);\n        const chars = char.repeat(Math.floor(freq[i]));\n\n        left = left + chars;\n        right = chars + right;\n    }\n\n    return left + (s.length & 1 ? s[halfLen] : '') + right;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is a leaner variant of the same idea that only inspects the **first half** of the string (`halfLen = floor(s.length / 2)`), counting the frequency of each letter that appears there; it then walks the alphabet from `a` to `z`, appending each letter (repeated by its count) to `left` and prepending the same run to `right` so the two halves become mirror images of each other, and finally stitches the result together as `left + (middle character, taken as-is from `s` if the length is odd) + right` — effectively sorting just the first half alphabetically and mirroring it to produce the smallest palindrome, while leaving the original middle character untouched.",
+    "status": "DONE",
+    "cpuUsage": 98.7,
+    "memoryUsage": 99.21,
+    "date": "2026-07-28T07:38:52.000Z"
+  }
+]

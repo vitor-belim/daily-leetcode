@@ -7,9 +7,17 @@ import fs from "fs";
 const FETCH_TIMEOUT_MS = 2 * 60 * 1000;
 const EXPLAIN_TIMEOUT_MS = 10 * 60 * 1000;
 
-function fetchDate(date: string) {
-  console.log(`\n=== ${date}: fetch-daily ===`);
-  execFileSync("npm", ["run", "fetch-daily", "--", date], {
+function fetchProblem(date: string) {
+  console.log(`\n=== ${date}: fetch-problem ===`);
+  execFileSync("npm", ["run", "fetch-problem", "--", date], {
+    stdio: "inherit",
+    timeout: FETCH_TIMEOUT_MS,
+  });
+}
+
+function fetchSolution(date: string) {
+  console.log(`\n=== ${date}: fetch-solution ===`);
+  execFileSync("npm", ["run", "fetch-solution", "--", date], {
     stdio: "inherit",
     timeout: FETCH_TIMEOUT_MS,
   });
@@ -31,10 +39,9 @@ function isExplainComplete(date: string): boolean {
     const solutions: Solution[] = JSON.parse(
       fs.readFileSync(solutionFilePath(date), "utf8"),
     );
-    return (
-      solutions.length > 0 &&
-      solutions.every((s) => (s.aiExplanation || "").trim().length > 0)
-    );
+    // An empty array is a settled day that was never solved, not an
+    // unfinished one — there is nothing left to explain.
+    return solutions.every((s) => (s.aiExplanation || "").trim().length > 0);
   } catch {
     return false;
   }
@@ -44,7 +51,7 @@ function main() {
   const filledDates = collectFilledDates();
   if (filledDates.length === 0) {
     console.error(
-      "No existing problem data found under data/problems. Run `npm run fetch-daily` manually to seed the first day.",
+      "No existing problem data found under data/problems. Run `npm run fetch-problem` manually to seed the first day.",
     );
     process.exit(1);
   }
@@ -53,32 +60,64 @@ function main() {
   console.log(`Last filled day: ${lastFilled}`);
 
   const missingDates = getMissingDates(filledDates);
+  const missingSet = new Set(missingDates);
+  const incompleteDates = filledDates.filter((date) => !isExplainComplete(date));
 
-  if (missingDates.length === 0) {
+  const datesToProcess = Array.from(
+    new Set([...missingDates, ...incompleteDates]),
+  ).sort();
+
+  if (datesToProcess.length === 0) {
     console.log("Already up to date, nothing to backfill.");
     return;
   }
 
   console.log(
-    `Missing days (${missingDates.length}): ${missingDates.join(", ")}`,
+    `Dates needing work (${datesToProcess.length}): ${datesToProcess.join(", ")}`,
   );
 
   const failedDates = new Set<string>();
 
-  for (const date of missingDates) {
-    try {
-      fetchDate(date);
-    } catch (error) {
-      console.error(
-        `\nfetch-daily failed for ${date}: ${(error as Error).message}`,
-      );
-      failedDates.add(date);
-      continue;
+  for (const date of datesToProcess) {
+    if (missingSet.has(date)) {
+      try {
+        fetchProblem(date);
+      } catch (error) {
+        console.error(
+          `\nfetch-problem failed for ${date}: ${(error as Error).message}`,
+        );
+        failedDates.add(date);
+        continue;
+      }
     }
 
+    // A date can have its problem already archived but no solutions yet, so
+    // this runs independently of the fetch above instead of re-fetching the
+    // problem just to reach the solutions.
     if (!solutionFileExists(date)) {
-      console.log(`\n${date}: no solutions file yet, skipping explain.`);
-      failedDates.add(date);
+      try {
+        fetchSolution(date);
+      } catch (error) {
+        console.error(
+          `\nfetch-solution failed for ${date}: ${(error as Error).message}`,
+        );
+        failedDates.add(date);
+        continue;
+      }
+
+      if (!solutionFileExists(date)) {
+        // Only reachable for a day still in progress; a day that is over gets
+        // an empty solutions file written instead.
+        console.log(`\n${date}: not solved yet, skipping explain.`);
+        failedDates.add(date);
+        continue;
+      }
+    }
+
+    // The fetch above can settle a day outright by writing an empty solutions
+    // file, leaving nothing for `/explain` to do.
+    if (isExplainComplete(date)) {
+      console.log(`\n${date}: no solutions to explain, skipping.`);
       continue;
     }
 

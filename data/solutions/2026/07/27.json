@@ -1,0 +1,35 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar maxProduct = function(nums) {\n    let max = 0;\n    let res = 0;\n\n    for (const num of nums) {\n        res = Math.max(res, (num - 1) * (max - 1));\n        max = Math.max(max, num);\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds the **largest product of `(num-1)` for two different elements** in the array by making a single pass through `nums`: it keeps track of the biggest number seen so far in `max`, and before updating `max` with the current `num`, it checks whether `(num - 1) * (max - 1)` beats the best result found so far in `res`, using `Math.max` to update both values along the way.",
+    "status": "DONE",
+    "cpuUsage": 32.96,
+    "memoryUsage": 28.54,
+    "date": "2026-07-27T07:07:07.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar maxProduct = function(nums) {\n    let max = 0;\n    let res = 0;\n\n    for (const num of nums) {\n        const mult = (num - 1) * (max - 1);\n        if (mult > res) {\n            res = mult;\n        }\n        if (num > max) {\n            max = num;\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is the **same algorithm as the previous solution**, but written with explicit `if` statements instead of `Math.max`: it loops through `nums` once, computing `mult = (num - 1) * (max - 1)` and updating `res` whenever `mult` is larger, then updating `max` whenever the current `num` is larger, so that by the end `res` holds the maximum product of `(num-1)` for any two elements in the array.",
+    "status": "DONE",
+    "cpuUsage": 70.25,
+    "memoryUsage": 9.89,
+    "date": "2026-07-27T07:08:11.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar maxProduct = function(nums) {\n    let max1 = 0;\n    let max2 = 0;\n\n    for (const num of nums) {\n        if (num > max1) {\n            max2 = max1;\n            max1 = num;\n        } else if (num > max2) {\n            max2 = num;\n        }\n    }\n\n    return (max1 - 1) * (max2 - 1);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution takes a **more direct approach**: instead of computing a running product, it makes a single pass through `nums` to track the **two largest values** seen so far, `max1` and `max2` — updating both whenever a bigger number is found — and once the loop finishes, it simply returns `(max1 - 1) * (max2 - 1)`, the product of the two biggest numbers minus one.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 58.99,
+    "date": "2026-07-27T07:09:36.000Z"
+  }
+]

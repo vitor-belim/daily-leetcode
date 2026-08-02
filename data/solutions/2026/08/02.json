@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} piles\n * @return {boolean}\n */\nvar stoneGame = function(piles) {\n    const memo = new Map();\n\n    const dfs = (left, right) => {\n        if (left > right) return 0;\n\n        const key = left + ':' + right;\n        if (memo.has(key)) return memo.get(key);\n\n        const res = Math.max(\n            piles[left] - dfs(left + 1, right),\n            piles[right] - dfs(left, right - 1),\n        );\n\n        memo.set(key, res);\n        return res;\n    };\n\n    return dfs(0, piles.length - 1) > 0;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses **recursive game-theory simulation with memoization** to decide if the first player wins the stone game: `dfs(left, right)` represents the *best score difference* the current player can achieve when only the piles between indices `left` and `right` remain, by choosing to take either the `left` or `right` pile and subtracting whatever advantage the opponent can then gain from the remaining piles (`piles[left] - dfs(left + 1, right)` vs `piles[right] - dfs(left, right - 1)`); a `Map` caches results for each `left:right` pair to avoid recomputing overlapping subproblems, and the function ultimately returns `true` if the optimal score difference is positive, meaning the first player can always end up with more stones.",
+    "status": "DONE",
+    "cpuUsage": 12.12,
+    "memoryUsage": 13.13,
+    "date": "2026-08-02T08:32:13.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} piles\n * @return {boolean}\n */\nvar stoneGame = function(piles) {\n    return true;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution simply **always returns `true`**, exploiting the fact that under the problem's guaranteed constraints (an even number of piles with an odd total number of stones), the first player can *always* force a win with optimal play, so no actual game simulation is needed.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 62.63,
+    "date": "2026-08-02T08:35:06.000Z"
+  }
+]

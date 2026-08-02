@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} word\n * @return {number}\n */\nvar minimumPushes = function(word) {\n    const freq = Array(26).fill(0);\n    const a = \"a\".charCodeAt(0);\n\n    for (let i = 0; i < word.length; i++) {\n        freq[word.charCodeAt(i) - a]++;\n    }\n\n    freq.sort((a, b) => b - a);\n\n    let sum = 0;\n\n    for (let i = 0; i < freq.length; i++) {\n        sum += freq[i] * Math.ceil((i + 1) / 8);\n    }\n\n    return sum;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function counts how many times each letter appears in `word` using a 26-slot **frequency array**, then **sorts the counts in descending order** so the most common letters can be assigned the cheapest keypad positions; since a phone keypad can hold up to 8 letters per additional \"press level\" (1 push for the first 8 letters, 2 pushes for the next 8, and so on), it computes each letter's push cost as `Math.ceil((i + 1) / 8)` based on its sorted rank `i`, multiplies that cost by the letter's frequency, and sums everything to return the minimum total number of key pushes needed to type the word.",
+    "status": "DONE",
+    "cpuUsage": 15.9,
+    "memoryUsage": 100,
+    "date": "2024-08-06T07:40:16.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} word\n * @return {number}\n */\nvar minimumPushes = function(word) {\n    const freq = Array(26).fill(0);\n\n    for (let i = 0; i < word.length; i++) {\n        freq[word.charCodeAt(i) - 97]++;\n    }\n\n    freq.sort((a, b) => b - a);\n\n    let sum = 0;\n\n    for (let i = 0; i < 26; i++) {\n        sum += freq[i] * (Math.floor(i / 8) + 1);\n    }\n\n    return sum;\n};\n",
+    "language": "javascript",
+    "notes": "Copy/pasted from yesterday's first attempt.",
+    "aiExplanation": "This is a slight variant of the same greedy approach: it builds a **26-slot frequency array** of letter counts (using `charCodeAt(i) - 97` to map `'a'`-`'z'` to indices 0-25), **sorts the counts in descending order** so the most frequent letters get the cheapest keys, and then for each sorted position `i` computes its push cost as `Math.floor(i / 8) + 1` (since only 8 letters fit per press-count tier on a keypad), multiplying that cost by the frequency and summing across all letters to return the minimum total key pushes needed to type `word`.",
+    "status": "DONE",
+    "cpuUsage": 93.9,
+    "memoryUsage": 78,
+    "date": "2026-07-31T07:14:19.000Z"
+  }
+]
