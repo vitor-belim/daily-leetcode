@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} stoneValue\n * @return {string}\n */\nvar stoneGameIII = function(stoneValue) {\n    const n = stoneValue.length;\n    const dp = Array(n);\n\n    const dfs = (pos) => {\n        if (pos >= n) return 0;\n        if (dp[pos] !== undefined) return dp[pos];\n\n        let sum = stoneValue[pos] - dfs(pos + 1);\n        if (pos + 1 < n) {\n            sum = Math.max(\n                sum,\n                stoneValue[pos] + stoneValue[pos + 1] - dfs(pos + 2),\n            );\n        }\n        if (pos + 2 < n) {\n            sum = Math.max(\n                sum,\n                stoneValue[pos] + stoneValue[pos + 1] + stoneValue[pos + 2] - dfs(pos + 3),\n            );\n        }\n\n        dp[pos] = sum;\n        return sum;\n    }\n    dfs(0);\n\n    return dp[0] === 0 ? 'Tie' : dp[0] > 0 ? 'Alice' : 'Bob';\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solves **Stone Game III**, where Alice and Bob take turns picking **1, 2, or 3 stones** from the front of a row, each playing optimally to maximize their own score. The function uses **memoized recursion** (top-down dynamic programming): `dfs(pos)` returns the best possible *score difference* (current player's total minus opponent's total) from position `pos` onward. For each turn it tries taking one stone (`stoneValue[pos] - dfs(pos + 1)`), and — when enough stones remain — two or three stones, subtracting the opponent's best result `dfs(...)` from the stones just taken, and keeps the maximum via `Math.max`. The `dp` array caches each position's answer so it's only computed once, giving **O(n)** time. Finally, `dp[0]` is the score difference for the whole game starting with Alice: positive means `\"Alice\"` wins, negative means `\"Bob\"`, and zero means `\"Tie\"`.",
+    "status": "DONE",
+    "cpuUsage": 43.04,
+    "memoryUsage": 39.54,
+    "date": "2026-08-03T07:36:14.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} stoneValue\n * @return {string}\n */\nvar stoneGameIII = function(stoneValue) {\n    const n = stoneValue.length;\n    const dp = Array(n);\n\n    const dfs = (pos) => {\n        if (pos >= n) return 0;\n        if (dp[pos] !== undefined) return dp[pos];\n\n        const sum = Math.max(\n            stoneValue[pos] - dfs(pos + 1),\n            pos + 1 >= n ? -Infinity : stoneValue[pos] + stoneValue[pos + 1] - dfs(pos + 2),\n            pos + 2 >= n ? -Infinity : stoneValue[pos] + stoneValue[pos + 1] + stoneValue[pos + 2] - dfs(pos + 3),\n        );\n\n        dp[pos] = sum;\n        return sum;\n    }\n    dfs(0);\n\n    return dp[0] === 0 ? 'Tie' : dp[0] > 0 ? 'Alice' : 'Bob';\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is a more compact version of the **Stone Game III** solution: two players alternately take **1, 2, or 3 stones** from the front of the row, both playing optimally. The recursive `dfs(pos)` computes the best achievable *score difference* (current player minus opponent) starting at index `pos`, with results cached in the `dp` array (**memoization**) so each position is solved only once — **O(n)** overall. Instead of separate `if` guards, it evaluates all three choices in a single `Math.max` call, using a ternary that substitutes `-Infinity` for moves that would run past the end of the array (e.g. `pos + 1 >= n ? -Infinity : ...`), which guarantees invalid options can never be chosen as the maximum. Each option adds up the stones taken and subtracts the opponent's best outcome `dfs(...)` for the remaining stones. The final answer comes from `dp[0]`: greater than zero means `\"Alice\"` wins, less than zero means `\"Bob\"`, and exactly zero means `\"Tie\"`.",
+    "status": "DONE",
+    "cpuUsage": 47.55,
+    "memoryUsage": 44.64,
+    "date": "2026-08-03T07:41:34.000Z"
+  }
+]

@@ -1,0 +1,57 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number[]}\n */\nvar findMissingElements = function(nums) {\n    let min = Infinity;\n    let max = -Infinity;\n    const set = new Set();\n\n    for (const num of nums) {\n        min = Math.min(min, num);\n        max = Math.max(max, num);\n        set.add(num);\n    }\n\n    const res = [];\n\n    for (let i = min + 1; i < max; i++) {\n        if (!set.has(i)) {\n            res.push(i);\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds all the numbers that are **missing** from an array within its own range. In a single pass over `nums`, it tracks the **minimum** and **maximum** values seen so far while also adding every number to a `Set` for fast lookups. Then it loops through every integer strictly between `min` and `max`, and any value the set does **not** contain (checked with `set.has(i)`) gets pushed into the result array `res`. For example, given `[3, 7, 5]`, it would return `[4, 6]` — the numbers absent between the smallest and largest values.",
+    "status": "DONE",
+    "cpuUsage": 65.73,
+    "memoryUsage": 28.33,
+    "date": "2026-08-04T06:56:24.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number[]}\n */\nvar findMissingElements = function(nums) {\n    let min = Infinity;\n    let max = -Infinity;\n\n    for (const num of nums) {\n        min = Math.min(min, num);\n        max = Math.max(max, num);\n    }\n\n    const original = new Set(nums);\n    const total = new Set(Array.from({ length: max - min + 1 }, (_, i) => min + i));\n\n    return [...total.difference(original)];\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution finds the missing numbers in an array using **set operations**. It first loops through `nums` to find the **minimum** and **maximum** values, then builds two sets: `original`, containing the numbers actually present in the array, and `total`, containing *every* integer from `min` to `max` (generated with `Array.from({ length: max - min + 1 }, (_, i) => min + i)`). Finally, it calls the modern `Set.prototype.difference()` method, which returns the elements in `total` that are **not** in `original` — exactly the missing numbers — and spreads the result into an array with `[...]`.",
+    "status": "DONE",
+    "cpuUsage": 11.9,
+    "memoryUsage": 38.57,
+    "date": "2026-08-04T07:02:04.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number[]}\n */\nvar findMissingElements = function(nums) {\n    let min = Math.min(...nums);\n    let max = Math.max(...nums);\n    const set = new Set(nums);\n    const res = [];\n\n    for (let num = min + 1; num < max; num++) {\n        if (!set.has(num)) {\n            res.push(num);\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is a compact take on finding the missing numbers in an array's range. It uses the **spread operator** with `Math.min(...nums)` and `Math.max(...nums)` to grab the smallest and largest values in one line each, and converts the array into a `Set` so membership checks are fast (**O(1)** on average). It then walks every integer from `min + 1` up to (but not including) `max`, and any number the set doesn't contain is appended to `res`. The result is the list of all integers that fall inside the array's range but are absent from it.",
+    "status": "DONE",
+    "cpuUsage": 65.73,
+    "memoryUsage": 43.18,
+    "date": "2026-08-04T07:04:42.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number[]}\n */\nvar findMissingElements = function(nums) {\n    nums.sort((a, b) => a - b);\n\n    const res = [];\n\n    for (let i = 0; i < nums.length - 1; i++) {\n        for (let j = nums[i] + 1; j < nums[i + 1]; j++) {\n            res.push(j);\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This approach finds missing numbers by **sorting first** instead of using a set. It sorts `nums` in ascending numeric order with `nums.sort((a, b) => a - b)`, then walks through each pair of **adjacent elements**. For every neighboring pair `nums[i]` and `nums[i + 1]`, the inner loop pushes every integer that lies strictly between them into `res` — these are exactly the values missing from the array. For example, after sorting `[7, 3, 5]` into `[3, 5, 7]`, the gaps between `3`→`5` and `5`→`7` yield `[4, 6]`. Duplicates and already-consecutive neighbors produce no gap, so nothing is added for them.",
+    "status": "DONE",
+    "cpuUsage": 65.73,
+    "memoryUsage": 33.06,
+    "date": "2026-08-04T07:09:51.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number[]}\n */\nvar findMissingElements = function(nums) {\n    nums.sort((a, b) => a - b);\n\n    const res = [];\n\n    for (let i = 0; i < nums.length - 1; i++) {\n        if (nums[i + 1] - nums[i] > 1) {\n            for (let j = nums[i] + 1; j < nums[i + 1]; j++) {\n                res.push(j);\n            }\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is a refinement of the sort-based approach to finding missing numbers. After sorting `nums` in ascending order with `nums.sort((a, b) => a - b)`, it scans each pair of **adjacent elements** but adds an explicit **guard check**: only when the difference `nums[i + 1] - nums[i]` is greater than `1` does a gap actually exist. When that's true, the inner loop pushes every integer strictly between the two neighbors into `res`. The `if` check skips consecutive or duplicate values without even starting the inner loop, making the intent clearer — collect only the numbers hiding in the **gaps** of the sorted sequence.",
+    "status": "DONE",
+    "cpuUsage": 89.04,
+    "memoryUsage": 24.29,
+    "date": "2026-08-04T07:10:49.000Z"
+  }
+]

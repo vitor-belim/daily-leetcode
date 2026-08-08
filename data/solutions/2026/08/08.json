@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Leetcode",
+    "code": "/**\n * @param {string} word1\n * @param {string} word2\n * @return {number[]}\n */\nvar validSequence = function (word1, word2) {\n    const n = word1.length;\n    const m = word2.length;\n    const last = new Array(m).fill(-1);\n    let j = m - 1;\n\n    for (let i = n - 1; i >= 0; i--) {\n        if (j >= 0 && word1[i] === word2[j]) {\n            last[j] = i;\n            j--;\n        }\n    }\n\n    const res = [];\n    let skipped = false;\n    j = 0;\n\n    for (let i = 0; i < n; i++) {\n        if (j === m) {\n            break;\n        }\n\n        const sameChar = word1[i] === word2[j];\n\n        if (!sameChar && (skipped || (j !== m - 1 && i >= last[j + 1]))) {\n            continue;\n        }\n\n        if (!sameChar) {\n            skipped = true;\n        }\n\n        res.push(i);\n        j++;\n    }\n\n    return j === m ? res : [];\n};\n",
+    "language": "javascript",
+    "notes": "Would have taken more than an hour to do, I'm too tired from the week.",
+    "aiExplanation": "This function finds the **lexicographically smallest** list of indices in `word1` that spell out `word2` as a subsequence, while allowing **at most one character mismatch**. It works in two passes: the first loop scans `word1` **backwards** and fills the `last` array, where `last[j]` records the latest position in `word1` at which `word2[j]` can still be matched exactly — this tells the second pass how long it can afford to wait before committing to a character. The second loop then scans **forwards** greedily: at each position `i` it checks whether the current character matches `word2[j]` (`sameChar`); if it doesn't match, the position is skipped when the single allowed mismatch (`skipped`) has already been used, or when it's still safe to wait because the remaining characters can be matched later (`i >= last[j + 1]` guards against waiting too long). Otherwise the index is pushed into `res` — burning the mismatch flag if the characters differ — and `j` advances to the next character of `word2`. Finally, if all `m` characters were matched (`j === m`) the index list is returned; otherwise an empty array signals that no valid sequence exists.",
+    "status": "DONE",
+    "cpuUsage": 66.67,
+    "memoryUsage": 33.33,
+    "date": "2026-08-08T09:00:01.000Z"
+  }
+]

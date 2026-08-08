@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @param {number} t\n * @return {number}\n */\nvar smallestNumber = function(n, t) {\n    let prod = 1;\n    let num = n;\n\n    while (num > 0) {\n        prod *= num % 10;\n        num = Math.floor(num / 10);\n    }\n\n    if (prod % t === 0) {\n        return n;\n    }\n\n    let rem = n % 10;\n    prod /= rem;\n\n    for (let i = 1; i <= 10; i++) {\n        const newProd = prod * (rem + i);\n        if (newProd % t === 0) {\n            return n + i;\n        }\n    }\n\n    return smallestNumber(n + 11, t);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function tries to find the smallest number greater than or equal to `n` whose **digit product** is divisible by `t`. It first multiplies together every digit of `n` by repeatedly grabbing the last digit with `num % 10` and stripping it off with `Math.floor(num / 10)`; if that product already divides evenly by `t` (`prod % t === 0`), it returns `n` right away. Otherwise it attempts a shortcut: it removes the last digit's contribution by dividing `prod` by `rem` (the last digit), then tries bumping that digit up by `1` through `10`, checking whether the recomputed product `prod * (rem + i)` becomes divisible by `t` and returning `n + i` on the first hit. If no bump works, it **recursively** restarts the whole process from `n + 11`. The shortcut is fragile, though — dividing by a last digit of `0` breaks the product, and adding `i` to `n` can carry into higher digits, so the recalculated product doesn't always match the real digits of `n + i`.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-08-06T07:20:59.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @param {number} t\n * @return {number}\n */\nvar smallestNumber = function(n, t) {\n    let prod = 1;\n    let num = n;\n\n    while (num > 0) {\n        prod *= num % 10;\n        num = Math.floor(num / 10);\n    }\n\n    if (prod % t === 0) {\n        return n;\n    }\n\n    return smallestNumber(n + 1, t);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds the smallest number greater than or equal to `n` whose **product of digits** is divisible by `t`. It computes the digit product with a loop that runs while `num > 0`, each time multiplying `prod` by the last digit (`num % 10`) and then dropping that digit with `Math.floor(num / 10)`. If the finished product divides evenly by `t` (checked with `prod % t === 0`), the current `n` is the answer and gets returned; otherwise the function **recursively** calls itself with `n + 1`, repeating the same check on each successive number until it reaches the first one that satisfies the condition.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 9.97,
+    "date": "2026-08-06T07:22:45.000Z"
+  }
+]
