@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Leetcode",
+    "code": "var stoneGameII = function(piles) {\n    const n = piles.length;\n    \n    const dp = Array.from({ length: n }, () => Array(n + 1).fill(0));\n    const suffixSum = Array(n).fill(0);\n    suffixSum[n - 1] = piles[n - 1];\n    \n    for (let i = n - 2; i >= 0; i--) {\n        suffixSum[i] = suffixSum[i + 1] + piles[i];\n    }\n    \n    for (let i = n - 1; i >= 0; i--) {\n        for (let m = 1; m <= n; m++) {\n            if (i + 2 * m >= n) {\n                dp[i][m] = suffixSum[i];\n            } else {\n                for (let x = 1; x <= 2 * m; x++) {\n                    dp[i][m] = Math.max(dp[i][m], suffixSum[i] - dp[i + x][Math.max(m, x)]);\n                }\n            }\n        }\n    }\n    \n    return dp[0][1];\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solves the **Stone Game II** problem using **dynamic programming**, where two players take turns grabbing piles of stones and each tries to maximize their own total. It first builds a `suffixSum` array so that `suffixSum[i]` holds the total number of stones from pile `i` to the end. Then it fills a table where `dp[i][m]` means \"the most stones the current player can get if the game starts at pile `i` with the multiplier `m`\". If the player can take all remaining piles (when `i + 2 * m >= n`), they simply take everything (`suffixSum[i]`). Otherwise, the player tries every allowed move of taking `x` piles (from `1` to `2 * m`): after taking `x` piles, the opponent plays optimally from position `i + x` with an updated multiplier `Math.max(m, x)`, so the current player's score is **everything left** (`suffixSum[i]`) **minus whatever the opponent will win** (`dp[i + x][Math.max(m, x)]`), and the code keeps the maximum over all choices. Working backwards from the last pile, the final answer `dp[0][1]` is the best score for the first player starting at pile `0` with `m = 1`.",
+    "status": "DONE",
+    "cpuUsage": 27.27,
+    "memoryUsage": 100,
+    "date": "2024-08-20T08:08:39.000Z"
+  },
+  {
+    "author": "Leetcode",
+    "code": "/**\n * @param {number[]} piles\n * @return {number}\n */\nvar stoneGameII = function (piles) {\n    const n = piles.length;\n    const dp = Array.from({ length: n + 1 }, () => Array(n + 1).fill(0));\n\n    const suffixSum = Array(n + 1).fill(0);\n    for (let i = n - 1; i >= 0; i--) {\n        suffixSum[i] = suffixSum[i + 1] + piles[i];\n    }\n\n    for (let i = 0; i <= n; i++) {\n        dp[i][n] = suffixSum[i];\n    }\n\n    for (let i = n - 1; i >= 0; i--) {\n        for (let m = n - 1; m >= 1; m--) {\n            const maxX = Math.min(2 * m, n - i);\n\n            for (let x = 1; x <= maxX; x++) {\n                dp[i][m] = Math.max(\n                    dp[i][m],\n                    suffixSum[i] - dp[i + x][Math.max(m, x)],\n                );\n            }\n        }\n    }\n\n    return dp[0][1];\n};\n",
+    "language": "javascript",
+    "notes": "2 years ago this was an impossible problem, today this is a hard problem. Maybe 2 years from now it'll be easy enough that I can solve it by myself.",
+    "aiExplanation": "This is a **bottom-up dynamic programming** solution to **Stone Game II**, a game where two players alternately take between `1` and `2M` piles from the front of the remaining row, each playing to maximize their own stones. A `suffixSum` array (sized `n + 1` with a zero sentinel at the end) is built so `suffixSum[i]` is the total of all stones from pile `i` onward. The table entry `dp[i][m]` represents the best score the player to move can achieve starting at pile `i` with multiplier `m`; as a base case, `dp[i][n]` is set to `suffixSum[i]` because with such a large multiplier the player can always take every remaining pile. The main loops then work backwards over positions and multipliers: for each state, the player tries taking `x` piles where `x` is capped at `Math.min(2 * m, n - i)` so they never grab past the end of the row. Taking `x` piles leaves the opponent at state `dp[i + x][Math.max(m, x)]`, so the current player's result is the remaining total minus the opponent's optimal haul (`suffixSum[i] - dp[i + x][Math.max(m, x)]`), and `dp[i][m]` keeps the best of these choices. The answer is `dp[0][1]` — the first player starting at the beginning with `M = 1`.",
+    "status": "DONE",
+    "cpuUsage": 29.55,
+    "memoryUsage": 34.09,
+    "date": "2026-08-09T09:11:47.000Z"
+  }
+]

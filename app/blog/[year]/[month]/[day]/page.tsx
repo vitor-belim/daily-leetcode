@@ -12,10 +12,10 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { formatDate, formatLongDate, timeAgo } from "@/lib/date-display";
+import { markdownToHtml } from "@/lib/markdown";
 import { getAdjacentDates, getProblem } from "@/lib/problems-repo";
 import { getSolutions } from "@/lib/solutions-repo";
-import { markdownToHtml } from "@/lib/markdown";
-import { formatDate, formatLongDate, timeAgo } from "@/lib/date-display";
 import { SolutionStatus } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import {
@@ -172,7 +172,8 @@ export default async function ProblemPage({
                             s.status === SolutionStatus.Done &&
                               "bg-green-100 text-green-800 data-active:bg-green-200 dark:bg-green-900/30 dark:text-green-400 dark:data-active:bg-green-900/50",
                             (s.status === SolutionStatus.TimeLimitExceeded ||
-                              s.status === SolutionStatus.MemoryLimitExceeded) &&
+                              s.status ===
+                                SolutionStatus.MemoryLimitExceeded) &&
                               "bg-yellow-100 text-yellow-800 data-active:bg-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:data-active:bg-yellow-900/50",
                             s.status === SolutionStatus.Failed &&
                               "bg-red-100 text-red-800 data-active:bg-red-200 dark:bg-red-900/30 dark:text-red-400 dark:data-active:bg-red-900/50",
@@ -184,7 +185,7 @@ export default async function ProblemPage({
                           <span>
                             {s.author} {s.label}
                           </span>
-                          <span className="text-xs text-muted-foreground">
+                          <span className="text-[0.6875rem] text-muted-foreground">
                             {timeAgo(s.date)}
                           </span>
                         </TabsTrigger>
@@ -287,7 +288,8 @@ export default async function ProblemPage({
                                         "bg-yellow-500 hover:bg-yellow-600 text-black",
                                       s.status === SolutionStatus.Failed &&
                                         "bg-red-500 hover:bg-red-600",
-                                      s.status === SolutionStatus.FailedConstraints &&
+                                      s.status ===
+                                        SolutionStatus.FailedConstraints &&
                                         "bg-orange-500 hover:bg-orange-600",
                                     )}
                                   >

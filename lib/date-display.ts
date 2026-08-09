@@ -60,40 +60,201 @@ export function formatLongDate(date: string) {
   return `${monthName} ${day}${ordinalSuffix(day)}, ${year}`;
 }
 
-/**
- * Renders how long ago a timestamp was, in the largest whole unit, e.g.
- * "5 minutes ago" or "2 years ago". Partial units are floored.
- *
- * @param date The past timestamp, as a Date or a date string.
- * @returns The English relative-time phrase. The final loop iteration
- *   (seconds) always returns, so the trailing throw is unreachable.
- */
-interface RelativeTimeUnit {
-  unit: Intl.RelativeTimeFormatUnit;
-  seconds: number;
+enum RelativeTimeUnitName {
+  Year = "year",
+  Month = "month",
+  Day = "day",
+  Hour = "hour",
+  Minute = "minute",
+  Second = "second",
 }
 
-export function timeAgo(date: Date | string): string {
-  const now = new Date();
-  const past = new Date(date);
-  const diffInSeconds = Math.floor((now.getTime() - past.getTime()) / 1000);
+/**
+ * One component of a relative-time phrase: its English singular name and
+ * its fixed length in seconds.
+ */
+interface RelativeTimeComponent {
+  readonly unit: RelativeTimeUnitName;
+  readonly seconds: number;
+}
 
-  const units: RelativeTimeUnit[] = [
-    { unit: "year", seconds: 31536000 },
-    { unit: "month", seconds: 2592000 },
-    { unit: "day", seconds: 86400 },
-    { unit: "hour", seconds: 3600 },
-    { unit: "minute", seconds: 60 },
-    { unit: "second", seconds: 1 },
-  ];
+/**
+ * A display unit for {@link timeAgo}. When `secondary` is present, the
+ * remainder below one primary unit is shown in that smaller unit, e.g.
+ * "2 months 10 days ago".
+ */
+interface RelativeTimeUnit extends RelativeTimeComponent {
+  readonly secondary?: RelativeTimeComponent;
+}
 
-  for (const { unit, seconds } of units) {
-    if (diffInSeconds >= seconds || unit === "second") {
-      const count = Math.floor(diffInSeconds / seconds);
-      const rtf = new Intl.RelativeTimeFormat("en", { numeric: "always" });
-      return rtf.format(-count, unit);
-    }
+const SECONDS_PER_MINUTE = 60;
+const SECONDS_PER_HOUR = 60 * SECONDS_PER_MINUTE;
+const SECONDS_PER_DAY = 24 * SECONDS_PER_HOUR;
+const SECONDS_PER_MONTH = 30 * SECONDS_PER_DAY;
+const SECONDS_PER_YEAR = 365 * SECONDS_PER_DAY;
+
+const YEAR_COMPONENT: RelativeTimeComponent = {
+  unit: RelativeTimeUnitName.Year,
+  seconds: SECONDS_PER_YEAR,
+};
+
+const MONTH_COMPONENT: RelativeTimeComponent = {
+  unit: RelativeTimeUnitName.Month,
+  seconds: SECONDS_PER_MONTH,
+};
+
+const DAY_COMPONENT: RelativeTimeComponent = {
+  unit: RelativeTimeUnitName.Day,
+  seconds: SECONDS_PER_DAY,
+};
+
+const HOUR_COMPONENT: RelativeTimeComponent = {
+  unit: RelativeTimeUnitName.Hour,
+  seconds: SECONDS_PER_HOUR,
+};
+
+const MINUTE_COMPONENT: RelativeTimeComponent = {
+  unit: RelativeTimeUnitName.Minute,
+  seconds: SECONDS_PER_MINUTE,
+};
+
+const SECOND_UNIT: RelativeTimeUnit = {
+  unit: RelativeTimeUnitName.Second,
+  seconds: 1,
+};
+
+const RELATIVE_TIME_UNITS: readonly RelativeTimeUnit[] = [
+  {
+    ...YEAR_COMPONENT,
+    secondary: MONTH_COMPONENT,
+  },
+  {
+    ...MONTH_COMPONENT,
+    secondary: DAY_COMPONENT,
+  },
+  DAY_COMPONENT,
+  HOUR_COMPONENT,
+  MINUTE_COMPONENT,
+  SECOND_UNIT,
+];
+
+/**
+ * Measures how much time has passed since a timestamp, in whole seconds.
+ * Future timestamps and unparseable input both clamp to zero so callers
+ * never render a negative or `NaN` duration.
+ *
+ * @param date The timestamp to measure from, as a Date or a date string.
+ * @returns The elapsed whole seconds, never negative and never `NaN`.
+ */
+function elapsedSeconds(date: Date | string): number {
+  const elapsedMilliseconds = Date.now() - new Date(date).getTime();
+
+  if (!Number.isFinite(elapsedMilliseconds)) return 0;
+
+  return Math.max(0, Math.floor(elapsedMilliseconds / 1000));
+}
+
+/**
+ * Picks the largest display unit that fits wholly into an elapsed duration.
+ *
+ * @param diffInSeconds The elapsed time in seconds, expected to be
+ *   non-negative.
+ * @returns The matching unit, falling back to seconds for durations shorter
+ *   than one minute.
+ */
+function selectRelativeTimeUnit(diffInSeconds: number): RelativeTimeUnit {
+  return (
+    RELATIVE_TIME_UNITS.find((entry) => diffInSeconds >= entry.seconds) ??
+    SECOND_UNIT
+  );
+}
+
+/**
+ * The whole-unit counts displayed for an elapsed duration: the count of
+ * primary units plus the rounded remainder in the secondary unit (zero
+ * when the unit has no secondary breakdown or the remainder rounds away).
+ */
+interface RelativeTimeBreakdown {
+  readonly primaryCount: number;
+  readonly secondaryCount: number;
+}
+
+/**
+ * Splits an elapsed duration into whole primary units plus a rounded
+ * remainder in the unit's secondary component. Without a secondary
+ * component the duration is rounded to the nearest primary unit. A
+ * remainder that rounds up to a whole primary unit carries over instead of
+ * being displayed, so 729 elapsed days yields 2 years rather than the
+ * nonsensical 1 year 12 months.
+ *
+ * @param diffInSeconds The elapsed time in seconds, expected to be
+ *   non-negative.
+ * @param unit The display unit to break the duration into.
+ * @returns The primary and secondary whole-unit counts; the secondary count
+ *   is zero when the unit has no secondary component or the remainder
+ *   rounded away or carried over.
+ */
+function breakDownElapsed(
+  diffInSeconds: number,
+  unit: RelativeTimeUnit,
+): RelativeTimeBreakdown {
+  const { secondary } = unit;
+
+  if (!secondary) {
+    return {
+      primaryCount: Math.round(diffInSeconds / unit.seconds),
+      secondaryCount: 0,
+    };
   }
 
-  throw new Error("unreachable");
+  const primaryCount = Math.floor(diffInSeconds / unit.seconds);
+  const remainder = diffInSeconds - primaryCount * unit.seconds;
+  const secondaryCount = Math.round(remainder / secondary.seconds);
+  const secondariesPerPrimary = Math.floor(unit.seconds / secondary.seconds);
+
+  if (secondaryCount >= secondariesPerPrimary) {
+    return { primaryCount: primaryCount + 1, secondaryCount: 0 };
+  }
+
+  return { primaryCount, secondaryCount };
+}
+
+/**
+ * Formats one component of a relative-time phrase in English, e.g.
+ * "1 month" or "10 days".
+ *
+ * @param count The whole-unit count.
+ * @param unit The unit name, pluralized when the count is not one.
+ * @returns The "<count> <unit>[s]" fragment.
+ */
+function relativeTimePart(count: number, unit: RelativeTimeUnitName): string {
+  return `${count} ${unit}${count === 1 ? "" : "s"}`;
+}
+
+/**
+ * Renders how long ago a timestamp was, e.g. "5 minutes ago" or
+ * "2 years ago", using fixed unit lengths (a month is 30 days, a year is
+ * 365 days). Months break down into days ("2 months 10 days ago") and years
+ * into months ("1 year 3 months ago"); a remainder of zero is omitted
+ * ("2 months ago"). Partial units are rounded to the nearest whole unit.
+ *
+ * @param date The past timestamp, as a Date or a date string. Future and
+ *   unparseable timestamps read as "0 seconds ago".
+ * @returns The English relative-time phrase.
+ */
+export function timeAgo(date: Date | string): string {
+  const diffInSeconds = elapsedSeconds(date);
+  const entry = selectRelativeTimeUnit(diffInSeconds);
+  const { primaryCount, secondaryCount } = breakDownElapsed(
+    diffInSeconds,
+    entry,
+  );
+
+  const primaryPart = relativeTimePart(primaryCount, entry.unit);
+  const secondaryPart =
+    entry.secondary && secondaryCount > 0
+      ? ` ${relativeTimePart(secondaryCount, entry.secondary.unit)}`
+      : "";
+
+  return `${primaryPart}${secondaryPart} ago`;
 }
