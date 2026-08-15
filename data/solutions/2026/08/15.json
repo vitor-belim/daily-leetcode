@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar longestSubsequence = function(nums) {\n    let xor = 0;\n    let allZeros = true;\n\n    for (const num of nums) {\n        xor = xor ^ num;\n        allZeros &&= num === 0;\n    }\n\n    if (allZeros) return 0;\n    if (xor === 0) return nums.length - 1;\n    return nums.length;\n};\n",
+    "language": "javascript",
+    "notes": "Observation-based exercise.",
+    "aiExplanation": "This function finds the length of the longest subsequence of `nums` whose bitwise XOR is non-zero. It makes a single pass through the array, accumulating the XOR of all elements in `xor` and tracking with the boolean `allZeros` whether every element is `0` (using the `&&=` operator, which stays `true` only while each `num === 0`). It then applies three simple rules: if **all elements are zero**, no subsequence can ever produce a non-zero XOR, so it returns `0`; if the XOR of the **whole array is zero** (but not all elements are), dropping any single non-zero element makes the remaining XOR non-zero, so the answer is `nums.length - 1`; otherwise the entire array already has a non-zero XOR, so it returns `nums.length`.",
+    "status": "DONE",
+    "cpuUsage": 37.5,
+    "memoryUsage": 87.5,
+    "date": "2026-08-15T08:24:26.000Z"
+  }
+]

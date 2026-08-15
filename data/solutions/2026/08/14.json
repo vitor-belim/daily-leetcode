@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar maximumLengthSubstring = function(s) {\n    const arr = new Array(26).fill(0);\n    let left = 0;\n    let res = 0;\n\n    for (let right = 0; right < s.length; right++) {\n        const pos = s.charCodeAt(right) - 97;\n        arr[pos]++;\n\n        while (arr[pos] > 2) {\n            arr[s.charCodeAt(left) - 97]--;\n            left++;\n        }\n\n        res = Math.max(res, right - left + 1);\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds the length of the **longest substring** where every letter appears **at most twice**, using a classic **sliding window** technique. It keeps a 26-slot counter array `arr` (one slot per lowercase letter) and two pointers: `left` marks the start of the current window and `right` expands it one character at a time. For each new character, its count is incremented via `arr[pos]++` (where `pos` is derived from `s.charCodeAt(right) - 97`, mapping `'a'`–`'z'` to `0`–`25`). If that character's count ever exceeds 2, the `while` loop shrinks the window from the left — decrementing counts and advancing `left` — until the window is valid again. After each step, `res = Math.max(res, right - left + 1)` records the largest valid window seen so far, which is returned at the end. Since each character is added and removed at most once, the whole thing runs in **O(n)** time.",
+    "status": "DONE",
+    "cpuUsage": 81.01,
+    "memoryUsage": 50.63,
+    "date": "2026-08-14T07:15:04.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar maximumLengthSubstring = function(s) {\n    const arr = Array.from({ length: 26 }, () => Array(2).fill(-1));\n    let left = 0;\n    let res = 0;\n\n    for (let right = 0; right < s.length; right++) {\n        const pos = s.charCodeAt(right) - 97;\n\n        left = Math.max(left, arr[pos][0] + 1);\n        arr[pos] = [arr[pos][1], right];\n\n        res = Math.max(res, right - left + 1);\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is a **sliding window** solution that finds the longest substring where each letter appears **at most twice**, but instead of counting occurrences it remembers *where* they happened: `arr` holds, for each of the 26 lowercase letters, the **last two indices** at which that letter was seen (initialized to `[-1, -1]`). As `right` scans the string, the current letter's *older* stored index `arr[pos][0]` is the position of its second-to-last occurrence — if the window still included it, adding the current character would make a **third** copy, so `left = Math.max(left, arr[pos][0] + 1)` jumps the window start just past it in a single step (no inner loop needed). Then `arr[pos] = [arr[pos][1], right]` shifts the record so it keeps only the two most recent positions, and `res = Math.max(res, right - left + 1)` tracks the biggest valid window, which is returned at the end. This runs in **O(n)** time with constant extra space.",
+    "status": "DONE",
+    "cpuUsage": 81.01,
+    "memoryUsage": 55.7,
+    "date": "2026-08-14T07:29:49.000Z"
+  }
+]

@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar missingInteger = function(nums) {\n    let sum = nums[0];\n\n    for (let j = 1; j < nums.length; j++) {\n        if (nums[j - 1] + 1 !== nums[j]) {\n            break;\n        }\n\n        sum += nums[j];\n    }\n\n    const set = new Set(nums);\n\n    while (set.has(sum)) {\n        sum++;\n    }\n\n    return sum;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds the **smallest missing integer** that is greater than or equal to the sum of the longest *sequential prefix* of the array. It starts by initializing `sum` with the first element, then loops through the array adding each element to `sum` as long as the values keep increasing by exactly 1 (e.g. `[3, 4, 5]`); the moment a number breaks that consecutive chain, the loop stops with `break`. At that point `sum` holds the total of the longest consecutive run at the start of the array. The code then builds a `Set` from `nums` for fast lookups and repeatedly increments `sum` while it already exists in the set, so the first value **not present** in the array is returned as the answer.",
+    "status": "DONE",
+    "cpuUsage": 59.83,
+    "memoryUsage": 87.52,
+    "date": "2026-08-11T06:33:11.000Z"
+  }
+]

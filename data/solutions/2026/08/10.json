@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "const LIMIT = 100_000;\nconst res = Array(LIMIT + 1).fill(false);\nres[0] = false;\nres[1] = true;\n\nfor (let i = 2; i <= LIMIT; i++) {\n    let canWin = false;\n\n    for (let j = 1; j * j <= i; j++) {\n        if (!res[i - j * j]) {\n            canWin = true;\n            break;\n        }\n    }\n\n    res[i] = canWin;\n}\n\n/**\n * @param {number} n\n * @return {boolean}\n */\nvar winnerSquareGame = function(n) {\n    return res[n];\n};\n",
+    "language": "javascript",
+    "notes": "Possible to pre-calculate for every single possible value.",
+    "aiExplanation": "This code solves a two-player game where players take turns removing a **perfect square** number of stones (1, 4, 9, 16, ...) from a pile, and the player who can't move loses. It uses **dynamic programming** to precompute, for every pile size up to `100,000`, whether the player whose turn it is can force a win. The array `res` holds these answers: `res[0]` is `false` (no stones left means the current player loses) and `res[1]` is `true` (take the single stone and win). For each pile size `i`, the inner loop tries every possible move `j * j` and checks the position it leaves behind — if any move lands the opponent in a **losing** position (`!res[i - j * j]`), then the current player **can win**, so `res[i]` is set to `true`. Because all of this work happens once at module load, the actual `winnerSquareGame` function is just an instant **array lookup**: `return res[n]`.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 96.04,
+    "date": "2026-08-10T06:47:39.000Z"
+  }
+]

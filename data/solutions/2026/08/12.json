@@ -1,0 +1,79 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} k\n * @return {number}\n */\nvar maxSubarrayLength = function(nums, k) {\n    const seen = {};\n    let left = 0;\n    let maxSeen = 0;\n    \n    for (let i = 0; i < nums.length; i++) {\n        seen[nums[i]] = (seen[nums[i]] || 0) + 1;\n\n        while (left <= i && seen[nums[i]] > k) {\n            seen[left]--;\n            left++;\n        }\n\n        maxSeen = Math.max(maxSeen, i - left + 1);\n    }\n\n    return maxSeen;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function tries to find the length of the longest contiguous subarray in which no value appears more than `k` times, using a **sliding window**. As the index `i` moves right, the `seen` object counts how many times each value has appeared in the window, and when the current value's count goes above `k`, the window is shrunk by advancing `left`. However, the shrink step decrements `seen[left]` — the count stored under the *index* `left` — instead of `seen[nums[left]]`, the count of the value leaving the window, so the frequency bookkeeping gets corrupted while shrinking. After each step it records the window size `i - left + 1` in `maxSeen` and returns the largest one found.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2024-03-28T09:01:15.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} k\n * @return {number}\n */\nvar maxSubarrayLength = function(nums, k) {\n    const seen = {};\n    let left = 0;\n    let maxSeen = 0;\n    \n    for (let i = 0; i < nums.length; i++) {\n        seen[nums[i]] = (seen[nums[i]] || 0) + 1;\n\n        while (left <= i && seen[nums[i]] > k) {\n            seen[nums[left]]--;\n            left++;\n        }\n\n        maxSeen = Math.max(maxSeen, i - left + 1);\n    }\n\n    return maxSeen;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is a classic **sliding window** solution for finding the longest contiguous subarray where every value occurs at most `k` times. The window expands one element at a time as `i` moves right, and the `seen` object tracks how many times each value currently appears inside the window. If adding `nums[i]` pushes its count above `k`, the window shrinks from the left — decrementing `seen[nums[left]]` and advancing `left` — until that count drops back to `k`. Since the window is always valid after this step, `maxSeen` simply keeps the largest window size `i - left + 1` observed, which is returned as the answer.",
+    "status": "DONE",
+    "cpuUsage": 5.31,
+    "memoryUsage": 100,
+    "date": "2024-03-28T09:06:46.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} k\n * @return {number}\n */\nvar maxSubarrayLength = function(nums, k) {\n    const seen = {};\n    let left = 0;\n    let maxSeen = 0;\n    \n    for (let i = 0; i < nums.length; i++) {\n        seen[nums[i]] = (seen[nums[i]] || 0) + 1;\n\n        while (left <= i && seen[nums[i]] > k) {\n            seen[nums[left]]--;\n            left++;\n        }\n\n        const distance = i - left + 1;\n        if (distance > maxSeen) {\n            maxSeen = distance;\n        }\n    }\n\n    return maxSeen;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses a **sliding window** to find the longest contiguous subarray where no value appears more than `k` times. The `seen` object counts occurrences of each value inside the current window; whenever the value just added at index `i` exceeds `k` occurrences, the window shrinks from the left (decrementing `seen[nums[left]]` and moving `left` forward) until it is valid again. The only difference from the usual pattern is that instead of calling `Math.max`, it computes the current window length as `distance = i - left + 1` and updates `maxSeen` with a plain `if` comparison, returning the largest valid window length at the end.",
+    "status": "DONE",
+    "cpuUsage": 5.31,
+    "memoryUsage": 100,
+    "date": "2024-03-28T09:07:43.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} k\n * @return {number}\n */\nvar maxSubarrayLength = function(nums, k) {\n    const map = new Map();\n    let left = 0;\n    let max = 0;\n\n    for (let right = 0; right < nums.length; right++) {\n        const freq = map.get(nums[right]) || [];\n\n        if (freq.length === 0) {\n            map.set(nums[right], freq);\n        }\n\n        if (freq.length === k) {\n            left = freq.shift() + 1;\n        }\n        freq.push(right);\n\n        max = Math.max(max, right - left + 1);\n    }\n\n    return max;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This attempt tracks, for each value, the **list of indices** where it appears: `map` associates every number with an array `freq` of its positions in the current window. When a value already has `k` recorded positions, the oldest one is removed with `freq.shift()` and `left` is set to just past that removed index, so the window excludes the extra occurrence; the current index is then pushed onto the list and `max` is updated with the window length `right - left + 1`. The flaw is that `left` is assigned *directly* rather than with `Math.max`, so a later value can move `left` **backwards**, re-admitting elements that were already excluded and producing an invalid, oversized window.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-08-12T07:14:48.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} k\n * @return {number}\n */\nvar maxSubarrayLength = function(nums, k) {\n    const map = new Map();\n    let res = 0;\n\n    for (let right = 0; right < nums.length; right++) {\n        const freq = map.get(nums[right]) || 0;\n\n        if (freq === k) {\n            continue;\n        }\n\n        map.set(nums[right], freq + 1);\n        res++;\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This version abandons the window entirely and just **counts how many elements can be kept** across the whole array: for each number it looks up its usage count in `map`, skips the element with `continue` once that value has already been taken `k` times, and otherwise increments both the value's count and the running total `res`. The result is the number of elements remaining after dropping every occurrence beyond the first `k` of each value — but since it ignores whether the kept elements are **contiguous**, it answers a different question than the longest-subarray problem asks.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-08-12T07:19:16.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} k\n * @return {number}\n */\nvar maxSubarrayLength = function(nums, k) {\n    const map = new Map();\n    let left = 0;\n    let max = 0;\n\n    for (let right = 0; right < nums.length; right++) {\n        const freq = map.get(nums[right]) || [];\n\n        if (freq.length === 0) {\n            map.set(nums[right], freq);\n        }\n\n        if (freq.length === k) {\n            left = Math.max(left, freq.shift() + 1);\n        }\n        freq.push(right);\n\n        max = Math.max(max, right - left + 1);\n    }\n\n    return max;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution keeps a `Map` from each value to the **array of indices** where it appears, and slides a window over `nums`. When the value at `right` already has `k` recorded positions, the oldest position is removed with `freq.shift()` and the left edge jumps past it via `left = Math.max(left, freq.shift() + 1)` — the `Math.max` is the key fix that prevents `left` from ever moving backwards when different values impose different boundaries. The current index is then appended to the value's list, and `max` records the biggest valid window length `right - left + 1`, which is the length of the longest subarray where every value occurs at most `k` times.",
+    "status": "DONE",
+    "cpuUsage": 5.31,
+    "memoryUsage": 5,
+    "date": "2026-08-12T07:23:53.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} k\n * @return {number}\n */\nvar maxSubarrayLength = function(nums, k) {\n    const map = new Map();\n    let left = 0;\n    let max = 0;\n\n    for (let right = 0; right < nums.length; right++) {\n        map.set(nums[right], (map.get(nums[right]) || 0) + 1);\n\n        while (map.get(nums[right]) > k) {\n            map.set(nums[left], map.get(nums[left]) - 1);\n            left++;\n        }\n\n        max = Math.max(max, right - left + 1);\n    }\n\n    return max;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is the textbook **sliding window** approach using a `Map` of frequency counts. Each step, the element at `right` enters the window and its count is incremented; if that count now exceeds `k`, the `while` loop shrinks the window from the left — decrementing the count of `nums[left]` and advancing `left` — until the offending value is back down to `k` occurrences. Because the window is guaranteed valid after every iteration, `max = Math.max(max, right - left + 1)` captures the longest subarray in which no value appears more than `k` times, and each element enters and leaves the window at most once, giving **O(n)** time overall.",
+    "status": "DONE",
+    "cpuUsage": 46.65,
+    "memoryUsage": 71.59,
+    "date": "2026-08-12T07:28:15.000Z"
+  }
+]
