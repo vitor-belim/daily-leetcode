@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} stones\n * @return {boolean}\n */\nvar stoneGameIX = function(stones) {\n    const buckets = Array(3).fill(0);\n\n    for (const stone of stones) {\n        buckets[stone % 3]++;\n    }\n\n    const memo = new Map();\n\n    const bob = (of0, of1, of2, sum) => {\n        if (of0 === 0 && of1 === 0 && of2 === 0) return true;\n\n        const key = of0 + ':' + of1 + ':' + of2 + ':' + sum;\n        if (memo.has(key)) return !memo.get(key);\n\n        let res = false;\n\n        res ||= of0 > 0 && sum % 3 !== 0 && !alice(of0 - 1, of1, of2, sum);\n        res ||= of1 > 0 && sum % 3 !== 2 && !alice(of0, of1 - 1, of2, sum + 1);\n        res ||= of2 > 0 && sum % 3 !== 1 && !alice(of0, of1, of2 - 1, sum + 2);\n\n        memo.set(key, !res);\n        return res;\n    };\n\n    const alice = (of0, of1, of2, sum) => {\n        if (of0 === 0 && of1 === 0 && of2 === 0) return false;\n\n        const key = of0 + ':' + of1 + ':' + of2 + ':' + sum;\n        if (memo.has(key)) return memo.get(key);\n\n        let res = false;\n\n        res ||= of0 > 0 && sum % 3 !== 0 && !bob(of0 - 1, of1, of2, sum);\n        res ||= of1 > 0 && sum % 3 !== 2 && !bob(of0, of1 - 1, of2, sum + 1);\n        res ||= of2 > 0 && sum % 3 !== 1 && !bob(of0, of1, of2 - 1, sum + 2);\n\n        memo.set(key, res);\n        return res;\n    };\n\n    return alice(...buckets, 0);\n};\n",
+    "language": "javascript",
+    "notes": "TLE because a pure math approach is what is expected.",
+    "aiExplanation": "This solution simulates the stone game directly using **recursive game theory with memoization**. Since only a stone's remainder when divided by 3 matters, it first counts the stones into three `buckets` (remainders `0`, `1`, and `2`). Two mutually recursive functions, `alice` and `bob`, then play out every possible game: each function receives how many stones of each remainder are left plus the running `sum`, and tries the three possible moves — taking a stone from a bucket is only allowed if the bucket isn't empty and the move wouldn't make the new total divisible by 3 (checked via conditions like `sum % 3 !== 0`). A player *wins* if at least one move leads to the opponent *losing* (the `!alice(...)` / `!bob(...)` calls), and if a player has no stones left to take, Bob wins by default (Alice returns `false` on empty, Bob returns `true`). A shared `memo` map caches each game state (encoded as a string `key`) to avoid recomputing it. While correct, exploring the full state space is too slow for large inputs, which is why this attempt got **Time Limit Exceeded**.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-08-16T09:43:42.000Z"
+  },
+  {
+    "author": "Leetcode",
+    "code": "/**\n * @param {number[]} stones\n * @return {boolean}\n */\nvar stoneGameIX = function(stones) {\n    const buckets = Array(3).fill(0);\n\n    for (const stone of stones) {\n        buckets[stone % 3]++;\n    }\n\n    if (buckets[0] % 2 === 0) {\n        return buckets[1] >= 1 && buckets[2] >= 1;\n    }\n    return buckets[1] - buckets[2] > 2 || buckets[2] - buckets[1] > 2;\n};\n",
+    "language": "javascript",
+    "notes": "The math approach.",
+    "aiExplanation": "Instead of simulating the game, this solution reduces it to a **pure counting argument**. Because only remainders modulo 3 matter, it tallies the stones into three `buckets` by `stone % 3`. Stones with remainder `0` don't change the running total's divisibility — they just **pass the turn** to the other player. So if `buckets[0]` is even, the turn-passing cancels out, and Alice wins as long as she has both a remainder-`1` and a remainder-`2` stone available (`buckets[1] >= 1 && buckets[2] >= 1`), letting her force Bob into eventually completing a multiple of 3. If `buckets[0]` is odd, one extra turn-swap flips the roles, and Alice can only win when the remainder-`1` and remainder-`2` counts are **unbalanced by more than 2** (`buckets[1] - buckets[2] > 2` or vice versa), because that surplus guarantees Bob runs out of safe moves first. This runs in a single pass over the input — **O(n) time and O(1) space** — which is why it passes where the brute-force simulation timed out.",
+    "status": "DONE",
+    "cpuUsage": 72.73,
+    "memoryUsage": 72.73,
+    "date": "2026-08-16T09:50:15.000Z"
+  }
+]
