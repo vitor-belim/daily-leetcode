@@ -1,6 +1,8 @@
+import { SPLIT_RESTORE_SCRIPT } from "@/lib/split-storage";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import React from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,10 +34,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <script dangerouslySetInnerHTML={{ __html: SPLIT_RESTORE_SCRIPT }} />
         {children}
       </body>
     </html>
