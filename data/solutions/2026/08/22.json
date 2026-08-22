@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @return {boolean}\n */\nvar checkDivisibility = function(n) {\n    let x = n;\n    let sum = 0;\n    let mult = 1;\n    \n    while (x !== 0) {\n        const rem = x % 10;\n\n        sum += rem;\n        mult *= rem;\n\n        x = Math.floor(x / 10);\n    }\n\n    return n % (sum + mult) === 0;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function checks whether a number `n` is divisible by the **sum of its digits plus the product of its digits**. It starts with a copy of `n` in `x`, a running `sum` of `0`, and a running `mult` of `1`. Inside the `while` loop it repeatedly peels off the last digit with `x % 10`, adds that digit to `sum`, multiplies it into `mult`, and then drops the digit from `x` using `Math.floor(x / 10)`, stopping once `x` reaches `0`. For example, with `n = 99` the digits are `9` and `9`, giving a sum of `18` and a product of `81`. Finally it returns `true` if `n % (sum + mult) === 0`, meaning `n` divides evenly by that combined value, and `false` otherwise.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 6.52,
+    "date": "2026-08-22T08:10:21.000Z"
+  }
+]

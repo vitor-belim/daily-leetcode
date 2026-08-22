@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} k\n * @return {number}\n */\nvar largestInteger = function(nums, k) {\n    const freq = new Map();\n\n    for (const num of nums) {\n        freq.set(num, (freq.get(num) || 0) + 1);\n    }\n\n    const first = nums[0];\n    const last = nums[nums.length - 1];\n    let res = -1;\n\n    for (const [num, count] of freq) {\n        if (k === 1 || num === first || num === last) {\n            if (count === 1 && num > res) {\n                res = num;\n            }\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Naive attempt, didn't fully realize all possible edge cases.",
+    "aiExplanation": "This function tries to find the **largest number that appears in exactly one subarray of length `k`**. It first builds a `Map` called `freq` that counts how many times each number appears in `nums`. It then notes the `first` and `last` elements of the array and starts with a result of `-1`. Looping over every distinct number, it only considers candidates when `k === 1` (every element is its own subarray) or when the number is the first or last element (since those sit in only one window of size `k` when `1 < k < n`); among those, it keeps the largest number whose `count` is exactly `1`. The logic is incomplete because it doesn't handle the `k === n` case (a single window containing everything, where any number qualifies) and doesn't cope with the first and last elements being equal, which is why this attempt is marked as failed.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-08-18T07:12:28.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} k\n * @return {number}\n */\nvar largestInteger = function(nums, k) {\n    const n = nums.length;\n\n    if (k === n) {\n        return Math.max(...nums);\n    }\n\n    const freq = new Map();\n\n    for (const num of nums) {\n        freq.set(num, (freq.get(num) || 0) + 1);\n    }\n\n    if (k === 1) {\n        return Math.max(-1, ...nums.filter(num => freq.get(num) === 1));\n    }\n\n    const first = nums[0];\n    const firstC = freq.get(first);\n    const last = nums[n - 1];\n    const lastC = freq.get(last);\n\n    if (firstC === 1 && lastC === 1) return Math.max(first, last);\n    if (firstC === 1) return first;\n    if (lastC === 1) return last;\n    return -1;\n};\n",
+    "language": "javascript",
+    "notes": "Seems crazy to me that someone created an exercise that needs 3 different solutions within itself.",
+    "aiExplanation": "This function finds the **largest number that appears in exactly one subarray of length `k`** by splitting the problem into three cases. If `k === n`, there is only one subarray (the whole array), so every number qualifies and it simply returns `Math.max(...nums)`. Otherwise it builds a `freq` map counting how often each number occurs; when `k === 1`, every element is its own window, so a number appears in exactly one window only if it occurs once overall, and the function returns the largest such number (or `-1` via `Math.max(-1, ...)` if none exist). For any other `k`, only the `first` and `last` elements belong to a single window, and only if they occur just once in the whole array, so it checks their counts (`firstC`, `lastC`) and returns the larger qualifying one, the single qualifying one, or `-1` when neither qualifies.",
+    "status": "DONE",
+    "cpuUsage": 71.34,
+    "memoryUsage": 83.26,
+    "date": "2026-08-18T07:22:16.000Z"
+  }
+]

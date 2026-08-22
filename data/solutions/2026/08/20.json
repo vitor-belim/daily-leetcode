@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number[]}\n */\nvar resultArray = function(nums) {\n    const arr1 = [nums[0]];\n    const arr2 = [nums[1]];\n\n    for (let i = 2; i < nums.length; i++) {\n        if (arr1[arr1.length - 1] > arr2[arr2.length - 1]) {\n            arr1.push(nums[i]);\n        } else {\n            arr2.push(nums[i]);\n        }\n    }\n\n    return arr1.concat(arr2);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function splits the input array `nums` into two lists and then joins them back together. It starts by placing the first element into `arr1` and the second element into `arr2`. Then, for every remaining element (from index `2` onward), it compares the **last element** of each list: if `arr1`'s last element is **greater** than `arr2`'s last element, the current number is appended to `arr1`; otherwise it goes to `arr2`. After the loop, the two lists are combined with `arr1.concat(arr2)`, so the result is all of `arr1`'s elements followed by all of `arr2`'s elements in the order they were added.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 85.88,
+    "date": "2026-08-20T07:12:34.000Z"
+  }
+]

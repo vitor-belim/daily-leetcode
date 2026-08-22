@@ -1,0 +1,46 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} coins\n * @param {number} k\n * @return {number}\n */\nvar findKthSmallest = function(coins, k) {\n    let globalLcm = 1;\n\n    for (const coin of coins) {\n        globalLcm = lcm(globalLcm, coin);\n    }\n\n    const set = new Set();\n\n    for (const coin of coins) {\n        for (let i = coin; i <= globalLcm; i += coin) {\n            set.add(i);\n        }\n    }\n\n    const arr = [...set];\n    arr.sort((a,  b) => a - b);\n\n    return Math.floor(k / set.size) * globalLcm + arr[k % set.size - 1];\n};\n\nconst gcd = (a, b) => {\n    while (b !== 0) {\n        [a, b] = [b, a % b];\n    }\n    return a;\n};\n\nconst lcm = (a, b) => (a * b) / gcd(a, b);\n",
+    "language": "javascript",
+    "notes": "Struggled with k being 1-based.",
+    "aiExplanation": "This solution relies on the idea that the set of amounts reachable with the given coins is **periodic**: it repeats every `globalLcm`, the least common multiple of all coins, which is computed with the helper `lcm` (built on a loop-based `gcd`). It then collects every multiple of every coin up to `globalLcm` into a `Set` to remove duplicates, converts it to a sorted array, and uses that array as a single \"period\" of the pattern. To find the k-th smallest amount it counts how many full periods fit (`Math.floor(k / set.size)`), multiplies that by `globalLcm`, and adds the appropriate entry from the array at index `k % set.size - 1`. However, this indexing is off by one: when `k` is an exact multiple of the set size the index becomes `-1`, yielding `undefined`, and building all multiples up to the LCM is also far too slow and memory-hungry when the LCM is huge, which is why this attempt **failed**.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-08-21T09:08:50.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} coins\n * @param {number} k\n * @return {number}\n */\nvar findKthSmallest = function(coins, k) {\n    let globalLcm = 1;\n\n    for (const coin of coins) {\n        globalLcm = lcm(globalLcm, coin);\n    }\n\n    const set = new Set();\n\n    for (const coin of coins) {\n        for (let i = coin; i <= globalLcm; i += coin) {\n            set.add(i);\n        }\n    }\n\n    const arr = [...set];\n    arr.sort((a,  b) => a - b);\n\n    //console.log(arr);\n\n    const div = (k - 1) / set.size;\n    const rem = (k - 1) % set.size;\n\n    return Math.floor(div) * globalLcm + arr[rem];\n};\n\nconst gcd = (a, b) => {\n    while (b !== 0) {\n        [a, b] = [b, a % b];\n    }\n    return a;\n};\n\nconst lcm = (a, b) => (a * b) / gcd(a, b);\n",
+    "language": "javascript",
+    "notes": "Exhausted memory by attempting to add all possible multiples of all coins to a set.",
+    "aiExplanation": "This is a refinement of the previous attempt that fixes the off-by-one indexing. It still computes `globalLcm` (the least common multiple of all coins via `lcm` and `gcd`), gathers every multiple of every coin up to that LCM into a `Set`, and sorts the unique values into `arr`, which represents one full repeating \"period\" of reachable amounts. The key change is that it now works with `k - 1` (a zero-based position): `div` is how many complete periods come before the answer and `rem` is the position inside the current period, so the result is `Math.floor(div) * globalLcm + arr[rem]`. The math is now correct, but the approach remains impractical because the LCM of many coins can be enormous, so enumerating all multiples up to it exhausts time or memory, which is why this version also **failed**.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-08-21T09:13:48.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} coins\n * @param {number} k\n * @return {number}\n */\nvar findKthSmallest = function(coins, k) {\n    let globalLcm = 1;\n\n    for (const coin of coins) {\n        globalLcm = lcm(globalLcm, coin);\n    }\n\n    //console.log('globalLcm', globalLcm);\n\n    const set = new Set();\n\n    for (const coin of coins) {\n        const len = Math.min(globalLcm, coin * k);\n        for (let i = coin; i <= len; i += coin) {\n            set.add(i);\n        }\n    }\n\n    const arr = [...set];\n    arr.sort((a,  b) => a - b);\n\n    //console.log(arr);\n\n    const div = (k - 1) / set.size;\n    const rem = (k - 1) % set.size;\n\n    return Math.floor(div) * globalLcm + arr[rem];\n};\n\nconst gcd = (a, b) => {\n    while (b !== 0) {\n        [a, b] = [b, a % b];\n    }\n    return a;\n};\n\nconst lcm = (a, b) => (a * b) / gcd(a, b);\n",
+    "language": "javascript",
+    "notes": "Achieved TLE as expected, 543 / 561 testcases passed.",
+    "aiExplanation": "This attempt tries to speed up the previous approach by capping how far it enumerates: for each coin it only generates multiples up to `Math.min(globalLcm, coin * k)`, reasoning that the k-th smallest amount can never exceed `coin * k` for any single coin. Everything else is unchanged: `globalLcm` is computed with `lcm`/`gcd`, the multiples go into a `Set` to deduplicate, the set is sorted into `arr`, and the answer is assembled from `k - 1` as `Math.floor(div) * globalLcm + arr[rem]` where `div` and `rem` are the quotient and remainder by the set size. Unfortunately the cap doesn't change the fundamental problem: with `k` up to two billion, `coin * k` multiples is still far too many values to generate and sort, so this version exceeded the time limit (**TLE**).",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-08-21T09:22:20.000Z"
+  },
+  {
+    "author": "Leetcode",
+    "code": "var findKthSmallest = function (coins, k) {\n    coins.sort((a, b) => a - b);\n    const newCoins = [];\n    for (const x of coins) {\n        let flag = true;\n        for (const y of newCoins) {\n            if (x % y === 0) {\n                flag = false;\n                break;\n            }\n        }\n        if (flag) {\n            newCoins.push(x);\n        }\n    }\n    coins = newCoins;\n\n    const n = coins.length;\n    const m = 1 << n;\n    const lcm = new Array(m).fill(0n);\n    let l = BigInt(k);\n    let r = BigInt(coins[0]) * BigInt(k) + 1n;\n\n    const gcd = (a, b) => {\n        a = a < 0n ? -a : a;\n        b = b < 0n ? -b : b;\n        while (b !== 0n) {\n            [a, b] = [b, a % b];\n        }\n        return a;\n    };\n\n    const trailingZeros = (x) => {\n        let count = 0;\n        while ((x & 1) === 0) {\n            count++;\n            x >>= 1;\n        }\n        return count;\n    };\n\n    const popcount = (x) => {\n        let count = 0;\n        while (x) {\n            count += x & 1;\n            x >>= 1;\n        }\n        return count;\n    };\n\n    lcm[0] = 1n;\n    for (let mask = 1; mask < m; mask++) {\n        const preMask = mask & (mask - 1);\n        const i = trailingZeros(mask);\n\n        const coin = BigInt(coins[i]);\n        const tmp = lcm[preMask] / gcd(lcm[preMask], coin);\n        if (tmp <= r / coin) {\n            lcm[mask] = tmp * coin;\n        } else {\n            lcm[mask] = r + 1n;\n        }\n    }\n\n    const count = (x) => {\n        let res = 0n;\n        for (let mask = 1; mask < m; mask++) {\n            if (lcm[mask] > x) continue;\n\n            if (popcount(mask) & 1) {\n                res += x / lcm[mask];\n            } else {\n                res -= x / lcm[mask];\n            }\n        }\n        return res;\n    };\n\n    while (l < r) {\n        const mid = (l + r) / 2n;\n        if (count(mid) >= k) {\n            r = mid;\n        } else {\n            l = mid + 1n;\n        }\n    }\n    return Number(l);\n};",
+    "language": "javascript",
+    "notes": "A \"bring your math degree to software engineering\" problem strikes again.",
+    "aiExplanation": "This accepted solution flips the problem around: instead of generating amounts, it **binary searches on the answer** and uses the **inclusion-exclusion principle** to count how many reachable amounts are `<= x`. It first sorts the coins and drops any coin that is a multiple of a smaller one (its multiples are already covered), then precomputes the LCM of every subset of the remaining coins using bitmasks: `lcm[mask]` is built from `lcm[preMask]` (the mask with its lowest bit removed, found via `mask & (mask - 1)` and `trailingZeros`) combined with one more coin, with `BigInt` to avoid overflow and a guard that caps any LCM larger than the search bound at `r + 1n`. The `count(x)` function then sums `x / lcm[mask]` for subsets with an odd number of coins and subtracts it for even-sized subsets (decided by `popcount`), which is exactly the number of integers up to `x` divisible by at least one coin. The binary search runs between `k` and `coins[0] * k + 1`, moving `r` down whenever `count(mid) >= k`, so it converges on the smallest `x` with at least `k` reachable amounts, which is returned as a regular `Number`.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 75,
+    "date": "2026-08-21T09:26:57.000Z"
+  }
+]
