@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} num\n * @return {boolean}\n */\nvar sumGame = function(num) {\n    const n = num.length;\n    const halfLen = n / 2;\n\n    const sum = [0, 0];\n    const quest = [0, 0];\n\n    for (let i = 0; i < n; i++) {\n        const pos = i < halfLen ? 0 : 1;\n\n        if (num[i] !== '?') {\n            sum[pos] += Number(num[i]);\n            continue;\n        }\n\n        if (quest[pos] === 0) {\n            quest[pos]++;\n            continue;\n        }\n\n        sum[pos] += 9;\n        quest[pos]--;\n    }\n\n    if (quest[0] !== quest[1]) {\n        return true;\n    }\n\n    return sum[0] !== sum[1];\n};\n",
+    "language": "javascript",
+    "notes": "Observed that any pair of question marks is the same as adding 9 to that sum. Alice wins when there is a different number of question marks left on each side, or when the sums are different.",
+    "aiExplanation": "This solves the **Sum Game** problem, where Alice and Bob take turns replacing `?` characters in a string with digits, and Alice wins if the two halves end up with **different** digit sums. The function splits the string into two halves (`pos` is `0` for the first half and `1` for the second) and walks through every character. Known digits are added to that half's `sum` via `Number(num[i])`. Each `?` is handled in pairs within its half: the first `?` is recorded in `quest[pos]`, and the second one adds `9` to the sum and clears the counter, modeling how a pair of `?`s in the same half can always be balanced to contribute exactly 9 (one player picks `d`, the other picks `9 - d`). After the loop, if the two halves are left with a different number of unpaired `?`s, the game is unbalanced and Alice wins, so it returns `true`. Otherwise Alice wins only if the adjusted sums differ, so the function returns `sum[0] !== sum[1]`.",
+    "status": "DONE",
+    "cpuUsage": 57.14,
+    "memoryUsage": 28.57,
+    "date": "2026-08-23T08:54:28.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} num\n * @return {boolean}\n */\nvar sumGame = function(num) {\n    const n = num.length;\n    const halfLen = n / 2;\n\n    const sum = [0, 0];\n    const quest = [0, 0];\n\n    for (let i = 0; i < n; i++) {\n        const pos = i < halfLen ? 0 : 1;\n\n        if (num[i] !== '?') {\n            sum[pos] += num.charCodeAt(i) - 48;\n            continue;\n        }\n\n        if (quest[pos] === 0) {\n            quest[pos]++;\n            continue;\n        }\n\n        sum[pos] += 9;\n        quest[pos]--;\n    }\n\n    if (quest[0] !== quest[1]) {\n        return true;\n    }\n\n    return sum[0] !== sum[1];\n};\n",
+    "language": "javascript",
+    "notes": "Attempt at better performance. There's a mathematical optimization possible here, but I didn't try hard enough to get it.",
+    "aiExplanation": "This is the same **Sum Game** approach as the first solution, with one micro-optimization: digits are converted with `num.charCodeAt(i) - 48` (since `'0'` has char code 48) instead of `Number(num[i])`, avoiding string-to-number parsing. The string is treated as two halves (`pos` is `0` for the left half, `1` for the right), and each half accumulates a `sum` of its known digits and a `quest` counter of unpaired `?` characters. Every time a second `?` shows up in the same half, the pair is collapsed into a fixed contribution of `9` added to `sum` and the counter is reset, because two `?`s in one half can always be balanced between the players to total 9. After scanning, if the halves end with a **different** number of leftover `?`s the position is unbalanced and Alice wins (`true`); otherwise Alice wins only when the two sums differ, which is what `sum[0] !== sum[1]` returns.",
+    "status": "DONE",
+    "cpuUsage": 35.71,
+    "memoryUsage": 35.71,
+    "date": "2026-08-23T08:58:48.000Z"
+  }
+]
