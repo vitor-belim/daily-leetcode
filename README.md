@@ -34,10 +34,13 @@ This project automatically fetches the LeetCode "Question of the Day" and allows
 
 1. Create a `.env` file in the root directory (see `scripts/README.md` for the full list of variables the scripts read).
 2. **LeetCode Credentials**: Required to fetch your own solutions.
-   - Login to [LeetCode](https://leetcode.com) in your browser.
-   - Open DevTools -> Application -> Cookies -> `https://leetcode.com`.
-   - Copy the value of `LEETCODE_SESSION` and `csrftoken`.
-3. Update `.env`:
+   - Login to [LeetCode](https://leetcode.com) in Chrome.
+   - Run `npm run refresh-auth` to copy the session cookies into `.env` and verify them.
+     It reads them from Chrome's cookie store (macOS only — see `scripts/README.md`), so approve
+     the Keychain prompt it raises. The cookies expire every few weeks; rerun it when a fetch
+     fails with `Authentication failed`.
+3. Or fill `.env` in by hand — DevTools -> Application -> Cookies -> `https://leetcode.com`, then
+   copy `LEETCODE_SESSION` and `csrftoken` into:
    ```env
    LEETCODE_SESSION=your_session_cookie
    LEETCODE_CSRFTOKEN=your_csrftoken

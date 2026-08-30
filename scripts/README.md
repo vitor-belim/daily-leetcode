@@ -12,6 +12,8 @@ Set these in `.env` at the project root:
 | `LEETCODE_CSRFTOKEN` | Yes      | LeetCode CSRF token, sent alongside the session cookie.                |
 | `LEETCODE_USERNAME`  | No       | `author` field on fetched solutions. Falls back to `"Vitor"` if unset. |
 
+Both LeetCode variables expire every few weeks; `npm run refresh-auth` refills them from Chrome.
+
 ## Commands
 
 All fetch commands default to today (LeetCode's UTC day) if no date is given. Problem and solution fetching are deliberately separate: the two halves of a day fill in at different times (the problem exists from midnight, your solutions only once you've solved it), so fetching one must never force a re-fetch of the other.
@@ -54,6 +56,22 @@ Steps 1 and 2 are independent, so a day whose problem is already archived but wh
 
 Exits non-zero if any day had a fetch or explain issue, after finishing everything it can.
 
+### `npm run refresh-auth`
+
+Refills `LEETCODE_SESSION` and `LEETCODE_CSRFTOKEN` in `.env` from the Chrome profile you are signed into, then verifies them against LeetCode and prints the username. Run it whenever a fetch fails with `Authentication failed: LEETCODE_SESSION or LEETCODE_CSRFTOKEN is invalid or expired.`
+
+It reads the cookies from Chrome's own store rather than the browser UI, because `LEETCODE_SESSION` is an `HttpOnly` cookie: it never appears in `document.cookie`, no extension or automation tool can read it out of the DevTools panel, and Chrome's network stack does not expose the `Cookie` header to extensions. The cookie store is the only place the value is reachable without copying it by hand.
+
+macOS specifics, all of them reasons this script is not portable as-is:
+
+- Cookie values in `~/Library/Application Support/Google/Chrome/<Profile>/Cookies` are encrypted with AES-128-CBC. The key is PBKDF2-HMAC-SHA1 over the *Chrome Safe Storage* password from the login Keychain — salt `saltysalt`, 1003 iterations, 16 bytes, IV of 16 spaces. Linux Chrome uses the same scheme with a different password and 1 iteration; Windows uses DPAPI instead.
+- Reading that password shells out to `security find-generic-password`, which raises a Keychain dialog. Choosing **Always Allow** stops it recurring.
+- The database is copied to a temp file before being queried, because Chrome holds the live one open.
+- Since Chrome 118 each decrypted value is prefixed with the SHA-256 of the cookie's `host_key`; the script strips that prefix only when it actually matches, so older rows still decrypt correctly.
+- Reading the profile directory at all requires the terminal (or whatever runs the script) to hold **Full Disk Access** in System Settings → Privacy & Security. Without it the copy fails with `EPERM`.
+
+Every profile is searched, `Default` first, and the first one holding both cookies wins — so it works when you are signed into LeetCode in a secondary Chrome profile.
+
 ## Shared modules (`lib/`)
 
 These scripts are thin CLI orchestrators; shared logic lives in `lib/` alongside the Next.js app's modules:
@@ -63,6 +81,8 @@ These scripts are thin CLI orchestrators; shared logic lives in `lib/` alongside
 - `lib/dates.ts` — UTC-only date primitives (deliberately UTC, not local time, to match LeetCode's daily rollover).
 - `lib/archive.ts` — `collectFilledDates` / `getMissingDates` for missing-day detection.
 - `lib/leetcode-api.ts` — GraphQL queries and the authenticated fetch client (CLI-only).
+- `lib/chrome-cookies.ts` — reads and decrypts LeetCode cookies out of Chrome's macOS cookie store (CLI-only).
+- `lib/env-file.ts` — rewrites `NAME=value` lines in `.env` without disturbing the rest of the file.
 - `lib/problems.ts` — maps a LeetCode daily challenge to the app's `Problem` shape, normalizes its link and recovers the question slug from one (CLI-only).
 - `lib/solutions.ts` — maps a LeetCode submission to the app's `Solution` shape and dedupes by code (CLI-only).
 
@@ -71,3 +91,5 @@ Note: don't add the `server-only` package to any of these — it breaks resoluti
 ## Tests
 
 `npm run test` runs the Vitest suite in `lib/*.test.ts`, covering nearly all of `lib/`. Untested: `lib/leetcode-api.ts` (needs network mocking) and `lib/actions.ts` (a one-line delegating wrapper).
+
+`lib/chrome-cookies.test.ts` covers the decryption path only — it encrypts fixtures exactly as Chrome does and asserts they round-trip, including the Chrome 118+ domain-hash prefix and a full trailing padding block. The Keychain lookup and the profile scan are not tested, since both depend on the local machine's Chrome install.

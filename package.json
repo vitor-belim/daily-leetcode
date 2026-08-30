@@ -12,7 +12,8 @@
     "fetch-daily": "f(){ npm run fetch-problem -- \"$@\" && npm run fetch-solution -- \"$@\"; }; f",
     "fetch-problem": "tsx scripts/fetch-problem.ts",
     "fetch-solution": "tsx scripts/fetch-solution.ts",
-    "backfill": "tsx scripts/backfill.ts"
+    "backfill": "tsx scripts/backfill.ts",
+    "refresh-auth": "tsx scripts/refresh-auth.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",
