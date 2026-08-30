@@ -1,0 +1,90 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} limit\n * @return {number[]}\n */\nvar lexicographicallySmallestArray = function(nums, limit) {\n    \n    for (let i = 0; i < nums.length - 1; i++) {\n        for (let j = i + 1; j < nums.length; j++) {\n            if (nums[i] > nums[j] && Math.abs(nums[i] - nums[j]) <= limit) {\n                const temp = nums[i];\n                nums[i] = nums[j];\n                nums[j] = temp;\n                j = i;\n            }\n        }\n    }\n\n    return nums;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is a **brute-force** attempt at making the array lexicographically smallest: for each position `i`, an inner loop scans the rest of the array, and whenever it finds a later element `nums[j]` that is smaller than `nums[i]` and within `limit` of it, it **swaps** the two values and resets `j = i` so the scan restarts with the new, smaller value in place. Repeatedly doing this bubbles the smallest reachable values toward the front, but the constant restarting of the inner loop makes the runtime far worse than quadratic, which is why it **times out** (TLE) on large inputs.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2025-01-25T06:52:10.000Z"
+  },
+  {
+    "author": "Leetcode",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} limit\n * @return {number[]}\n */\nvar lexicographicallySmallestArray = function (nums, limit) {\n\n    const N = nums.length;\n\n    // Step 1: Maintain a sorted array with element values and their indices\n    const sortedArray = nums.map((num, index) => [num, index]);\n    sortedArray.sort(([num1, index1], [num2, index2]) => num1 - num2);\n\n    // Step 2: Group elements whose absolute differences are within the limit\n    const groupedElements = [];\n    let group = [sortedArray[0]];\n    for (let i = 1; i < N; i++) {\n        const element1 = group[group.length - 1], // Last element in the current group\n            element2 = sortedArray[i]; // Current element to consider\n\n        // Check if the absolute difference is within the limit\n        if (Math.abs(element1[0] - element2[0]) <= limit) {\n            group.push(element2);\n        } else {\n            // Push the completed group and start a new group\n            groupedElements.push(group);\n            group = [element2];\n        }\n    }\n\n    // Add the last group if it contains elements\n    if (group.length) {\n        groupedElements.push(group);\n    }\n\n    // Step 3: Process each group to rearrange elements in the original array\n    for (const groupedElement of groupedElements) {\n        // Extract indices from the current group\n        const indicesInCurrentGroup = [], M = groupedElement.length;\n        for (const [, index] of groupedElement) {\n            indicesInCurrentGroup.push(index);\n        }\n\n        // Sort the indices to maintain relative order\n        indicesInCurrentGroup.sort((a, b) => a - b);\n\n        // Step 4: Update the `nums` array at the sorted indices\n        for (let i = 0; i < M; i++) {\n            const index = indicesInCurrentGroup[i];\n            nums[index] = groupedElement[i][0]; // Assign the sorted values back to the original array\n        }\n    }\n\n    // Step 5: Return the modified array\n    return nums;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution exploits the key insight that elements can be freely rearranged among each other whenever they form a **chain** of values where each neighbor differs by at most `limit`. It first pairs every number with its original index and **sorts** the pairs by value, then walks the sorted list and splits it into **groups** wherever the gap between consecutive values exceeds `limit` — each group is a set of mutually swappable elements. For each group it collects the original indices, sorts them ascending, and writes the group's already-sorted values back so the **smallest value lands at the smallest index**, which produces the lexicographically smallest possible array in `O(n log n)` time.",
+    "status": "DONE",
+    "cpuUsage": 16.67,
+    "memoryUsage": 33.33,
+    "date": "2025-01-25T07:07:04.000Z"
+  },
+  {
+    "author": "Leetcode",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} limit\n * @return {number[]}\n */\nvar lexicographicallySmallestArray = function (nums, limit) {\n    const n = nums.length, res = Array(n).fill(0)\n    const sorted = nums.map((val, idx) => [val, idx]).sort((a, b) => a[0] - b[0])\n    let i = 0\n\n    while (i < n) {\n        let j = i\n        while (j < n - 1 && sorted[j + 1][0] - sorted[j][0] <= limit) j++\n\n        const sub = sorted.slice(i, j + 1)\n        const subIdx = sub.map(val => val[1]).sort((a, b) => a - b)\n        subIdx.forEach((subIdx, i) => res[subIdx] = sub[i][0])\n\n        i = j + 1\n    }\n    return res\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "A compact version of the sort-and-group strategy: it builds `[value, index]` pairs sorted by value, then uses a **two-pointer** `while` loop to find each maximal run of the sorted list where every adjacent gap is at most `limit`, meaning all elements in that run can reach each other through chained swaps. For every run it slices out the pairs (`sub`), extracts and sorts their **original indices** (`subIdx`), and assigns the run's ascending values to those indices in order via `forEach`, so the smallest values fill the earliest positions; the answer is assembled in a fresh `res` array and returned.",
+    "status": "DONE",
+    "cpuUsage": 33.33,
+    "memoryUsage": 50,
+    "date": "2025-01-25T07:08:58.000Z"
+  },
+  {
+    "author": "Leetcode",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} limit\n * @return {number[]}\n */\nvar lexicographicallySmallestArray = function (nums, limit) {\n    const n = nums.length;\n    const sorted = nums\n        .map((val, idx) => [val, idx])\n        .sort((a, b) => a[0] - b[0]);\n    let i = 0;\n    const res = Array(n).fill(0);\n\n    while (i < n) {\n        let j = i;\n\n        while (j < n - 1 && sorted[j + 1][0] - sorted[j][0] <= limit) {\n            j++;\n        }\n\n        const sub = sorted.slice(i, j + 1);\n        const subIdx = sub\n            .map(val => val[1])\n            .sort((a, b) => a - b);\n        subIdx.forEach((subIdx, i) => res[subIdx] = sub[i][0]);\n\n        i = j + 1;\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is a cleaned-up formatting pass over the grouping approach: the array is turned into value/index pairs and **sorted by value**, then a `while` loop advances a second pointer `j` as long as consecutive sorted values differ by no more than `limit`, carving out one **swappable window** at a time. Within each window the code sorts the members' original positions ascending and places the window's values (already in ascending order thanks to the initial sort) into those positions one-by-one, guaranteeing that inside every group of mutually reachable elements the **smallest number sits at the leftmost index** — exactly the lexicographically smallest arrangement.",
+    "status": "DONE",
+    "cpuUsage": 50,
+    "memoryUsage": 66.67,
+    "date": "2025-01-25T07:14:09.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} limit\n * @return {number[]}\n */\nvar lexicographicallySmallestArray = function (nums, limit) {\n    for (let i = 0; i < nums.length; i++) {\n        let minPos = i;\n\n        for (let j = i + 1; j < nums.length; j++) {\n            if (nums[j] < nums[i] &&\n                Math.abs(nums[i] - nums[j]) <= limit &&\n                nums[j] < nums[minPos]) {\n                minPos = j;\n\n                if (nums[j] === nums[i] - limit) break;\n            }\n        }\n\n        if (minPos > i) {\n            const temp = nums[i];\n            nums[i] = nums[minPos];\n            nums[minPos] = temp;\n        }\n    }\n\n    return nums;\n};\n",
+    "language": "javascript",
+    "notes": "Attempt at reducing number of swaps.",
+    "aiExplanation": "This attempt uses a **selection-sort** style greedy: for each position `i` it scans ahead for the best later element that is smaller than `nums[i]` and within `limit` of it, tracking the position of the smallest such candidate in `minPos` (with an early `break` once a value exactly `limit` below `nums[i]` is found, since nothing smaller can qualify), and then performs a **single swap**. It fails because swappability is **transitive**: a value more than `limit` away from `nums[i]` can still travel to position `i` through a chain of intermediate swaps, and one direct swap per position cannot reproduce those chains — hence the **FAILED** verdict.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-08-29T09:06:36.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} limit\n * @return {number[]}\n */\nvar lexicographicallySmallestArray = function (nums, limit) {\n    for (let i = 0; i < nums.length; i++) {\n        for (let j = i + 1; j < nums.length; j++) {\n            if (nums[j] < nums[i] && Math.abs(nums[i] - nums[j]) <= limit) {\n                const temp = nums[i];\n                nums[i] = nums[j];\n                nums[j] = temp;\n            }\n        }\n    }\n\n    return nums;\n};\n",
+    "language": "javascript",
+    "notes": "Simplified code, still attempting to get less swaps.",
+    "aiExplanation": "Here the code does a single forward sweep per position: for each `i` it walks the remainder of the array and **swaps** `nums[i]` with any later element that is both smaller and within `limit`, so position `i` keeps shrinking as the scan proceeds. The flaw is that once `nums[i]` becomes smaller, elements the scan **already passed** may newly fall within `limit` of it, but the inner loop never revisits them — so chains of swaps that require backtracking are missed and the greedy produces a suboptimal (wrong) answer, giving a **FAILED** result.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-08-29T09:11:06.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} limit\n * @return {number[]}\n */\nvar lexicographicallySmallestArray = function (nums, limit) {\n    for (let i = 0; i < nums.length; i++) {\n        for (let j = i + 1; j < nums.length; j++) {\n            if (nums[j] < nums[i] && nums[i] - nums[j] <= limit) {\n                const temp = nums[i];\n                nums[i] = nums[j];\n                nums[j] = temp;\n                i--;\n                break;\n            }\n        }\n    }\n\n    return nums;\n};\n",
+    "language": "javascript",
+    "notes": "Finally achieved TLE as expected, 504 / 523 testcases passed.",
+    "aiExplanation": "This version repairs the correctness gap of the one-pass greedy by adding `i--` and `break` after every swap, which **restarts the scan from the same position** until no more qualifying swap exists there — that repetition lets values reach position `i` through **chained swaps**, so the logic now finds the true lexicographically smallest array. The price is performance: every swap triggers a full rescan of the suffix, pushing the running time toward **cubic** in the worst case, so the solution exceeds the time limit (**TLE**) even though the answer it would produce is correct.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-08-29T09:14:33.000Z"
+  },
+  {
+    "author": "Leetcode",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} limit\n * @return {number[]}\n */\nvar lexicographicallySmallestArray = function (nums, limit) {\n    const n = nums.length;\n    const sorted = nums\n        .map((val, idx) => [val, idx])\n        .sort((a, b) => a[0] - b[0]);\n    let i = 0;\n    const res = Array(n);\n\n    while (i < n) {\n        let j = i;\n\n        while (j < n - 1 && sorted[j + 1][0] - sorted[j][0] <= limit) {\n            j++;\n        }\n\n        const sortedSlice = sorted.slice(i, j + 1);\n\n        sortedSlice\n            .map(val => val[1])\n            .sort((a, b) => a - b)\n            .forEach((index, k) => res[index] = sortedSlice[k][0]);\n\n        i = j + 1;\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Farfetched solution, but sort of what I was expecting would be needed for completion.",
+    "aiExplanation": "The final, polished take on the efficient approach: it sorts `[value, index]` pairs by value, then repeatedly extends a window `[i, j]` while consecutive sorted values stay within `limit` of each other, identifying each **group of mutually swappable elements** in one pass. For every window it takes the slice `sortedSlice`, and in a single method chain maps out the original indices, sorts them ascending, and `forEach`-assigns the k-th smallest value of the group to the k-th smallest index, filling the preallocated `res` array. Sorting dominates the cost, so the whole thing runs in **`O(n log n)`** and earns the **DONE** status.",
+    "status": "DONE",
+    "cpuUsage": 33.33,
+    "memoryUsage": 33.33,
+    "date": "2026-08-29T09:45:21.000Z"
+  }
+]

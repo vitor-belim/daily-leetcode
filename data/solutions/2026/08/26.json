@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @param {number} k\n * @return {string}\n */\nvar shortestBeautifulSubstring = function(s, k) {\n    let res = '';\n    let left = 0;\n    let ones = 0;\n\n    for (let right = 0; right < s.length; right++) {\n        if (s[right] === '1') {\n            ones++;\n        } else {\n            continue;\n        }\n\n        while (ones > k || s[left] === '0') {\n            if (s[left] === '1') {\n                ones--;\n            }\n            left++;\n        }\n\n        if (ones === k) {\n            const cur = s.slice(left, right + 1);\n            if (!res || cur.length < res.length || cur < res) {\n                res = cur;\n            }\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "I wasn't aware a string could be lower lexicographically, while having more characters.",
+    "aiExplanation": "This function uses a **sliding window** to find the shortest substring of the binary string `s` that contains exactly `k` ones (and among equally short candidates, the lexicographically smallest). It walks a `right` pointer across the string, counting ones with the `ones` counter and skipping zeros via `continue`. Whenever the window holds too many ones (`ones > k`) or starts with a useless `'0'`, it shrinks the window by advancing `left`, decrementing `ones` when a `'1'` is dropped. Each time the window contains exactly `k` ones, it takes the current substring with `s.slice(left, right + 1)` and keeps it as the result `res` if it's the first candidate, strictly shorter, or smaller when compared with `cur < res`. The subtle flaw is that last check: `cur < res` performs a plain string comparison **without first requiring equal lengths**, so a longer substring that happens to sort earlier alphabetically (e.g. `\"1011\"` vs `\"11\"`) can wrongly replace a shorter one, which is why this version fails.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-08-26T07:02:54.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @param {number} k\n * @return {string}\n */\nvar shortestBeautifulSubstring = function(s, k) {\n    let res = '';\n    let left = 0;\n    let ones = 0;\n\n    for (let right = 0; right < s.length; right++) {\n        if (s[right] === '1') {\n            ones++;\n        } else {\n            continue;\n        }\n\n        while (ones > k || s[left] === '0') {\n            if (s[left] === '1') {\n                ones--;\n            }\n            left++;\n        }\n\n        if (ones === k) {\n            const cur = s.slice(left, right + 1);\n\n            if (!res || cur.length < res.length || (cur.length === res.length && cur < res)) {\n                res = cur;\n            }\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Same length comparison added.",
+    "aiExplanation": "This function finds the shortest **beautiful substring** — a substring of the binary string `s` containing exactly `k` ones — returning the lexicographically smallest one when there are ties. It uses a **sliding window**: the `right` pointer scans the string, incrementing the `ones` counter on each `'1'` and simply skipping zeros with `continue`. The inner `while` loop shrinks the window from the left whenever it has more than `k` ones or begins with a `'0'` (which only adds useless length), decrementing `ones` whenever a `'1'` falls out. Each time the window holds exactly `k` ones, the candidate `s.slice(left, right + 1)` replaces the stored result `res` if `res` is still empty, if the candidate is **strictly shorter**, or if it has the **same length but is lexicographically smaller** (`cur.length === res.length && cur < res`) — that equal-length guard is the fix over the previous attempt, ensuring string comparison is only used to break ties between candidates of identical length.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 87.93,
+    "date": "2026-08-26T07:04:23.000Z"
+  }
+]

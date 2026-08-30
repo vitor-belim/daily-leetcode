@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar minimumDeletions = function(nums) {\n    const n = nums.length;\n    let minPos = 0;\n    let maxPos = 0;\n\n    for (let i = 1; i < n; i++) {\n        if (nums[i] < nums[minPos]) minPos = i;\n        if (nums[i] > nums[maxPos]) maxPos = i;\n    }\n\n    const sameSideStart = Math.max(minPos, maxPos) + 1;\n    const sameSideEnd = n - Math.min(minPos, maxPos);\n    const oppositeStart = minPos + 1 + n - maxPos;\n    const oppositeEnd = maxPos + 1 + n - minPos;\n\n    return Math.min(sameSideStart, sameSideEnd, oppositeStart, oppositeEnd);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds the **minimum number of deletions** needed to remove both the smallest and largest elements from an array, where you can only delete from the **front** or the **back**. It first loops through the array once to record the positions of the minimum (`minPos`) and maximum (`maxPos`) values. Then it computes the cost of four possible strategies: delete only from the front until both are gone (`sameSideStart`, which needs `Math.max(minPos, maxPos) + 1` deletions), delete only from the back (`sameSideEnd`, which needs `n - Math.min(minPos, maxPos)` deletions), or remove one element from each end (`oppositeStart` and `oppositeEnd`, which take the min from the front and the max from the back, or vice versa). Finally, `Math.min` picks the cheapest of the four options, giving an efficient **O(n)** solution with a single pass and constant extra work.",
+    "status": "DONE",
+    "cpuUsage": 86.21,
+    "memoryUsage": 75.86,
+    "date": "2026-08-30T08:45:42.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar minimumDeletions = function(nums) {\n    const n = nums.length;\n    let minPos = 0;\n    let maxPos = 0;\n\n    for (let i = 1; i < n; i++) {\n        if (nums[i] < nums[minPos]) minPos = i;\n        if (nums[i] > nums[maxPos]) maxPos = i;\n    }\n\n    const earliest = Math.min(minPos, maxPos);\n    const latest = Math.max(minPos, maxPos);\n\n    const sameSideStart = latest + 1;\n    const sameSideEnd = n - earliest;\n    const oppositeSides = earliest + 1 + n - latest;\n\n    return Math.min(sameSideStart, sameSideEnd, oppositeSides);\n};\n",
+    "language": "javascript",
+    "notes": "Simplified for better performance, not enough test coverage to allow for proper performance testing.",
+    "aiExplanation": "This function computes the **minimum number of deletions** required to remove both the smallest and largest values from an array when deletions are only allowed from the **front** or the **back**. A single loop finds where the minimum and maximum live (`minPos` and `maxPos`), and these are then simplified into `earliest` (the one closer to the start) and `latest` (the one closer to the end). Only three strategies matter: delete everything from the front up to and including `latest` (`latest + 1` deletions), delete everything from the back down to and including `earliest` (`n - earliest` deletions), or split the work by taking `earliest` out through the front and `latest` out through the back (`earliest + 1 + n - latest` deletions). The answer is the smallest of the three via `Math.min`, and because the positions are ordered up front, this version avoids checking a redundant fourth case while staying **O(n)** with one pass over the array.",
+    "status": "DONE",
+    "cpuUsage": 86.21,
+    "memoryUsage": 96.55,
+    "date": "2026-08-30T10:28:41.000Z"
+  }
+]

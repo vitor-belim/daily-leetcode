@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} k\n * @return {number}\n */\nvar missingMultiple = function(nums, k) {\n    const set = new Set(nums);\n    let num = k;\n\n    while (set.has(num)) {\n        num += k;\n    }\n\n    return num;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds the **smallest positive multiple of `k`** that is *not* present in the array `nums`. It first converts the array into a `Set` so that checking whether a number exists is fast (constant time). Then it starts with `num = k` (the first multiple of `k`) and repeatedly checks: if the set contains `num`, it moves on to the next multiple by adding `k` (`num += k`). As soon as it reaches a multiple of `k` that the set does **not** contain, the loop stops and that value is returned — the first \"missing\" multiple of `k`.",
+    "status": "DONE",
+    "cpuUsage": 58.67,
+    "memoryUsage": 32.2,
+    "date": "2026-08-25T06:35:27.000Z"
+  }
+]

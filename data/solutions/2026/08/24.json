@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Leetcode",
+    "code": "/**\n * @param {number[]} stones\n * @return {number}\n */\nvar stoneGameVIII = function (stones) {\n    const n = stones.length;\n    const prefixSum = new Array(n);\n    prefixSum[0] = stones[0];\n\n    for (let i = 1; i < n; i++) {\n        prefixSum[i] = prefixSum[i - 1] + stones[i];\n    }\n\n    const dp = new Array(n);\n    dp[n - 1] = prefixSum[n - 1];\n\n    for (let i = n - 2; i >= 1; i--) {\n        dp[i] = Math.max(dp[i + 1], prefixSum[i] - dp[i + 1]);\n    }\n\n    return dp[1];\n};\n",
+    "language": "javascript",
+    "notes": "Knew solution involved dp, couldn't figure it out.",
+    "aiExplanation": "This code solves **Stone Game VIII**, where two players alternately take the first `x` stones (with `x > 1`), replace them with a single stone worth their sum, and each player tries to maximize the difference between their score and their opponent's. It first builds a `prefixSum` array so that `prefixSum[i]` holds the total value of stones `0` through `i` — the score a player earns by taking everything up to index `i`. Then it fills a `dp` array **backwards**, where `dp[i]` represents the best score difference the current player can achieve when only moves ending at index `i` or later are allowed: at each step the player either sticks with the best later option (`dp[i + 1]`) or takes the stones up to `i`, earning `prefixSum[i]` while leaving the opponent the best remaining outcome (hence `prefixSum[i] - dp[i + 1]`), and keeps whichever is larger via `Math.max`. Since the first move must take at least two stones, the answer is `dp[1]`, giving Alice's maximum achievable score difference in **O(n)** time and space.",
+    "status": "DONE",
+    "cpuUsage": 50.66,
+    "memoryUsage": 31.84,
+    "date": "2026-08-24T06:52:13.000Z"
+  }
+]
