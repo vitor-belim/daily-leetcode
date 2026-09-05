@@ -41,16 +41,18 @@ Note that because an existing file is never overwritten, solving a past daily af
 
 Resolves the question slug from `data/problems/YYYY/MM/DD.json` when that file exists, costing no extra API call; only a date with no problem file on disk falls back to the daily-challenge lookup.
 
-### `npm run backfill`
+### `npm run backfill -- [--from YYYY-MM-DD]`
 
 Finds every day that is missing a problem (including interior gaps) or is missing complete solutions, and for each one:
 
 1. Runs `fetch-problem` for that date, if the problem file is missing.
 2. Runs `fetch-solution` for that date, if the solutions file is missing.
-3. Runs `claude -p "/explain <date>"` if a solutions file is present and has solutions still needing an explanation — skipped otherwise, since `/explain` would just no-op.
+3. Runs `claude -p "/explain <date>" --model haiku` if a solutions file is present and has solutions still needing an explanation — skipped otherwise, since `/explain` would just no-op. Pinned to Haiku since explaining already-written code is cheap work that doesn't need a larger model.
 4. Re-checks the solutions file to confirm every solution got a non-empty `aiExplanation`.
 
 A day recorded as unsolved (an empty `[]` solutions file) counts as complete and is not revisited.
+
+The scan normally starts at the oldest archived day. Pass `--from YYYY-MM-DD` to start earlier and pull in history that predates the archive, e.g. `npm run backfill -- --from 2026-01-01`; days before the archive on which you never submitted get an empty `[]` solutions file, so they show up as unsolved rather than being re-fetched every run.
 
 Steps 1 and 2 are independent, so a day whose problem is already archived but whose solutions are missing is topped up without re-fetching and rewriting the problem.
 

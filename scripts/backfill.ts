@@ -1,4 +1,5 @@
 import { collectFilledDates, getMissingDates } from "@/lib/archive";
+import { isValidCalendarDate, todayUTC } from "@/lib/dates";
 import { solutionFileExists, solutionFilePath } from "@/lib/paths";
 import type { Solution } from "@/lib/types";
 import { execFileSync } from "child_process";
@@ -23,11 +24,20 @@ function fetchSolution(date: string) {
   });
 }
 
+const EXPLAIN_MODEL = "haiku";
+
 function explainDate(date: string) {
   console.log(`\n=== explain: ${date} ===`);
   execFileSync(
     "claude",
-    ["-p", `/explain ${date}`, "--permission-mode", "acceptEdits"],
+    [
+      "-p",
+      `/explain ${date}`,
+      "--permission-mode",
+      "acceptEdits",
+      "--model",
+      EXPLAIN_MODEL,
+    ],
     { stdio: "inherit", timeout: EXPLAIN_TIMEOUT_MS },
   );
 }
@@ -45,21 +55,38 @@ function isExplainComplete(date: string): boolean {
   }
 }
 
+function parseFromArg(args: string[]): string | undefined {
+  const inline = args.find((arg) => arg.startsWith("--from="));
+  const separateIndex = args.indexOf("--from");
+  const value = inline?.slice("--from=".length) ?? args[separateIndex + 1];
+
+  if (inline === undefined && separateIndex === -1) return undefined;
+  if (value === undefined || !isValidCalendarDate(value)) {
+    console.error(`--from expects a YYYY-MM-DD date, got "${value ?? ""}"`);
+    process.exit(1);
+  }
+  return value;
+}
+
 function main() {
+  const from = parseFromArg(process.argv.slice(2));
   const filledDates = collectFilledDates();
-  if (filledDates.length === 0) {
+  if (filledDates.length === 0 && from === undefined) {
     console.error(
-      "No existing problem data found under data/problems. Run `npm run fetch-problem` manually to seed the first day.",
+      "No existing problem data found under data/problems. Run `npm run fetch-problem` manually to seed the first day, or pass --from YYYY-MM-DD.",
     );
     process.exit(1);
   }
 
-  const lastFilled = filledDates.at(-1) as string;
-  console.log(`Last filled day: ${lastFilled}`);
+  const lastFilled = filledDates.at(-1);
+  console.log(`Last filled day: ${lastFilled ?? "none"}`);
+  if (from !== undefined) console.log(`Scanning from: ${from}`);
 
-  const missingDates = getMissingDates(filledDates);
+  const missingDates = getMissingDates(filledDates, todayUTC(), from);
   const missingSet = new Set(missingDates);
-  const incompleteDates = filledDates.filter((date) => !isExplainComplete(date));
+  const incompleteDates = filledDates.filter(
+    (date) => !isExplainComplete(date),
+  );
 
   const datesToProcess = Array.from(
     new Set([...missingDates, ...incompleteDates]),

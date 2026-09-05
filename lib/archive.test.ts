@@ -20,7 +20,9 @@ describe("collectFilledDates", () => {
   }
 
   it("returns an empty array when the root doesn't exist", () => {
-    expect(collectFilledDates(path.join(os.tmpdir(), "does-not-exist"))).toEqual([]);
+    expect(
+      collectFilledDates(path.join(os.tmpdir(), "does-not-exist")),
+    ).toEqual([]);
   });
 
   it("collects valid dates and ignores a stray non-date file", () => {
@@ -79,5 +81,22 @@ describe("getMissingDates", () => {
 
   it("returns an empty array for an empty input (no range to scan)", () => {
     expect(getMissingDates([], new Date(Date.UTC(2026, 6, 22)))).toEqual([]);
+  });
+});
+
+describe("getMissingDates with an explicit start", () => {
+  it("scans from the given day even when it predates the archive", () => {
+    const today = new Date(Date.UTC(2026, 0, 6));
+    expect(
+      getMissingDates(["2026-01-04", "2026-01-05"], today, "2026-01-01"),
+    ).toEqual(["2026-01-01", "2026-01-02", "2026-01-03", "2026-01-06"]);
+  });
+
+  it("works on an empty archive when a start is given", () => {
+    const today = new Date(Date.UTC(2026, 0, 2));
+    expect(getMissingDates([], today, "2026-01-01")).toEqual([
+      "2026-01-01",
+      "2026-01-02",
+    ]);
   });
 });

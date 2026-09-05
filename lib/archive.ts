@@ -49,21 +49,24 @@ export function collectFilledDates(root: string = PROBLEMS_ROOT): string[] {
 }
 
 /**
- * Finds the days missing from a filled-dates list, scanning from the first
- * filled day through today inclusive. Input does not need to be pre-sorted
- * beyond its first element being the range start, which is how
- * `collectFilledDates` returns it.
+ * Finds the days missing from a filled-dates list, scanning from a start day
+ * through today inclusive. The start defaults to the first filled day, so
+ * input does not need to be pre-sorted beyond its first element being the
+ * range start, which is how `collectFilledDates` returns it.
  *
  * @param filledDates The days that already have data, sorted ascending.
  * @param today The scan end (defaults to the current UTC day).
+ * @param from The scan start as `YYYY-MM-DD` (defaults to the first filled
+ *   day), letting a backfill reach further back than the archive does.
  * @returns The missing days as ascending `YYYY-MM-DD` strings; empty when
- *   `filledDates` is empty (no range to scan).
+ *   there is no start day (`filledDates` empty and no `from`).
  */
 export function getMissingDates(
   filledDates: string[],
   today: Date = todayUTC(),
+  from?: string,
 ): string[] {
-  const rangeStart = filledDates[0];
+  const rangeStart = from ?? filledDates[0];
   if (rangeStart === undefined) return [];
 
   const filledSet = new Set(filledDates);
