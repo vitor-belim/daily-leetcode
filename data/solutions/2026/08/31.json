@@ -1,0 +1,57 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for singly-linked list.\n * function ListNode(val, next) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.next = (next===undefined ? null : next)\n * }\n */\n/**\n * @param {ListNode} head\n * @return {number[]}\n */\nvar nodesBetweenCriticalPoints = function(head) {\n    const critPoints = [];\n\n    let last = head;\n    let node = head.next;\n    let distance = 1;\n    while (node) {\n        if (node.next && (\n                (node.val < last.val && node.val < node.next.val) ||\n                (node.val > last.val && node.val > node.next.val)\n            )) {\n            critPoints.push(distance);\n        }\n\n        last = node;\n        node = node.next;\n        distance++;\n    }\n\n    let min = Infinity;\n    let max = -1;\n\n    for (let i = 0; i < critPoints.length - 1; i++) {\n        const diff = critPoints[i + 1] - critPoints[i];\n        if (diff < min) {\n            min = diff;\n        }\n    }\n\n    if (min === Infinity) {\n        min = -1;\n    }\n\n    if (critPoints.length > 1) {\n        max = critPoints[critPoints.length - 1] - critPoints[0];\n    }\n\n    return [min, max];\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function walks through a singly-linked list to find **critical points** — nodes that are either a *local minimum* (smaller than both neighbors) or a *local maximum* (bigger than both neighbors) — and returns the minimum and maximum distances between them. In the first loop it tracks the previous node (`last`), the current node, and a position counter (`distance`), pushing the position of every critical point into the `critPoints` array; the first and last nodes can never qualify because they only have one neighbor. Afterwards, a second loop finds the **minimum distance** by comparing each pair of consecutive critical points, while the **maximum distance** is simply the gap between the first and last critical points. If fewer than two critical points exist, both values fall back to `-1`, and the function returns `[min, max]`.",
+    "status": "DONE",
+    "cpuUsage": 5.23,
+    "memoryUsage": 99.59,
+    "date": "2024-07-05T08:19:50.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for singly-linked list.\n * function ListNode(val, next) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.next = (next===undefined ? null : next)\n * }\n */\n/**\n * @param {ListNode} head\n * @return {number[]}\n */\nvar nodesBetweenCriticalPoints = function(head) {\n    let fCrit, lCrit;\n    let min = Infinity;\n\n    let last = head;\n    let node = head.next;\n    let distance = 1;\n    while (node) {\n        if (node.next && (\n                (node.val < last.val && node.val < node.next.val) ||\n                (node.val > last.val && node.val > node.next.val)\n            )) {\n            if (!fCrit) {\n                fCrit = distance;\n            } else if (!lCrit) {\n                lCrit = distance;\n                min = lCrit - fCrit;\n            } else if (distance - lCrit < min) {\n                min = distance - lCrit;\n                lCrit = distance;\n            }\n        }\n\n        last = node;\n        node = node.next;\n        distance++;\n    }\n\n    return [\n        min === Infinity ? -1 : min,\n        (!fCrit || !lCrit) ? -1 : (lCrit - fCrit)\n    ];\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is a single-pass take on the same problem: it scans the linked list looking for **critical points** (nodes strictly smaller or strictly larger than both of their neighbors) while counting positions with `distance`. Instead of storing every critical point, it remembers only the **first** one (`fCrit`) and the **most recent** one (`lCrit`); when a second critical point appears it initializes `min`, and for later ones it updates `min` whenever the gap to the previous critical point is smaller. At the end it returns `[min, lCrit - fCrit]`, substituting `-1` when fewer than two critical points were found. There is a subtle flaw, though: `lCrit` is only advanced when a *new minimum* gap is found, so a critical point that does not improve `min` is skipped and later gaps get measured from the wrong node — which is why this attempt failed.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2024-07-05T08:29:50.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for singly-linked list.\n * function ListNode(val, next) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.next = (next===undefined ? null : next)\n * }\n */\n/**\n * @param {ListNode} head\n * @return {number[]}\n */\nvar nodesBetweenCriticalPoints = function(head) {\n    let fCrit, lCrit;\n    let min = Infinity;\n\n    let last = head;\n    let node = head.next;\n    let distance = 1;\n    while (node) {\n        if (node.next && (\n                (node.val < last.val && node.val < node.next.val) ||\n                (node.val > last.val && node.val > node.next.val)\n            )) {\n            if (!fCrit) {\n                fCrit = distance;\n            } else if (!lCrit) {\n                lCrit = distance;\n                min = lCrit - fCrit;\n            } else if (distance - lCrit < min) {\n                min = distance - lCrit;\n                lCrit = distance;\n            } else {\n                lCrit = distance;\n            }\n        }\n\n        last = node;\n        node = node.next;\n        distance++;\n    }\n\n    return [\n        min === Infinity ? -1 : min,\n        (!fCrit || !lCrit) ? -1 : (lCrit - fCrit)\n    ];\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution finds the **minimum** and **maximum** distances between *critical points* of a linked list in a single pass, where a critical point is a node strictly smaller (local minimum) or strictly larger (local maximum) than both of its neighbors. It walks the list with three references — `last` (the previous node), `node` (the current one), and `node.next` — while counting positions in `distance`. Only two positions are remembered: `fCrit`, the first critical point ever seen, and `lCrit`, the latest one; each time a new critical point appears, the gap `distance - lCrit` is compared against `min`, and `lCrit` is always moved forward to the current position (the final `else` branch fixes the bug from the previous attempt). Since the maximum distance is always the span from the first to the last critical point, the function returns `[min, lCrit - fCrit]`, substituting `-1` for either value when fewer than two critical points exist.",
+    "status": "DONE",
+    "cpuUsage": 5.23,
+    "memoryUsage": 100,
+    "date": "2024-07-05T08:32:00.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for singly-linked list.\n * function ListNode(val, next) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.next = (next===undefined ? null : next)\n * }\n */\n/**\n * @param {ListNode} head\n * @return {number[]}\n */\nvar nodesBetweenCriticalPoints = function(head) {\n    if (!head) return [-1, -1];\n\n    let node = head.next;\n    let last = head;\n    let firstCP = null;\n    let lastCP = null;\n    let minDist = Infinity;\n    let maxDist = -Infinity;\n    let depth = 1;\n\n    while (node.next) {\n        if ((node.val < last.val && node.val < node.next.val) ||\n            (node.val > last.val && node.val > node.next.val)) {\n            if (!firstCP) {\n                firstCP = depth;\n            } else {\n                minDist = Math.min(minDist, depth - lastCP);\n                maxDist = depth - firstCP;\n            }\n            lastCP = depth;\n        }\n\n        last = node;\n        node = node.next;\n        depth++;\n    }\n\n    return minDist < Infinity ? [minDist, maxDist] : [-1, -1];\n};\n",
+    "language": "javascript",
+    "notes": "Straightforward solution.",
+    "aiExplanation": "This version solves the problem in one pass while computing both answers on the fly. Starting from the second node, it checks whether the current `node` is a **critical point** — strictly less than both neighbors (a *local minimum*) or strictly greater than both (a *local maximum*) — using `last` for the previous node and `node.next` for the following one, with `depth` counting the position. The first critical point's position is saved in `firstCP`; for every subsequent one, `minDist` is updated with the gap to the previous critical point via `Math.min(minDist, depth - lastCP)`, and `maxDist` is recomputed as the span from the first critical point (`depth - firstCP`), after which `lastCP` is refreshed to the current position. If at least two critical points were found (`minDist < Infinity`), it returns `[minDist, maxDist]`; otherwise it returns `[-1, -1]`.",
+    "status": "DONE",
+    "cpuUsage": 53.02,
+    "memoryUsage": 74.75,
+    "date": "2026-08-31T07:37:34.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for singly-linked list.\n * function ListNode(val, next) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.next = (next===undefined ? null : next)\n * }\n */\n/**\n * @param {ListNode} head\n * @return {number[]}\n */\nvar nodesBetweenCriticalPoints = function(head) {\n    if (!head) return [-1, -1];\n\n    let node = head.next;\n    let last = head;\n    let firstCP = null;\n    let lastCP = null;\n    let minDist = Infinity;\n    let depth = 1;\n\n    while (node.next) {\n        if ((node.val < last.val && node.val < node.next.val) ||\n            (node.val > last.val && node.val > node.next.val)) {\n            if (!firstCP) {\n                firstCP = depth;\n            } else {\n                minDist = Math.min(minDist, depth - lastCP);\n            }\n            lastCP = depth;\n        }\n\n        last = node;\n        node = node.next;\n        depth++;\n    }\n\n    return minDist < Infinity ? [minDist, lastCP - firstCP] : [-1, -1];\n};\n",
+    "language": "javascript",
+    "notes": "Improved for performance.",
+    "aiExplanation": "This is a slightly streamlined single-pass solution: it walks the linked list comparing each `node` against its previous node (`last`) and its `node.next` to detect **critical points** — *local minima* or *maxima* that are strictly smaller or larger than both neighbors — while `depth` tracks the current position. It stores the position of the **first** critical point in `firstCP` and the **latest** one in `lastCP`, and every time a new critical point shows up after the first, it updates `minDist` with the gap since the previous one using `Math.min(minDist, depth - lastCP)`. Unlike the earlier variant, the maximum distance is not maintained inside the loop; it is derived once at the end as `lastCP - firstCP`, since the widest gap is always between the first and last critical points. If fewer than two critical points exist, `minDist` stays at `Infinity` and the function returns `[-1, -1]`.",
+    "status": "DONE",
+    "cpuUsage": 90.28,
+    "memoryUsage": 65.77,
+    "date": "2026-08-31T07:40:52.000Z"
+  }
+]

@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} k\n * @return {number}\n */\nvar firstStableIndex = function(nums, k) {\n    const n = nums.length;\n    const prefixSum = Array(n);\n    prefixSum[0] = nums[0];\n    const suffixSum = Array(n);\n    suffixSum[n - 1] = nums[n - 1];\n\n    for (let i = 1; i < n; i++) {\n        prefixSum[i] = Math.max(prefixSum[i - 1], nums[i]);\n\n        const j = n - 1 - i;\n        suffixSum[j] = Math.min(suffixSum[j + 1], nums[j]);\n    }\n\n    let res = -1;\n\n    for (let i = 0; i < n; i++) {\n        const score = prefixSum[i] - suffixSum[i];\n        if (score <= k && (res === -1 || score < prefixSum[res] - suffixSum[res])) {\n            res = i;\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Thought the exercise was requesting the lowest possible score.",
+    "aiExplanation": "This function looks for the index in `nums` with the best \"stability score\" that stays within a threshold `k`. It first builds two helper arrays in a single loop: `prefixSum[i]` holds the **maximum** value seen from the start of the array up to index `i`, and `suffixSum[j]` holds the **minimum** value from index `j` to the end (despite their names, they track max/min, not sums). The score for an index is then `prefixSum[i] - suffixSum[i]` — the gap between the largest value on the left side and the smallest value on the right side. In the second loop, the function scans every index and keeps track of the one whose score is both within the limit (`score <= k`) and **smaller** than the best score found so far, returning that index in `res`, or `-1` if no index qualifies. Note that because it picks the *lowest-scoring* index rather than the *first* one that satisfies the condition, this version returns a different answer than a \"first stable index\" would require.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-09-04T07:21:00.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} k\n * @return {number}\n */\nvar firstStableIndex = function(nums, k) {\n    const n = nums.length;\n    const prefixSum = Array(n);\n    prefixSum[0] = nums[0];\n    const suffixSum = Array(n);\n    suffixSum[n - 1] = nums[n - 1];\n\n    for (let i = 1; i < n; i++) {\n        prefixSum[i] = Math.max(prefixSum[i - 1], nums[i]);\n\n        const j = n - 1 - i;\n        suffixSum[j] = Math.min(suffixSum[j + 1], nums[j]);\n    }\n\n    for (let i = 0; i < n; i++) {\n        if (prefixSum[i] - suffixSum[i] <= k) {\n            return i;\n        }\n    }\n\n    return -1;\n};\n",
+    "language": "javascript",
+    "notes": "Corrected and simplified.",
+    "aiExplanation": "This function finds the **first** index in `nums` where the array is \"stable\" according to a threshold `k`. It precomputes two helper arrays in one clever loop that walks from both ends at once: `prefixSum[i]` stores the **maximum** value from the start of the array up to index `i`, while `suffixSum[j]` stores the **minimum** value from index `j` to the end (the names say \"sum\", but they really track a running max and min). With those in place, each index has a simple score: `prefixSum[i] - suffixSum[i]`, i.e. the difference between the biggest value seen so far on the left and the smallest value remaining on the right. The final loop scans left to right and returns the first index where that difference is at most `k`; if no index ever satisfies the condition, it returns `-1`. Thanks to the precomputation, the whole thing runs in **O(n)** time with O(n) extra space, instead of recomputing max/min ranges for every index.",
+    "status": "DONE",
+    "cpuUsage": 96.3,
+    "memoryUsage": 48.15,
+    "date": "2026-09-04T07:25:00.000Z"
+  }
+]

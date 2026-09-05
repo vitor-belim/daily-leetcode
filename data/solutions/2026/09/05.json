@@ -1,0 +1,35 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} k\n * @return {number}\n */\nvar firstStableIndex = function(nums, k) {\n    const n = nums.length;\n    const maxPrefixSum = Array(n);\n    maxPrefixSum[0] = nums[0];\n    const minSuffixSum = Array(n);\n    minSuffixSum[n - 1] = nums[n - 1];\n\n    for (let i = 1; i < n; i++) {\n        maxPrefixSum[i] = Math.max(maxPrefixSum[i - 1], nums[i]);\n\n        const j = n - 1 - i;\n        minSuffixSum[j] = Math.min(minSuffixSum[j - 1], nums[j]);\n    }\n\n    for (let i = 0; i < n; i++) {\n        if (maxPrefixSum[i] - minSuffixSum[i] <= k) {\n            return i;\n        }\n    }\n\n    return -1;\n};\n",
+    "language": "javascript",
+    "notes": "Minor mistake on the minSuffixSum summing.",
+    "aiExplanation": "This code tries to find the **first \"stable\" index** — the first position `i` where the largest value seen so far (from the start up to `i`) minus the smallest value from `i` to the end is at most `k`. It builds two helper arrays in a single loop: `maxPrefixSum`, a running **maximum from the left**, and `minSuffixSum`, meant to be a running **minimum from the right** (filled at the mirrored index `j = n - 1 - i`). However, there's a subtle bug: when filling the suffix array it reads `minSuffixSum[j - 1]` (the *left* neighbor, which hasn't been computed yet) instead of `minSuffixSum[j + 1]` (the *right* neighbor), so the suffix minimums are built from uninitialized values and come out wrong — which is why this attempt failed. The final loop then scans for the first index where `maxPrefixSum[i] - minSuffixSum[i] <= k`, returning `-1` if none exists.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-09-05T08:15:08.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} k\n * @return {number}\n */\nvar firstStableIndex = function(nums, k) {\n    const n = nums.length;\n    const maxPrefixSum = Array(n);\n    maxPrefixSum[0] = nums[0];\n    const minSuffixSum = Array(n);\n    minSuffixSum[n - 1] = nums[n - 1];\n\n    for (let i = 1; i < n; i++) {\n        maxPrefixSum[i] = Math.max(maxPrefixSum[i - 1], nums[i]);\n\n        const j = n - 1 - i;\n        minSuffixSum[j] = Math.min(minSuffixSum[j + 1], nums[j]);\n    }\n\n    for (let i = 0; i < n; i++) {\n        if (maxPrefixSum[i] - minSuffixSum[i] <= k) {\n            return i;\n        }\n    }\n\n    return -1;\n};\n",
+    "language": "javascript",
+    "notes": "Mistake corrected, performance not really great.",
+    "aiExplanation": "This code finds the **first \"stable\" index** in an array — the first position `i` where the gap between the biggest value up to `i` and the smallest value from `i` onward is no more than `k`. In a single clever loop it fills two helper arrays from opposite ends: `maxPrefixSum[i]` holds the **running maximum** of the first `i + 1` elements (built left to right), while `minSuffixSum[j]` holds the **running minimum** from position `j` to the end (built right to left using the mirrored index `j = n - 1 - i` and correctly reading the already-computed right neighbor `minSuffixSum[j + 1]`). A second loop then scans from the start and returns the first index where `maxPrefixSum[i] - minSuffixSum[i] <= k`, or `-1` if no such index exists. This runs in **O(n) time** with two extra arrays of size `n`.",
+    "status": "DONE",
+    "cpuUsage": 16.67,
+    "memoryUsage": 25,
+    "date": "2026-09-05T08:15:35.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} k\n * @return {number}\n */\nvar firstStableIndex = function(nums, k) {\n    const n = nums.length;\n\n    const minSuffixSum = Array(n);\n    minSuffixSum[n - 1] = nums[n - 1];\n\n    for (let i = n - 2; i >= 0; i--) {\n        minSuffixSum[i] = Math.min(minSuffixSum[i + 1], nums[i]);\n    }\n\n    let max = -Infinity;\n\n    for (let i = 0; i < n; i++) {\n        max = Math.max(max, nums[i]);\n\n        if (max - minSuffixSum[i] <= k) {\n            return i;\n        }\n    }\n\n    return -1;\n};\n",
+    "language": "javascript",
+    "notes": "Improved performance by simplifying to only 1 suffix array.",
+    "aiExplanation": "This code finds the **first \"stable\" index** — the first position `i` where the largest value from the start up to `i` minus the smallest value from `i` to the end is at most `k`. It first does a **backwards pass** to build `minSuffixSum`, where each entry `minSuffixSum[i]` is the smallest value in the array from index `i` onward, computed by taking the minimum of the current element and the already-known minimum to its right. Then, instead of storing all the prefix maximums in a second array, it makes a **forward pass** keeping just a single running `max` variable (starting at `-Infinity`), updating it with each element and returning the first index where `max - minSuffixSum[i] <= k`; if the loop finishes without a match it returns `-1`. This is a leaner version of the two-array approach: still **O(n) time**, but with only one extra array instead of two.",
+    "status": "DONE",
+    "cpuUsage": 83.33,
+    "memoryUsage": 50,
+    "date": "2026-09-05T08:20:53.000Z"
+  }
+]

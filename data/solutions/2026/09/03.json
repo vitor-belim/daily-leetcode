@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums1\n * @return {boolean}\n */\nvar uniformArray = function(nums1) {\n    const n = nums1.length;\n    let odd = 0;\n    let even = 0;\n    let lowestOdd1 = Infinity;\n    let lowestOdd2 = Infinity;\n\n    for (const num of nums1) {\n        if (num & 1) {\n            odd++;\n\n            if (num < lowestOdd1) {\n                lowestOdd2 = lowestOdd1;\n                lowestOdd1 = num;\n            } else if (num < lowestOdd2) lowestOdd2 = num;\n        } else {\n            even++;\n        }\n    }\n\n    for (const num of nums1) {\n        if (num > lowestOdd1 || num > lowestOdd2) {\n            if (num & 1) even++;\n            else odd++;\n        }\n    }\n\n    return even === n || odd === n;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function decides whether the array can be made **uniform**, meaning every element could end up with the same parity (all even or all odd). In a first pass it counts how many numbers are odd and how many are even, using the bitwise trick `num & 1` to test parity, while also remembering the two smallest odd values seen (`lowestOdd1` and `lowestOdd2`). The key idea is that subtracting a *smaller odd number* from an element flips that element's parity, so in a second pass any number strictly greater than one of those smallest odds is treated as convertible: an odd number gets added to the `even` tally and an even number to the `odd` tally. If either tally reaches `n`, every element is (or can be turned) even, or every element is (or can be turned) odd, so the function returns `true`; otherwise it returns `false`.",
+    "status": "DONE",
+    "cpuUsage": 25.62,
+    "memoryUsage": 76.66,
+    "date": "2026-09-03T07:25:26.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums1\n * @return {boolean}\n */\nvar uniformArray = function(nums1) {\n    const n = nums1.length;\n    let odd = 0;\n    let even = 0;\n    let lowestOdd = Infinity;\n\n    for (const num of nums1) {\n        if (num & 1) {\n            odd++;\n\n            if (num < lowestOdd) {\n                lowestOdd = num;\n            }\n        } else {\n            even++;\n        }\n    }\n\n    for (const num of nums1) {\n        if (num > lowestOdd) {\n            if (num & 1) even++;\n            else odd++;\n        }\n    }\n\n    return even === n || odd === n;\n};\n",
+    "language": "javascript",
+    "notes": "Attempted to improve performance. Turns out, the best performance is only achieved via a mathematical approach.",
+    "aiExplanation": "This is a streamlined take on the same problem: can the array be made **uniform**, with every element sharing the same parity (all even or all odd)? The first loop counts the `odd` and `even` numbers, checking parity with the bitwise test `num & 1`, and tracks only the single smallest odd value, `lowestOdd`. Since subtracting a smaller odd number flips an element's parity, the second loop treats every number strictly greater than `lowestOdd` as convertible to the opposite parity — odd numbers are added to the `even` count and even numbers to the `odd` count. The function returns `true` when either count reaches the array length `n`, meaning all elements are (or can be made) even, or all are (or can be made) odd.",
+    "status": "DONE",
+    "cpuUsage": 25.62,
+    "memoryUsage": 35.86,
+    "date": "2026-09-03T07:29:32.000Z"
+  }
+]
