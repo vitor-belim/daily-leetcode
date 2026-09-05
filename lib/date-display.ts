@@ -258,3 +258,33 @@ export function timeAgo(date: Date | string): string {
 
   return `${primaryPart}${secondaryPart} ago`;
 }
+
+const WEEKDAY_SHORT_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+/**
+ * Formats a `YYYY-MM-DD` day as its month and year, e.g. "September 2026",
+ * for grouping the archive list by month.
+ *
+ * @param date The `YYYY-MM-DD` day to format.
+ * @returns The "MonthName YYYY" string; malformed input produces garbage
+ *   output rather than throwing.
+ */
+export function formatMonthYear(date: string) {
+  const [year = NaN, month = NaN] = date.split("-").map(Number);
+  return `${MONTH_NAMES[month - 1]} ${year}`;
+}
+
+/**
+ * Names the weekday of a `YYYY-MM-DD` day in short English form, e.g. "Sat".
+ * The day is interpreted in UTC, matching how challenge days are stored, so
+ * the viewer's timezone can't shift it.
+ *
+ * @param date The `YYYY-MM-DD` day to format.
+ * @returns The three-letter weekday name, or an empty string for a malformed
+ *   day.
+ */
+export function formatWeekdayShort(date: string) {
+  const [year = NaN, month = NaN, day = NaN] = date.split("-").map(Number);
+  const weekday = new Date(Date.UTC(year, month - 1, day)).getUTCDay();
+  return WEEKDAY_SHORT_NAMES[weekday] ?? "";
+}

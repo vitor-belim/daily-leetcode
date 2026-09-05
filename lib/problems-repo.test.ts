@@ -2,41 +2,9 @@ import { describe, it, expect, afterEach } from "vitest";
 import fs from "fs";
 import path from "path";
 import os from "os";
-import {
-  paginateDescending,
-  getLatestDailiesData,
-  getProblem,
-  getAdjacentDates,
-} from "./problems-repo";
+import { getProblem, getAdjacentDates, readProblemFile } from "./problems-repo";
 
-describe("paginateDescending", () => {
-  it("reverses and slices ascending items into a descending page", () => {
-    const result = paginateDescending(["a", "b", "c"], 2, 0);
-    expect(result).toEqual({ page: ["c", "b"], total: 3, hasMore: true });
-  });
-
-  it("handles offset past the end", () => {
-    const result = paginateDescending(["a", "b", "c"], 2, 10);
-    expect(result).toEqual({ page: [], total: 3, hasMore: false });
-  });
-
-  it("handles limit 0", () => {
-    const result = paginateDescending(["a", "b", "c"], 0, 0);
-    expect(result).toEqual({ page: [], total: 3, hasMore: true });
-  });
-
-  it("handles limit larger than remaining items", () => {
-    const result = paginateDescending(["a", "b", "c"], 100, 0);
-    expect(result).toEqual({ page: ["c", "b", "a"], total: 3, hasMore: false });
-  });
-
-  it("handles an empty array", () => {
-    const result = paginateDescending([], 10, 0);
-    expect(result).toEqual({ page: [], total: 0, hasMore: false });
-  });
-});
-
-describe("getProblem / getAdjacentDates / getLatestDailiesData", () => {
+describe("getProblem / getAdjacentDates / readProblemFile", () => {
   const tmpDirs: string[] = [];
 
   afterEach(() => {
@@ -134,57 +102,23 @@ describe("getProblem / getAdjacentDates / getLatestDailiesData", () => {
     });
   });
 
-  describe("getLatestDailiesData", () => {
-    it("returns the most recent problems first, paginated", async () => {
+  describe("readProblemFile", () => {
+    it("reads a valid problem file", async () => {
       const root = makeFixture();
-      writeProblem(root, "2026-07-19", { date: "2026-07-19" });
-      writeProblem(root, "2026-07-20", { date: "2026-07-20" });
-      writeProblem(root, "2026-07-21", { date: "2026-07-21" });
+      writeProblem(root, "2026-07-20", { title: "Test", date: "2026-07-20" });
 
-      const result = await getLatestDailiesData(2, 0, root);
-      expect(result.total).toBe(3);
-      expect(result.hasMore).toBe(true);
-      expect(result.problems.map((p) => p.date)).toEqual([
-        "2026-07-21",
-        "2026-07-20",
-      ]);
+      expect(await readProblemFile("2026-07-20", root)).toEqual({
+        title: "Test",
+        date: "2026-07-20",
+      });
     });
 
-    it("filters out an unparseable file instead of crashing the whole list", async () => {
+    it("returns null for a missing or malformed file", async () => {
       const root = makeFixture();
-      writeProblem(root, "2026-07-19", { date: "2026-07-19" });
       writeProblem(root, "2026-07-20", "{not json");
 
-      const result = await getLatestDailiesData(10, 0, root);
-      expect(result.total).toBe(2);
-      expect(result.problems.map((p) => p.date)).toEqual(["2026-07-19"]);
-    });
-
-    it("advances nextOffset by dates consumed, not problems returned", async () => {
-      const root = makeFixture();
-      writeProblem(root, "2026-07-19", { date: "2026-07-19" });
-      writeProblem(root, "2026-07-20", "{not json");
-      writeProblem(root, "2026-07-21", { date: "2026-07-21" });
-
-      // Page of 2 consumes 07-21 and the broken 07-20 but returns 1 problem;
-      // paging from nextOffset must land on 07-19 without re-serving 07-21.
-      const first = await getLatestDailiesData(2, 0, root);
-      expect(first.problems.map((p) => p.date)).toEqual(["2026-07-21"]);
-      expect(first.nextOffset).toBe(2);
-      expect(first.hasMore).toBe(true);
-
-      const second = await getLatestDailiesData(2, first.nextOffset, root);
-      expect(second.problems.map((p) => p.date)).toEqual(["2026-07-19"]);
-      expect(second.hasMore).toBe(false);
-    });
-
-    it("ignores a stray non-date file", async () => {
-      const root = makeFixture();
-      writeProblem(root, "2026-07-19", { date: "2026-07-19" });
-      fs.writeFileSync(path.join(root, "2026", "07", "notes.json"), "{}");
-
-      const result = await getLatestDailiesData(10, 0, root);
-      expect(result.total).toBe(1);
+      expect(await readProblemFile("2026-07-20", root)).toBeNull();
+      expect(await readProblemFile("2026-07-21", root)).toBeNull();
     });
   });
 });

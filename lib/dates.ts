@@ -79,3 +79,35 @@ export function shiftDateUTC(date: string, days: number): string {
   shifted.setUTCDate(shifted.getUTCDate() + days);
   return formatDateUTC(shifted);
 }
+
+/**
+ * Formats a Date's UTC month as `YYYY-MM`.
+ *
+ * @param date The date to format.
+ * @returns The `YYYY-MM` string for the date's UTC month.
+ */
+export function formatMonthUTC(date: Date): string {
+  return formatDateUTC(date).slice(0, 7);
+}
+
+/**
+ * Extracts the `YYYY-MM` month of a `YYYY-MM-DD` day.
+ *
+ * @param date The `YYYY-MM-DD` day.
+ * @returns Its `YYYY-MM` month.
+ */
+export function monthOf(date: string): string {
+  return date.slice(0, 7);
+}
+
+/**
+ * Shifts a `YYYY-MM` month by a number of months.
+ *
+ * @param month The `YYYY-MM` starting month.
+ * @param months The offset in months; negative values shift into the past.
+ * @returns The shifted month as `YYYY-MM`.
+ */
+export function shiftMonth(month: string, months: number): string {
+  const [y = NaN, m = NaN] = month.split("-").map(Number);
+  return formatMonthUTC(new Date(Date.UTC(y, m - 1 + months, 1)));
+}

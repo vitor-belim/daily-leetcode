@@ -51,3 +51,61 @@ export interface Solution {
   /** Submission timestamp as an ISO string. */
   date: string;
 }
+
+/**
+ * Whether a day's challenge has been solved, derived from the author's own
+ * submissions in `data/solutions`. Editorial solutions never count.
+ */
+export enum SolveStatus {
+  /** At least one of the author's own submissions was accepted. */
+  Solved = "SOLVED",
+  /** The author submitted at least once, but nothing was accepted. */
+  Failed = "FAILED",
+  /** The day is over and the author never submitted. */
+  Unsolved = "UNSOLVED",
+  /** The day is still in progress and the author has not submitted yet. */
+  Pending = "PENDING",
+}
+
+/** What a day's solutions say about the author's progress on it. */
+export interface SolveSummary {
+  solveStatus: SolveStatus;
+  /** Number of the author's own submissions. */
+  attempts: number;
+  /** Distinct languages across the author's own submissions. */
+  languages: string[];
+  /** Best runtime percentile among the author's accepted submissions. */
+  bestRuntime: number | null;
+  /** Best memory percentile among the author's accepted submissions. */
+  bestMemory: number | null;
+  /** Whether an editorial (non-author) solution is archived for the day. */
+  hasEditorial: boolean;
+}
+
+/** One archived day as listed on the home page: the problem plus progress. */
+export interface DailySummary extends SolveSummary {
+  date: string;
+  title: string;
+  difficulty: Difficulty;
+  link: string;
+}
+
+/** Solved-vs-total counts for one difficulty tier. */
+export interface DifficultyStats {
+  total: number;
+  solved: number;
+}
+
+/** Aggregate progress across the whole archive. */
+export interface ArchiveStats {
+  totalDays: number;
+  solved: number;
+  failed: number;
+  unsolved: number;
+  pending: number;
+  byDifficulty: Record<Difficulty, DifficultyStats>;
+  /** Consecutive solved calendar days ending today (or yesterday while today is pending). */
+  currentStreak: number;
+  /** The longest run of consecutive solved calendar days on record. */
+  longestStreak: number;
+}

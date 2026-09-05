@@ -1,42 +1,90 @@
 "use client";
 
-import { DifficultyBadge } from "@/components/difficulty-badge";
-import { Button } from "@/components/ui/button";
+import { DailyRow } from "@/components/home/daily-row";
 import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { getLatestDailies } from "@/lib/actions";
-import { Problem } from "@/lib/types";
+import { formatMonthYear } from "@/lib/date-display";
+import { monthOf } from "@/lib/dates";
+import type { DailySummary } from "@/lib/types";
 import { Loader2 } from "lucide-react";
-import Link from "next/link";
 import { useState } from "react";
 
 interface DailyListProps {
-  initialProblems: Problem[];
+  initialDailies: DailySummary[];
   initialHasMore: boolean;
-  initialNextOffset: number;
+  initialCursor: string | null;
+  /** Today's `YYYY-MM` month, the only one expanded on first render. */
+  currentMonth: string;
+  total: number;
+}
+
+/** The consecutive days of one calendar month, newest first. */
+interface MonthGroup {
+  /** The month as `YYYY-MM`, used as the React key and accordion value. */
+  key: string;
+  label: string;
+  dailies: DailySummary[];
+}
+
+/**
+ * Splits a newest-first list of days into runs sharing a calendar month,
+ * preserving order.
+ */
+function groupByMonth(dailies: DailySummary[]): MonthGroup[] {
+  const groups: MonthGroup[] = [];
+
+  for (const daily of dailies) {
+    const key = monthOf(daily.date);
+    const last = groups[groups.length - 1];
+    if (last && last.key === key) {
+      last.dailies.push(daily);
+    } else {
+      groups.push({
+        key,
+        label: formatMonthYear(daily.date),
+        dailies: [daily],
+      });
+    }
+  }
+
+  return groups;
+}
+
+/** The distinct months present in a list of days, in list order. */
+function monthKeys(dailies: DailySummary[]): string[] {
+  return [...new Set(dailies.map((d) => monthOf(d.date)))];
 }
 
 export function DailyList({
-  initialProblems,
+  initialDailies,
   initialHasMore,
-  initialNextOffset,
+  initialCursor,
+  currentMonth,
+  total,
 }: DailyListProps) {
-  const [problems, setProblems] = useState<Problem[]>(initialProblems);
+  const [dailies, setDailies] = useState<DailySummary[]>(initialDailies);
   const [hasMore, setHasMore] = useState(initialHasMore);
-  const [nextOffset, setNextOffset] = useState(initialNextOffset);
+  const [cursor, setCursor] = useState(initialCursor);
   const [isLoading, setIsLoading] = useState(false);
+  const [openMonths, setOpenMonths] = useState<string[]>([currentMonth]);
 
   async function loadMore() {
     setIsLoading(true);
     try {
-      const result = await getLatestDailies(10, nextOffset);
-      setProblems((prev) => [...prev, ...result.problems]);
+      const result = await getLatestDailies(1, cursor);
+      setDailies((prev) => [...prev, ...result.dailies]);
+      setOpenMonths((prev) => [
+        ...new Set([...prev, ...monthKeys(result.dailies)]),
+      ]);
       setHasMore(result.hasMore);
-      setNextOffset(result.nextOffset);
+      setCursor(result.nextCursor);
     } catch (error) {
       console.error("Failed to load more dailies:", error);
     } finally {
@@ -44,11 +92,11 @@ export function DailyList({
     }
   }
 
-  if (problems.length === 0) {
+  if (dailies.length === 0) {
     return (
-      <Card className="p-12 text-center border-dashed">
+      <Card className="items-center border-dashed p-12 text-center shadow-none ring-0 border">
         <p className="text-muted-foreground italic">
-          No daily assignments found yet.
+          No daily challenges archived yet.
         </p>
       </Card>
     );
@@ -56,52 +104,62 @@ export function DailyList({
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-4">
-        {problems.map((problem) => {
-          const [year, month, day] = problem.date.split("-");
-          return (
-            <Link
-              href={`/blog/${year}/${month}/${day}`}
-              key={problem.date}
-              className="block group"
-            >
-              <Card className="transition-all group-hover:border-primary/50 group-hover:shadow-sm">
-                <CardHeader className="p-4">
-                  <div className="flex justify-between items-start">
-                    <div className="space-y-1">
-                      <CardTitle className="text-xl group-hover:text-primary transition-colors">
-                        {problem.title}
-                      </CardTitle>
-                      <CardDescription>{problem.date}</CardDescription>
-                    </div>
-                    <DifficultyBadge difficulty={problem.difficulty} />
-                  </div>
-                </CardHeader>
-              </Card>
-            </Link>
-          );
-        })}
-      </div>
+      <Accordion
+        multiple
+        value={openMonths}
+        onValueChange={(value) => setOpenMonths(value.map(String))}
+        className="gap-6"
+      >
+        {groupByMonth(dailies).map((group) => (
+          <AccordionItem
+            key={group.key}
+            value={group.key}
+            className="overflow-hidden rounded-xl bg-card ring-1 ring-foreground/10 not-last:border-b-0"
+          >
+            <AccordionTrigger className="rounded-none border-0 bg-muted/60 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground hover:bg-muted hover:no-underline focus-visible:ring-inset data-panel-open:border-b">
+              <span className="flex items-baseline gap-2">
+                {group.label}
+                <span className="font-normal normal-case tracking-normal text-muted-foreground/70">
+                  {group.dailies.length}{" "}
+                  {group.dailies.length === 1 ? "day" : "days"}
+                </span>
+              </span>
+            </AccordionTrigger>
+            <AccordionContent className="pb-0 [&_a]:no-underline">
+              <ul className="divide-y">
+                {group.dailies.map((daily) => (
+                  <li key={daily.date}>
+                    <DailyRow daily={daily} />
+                  </li>
+                ))}
+              </ul>
+            </AccordionContent>
+          </AccordionItem>
+        ))}
+      </Accordion>
 
-      {hasMore && (
-        <div className="flex justify-center mt-8">
+      <div className="flex flex-col items-center gap-2">
+        <p className="text-xs text-muted-foreground">
+          Showing {dailies.length} of {total} challenges
+        </p>
+        {hasMore && (
           <Button
             onClick={loadMore}
             disabled={isLoading}
             variant="outline"
-            className="w-full sm:w-auto"
+            className="w-full sm:w-auto sm:min-w-48"
           >
             {isLoading ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Loading...
+                <Loader2 className="animate-spin" />
+                Loading…
               </>
             ) : (
-              "Load More"
+              "Load previous month"
             )}
           </Button>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

@@ -111,8 +111,10 @@ All three take the same optional date argument, and default to today if none is 
   - `solutions/YYYY/MM/DD.json`: Your solution implementation and AI explanation.
   - Read at request time via dynamically built paths, which output file tracing can't reliably discover — `outputFileTracingIncludes` in `next.config.ts` ships them with serverless deploys explicitly. Don't remove that entry.
 - `lib/`: Shared utilities, TypeScript types, and data access, split by responsibility rather than bundled into one "data" file:
-  - `actions.ts`: the only `"use server"` file left — a thin wrapper around `problems-repo.ts` for the one function (`getLatestDailies`) actually called from a Client Component.
+  - `actions.ts`: the only `"use server"` file left — a thin wrapper around `dailies-repo.ts` for the one function (`getLatestDailies`) actually called from a Client Component.
   - `problems-repo.ts` / `solutions-repo.ts`: plain (non-`"use server"`) data-access modules for reading `data/problems`/`data/solutions` — used directly by Server Components, never client-reachable, so they're safe to unit test with fixture directories.
+  - `dailies-repo.ts`: joins the two archives into the home page's per-day summaries (problem + solve status) and archive-wide stats (solved counts per difficulty, streaks).
+  - `solve-status.ts`: derives a day's `SolveStatus` from its solutions — only the author's own submissions count, editorial copies (`author: "Leetcode"`) never do — plus the streak/stat aggregation.
   - `dates.ts`, `paths.ts`, `archive.ts`, `types.ts`: shared between the app and the CLI scripts.
   - `leetcode-api.ts`, `problems.ts`, `solutions.ts`: CLI-only (LeetCode API client, challenge-to-`Problem` mapping, submission-to-`Solution` mapping).
   - `utils.ts` (`cn`, pinned by `components.json`), `date-display.ts` (local-time display formatting), `markdown.ts` (markdown/LaTeX-ish → HTML).

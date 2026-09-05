@@ -4,6 +4,30 @@ import { solutionFilePath, SOLUTIONS_ROOT } from "./paths";
 import { isValidCalendarDate } from "./dates";
 
 /**
+ * Reads the archived solutions for one `YYYY-MM-DD` day without validating
+ * the date, for callers that already hold a date from the archive scan.
+ *
+ * @param date The day as `YYYY-MM-DD`.
+ * @param root The solutions root (defaults to `data/solutions`).
+ * @returns The day's solutions sorted newest-first; empty when the file is
+ *   missing or fails to parse.
+ */
+export async function readSolutionsFile(
+  date: string,
+  root: string = SOLUTIONS_ROOT,
+): Promise<Solution[]> {
+  try {
+    const content = await fs.readFile(solutionFilePath(date, root), "utf8");
+    const solutions: Solution[] = JSON.parse(content);
+    return solutions.sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+    );
+  } catch {
+    return [];
+  }
+}
+
+/**
  * Reads the archived solutions for one day.
  *
  * @param year The four-digit year.
@@ -24,13 +48,5 @@ export async function getSolutions(
     return [];
   }
 
-  try {
-    const content = await fs.readFile(solutionFilePath(date, root), "utf8");
-    const solutions: Solution[] = JSON.parse(content);
-    return solutions.sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-    );
-  } catch {
-    return [];
-  }
+  return readSolutionsFile(date, root);
 }

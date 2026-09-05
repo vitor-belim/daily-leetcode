@@ -6,6 +6,9 @@ import {
   isValidCalendarDate,
   shiftDateUTC,
   isPastDateUTC,
+  formatMonthUTC,
+  monthOf,
+  shiftMonth,
 } from "./dates";
 
 describe("formatDateUTC / parseDateUTC", () => {
@@ -110,5 +113,21 @@ describe("isPastDateUTC", () => {
   it("orders correctly across month and year boundaries", () => {
     expect(isPastDateUTC("2026-07-31", parseDateUTC("2026-08-01"))).toBe(true);
     expect(isPastDateUTC("2026-01-01", parseDateUTC("2025-12-31"))).toBe(false);
+  });
+});
+
+describe("formatMonthUTC / monthOf / shiftMonth", () => {
+  it("formats the UTC month of a date", () => {
+    expect(formatMonthUTC(new Date(Date.UTC(2026, 8, 5)))).toBe("2026-09");
+  });
+
+  it("extracts the month of a day", () => {
+    expect(monthOf("2026-09-05")).toBe("2026-09");
+  });
+
+  it("shifts months across year boundaries in both directions", () => {
+    expect(shiftMonth("2026-09", -1)).toBe("2026-08");
+    expect(shiftMonth("2026-01", -2)).toBe("2025-11");
+    expect(shiftMonth("2026-12", 1)).toBe("2027-01");
   });
 });

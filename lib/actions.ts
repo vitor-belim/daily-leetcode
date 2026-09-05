@@ -1,24 +1,27 @@
 "use server";
 
-import { getLatestDailiesData, type LatestDailies } from "./problems-repo";
+import { getDailySummariesByMonth, type LatestDailies } from "./dailies-repo";
 
-const MAX_LIMIT = 50;
+const MAX_MONTHS = 12;
+const MONTH_CURSOR = /^\d{4}-(0[1-9]|1[0-2])$/;
 
 /**
- * Server action returning the newest archived problems, paginated. As a
- * publicly invokable endpoint it clamps its inputs rather than trusting
- * them: `limit` to 1-50, `offset` to >= 0, NaN to the defaults.
+ * Server action returning archived days as summaries, a run of whole
+ * calendar months at a time. As a publicly invokable endpoint it clamps its
+ * inputs rather than trusting them: `months` to 1-12 (NaN to 1), and a
+ * malformed `before` cursor to null, which restarts from today's month.
  *
- * @param limit Maximum problems per page (default 10).
- * @param offset Pagination cursor; pass the previous page's `nextOffset`.
- * @returns The page of problems plus pagination state.
+ * @param months How many calendar months to cover (default 1).
+ * @param before The previous page's `nextCursor`, or null for the first page.
+ * @returns The page of summaries plus pagination state.
  */
 export async function getLatestDailies(
-  limit = 10,
-  offset = 0,
+  months = 1,
+  before: string | null = null,
 ): Promise<LatestDailies> {
-  const safeLimit = Math.min(Math.max(Math.trunc(limit) || 1, 1), MAX_LIMIT);
-  const safeOffset = Math.max(Math.trunc(offset) || 0, 0);
+  const safeMonths = Math.min(Math.max(Math.trunc(months) || 1, 1), MAX_MONTHS);
+  const safeBefore =
+    before !== null && MONTH_CURSOR.test(before) ? before : null;
 
-  return getLatestDailiesData(safeLimit, safeOffset);
+  return getDailySummariesByMonth(safeMonths, safeBefore);
 }

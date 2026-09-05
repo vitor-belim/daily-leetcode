@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { formatDate, formatLongDate, timeAgo } from "./date-display";
+import {
+  formatDate,
+  formatLongDate,
+  formatMonthYear,
+  formatWeekdayShort,
+  timeAgo,
+} from "./date-display";
 
 describe("formatLongDate", () => {
   it("formats a date with the correct ordinal suffix", () => {
@@ -153,5 +159,24 @@ describe("timeAgo", () => {
 
   it("renders unparseable input as 0 seconds rather than NaN", () => {
     expect(timeAgo("not a date")).toBe("0 seconds ago");
+  });
+});
+
+describe("formatMonthYear", () => {
+  it("formats the month name and year", () => {
+    expect(formatMonthYear("2026-09-05")).toBe("September 2026");
+    expect(formatMonthYear("2026-01-31")).toBe("January 2026");
+  });
+});
+
+describe("formatWeekdayShort", () => {
+  it("names the weekday in UTC regardless of the viewer's timezone", () => {
+    // 2026-09-05 is a Saturday; 2026-09-07 a Monday.
+    expect(formatWeekdayShort("2026-09-05")).toBe("Sat");
+    expect(formatWeekdayShort("2026-09-07")).toBe("Mon");
+  });
+
+  it("returns an empty string for malformed input", () => {
+    expect(formatWeekdayShort("nonsense")).toBe("");
   });
 });
