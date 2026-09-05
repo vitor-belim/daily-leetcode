@@ -1,0 +1,35 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar minPairSum = function(nums) {\n    nums.sort((a, b) => a - b);\n\n    return nums[0] + nums[nums.length - 1];\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution sorts the array in ascending order and returns the sum of just the first and last elements. While this finds the sum between the smallest and largest numbers, it doesn't actually solve the minimum pair sum problem correctly—it only considers one pair instead of checking all possible pairs formed by matching elements from opposite ends of the sorted array.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-01-24T08:57:20.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar minPairSum = function(nums) {\n    nums.sort((a, b) => a - b);\n\n    const n = nums.length;\n    let max = -Infinity;\n\n    for (let i = 0; i <= n / 2; i++) {\n        max = Math.max(max, nums[i] + nums[n - 1 - i]);\n    }\n\n    return max;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution sorts the array and then uses a two-pointer approach to pair elements from both ends. The loop iterates through the first half of the sorted array, pairing each element `nums[i]` with `nums[n - 1 - i]` from the end, calculating their sum, and tracking the maximum sum encountered. This correctly finds the **maximum** (not minimum) pair sum by pairing the smallest elements with the largest elements and determining which pairing produces the largest sum.",
+    "status": "DONE",
+    "cpuUsage": 30.77,
+    "memoryUsage": 28.85,
+    "date": "2026-01-24T08:59:00.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar minPairSum = function(nums) {\n    nums.sort((a, b) => a - b);\n\n    const n = nums.length;\n    const len = n / 2;\n    let max = -Infinity;\n\n    for (let i = 0; i < len; i++) {\n        const sum = nums[i] + nums[n - 1 - i];\n\n        if (sum > max) {\n            max = sum;\n        }\n    }\n\n    return max;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution sorts the array and employs a two-pointer technique to pair elements symmetrically from opposite ends. It iterates through the first half of the array, summing each element with its counterpart from the end, and uses an explicit `if` statement to track the maximum sum seen. It's functionally equivalent to the previous solution but replaces `Math.max()` with a manual comparison, achieving the same goal of finding the largest pair sum by pairing the smallest elements with the largest elements.",
+    "status": "DONE",
+    "cpuUsage": 9.61,
+    "memoryUsage": 48.08,
+    "date": "2026-01-24T09:12:34.000Z"
+  }
+]

@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "const { AvlTree } = require(\"@datastructures-js/binary-search-tree\");\n\nvar minOperations = function (s, k) {\n    const n = s.length;\n    let m = 0;\n\n    const dist = new Array(n + 1).fill(Infinity);\n    const nodeTrees = [new AvlTree(), new AvlTree()];\n    for (let i = 0; i <= n; i++) {\n        nodeTrees[i % 2].insert(i);\n        if (i < n && s[i] === \"0\") {\n            m++;\n        }\n    }\n\n    const queue = new Array(n + 1);\n    let head = 0,\n        tail = 0;\n    queue[tail++] = m;\n\n    dist[m] = 0;\n    nodeTrees[m % 2].remove(m);\n\n    while (head < tail) {\n        const currentM = queue[head++];\n        const c1 = Math.max(k - n + currentM, 0);\n        const c2 = Math.min(currentM, k);\n        const lnode = currentM + k - 2 * c2;\n        const rnode = currentM + k - 2 * c1;\n        const currentTree = nodeTrees[lnode % 2];\n        let node = currentTree.upperBound(lnode, true);\n\n        while (node !== null) {\n            const nodeValue = node.getValue();\n            if (nodeValue > rnode) {\n                break;\n            }\n            dist[nodeValue] = dist[currentM] + 1;\n            queue[tail++] = nodeValue;\n            const nextNode = currentTree.upperBound(nodeValue, false);\n            currentTree.remove(nodeValue);\n            node = nextNode;\n        }\n    }\n\n    return dist[0] === Infinity ? -1 : dist[0];\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This algorithm uses **BFS (breadth-first search)** to find the minimum number of operations needed to transform a string to all zeros, with constraints based on parameter `k`. It starts by counting the number of **zeros** in string `s` (stored in `m`), then uses two **AVL trees** (organized by even/odd indices for efficient lookups) to explore all reachable states. For each state, it calculates a valid range of next states using formulas involving `k`, and uses the tree's **`upperBound`** method to efficiently find all states in that range without checking each one individually. The algorithm tracks the distance to reach each state, proceeding breadth-first so the first time it encounters state `0`, it has found the **shortest path**—or returns **-1** if state `0` is unreachable. The clever use of AVL trees avoids repeatedly checking already-visited states, making the search much faster than naive iteration.",
+    "status": "DONE",
+    "cpuUsage": 6.67,
+    "memoryUsage": 6.67,
+    "date": "2026-02-27T08:48:54.000Z"
+  }
+]

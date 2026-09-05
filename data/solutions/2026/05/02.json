@@ -1,0 +1,35 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @return {number}\n */\nvar rotatedDigits = function(n) {\n    let count = 0;\n\n    for (let x = 1; x <= n; x++) {\n        let num = x;\n        let rotated = false;\n\n        while (num > 0) {\n            const rem = num % 10;\n            if (rem === 2 || rem === 5 || rem === 6 || rem === 9) rotated = true;\n            if (rem === 3 || rem === 4 || rem === 7) break;\n            num = Math.floor(num / 10);\n        }\n\n        if (num === 0 && rotated) {\n            count++;\n        }\n    }\n\n    return count;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function counts how many numbers from **1 to n** have \"rotated digits\" — meaning when you rotate the number 180 degrees, it forms a valid different number. It loops through each number and checks its digits: **`2`, `5`, `6`, and `9`** are \"rotatable\" (they become different valid digits when rotated), **`0`, `1`, and `8`** are \"neutral\" (they stay the same when rotated), and **`3`, `4`, and `7`** are invalid (they don't form valid digits when rotated). The function extracts each digit from right to left and breaks early if it finds an invalid digit; if it successfully processes all digits without hitting an invalid one (`num === 0`) **and** at least one digit was actually rotatable (`rotated === true`), it increments the count. For example, 26 is counted because both 2 and 6 are rotatable, but 24 is not counted because 4 is invalid.",
+    "status": "DONE",
+    "cpuUsage": 75.51,
+    "memoryUsage": 77.55,
+    "date": "2026-05-02T09:13:06.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @return {number}\n */\nvar rotatedDigits = function(n) {\n    let count = 0;\n\n    for (let x = 1; x <= n; x++) {\n        let num = x;\n        let rotated = false;\n\n        while (num > 0) {\n            const rem = num % 10;\n            if (rem === 2 || rem === 5 || rem === 6 || rem === 9) rotated = true;\n            if (rem === 3 || rem === 4 || rem === 7) break;\n            num = ~~(num / 10);\n        }\n\n        if (num === 0 && rotated) {\n            count++;\n        }\n    }\n\n    return count;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code counts how many numbers from **1 to n** are \"rotated digits\" — numbers that look like valid numbers when rotated 180 degrees and have at least one digit that changes. It iterates through each number, extracting its digits one at a time using the modulo operator. Digits `0`, `1`, and `8` are valid (they look the same or correct when rotated), digits `2`, `5`, `6`, and `9` are valid but change when rotated (so `rotated` is set to `true`), and digits `3`, `4`, and `7` are invalid (they don't form recognizable digits when rotated, so the loop breaks). A number is counted only if all its digits passed validation (`num === 0` after the loop) **and** it contained at least one rotatable digit (`rotated === true`), meaning numbers like 89 would count but 11 would not.",
+    "status": "DONE",
+    "cpuUsage": 91.84,
+    "memoryUsage": 97.96,
+    "date": "2026-05-02T09:21:48.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "const cache = [[0, 0]];\n\n/**\n * @param {number} n\n * @return {number}\n */\nvar rotatedDigits = function(n) {\n    let start = 1;\n    let count = 0;\n\n    for (const [s, c] of cache) {\n        if (s + 1 <= n && s + 1 > start) {\n            start = s + 1;\n            count = c;\n        }\n    }\n\n    for (let x = start; x <= n; x++) {\n        let num = x;\n        let rotated = false;\n\n        while (num > 0) {\n            const rem = num % 10;\n            if (rem === 2 || rem === 5 || rem === 6 || rem === 9) rotated = true;\n            if (rem === 3 || rem === 4 || rem === 7) break;\n            num = ~~(num / 10);\n        }\n\n        if (num === 0 && rotated) {\n            count++;\n        }\n    }\n\n    cache.push([n, count]);\n\n    return count;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function counts how many numbers from 1 to `n` are **\"good rotated digits\"** — numbers that look like valid numbers when their digits are rotated 180 degrees. It uses a **cache** to remember previous results for optimization. For each number, it checks every digit: digits **0, 1, 8** stay the same when rotated, digits **2, 5, 6, 9** transform into different valid digits (making the number \"rotated\"), and digits **3, 4, 7** don't form valid digits when rotated. The function increments a counter only for numbers that contain exclusively valid digits AND have at least one transforming digit (2, 5, 6, or 9), then it stores the final result in the cache and returns the count.",
+    "status": "DONE",
+    "cpuUsage": 81.63,
+    "memoryUsage": 73.47,
+    "date": "2026-05-02T09:30:08.000Z"
+  }
+]

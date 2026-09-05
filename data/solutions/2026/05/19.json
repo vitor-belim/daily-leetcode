@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums1\n * @param {number[]} nums2\n * @return {number}\n */\nvar getCommon = function(nums1, nums2) {\n    let i = 0;\n    let j = 0;\n\n    while (i < nums1.length && j < nums2.length) {\n        if (nums1[i] === nums2[j]) {\n            return nums1[i];\n        } else if (nums1[i] < nums2[j]) {\n            i++;\n        } else {\n            j++;\n        }\n    }\n\n    return -1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses a **two-pointer technique** to find the smallest common element between two sorted arrays. Starting with pointers `i` and `j` at the beginning of each array, it compares elements at both positions—when they match, it returns that value immediately. If `nums1[i]` is smaller, it increments `i` to move forward in the first array; otherwise, it increments `j`. This leverages the sorted property of both arrays to efficiently search in O(n + m) time with O(1) space, returning `-1` if no common element exists.",
+    "status": "DONE",
+    "cpuUsage": 5.16,
+    "memoryUsage": 100,
+    "date": "2024-03-09T14:45:36.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums1\n * @param {number[]} nums2\n * @return {number}\n */\nvar getCommon = function(nums1, nums2) {\n    let pos1 = 0;\n    let pos2 = 0;\n\n    while (pos1 < nums1.length && pos2 < nums2.length) {\n        if (nums1[pos1] === nums2[pos2]) return nums1[pos1];\n\n        if (nums1[pos1] < nums2[pos2]) {\n            pos1++;\n        } else {\n            pos2++;\n        }\n    }\n\n    return -1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution applies the same **two-pointer strategy** with variables `pos1` and `pos2` to traverse both sorted arrays in parallel. It compares elements at the current positions and returns the match immediately upon finding one, avoiding an unnecessary comparison in the next iteration. By advancing the pointer pointing to the smaller element, it efficiently narrows the search space, achieving O(n + m) time complexity with O(1) extra space and returning `-1` when no common element is found.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 78.87,
+    "date": "2026-05-19T08:11:04.000Z"
+  }
+]

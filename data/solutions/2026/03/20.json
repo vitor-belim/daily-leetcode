@@ -1,0 +1,35 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} grid\n * @param {number} k\n * @return {number[][]}\n */\nvar minAbsDiff = function(grid, k) {\n    const m = grid.length;\n    const n = grid[0].length;\n\n    const dp = Array.from({ length: m - k + 1 }, () => Array.from({ length: n - k + 1 }, () => new Set()));\n\n    for (let row = 0; row < m - k + 1; row++) {\n        for (let col = 0; col < n - k + 1; col++) {\n            for (let r = 0; r < k; r++) {\n                for (let c = 0; c < k; c++) {\n                    dp[row][col].add(grid[row + r][col + c]);\n                }\n            }\n        }\n    }\n\n    for (let i = 0; i < dp.length; i++) {\n        for (let j = 0; j < dp[i].length; j++) {\n            const arr = [...dp[i][j]].sort((a, b) => a - b);\n            let minDiff = arr.length > 1 ? Infinity : 0;\n            let last;\n\n            for (const val of arr) {\n                if (last !== undefined) {\n                    minDiff = Math.min(minDiff, Math.abs(val - last));\n                }\n                last = val;\n            }\n\n            dp[i][j] = minDiff;\n        }\n    }\n\n    return dp;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds the **minimum absolute difference** between any two distinct numbers in every **k×k subgrid** of the input grid. It creates a 2D array where each cell contains a **Set** of all unique values from the corresponding k×k window, then sorts each Set and calculates the smallest difference between consecutive elements, handling single-element cases by returning 0.",
+    "status": "DONE",
+    "cpuUsage": 43.75,
+    "memoryUsage": 56.25,
+    "date": "2026-03-20T09:21:26.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} grid\n * @param {number} k\n * @return {number[][]}\n */\nvar minAbsDiff = function(grid, k) {\n    const m = grid.length;\n    const n = grid[0].length;\n\n    const dp = Array.from({ length: m - k + 1 }, () => Array.from({ length: n - k + 1 }, () => new Set()));\n\n    for (let row = 0; row < m - k + 1; row++) {\n        for (let col = 0; col < n - k + 1; col++) {\n            for (let r = 0; r < k; r++) {\n                for (let c = 0; c < k; c++) {\n                    dp[row][col].add(grid[row + r][col + c]);\n                }\n            }\n        }\n    }\n\n    for (let i = 0; i < dp.length; i++) {\n        for (let j = 0; j < dp[i].length; j++) {\n            const arr = [...dp[i][j]];\n            arr.sort((a, b) => a - b);\n\n            let minDiff = Infinity;\n\n            for (let pos = 1; pos < arr.length; pos++) {\n                minDiff = Math.min(minDiff, Math.abs(arr[pos] - arr[pos - 1]));\n            }\n\n            dp[i][j] = minDiff === Infinity ? 0 : minDiff;\n        }\n    }\n\n    return dp;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses the same approach as Solution 1 — extracting unique values from k×k subgrids into Sets and finding the **minimum difference between consecutive sorted values** — but simplifies the difference calculation logic by always initializing `minDiff` to **Infinity** and then converting it to **0** at the end if no pair differences were found, rather than checking the Set size upfront.",
+    "status": "DONE",
+    "cpuUsage": 25,
+    "memoryUsage": 68.75,
+    "date": "2026-03-20T10:00:50.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} grid\n * @param {number} k\n * @return {number[][]}\n */\nvar minAbsDiff = function(grid, k) {\n    const m = grid.length;\n    const n = grid[0].length;\n\n    const dp = Array.from({ length: m - k + 1 }, () => Array(n - k + 1).fill(0));\n\n    for (let row = 0; row < m - k + 1; row++) {\n        for (let col = 0; col < n - k + 1; col++) {\n            const set = new Set();\n\n            for (let r = 0; r < k; r++) {\n                for (let c = 0; c < k; c++) {\n                    set.add(grid[row + r][col + c]);\n                }\n            }\n\n            const arr = [...set];\n\n            if (arr.length <= 1) {\n                continue;\n            }\n\n            arr.sort((a, b) => a - b);\n\n            let minDiff = Infinity;\n\n            for (let pos = 1; pos < arr.length; pos++) {\n                minDiff = Math.min(minDiff, Math.abs(arr[pos] - arr[pos - 1]));\n            }\n\n            dp[row][col] = minDiff;\n        }\n    }\n\n    return dp;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is a more **memory-efficient variant** that avoids storing Sets in the DP array; instead, it creates a temporary Set for each k×k subgrid, immediately processes it to find the minimum difference, and stores only the final result in the DP cell. It uses a **`continue` statement** to skip processing when a subgrid has only one unique element, leaving that cell at its initialized value of 0.",
+    "status": "DONE",
+    "cpuUsage": 81.25,
+    "memoryUsage": 50,
+    "date": "2026-03-20T10:07:04.000Z"
+  }
+]

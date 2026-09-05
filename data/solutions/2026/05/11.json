@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number[]}\n */\nvar separateDigits = function(nums) {\n    const res = [];\n\n    for (let i = nums.length - 1; i >= 0; i--) {\n        let num = nums[i];\n\n        while (num > 0) {\n            res.push(num % 10);\n            num = Math.floor(num / 10);\n        }\n    }\n\n    return res.reverse();\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function **separates all individual digits** from an array of numbers and returns them as a flat array in the original order. It works backwards through the input array, extracting each digit from right to left using the modulo operator (`%`) to get the last digit and integer division to remove it, pushing each digit onto a result array. Since this process naturally reverses the digit order, the function reverses the entire result array at the end to restore the correct sequence—so for example, `[123, 456]` becomes `[1, 2, 3, 4, 5, 6]`.",
+    "status": "DONE",
+    "cpuUsage": 99.39,
+    "memoryUsage": 71.34,
+    "date": "2026-05-11T08:04:05.000Z"
+  }
+]

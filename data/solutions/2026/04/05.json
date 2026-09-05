@@ -1,0 +1,68 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} moves\n * @return {boolean}\n */\nvar judgeCircle = function(moves) {\n    let x = 0;\n    let y = 0;\n\n    for (const move of moves) {\n        if (move === 'U') {\n            y++;\n        } else if (move === 'R') {\n            x++;\n        } else if (move === 'D') {\n            y--;\n        } else if (move === 'L') {\n            x--;\n        }\n    }\n\n    return x === 0 && y === 0;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution tracks the robot's position using **x** and **y** coordinates. It iterates through each `move` in the input string, incrementing or decrementing the appropriate coordinate based on the direction (`U` for up, `R` for right, `D` for down, `L` for left). Finally, it returns `true` if both coordinates are `0`, meaning the robot has returned to its starting position.",
+    "status": "DONE",
+    "cpuUsage": 88.34,
+    "memoryUsage": 93.05,
+    "date": "2025-06-07T20:17:18.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} moves\n * @return {boolean}\n */\nvar judgeCircle = function(moves) {\n    const map = {\n        'U': 0,\n        'R': 0,\n        'D': 0,\n        'L': 0,\n    };\n\n    for (const move of moves) {\n        map[move]++;\n    }\n\n    return map['U'] === map['D'] && map['L'] === map['R'];\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses an **object map** to count how many times each direction appears in the moves string. It then checks if the count of `U` moves equals `D` moves (vertical balance) and the count of `L` moves equals `R` moves (horizontal balance), returning `true` only if both conditions are satisfied.",
+    "status": "DONE",
+    "cpuUsage": 17.12,
+    "memoryUsage": 63.03,
+    "date": "2025-06-07T20:21:31.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} moves\n * @return {boolean}\n */\nvar judgeCircle = function(moves) {\n    let x = 0;\n    let y = 0;\n\n    for (const move of moves) {\n        if (move === 'U') {\n            y++;\n        } else if (move === 'R') {\n            x++;\n        } else if (move === 'D') {\n            y--;\n        } else if (move === 'L') {\n            x--;\n        }\n    }\n\n    return !x && !y;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution is identical in logic to the first approach—it tracks **x** and **y** coordinates while iterating through moves. The only difference is the return condition uses **truthiness checks** (`!x && !y`) instead of explicit equality comparisons to determine if the robot returned to the origin.",
+    "status": "DONE",
+    "cpuUsage": 13.15,
+    "memoryUsage": 11.17,
+    "date": "2025-06-07T20:23:53.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} moves\n * @return {boolean}\n */\nvar judgeCircle = function(moves) {\n    const map = {\n        U: 0,\n        R: 0,\n        D: 0,\n        L: 0,\n    };\n\n    for (const move of moves) {\n        map[move]++;\n    }\n\n    return map.U === map.D && map.L === map.R;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses a **direction map** to count occurrences of each move type, identical in approach to Solution 2. The only difference is that it accesses object properties using **dot notation** (`map.U`, `map.D`, etc.) rather than bracket notation, making it slightly more concise.",
+    "status": "DONE",
+    "cpuUsage": 13.15,
+    "memoryUsage": 71.46,
+    "date": "2025-06-07T20:26:35.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} moves\n * @return {boolean}\n */\nvar judgeCircle = function(moves) {\n    const dir = [0, 0, 0, 0];\n    const map = { U: 0, D: 1, L: 2, R: 3 };\n\n    for (const move of moves) {\n        dir[map[move]]++;\n    }\n\n    return dir[0] === dir[1] && dir[2] === dir[3];\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution creates an **array** indexed by direction numbers (mapped via an object where `U=0`, `D=1`, `L=2`, `R=3`) to count move occurrences. It then verifies the robot returned home by checking if opposite directions have equal counts: up equals down, and left equals right.",
+    "status": "DONE",
+    "cpuUsage": 14.64,
+    "memoryUsage": 46.15,
+    "date": "2025-06-07T20:43:38.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} moves\n * @return {boolean}\n */\nvar judgeCircle = function(moves) {\n    let x = 0;\n    let y = 0;\n\n    for (const move of moves) {\n        if (move === 'R') {\n            x++;\n        } else if (move === 'L') {\n            x--;\n        } else if (move === 'U') {\n            y++;\n        } else if (move === 'D') {\n            y--;\n        }\n    }\n\n    return x === 0 && y === 0;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution tracks the robot's **x** and **y** coordinates while iterating through the moves, incrementing or decrementing based on direction (`R`/`L` for horizontal, `U`/`D` for vertical). It returns `true` if both coordinates are `0` at the end, confirming the robot completed a circular path back to the starting position.",
+    "status": "DONE",
+    "cpuUsage": 94.54,
+    "memoryUsage": 67.99,
+    "date": "2026-04-05T08:47:49.000Z"
+  }
+]

@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s1\n * @param {string} s2\n * @return {number}\n */\nvar minimumDeleteSum = function (s1, s2) {\n    const m = s1.length;\n    const n = s2.length;\n    const dp = Array.from({ length: m + 1 }, () => Array(n + 1).fill(0));\n\n    for (let i = 0; i < m; i++) {\n        for (let j = 0; j < n; j++) {\n            if (s1[i] === s2[j]) {\n                dp[i + 1][j + 1] = dp[i][j] + s1.charCodeAt(i);\n            } else {\n                dp[i + 1][j + 1] = Math.max(dp[i][j + 1], dp[i + 1][j]);\n            }\n        }\n    }\n\n    let total = 0;\n\n    for (let i = 0; i < m; i++) {\n        total += s1.charCodeAt(i);\n    }\n    for (let i = 0; i < n; i++) {\n        total += s2.charCodeAt(i);\n    }\n\n    return total - 2 * dp[m][n];\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function solves the problem of making two strings equal by deleting characters, while minimizing the total **ASCII value** of everything deleted. Instead of tracking deletions directly, it flips the problem around: it uses **dynamic programming** to find the *common subsequence* with the **maximum possible ASCII sum** — the characters worth keeping. The 2D table `dp[i+1][j+1]` stores the best ASCII sum of a common subsequence using the first `i` characters of `s1` and the first `j` characters of `s2`: when characters match (`s1[i] === s2[j]`), it extends the previous best with that character's ASCII value via `dp[i][j] + s1.charCodeAt(i)`; otherwise it carries forward the larger of the two neighboring results with `Math.max`. Finally, it sums the ASCII values of *every* character in both strings into `total`, and returns `total - 2 * dp[m][n]` — subtracting the kept subsequence **twice** because those characters survive in *both* strings, leaving exactly the ASCII sum of the deleted characters.",
+    "status": "DONE",
+    "cpuUsage": 51.52,
+    "memoryUsage": 27.27,
+    "date": "2026-01-10T10:44:19.000Z"
+  }
+]

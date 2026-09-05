@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} zero\n * @param {number} one\n * @param {number} limit\n * @return {number}\n */\nvar numberOfStableArrays = function(zero, one, limit) {\n    let res = 0;\n    \n    const dfs = (z, o, cur) => {\n        if (z === 0 && o === 0) {\n            res++;\n            return;\n        }\n\n        if (z > 0 && (cur.length < limit || cur.slice(-limit).includes('1'))) {\n            dfs(z - 1, o, cur + '0');\n        }\n        if (o > 0 && (cur.length < limit || cur.slice(-limit).includes('0'))) {\n            dfs(z, o - 1, cur + '1');\n        }\n    };\n    dfs(zero, one, '');\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is a recursive backtracking approach that builds strings by adding 0s and 1s one at a time. For each digit added, it checks if adding that digit would violate the constraint (more than `limit` consecutive identical digits) by examining the last `limit` characters. The function recursively tries adding a **0** (if available) and a **1** (if available), only proceeding if the constraint is satisfied, and counts valid complete strings where all zeros and ones are used up.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-03-09T08:56:32.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} zero\n * @param {number} one\n * @param {number} limit\n * @return {number}\n */\nvar numberOfStableArrays = function (zero, one, limit) {\n    const MOD = 1000000007;\n    const dp = Array.from({ length: zero + 1 }, () =>\n        Array.from({ length: one + 1 }, () => [0, 0]),\n    );\n\n    for (let i = 0; i <= Math.min(zero, limit); i++) {\n        dp[i][0][0] = 1;\n    }\n    for (let j = 0; j <= Math.min(one, limit); j++) {\n        dp[0][j][1] = 1;\n    }\n\n    for (let i = 1; i <= zero; i++) {\n        for (let j = 1; j <= one; j++) {\n            if (i > limit) {\n                dp[i][j][0] =\n                    dp[i - 1][j][0] + dp[i - 1][j][1] - dp[i - limit - 1][j][1];\n            } else {\n                dp[i][j][0] = dp[i - 1][j][0] + dp[i - 1][j][1];\n            }\n            dp[i][j][0] = ((dp[i][j][0] % MOD) + MOD) % MOD;\n            if (j > limit) {\n                dp[i][j][1] =\n                    dp[i][j - 1][1] + dp[i][j - 1][0] - dp[i][j - limit - 1][0];\n            } else {\n                dp[i][j][1] = dp[i][j - 1][1] + dp[i][j - 1][0];\n            }\n            dp[i][j][1] = ((dp[i][j][1] % MOD) + MOD) % MOD;\n        }\n    }\n    return (dp[zero][one][0] + dp[zero][one][1]) % MOD;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This uses **dynamic programming** where `dp[i][j][k]` represents the number of valid strings using exactly `i` zeros and `j` ones, ending with digit `k` (0 or 1). It initializes base cases for strings ending at the limit, then fills the table by computing transitions: when adding more of a digit than the limit allows, it subtracts out the invalid cases using **inclusion-exclusion principle**. The **modulo** operations handle the large number of possibilities while keeping results within bounds.",
+    "status": "DONE",
+    "cpuUsage": 66.67,
+    "memoryUsage": 50,
+    "date": "2026-03-09T08:58:39.000Z"
+  }
+]

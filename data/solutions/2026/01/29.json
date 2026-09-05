@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} source\n * @param {string} target\n * @param {character[]} original\n * @param {character[]} changed\n * @param {number[]} cost\n * @return {number}\n */\nvar minimumCost = function(source, target, original, changed, cost) {\n    let total = 0;\n\n    let aCode = \"a\".charCodeAt(0);\n    const map = Array(26).fill().map(() => Array(26).fill(Infinity));\n    for (let i = 0; i < original.length; i++) {\n        map[original[i].charCodeAt(0) - aCode][changed[i].charCodeAt(0) - aCode] = cost[i];\n    }\n\n    for (let k = 0; k < 26; k++) {\n        for (let i = 0; i < 26; i++) {\n            for (let j = 0; j < 26; j++) {\n                if (map[i][j] > map[i][k] + map[k][j]) {\n                    map[i][j] = map[i][k] + map[k][j];\n                }\n            }\n        }\n    }\n\n    for (let i = 0; i < source.length; i++) {\n        if (source[i] === target[i]) {\n            continue;\n        }\n\n        const co = map[source.charCodeAt(i) - aCode][target.charCodeAt(i) - aCode];\n\n        if (co === Infinity) {\n            return -1;\n        }\n\n        total += co;\n    }\n\n    return total;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code finds the **minimum cost to transform a source string into a target string** using the **Floyd-Warshall algorithm**. It starts by building a 26×26 matrix representing the cost to transform each lowercase letter to every other letter, then applies Floyd-Warshall to compute the cheapest transformation paths through intermediate characters (e.g., if `a→b` costs 1 and `b→c` costs 2, it finds that `a→c` can be done for 3). Finally, it iterates through the source string and, for each character that doesn't match the target, looks up the minimum transformation cost from the matrix—if any character can't be transformed, it returns **-1**; otherwise, it returns the total cost.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2024-07-27T07:11:01.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} source\n * @param {string} target\n * @param {character[]} original\n * @param {character[]} changed\n * @param {number[]} cost\n * @return {number}\n */\nvar minimumCost = function(source, target, original, changed, cost) {\n    let aCode = \"a\".charCodeAt(0);\n\n    const map = Array(26).fill().map(() => Array(26).fill(Infinity));\n    for (let i = 0; i < original.length; i++) {\n        const from = original[i].charCodeAt(0) - aCode;\n        const to = changed[i].charCodeAt(0) - aCode;\n\n        map[from][to] = Math.min(map[from][to], cost[i]);\n    }\n\n    for (let k = 0; k < 26; k++) {\n        for (let i = 0; i < 26; i++) {\n            for (let j = 0; j < 26; j++) {\n                if (map[i][j] > map[i][k] + map[k][j]) {\n                    map[i][j] = map[i][k] + map[k][j];\n                }\n            }\n        }\n    }\n\n    let total = 0;\n\n    for (let i = 0; i < source.length; i++) {\n        if (source[i] === target[i]) {\n            continue;\n        }\n\n        const co = map[source.charCodeAt(i) - aCode][target.charCodeAt(i) - aCode];\n\n        if (co === Infinity) {\n            return -1;\n        }\n\n        total += co;\n    }\n\n    return total;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code solves the **minimum string transformation cost problem** using the **Floyd-Warshall shortest-path algorithm**. It constructs a 26×26 cost matrix where each cell `[i][j]` represents the minimum cost to transform character `i` to character `j`, using `Math.min()` to keep the cheapest option when multiple transformations exist for the same pair. After building this matrix, Floyd-Warshall is applied to find the lowest cost paths that may use intermediate characters as stepping stones. Then the algorithm scans through each position in the source string, and if a character differs from the target, it adds the corresponding transformation cost from the matrix—returning **-1** if any character transformation is impossible (cost remains **Infinity**), otherwise returning the total accumulated cost.",
+    "status": "DONE",
+    "cpuUsage": 33.33,
+    "memoryUsage": 100,
+    "date": "2024-07-27T07:23:57.000Z"
+  }
+]

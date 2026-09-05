@@ -1,0 +1,189 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} positions\n * @param {number[]} healths\n * @param {string} directions\n * @return {number[]}\n */\nvar survivedRobotsHealths = function (positions, healths, directions) {\n    const robots = [];\n    for (let i = 0; i < positions.length; i++) {\n        robots.push({\n            orig: i,\n            pos: positions[i],\n            hp: healths[i],\n            dir: directions[i],\n        });\n    }\n    robots.sort((a, b) => a.pos - b.pos);\n\n    console.log('before', robots);\n\n    for (let i = 0; i < robots.length - 1; i++) {\n        if (robots[i].dir === 'R' && robots[i + 1].dir === 'L') {\n            if (robots[i].hp === robots[i + 1].hp) {\n                robots.splice(i, 2);\n            } else if (robots[i].hp < robots[i + 1].hp) {\n                if (robots[i + 1].hp === 1) {\n                    robots.splice(i, 2);\n                } else {\n                    robots[i + 1].hp--;\n                    robots.splice(i, 1);\n                }\n            } else {\n                if (robots[i].hp === 1) {\n                    robots.splice(i, 2);\n                } else {\n                    robots[i].hp--;\n                    robots.splice(i + 1, 1);\n                }\n            }\n            i = Math.max(i - 2, -1);\n        }\n    }\n\n    console.log('after', robots);\n\n    robots.sort((a, b) => a.orig - b.orig);\n\n    return robots.map(r => r.hp);\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Tracks robots using **objects** with position, health, and direction; **sorts** them by position, then iterates through checking adjacent pairs for **right-moving followed by left-moving** collisions, updating health and removing defeated robots using **splice** with index backtracking.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2024-07-13T07:30:02.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} positions\n * @param {number[]} healths\n * @param {string} directions\n * @return {number[]}\n */\nvar survivedRobotsHealths = function (positions, healths, directions) {\n    const robots = [];\n    for (let i = 0; i < positions.length; i++) {\n        robots.push({\n            orig: i,\n            pos: positions[i],\n            hp: healths[i],\n            dir: directions[i],\n        });\n    }\n    robots.sort((a, b) => a.pos - b.pos);\n\n    for (let i = 0; i < robots.length - 1; i++) {\n        if (robots[i].dir === 'R' && robots[i + 1].dir === 'L') {\n            if (robots[i].hp === robots[i + 1].hp) {\n                robots.splice(i, 2);\n                i--;\n            } else if (robots[i].hp < robots[i + 1].hp) {\n                if (robots[i + 1].hp === 1) {\n                    robots.splice(i, 2);\n                    i--;\n                } else {\n                    robots[i + 1].hp--;\n                    robots.splice(i, 1);\n                }\n            } else {\n                if (robots[i].hp === 1) {\n                    robots.splice(i, 2);\n                    i--;\n                } else {\n                    robots[i].hp--;\n                    robots.splice(i + 1, 1);\n                }\n            }\n            if (i > -1)\n                i--;\n        }\n    }\n\n    robots.sort((a, b) => a.orig - b.orig);\n\n    return robots.map(r => r.hp);\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Improves on the splice-based approach by using **`i--`** for index management instead of `Math.max(i - 2, -1)`, ensuring collision checks properly **restart** when robots are removed from the array.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2024-07-13T07:34:42.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} positions\n * @param {number[]} healths\n * @param {string} directions\n * @return {number[]}\n */\nvar survivedRobotsHealths = function (positions, healths, directions) {\n    const robots = [];\n    for (let i = 0; i < positions.length; i++) {\n        robots.push({\n            orig: i,\n            pos: positions[i],\n            hp: healths[i],\n            dir: directions[i],\n        });\n    }\n    robots.sort((a, b) => a.pos - b.pos);\n\n    for (let i = 0; i < robots.length - 1; i++) {\n        if (robots[i].dir === 'R' && robots[i + 1].dir === 'L') {\n            if (robots[i].hp === robots[i + 1].hp) {\n                robots.splice(i, 2);\n                i--;\n            } else if (robots[i].hp < robots[i + 1].hp) {\n                if (robots[i + 1].hp === 1) {\n                    robots.splice(i, 2);\n                    i--;\n                } else {\n                    robots[i + 1].hp--;\n                    robots.splice(i, 1);\n                }\n            } else {\n                if (robots[i].hp === 1) {\n                    robots.splice(i, 2);\n                    i--;\n                } else {\n                    robots[i].hp--;\n                    robots.splice(i + 1, 1);\n                }\n            }\n            i = Math.max(-1, i - 1);\n        }\n    }\n\n    robots.sort((a, b) => a.orig - b.orig);\n\n    return robots.map(r => r.hp);\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Attempts the splice-based logic but reverts to using **`i = Math.max(i - 2, -1)`** for index backtracking, which **creates gaps** in collision detection and causes robots to miss being checked.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2024-07-13T07:35:27.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} positions\n * @param {number[]} healths\n * @param {string} directions\n * @return {number[]}\n */\nvar survivedRobotsHealths = function (positions, healths, directions) {\n    const robots = [];\n    for (let i = 0; i < positions.length; i++) {\n        robots.push({\n            orig: i,\n            pos: positions[i],\n            hp: healths[i],\n            dir: directions[i],\n        });\n    }\n    robots.sort((a, b) => a.pos - b.pos);\n\n    for (let i = 0; i < robots.length - 1; i++) {\n        if (robots[i].dir === 'R' && robots[i + 1].dir === 'L') {\n            if (robots[i].hp === robots[i + 1].hp) {\n                robots.splice(i, 2);\n            } else if (robots[i].hp < robots[i + 1].hp) {\n                if (robots[i + 1].hp === 1) {\n                    robots.splice(i, 2);\n                } else {\n                    robots[i + 1].hp--;\n                    robots.splice(i, 1);\n                }\n            } else {\n                if (robots[i].hp === 1) {\n                    robots.splice(i, 2);\n                } else {\n                    robots[i].hp--;\n                    robots.splice(i + 1, 1);\n                }\n            }\n            i = Math.max(i - 2, -1);\n        }\n    }\n\n    robots.sort((a, b) => a.orig - b.orig);\n\n    return robots.map(r => r.hp);\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Repeats the object-based splice approach with **`i = Math.max(i - 2, -1)`** index management, which produces **infinite loops** and **timeout errors (TLE)** due to improper iteration control.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2024-07-13T07:36:54.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} positions\n * @param {number[]} healths\n * @param {string} directions\n * @return {number[]}\n */\nvar survivedRobotsHealths = function(positions, healths, directions) {\n  const n = positions.length;\n        const indices = Array.from({ length: n }, (_, i) => i);\n        const result = [];\n        const stack = [];\n\n        // Sort indices based on positions\n        indices.sort((lhs, rhs) => positions[lhs] - positions[rhs]);\n\n        for (const currentIndex of indices) {\n            if (directions[currentIndex] === 'R') {\n                stack.push(currentIndex);\n            } else {\n                while (stack.length > 0 && healths[currentIndex] > 0) {\n                    const topIndex = stack.pop();\n\n                    if (healths[topIndex] > healths[currentIndex]) {\n                        healths[topIndex] -= 1;\n                        healths[currentIndex] = 0;\n                        stack.push(topIndex);\n                    } else if (healths[topIndex] < healths[currentIndex]) {\n                        healths[currentIndex] -= 1;\n                        healths[topIndex] = 0;\n                    } else {\n                        healths[currentIndex] = 0;\n                        healths[topIndex] = 0;\n                    }\n                }\n            }\n        }\n\n        // Collect surviving robots\n        for (let index = 0; index < n; ++index) {\n            if (healths[index] > 0) {\n                result.push(healths[index]);\n            }\n        }\n\n        return result;  \n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Uses a **stack** and sorted robot positions; when encountering a **right-moving** robot it's **pushed** to the stack, and when hitting a **left-moving** robot, **repeatedly pops and compares health** values, either reducing health or removing robots from the stack until no collisions remain.",
+    "status": "DONE",
+    "cpuUsage": 5,
+    "memoryUsage": 100,
+    "date": "2024-07-13T19:52:50.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} positions\n * @param {number[]} healths\n * @param {string} directions\n * @return {number[]}\n */\nvar survivedRobotsHealths = function (positions, healths, directions) {\n    const robots = [];\n    for (let i = 0; i < positions.length; i++) {\n        robots.push({\n            orig: i,\n            pos: positions[i],\n            hp: healths[i],\n            dir: directions[i],\n        });\n    }\n    robots.sort((a, b) => a.pos - b.pos);\n\n    for (let i = 0; i < robots.length - 1; i++) {\n        if (robots[i].dir === 'R' && robots[i + 1].dir === 'L') {\n            if (robots[i].hp === robots[i + 1].hp) {\n                robots.splice(i, 2);\n                i--;\n            } else if (robots[i].hp < robots[i + 1].hp) {\n                if (robots[i + 1].hp === 1) {\n                    robots.splice(i, 2);\n                    i--;\n                } else {\n                    robots[i + 1].hp--;\n                    robots.splice(i, 1);\n                }\n            } else {\n                if (robots[i].hp === 1) {\n                    robots.splice(i, 2);\n                    i--;\n                } else {\n                    robots[i].hp--;\n                    robots.splice(i + 1, 1);\n                }\n            }\n            i = Math.max(i - 1, -1);\n        }\n    }\n\n    robots.sort((a, b) => a.orig - b.orig);\n\n    return robots.map(r => r.hp);\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Mirrors the splice-based approach but replaces proper backtracking with **`i = Math.max(i - 1, -1)`** and inconsistently placed **`i--`** statements, causing the algorithm to **skip collision checks** and fail.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2024-07-14T11:36:33.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} positions\n * @param {number[]} healths\n * @param {string} directions\n * @return {number[]}\n */\nvar survivedRobotsHealths = function (positions, healths, directions) {\n    const robots = [];\n    for (let i = 0; i < positions.length; i++) {\n        robots.push({\n            orig: i,\n            pos: positions[i],\n            hp: healths[i],\n            dir: directions[i],\n        });\n    }\n    robots.sort((a, b) => a.pos - b.pos);\n\n    for (let i = 0; i < robots.length - 1; i++) {\n        if (robots[i].dir === 'R' && robots[i + 1].dir === 'L') {\n            if (robots[i].hp === robots[i + 1].hp) {\n                robots.splice(i, 2);\n                i--;\n            } else if (robots[i].hp < robots[i + 1].hp) {\n                if (robots[i + 1].hp === 1) {\n                    robots.splice(i, 2);\n                } else {\n                    robots[i + 1].hp--;\n                    robots.splice(i, 1);\n                }\n                i--;\n            } else {\n                if (robots[i].hp === 1) {\n                    robots.splice(i, 2);\n                    i--;\n                } else {\n                    robots[i].hp--;\n                    robots.splice(i + 1, 1);\n                }\n            }\n            i = Math.max(i - 1, -1);\n        }\n    }\n\n    robots.sort((a, b) => a.orig - b.orig);\n\n    return robots.map(r => r.hp);\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Variant of the splice-based approach that implements **specific backtracking logic** with **conditional `i--` statements**, attempting to handle removals differently than the standard decrement-and-backtrack pattern.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2024-07-14T11:40:13.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} positions\n * @param {number[]} healths\n * @param {string} directions\n * @return {number[]}\n */\nvar survivedRobotsHealths = function (positions, healths, directions) {\n    const robots = [];\n    for (let i = 0; i < positions.length; i++) {\n        robots.push({\n            orig: i,\n            pos: positions[i],\n        });\n    }\n    robots.sort((a, b) => a.pos - b.pos);\n\n    for (let i = 0; i < robots.length - 1; i++) {\n        const posRob1 = robots[i].orig;\n        const posRob2 = robots[i + 1].orig;\n        if (directions[posRob1] === 'R' && directions[posRob2] === 'L') {\n            if (healths[posRob1] === healths[posRob2]) {\n                healths[posRob1] = 0;\n                healths[posRob2] = 0;\n                robots.splice(i, 2);\n                i--;\n            } else if (healths[posRob1] < healths[posRob2]) {\n                healths[posRob1] = 0;\n                healths[posRob2]--;\n                if (healths[posRob2] === 0) {\n                    robots.splice(i, 2);\n                } else {\n                    robots.splice(i, 1);\n                }\n                i--;\n            } else {\n                healths[posRob2] = 0;\n                healths[posRob1]--;\n                if (healths[posRob1] === 0) {\n                    robots.splice(i, 2);\n                    i--;\n                } else {\n                    robots.splice(i + 1, 1);\n                }\n            }\n            i = Math.max(i - 1, -1);\n        }\n    }\n\n    return healths.filter(hp => hp > 0);\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "**Streamlined** approach storing only **position and original index** in the tracking structure, then maintaining **references** to the original health and direction arrays for collision detection, reducing memory overhead.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2024-07-14T11:49:51.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} positions\n * @param {number[]} healths\n * @param {string} directions\n * @return {number[]}\n */\nvar survivedRobotsHealths = function (positions, healths, directions) {\n    const sortedPos = Array(positions.length).fill().map((_, i) => i);\n\n    sortedPos.sort((a, b) => positions[a] - positions[b]);\n\n    const stack = [];\n    for (let i = 0; i < sortedPos.length; i++) {\n        const curPos = sortedPos[i];\n        const curHp = healths[curPos];\n        const curDir = directions[curPos];\n\n        if (stack.length > 0) {\n            const lastPos = stack[stack.length - 1];\n            const lastHp = healths[lastPos];\n            const lastDir = directions[lastPos];\n\n            if (lastDir === 'R' && curDir === 'L') {\n                if (lastHp === curHp) {\n                    healths[curPos] = 0;\n                    healths[lastPos] = 0;\n                } else if (lastHp < curHp) {\n                    healths[curPos]--;\n                    healths[lastPos] = 0;\n                } else {\n                    healths[curPos] = 0;\n                    healths[lastPos]--;\n                }\n            }\n\n            if (healths[lastPos] === 0) {\n                stack.pop();\n            }\n        }\n\n        if (healths[curPos] > 0) {\n            stack.push(curPos);\n        }\n    }\n\n    return healths.filter(hp => hp > 0);\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "**Stack-based** solution storing only **position and original index** in the tracking structure, then maintaining **references** to the original health and direction arrays for collision detection, reducing memory overhead.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2024-07-16T18:13:31.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} positions\n * @param {number[]} healths\n * @param {string} directions\n * @return {number[]}\n */\nvar survivedRobotsHealths = function (positions, healths, directions) {\n    const sortedPos = Array(positions.length).fill().map((_, i) => i);\n\n    sortedPos.sort((a, b) => positions[a] - positions[b]);\n\n    const stack = [];\n    for (const curPos of sortedPos) {\n\n        while (stack.length > 0 &&\n            directions[stack[stack.length - 1]] === 'R' &&\n            directions[curPos] === 'L' &&\n            healths[curPos] > 0) {\n            const lastPos = stack[stack.length - 1];\n\n            if (healths[lastPos] === healths[curPos]) {\n                healths[curPos] = 0;\n                healths[lastPos] = 0;\n            } else if (healths[lastPos] < healths[curPos]) {\n                healths[curPos]--;\n                healths[lastPos] = 0;\n            } else {\n                healths[curPos] = 0;\n                healths[lastPos]--;\n            }\n\n            if (healths[lastPos] === 0) {\n                stack.pop();\n            }\n        }\n\n        if (healths[curPos] > 0) {\n            stack.push(curPos);\n        }\n    }\n\n    return healths.filter(hp => hp > 0);\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "**Stack-based** with objects containing **index, position, health, and direction**; processes collisions by **comparing health values**, then **sorts survivors by original index** before returning the final result.",
+    "status": "DONE",
+    "cpuUsage": 5,
+    "memoryUsage": 100,
+    "date": "2024-07-16T18:24:50.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} positions\n * @param {number[]} healths\n * @param {string} directions\n * @return {number[]}\n */\nvar survivedRobotsHealths = function (positions, healths, directions) {\n    const sortedPos = Array(positions.length).fill().map((_, i) => i);\n\n    sortedPos.sort((a, b) => positions[a] - positions[b]);\n\n    const stack = [];\n    for (const curPos of sortedPos) {\n        while (stack.length > 0 &&\n            directions[stack[stack.length - 1]] === 'R' &&\n            directions[curPos] === 'L' &&\n            healths[curPos] > 0) {\n            const lastPos = stack[stack.length - 1];\n\n            if (healths[lastPos] === healths[curPos]) {\n                healths[curPos] = 0;\n                healths[lastPos] = 0;\n            } else if (healths[lastPos] < healths[curPos]) {\n                healths[curPos]--;\n                healths[lastPos] = 0;\n            } else {\n                healths[curPos] = 0;\n                healths[lastPos]--;\n            }\n\n            if (healths[lastPos] === 0) {\n                stack.pop();\n            }\n        }\n\n        if (healths[curPos] > 0) {\n            stack.push(curPos);\n        }\n    }\n\n    return healths.filter(hp => hp > 0);\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Duplicates solution #9 with identical **stack-based** logic, storing the same object fields and applying the same **health comparison and index sorting** strategy.",
+    "status": "DONE",
+    "cpuUsage": 5,
+    "memoryUsage": 100,
+    "date": "2024-07-16T18:27:18.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} positions\n * @param {number[]} healths\n * @param {string} directions\n * @return {number[]}\n */\nvar survivedRobotsHealths = function (positions, healths, directions) {\n    const sortedPos = Array(positions.length).fill().map((_, i) => i);\n\n    sortedPos.sort((a, b) => positions[a] - positions[b]);\n\n    const stack = [];\n    for (const curPos of sortedPos) {\n        if (directions[curPos] === 'R') {\n            stack.push(curPos);\n            continue;\n        }\n\n        while (stack.length > 0 && healths[curPos] > 0) {\n            const lastPos = stack.pop();\n\n            if (healths[lastPos] === healths[curPos]) {\n                healths[curPos] = 0;\n                healths[lastPos] = 0;\n            } else if (healths[lastPos] < healths[curPos]) {\n                healths[curPos]--;\n                healths[lastPos] = 0;\n            } else {\n                healths[curPos] = 0;\n                healths[lastPos]--;\n                stack.push(lastPos);\n            }\n        }\n    }\n\n    return healths.filter(hp => hp > 0);\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "**Stack-based** with objects; **pushes right-moving** robots onto the stack, and when a **left-moving** robot arrives, **repeatedly pops and compares health** values until no collision pairs remain, tracking survivors.",
+    "status": "DONE",
+    "cpuUsage": 5,
+    "memoryUsage": 100,
+    "date": "2024-07-16T18:35:06.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} positions\n * @param {number[]} healths\n * @param {string} directions\n * @return {number[]}\n */\nvar survivedRobotsHealths = function (positions, healths, directions) {\n    const objs = positions.map((pos, idx) => ({\n        idx: idx,\n        pos: pos,\n        hp: healths[idx],\n        dir: directions[idx],\n    }));\n\n    objs.sort((a, b) => a.pos - b.pos);\n\n    const stack = [];\n\n    for (const obj of objs) {\n        if (obj.dir === 'R') {\n            stack.push(obj);\n            continue;\n        }\n\n        while (obj.hp > 0 && stack.length > 0) {\n            const last = stack[stack.length - 1];\n\n            if (obj.hp > last.hp) {\n                obj.hp--;\n                stack.pop();\n            } else if (obj.hp < last.hp) {\n                obj.hp = 0;\n                last.hp--;\n            } else {\n                obj.hp = 0;\n                stack.pop();\n            }\n        }\n\n        if (obj.hp > 0) {\n            stack.push(obj);\n        }\n    }\n\n    stack.sort((a, b) => a.idx - b.idx);\n\n    return stack.map(obj => obj.hp);\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "**Stack-based** approach that **immediately pops** when processing a **left-moving** robot, **compares health** with the right-moving robot, and **re-pushes** the right-moving robot **only if it survives** the collision.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-04-01T08:29:33.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} positions\n * @param {number[]} healths\n * @param {string} directions\n * @return {number[]}\n */\nvar survivedRobotsHealths = function (positions, healths, directions) {\n    const objs = positions.map((pos, idx) => ({\n        idx: idx,\n        pos: pos,\n        hp: healths[idx],\n        dir: directions[idx],\n    }));\n\n    objs.sort((a, b) => a.pos - b.pos);\n\n    const stack = [];\n\n    for (const obj of objs) {\n        if (obj.dir === 'R') {\n            stack.push(obj);\n            continue;\n        }\n\n        if (stack.length === 0 || stack[stack.length - 1].dir === 'L') {\n            stack.push(obj);\n            continue;\n        }\n\n        while (obj.hp > 0 && stack.length > 0) {\n            const last = stack[stack.length - 1];\n\n            if (obj.hp > last.hp) {\n                obj.hp--;\n                stack.pop();\n            } else if (obj.hp < last.hp) {\n                obj.hp = 0;\n                last.hp--;\n            } else {\n                obj.hp = 0;\n                stack.pop();\n            }\n        }\n\n        if (obj.hp > 0) {\n            stack.push(obj);\n        }\n    }\n\n    stack.sort((a, b) => a.idx - b.idx);\n\n    return stack.map(obj => obj.hp);\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Uses a **stack** with objects (**index, position, health, direction**), processes collisions via **health comparisons**, and **filters and sorts** results by original index for the final output.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-04-01T08:31:44.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} positions\n * @param {number[]} healths\n * @param {string} directions\n * @return {number[]}\n */\nvar survivedRobotsHealths = function (positions, healths, directions) {\n    const objs = positions.map((pos, idx) => ({\n        idx: idx,\n        pos: pos,\n        hp: healths[idx],\n        dir: directions[idx],\n    }));\n\n    objs.sort((a, b) => a.pos - b.pos);\n\n    const stack = [];\n\n    for (const obj of objs) {\n        if (obj.dir === 'R') {\n            stack.push(obj);\n            continue;\n        }\n\n        while (obj.hp > 0 && stack.length > 0) {\n            const last = stack[stack.length - 1];\n\n            if (obj.dir === last.dir) {\n                break;\n            }\n\n            if (obj.hp > last.hp) {\n                obj.hp--;\n                stack.pop();\n            } else if (obj.hp < last.hp) {\n                obj.hp = 0;\n                last.hp--;\n            } else {\n                obj.hp = 0;\n                stack.pop();\n            }\n        }\n\n        if (obj.hp > 0) {\n            stack.push(obj);\n        }\n    }\n\n    stack.sort((a, b) => a.idx - b.idx);\n\n    return stack.map(obj => obj.hp);\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Refines collision detection by **checking for direction mismatch** (`R` immediately followed by `L`) **before processing collisions**, avoiding **invalid comparisons** between robots moving in the same direction.",
+    "status": "DONE",
+    "cpuUsage": 45,
+    "memoryUsage": 30,
+    "date": "2026-04-01T08:33:34.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} positions\n * @param {number[]} healths\n * @param {string} directions\n * @return {number[]}\n */\nvar survivedRobotsHealths = function (positions, healths, directions) {\n    const objs = positions.map((pos, idx) => ({\n        idx: idx,\n        pos: pos,\n    }));\n\n    objs.sort((a, b) => a.pos - b.pos);\n\n    const stack = [];\n\n    for (const obj of objs) {\n        if (directions[obj.idx] === 'R') {\n            stack.push(obj);\n            continue;\n        }\n\n        while (healths[obj.idx] > 0 && stack.length > 0) {\n            const last = stack[stack.length - 1];\n\n            if (directions[obj.idx] === directions[last.idx]) {\n                break;\n            }\n\n            if (healths[obj.idx] > healths[last.idx]) {\n                healths[obj.idx]--;\n                healths[last.idx] = 0;\n                stack.pop();\n            } else if (healths[obj.idx] < healths[last.idx]) {\n                healths[obj.idx] = 0;\n                healths[last.idx]--;\n            } else {\n                healths[obj.idx] = 0;\n                healths[last.idx] = 0;\n                stack.pop();\n            }\n        }\n\n        if (healths[obj.idx] > 0) {\n            stack.push(obj);\n        }\n    }\n\n    return healths.filter(hp => hp > 0);\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Object-based **stack** approach with an **early-exit check** when detecting adjacent **left-moving robots**, allowing the algorithm to **skip collision processing** for robots that will eventually collide with each other.",
+    "status": "DONE",
+    "cpuUsage": 20,
+    "memoryUsage": 30,
+    "date": "2026-04-01T09:08:30.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} positions\n * @param {number[]} healths\n * @param {string} directions\n * @return {number[]}\n */\nvar survivedRobotsHealths = function (positions, healths, directions) {\n    const indexes = Array.from({ length: positions.length }, (_, i) => i);\n\n    indexes.sort((a, b) => positions[a] - positions[b]);\n\n    const stack = [];\n\n    for (const index of indexes) {\n        if (directions[index] === 'R') {\n            stack.push(index);\n            continue;\n        }\n\n        while (healths[index] > 0 && stack.length > 0) {\n            const last = stack[stack.length - 1];\n\n            if (directions[index] === directions[last]) {\n                break;\n            }\n\n            if (healths[index] > healths[last]) {\n                healths[index]--;\n                healths[last] = 0;\n            } else if (healths[index] < healths[last]) {\n                healths[index] = 0;\n                healths[last]--;\n            } else {\n                healths[index] = 0;\n                healths[last] = 0;\n            }\n\n            if (healths[last] === 0) {\n                stack.pop();\n            }\n        }\n\n        if (healths[index] > 0) {\n            stack.push(index);\n        }\n    }\n\n    return healths.filter(hp => hp > 0);\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "**Optimized** version storing only **original indices** in objects, **sorts by position**, uses **stack-based collision detection** with **health tracking**, and **filters final survivors**, minimizing memory usage while maintaining correctness.",
+    "status": "DONE",
+    "cpuUsage": 65,
+    "memoryUsage": 75,
+    "date": "2026-04-01T09:16:21.000Z"
+  }
+]

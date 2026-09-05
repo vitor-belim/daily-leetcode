@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "\nvar Fancy = function() {\n    this.seq = [];\n    this.op = [];\n};\n\n/** \n * @param {number} val\n * @return {void}\n */\nFancy.prototype.append = function(val) {\n    this.seq.push([val, this.op.length]);\n};\n\n/** \n * @param {number} inc\n * @return {void}\n */\nFancy.prototype.addAll = function(inc) {\n    this.op.push(['+', inc]);\n};\n\n/** \n * @param {number} m\n * @return {void}\n */\nFancy.prototype.multAll = function(m) {\n    this.op.push(['*', m]);\n};\n\nconst MOD = 10 ** 9 + 7;\n\n/** \n * @param {number} idx\n * @return {number}\n */\nFancy.prototype.getIndex = function(idx) {\n    if (idx >= this.seq.length) return -1;\n\n    let [num, start] = this.seq[idx];\n\n    for (let i = start; i < this.op.length; i++) {\n        const [_op, val] = this.op[i];\n\n        if (_op === '+') {\n            num = (num + val) % MOD;\n        } else {\n            num = (num * val) % MOD;\n        }\n    }\n\n    this.seq[idx] = [num, this.op.length];\n\n    return num;\n};\n\n/** \n * Your Fancy object will be instantiated and called as such:\n * var obj = new Fancy()\n * obj.append(val)\n * obj.addAll(inc)\n * obj.multAll(m)\n * var param_4 = obj.getIndex(idx)\n */",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code implements a `Fancy` sequence using **lazy evaluation** of operations. It stores each appended value along with the operation index at append time, and maintains a separate array of all operations (add or multiply). When `getIndex()` is called, it **replays all operations** that occurred after the value was appended, applying them sequentially with modulo arithmetic. While straightforward, this approach becomes inefficient (resulting in TLE) when many operations are queued because each `getIndex` call must iterate through all operations since the value's append point—O(n) per query.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-03-15T11:04:35.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @description Fancy sequence implementation using BigInt for precision\n * and modular inverse for O(1) updates.\n */\nvar Fancy = function() {\n    this.mod = BigInt(10**9 + 7);\n    this.values = [];\n    this.a = 1n; \n    this.b = 0n; \n};\n\n/** * Helper: Modular Exponentiation (Fast Power)\n * Computes (base^exp) % mod\n */\nFancy.prototype.power = function(base, exp) {\n    let res = 1n;\n    base %= this.mod;\n    while (exp > 0n) {\n        if (exp % 2n === 1n) res = (res * base) % this.mod;\n        base = (base * base) % this.mod;\n        exp /= 2n;\n    }\n    return res;\n};\n\n/** * Helper: Modular Inverse using Fermat's Little Theorem\n * Since mod is prime, a^(mod-2) % mod is the inverse.\n */\nFancy.prototype.modInverse = function(n) {\n    return this.power(n, this.mod - 2n);\n};\n\n/** * @param {number} val\n * @return {void}\n */\nFancy.prototype.append = function(val) {\n    let valBI = BigInt(val);\n    let invA = this.modInverse(this.a);\n    let x = ((valBI - this.b + this.mod) % this.mod * invA) % this.mod;\n    this.values.push(x);\n};\n\n/** * @param {number} inc\n * @return {void}\n */\nFancy.prototype.addAll = function(inc) {\n    this.b = (this.b + BigInt(inc)) % this.mod;\n};\n\n/** * @param {number} m\n * @return {void}\n */\nFancy.prototype.multAll = function(m) {\n    let mBI = BigInt(m);\n    this.a = (this.a * mBI) % this.mod;\n    this.b = (this.b * mBI) % this.mod;\n};\n\n/** * @param {number} idx\n * @return {number}\n */\nFancy.prototype.getIndex = function(idx) {\n    if (idx >= this.values.length) \n        return -1;\n    let result = (this.a * this.values[idx] + this.b) % this.mod;\n    return Number(result);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution optimizes using **modular arithmetic** and **modular inverse**. Instead of storing all operations, it tracks coefficients `a` and `b` representing the transformation formula `x → a*x + b (mod MOD)`. On `append()`, it converts the input value using modular inverse to find the base value that will produce the correct result after all accumulated transformations. On `addAll()` and `multAll()`, the coefficients are updated in **O(1)** time. On `getIndex()`, the result is computed directly as `a*x + b` without replaying operations. Using **Fermat's Little Theorem** (`a^(p-2) mod p` for inverse), this achieves **O(1) per operation**—dramatically faster than lazy evaluation.",
+    "status": "DONE",
+    "cpuUsage": 85,
+    "memoryUsage": 15,
+    "date": "2026-03-15T11:12:21.000Z"
+  }
+]

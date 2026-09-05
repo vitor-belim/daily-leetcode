@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string[]} queries\n * @param {string[]} dictionary\n * @return {string[]}\n */\nvar twoEditWords = function(queries, dictionary) {\n    const n = queries[0].length;\n    let res = [];\n\n    for (const query of queries) {\n        let match = false;\n\n        for (const dict of dictionary) {\n            let diff = 0;\n\n            for (let k = 0; k < n; k++) {\n                if (query[k] !== dict[k]) {\n                    diff++;\n\n                    if (diff > 2) {\n                        break;\n                    }\n                }\n            }\n\n            if (diff <= 2) {\n                match = true;\n                break;\n            }\n        }\n\n        if (match) {\n            res.push(query);\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function filters an array of **queries** to return only those that have a **match** in a **dictionary**, where a match is defined as a word that differs by **at most 2 characters**. For each query string, it iterates through the dictionary, comparing the query character-by-character with each dictionary word and counting how many positions differ. If the difference count exceeds 2, it stops checking that dictionary word early (optimization) and moves to the next one. Once it finds any dictionary word that differs by 2 or fewer characters, it marks that query as a match, adds it to the result array, and moves on to the next query. The function ultimately returns only the query words that had at least one close match in the dictionary based on this 2-character edit distance threshold.",
+    "status": "DONE",
+    "cpuUsage": 77.5,
+    "memoryUsage": 100,
+    "date": "2026-04-22T08:28:48.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string[]} queries\n * @param {string[]} dictionary\n * @return {string[]}\n */\nvar twoEditWords = function(queries, dictionary) {\n    const n = queries[0].length;\n    let res = [];\n\n    for (const query of queries) {\n        for (const dict of dictionary) {\n            let diff = 0;\n\n            for (let k = 0; k < n; k++) {\n                if (query[k] !== dict[k]) {\n                    diff++;\n\n                    if (diff > 2) {\n                        break;\n                    }\n                }\n            }\n\n            if (diff <= 2) {\n                res.push(query);\n                break;\n            }\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds all **queries** that can be transformed into at least one **dictionary** word with **at most 2 character edits**. For each query, it compares it character-by-character against every dictionary word, counting the differences (`diff`). If it finds a dictionary word that differs by 2 or fewer characters, it immediately adds the query to the result array and moves to the next query (using `break`). The loop also optimizes by breaking early if differences exceed 2 before checking all characters. Finally, it returns an array of all queries that had a close match in the dictionary.",
+    "status": "DONE",
+    "cpuUsage": 75,
+    "memoryUsage": 62.5,
+    "date": "2026-04-22T08:30:27.000Z"
+  }
+]

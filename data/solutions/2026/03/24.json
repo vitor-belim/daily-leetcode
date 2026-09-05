@@ -1,0 +1,35 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} grid\n * @return {number[][]}\n */\nvar constructProductMatrix = function(grid) {\n    const m = grid.length;\n    const n = grid[0].length;\n    let prod = 1;\n\n    for (let row = 0; row < m; row++) {\n        for (let col = 0; col < n; col++) {\n            prod *= grid[row][col];\n\n            if (prod === 0) return 0;\n        }\n    }\n\n    for (let row = 0; row < m; row++) {\n        for (let col = 0; col < n; col++) {\n            grid[row][col] = (prod / grid[row][col]) % 12345;\n        }\n    }\n\n    return grid;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function computes a **product matrix** where each element is replaced with the product of all other elements in the grid, modulo `12345`. It works in two passes: first, it multiplies all grid values together (returning early if any zero is found), then it replaces each element with the total product divided by that element, applying the modulo operation. However, the code has a **flaw** — when `prod === 0`, it returns the number `0` instead of a properly formatted result matrix, and it doesn't handle the case where individual elements are zero (which would cause division by zero).",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-03-24T09:02:46.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} grid\n * @return {number[][]}\n */\nvar constructProductMatrix = function(grid) {\n    const m = grid.length;\n    const n = grid[0].length;\n    let prod = 1n;\n\n    for (let row = 0; row < m; row++) {\n        for (let col = 0; col < n; col++) {\n            prod *= BigInt(grid[row][col]);\n        }\n    }\n\n    for (let row = 0; row < m; row++) {\n        for (let col = 0; col < n; col++) {\n            grid[row][col] = parseInt((prod / BigInt(grid[row][col])) % 12345n);\n        }\n    }\n\n    return grid;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function calculates the **product of all elements except the current one** for each position in a 2D grid. It works in two passes: first, it multiplies all elements together using `BigInt` to avoid overflow, storing the total product. Then, for each cell in the grid, it replaces that cell's value with `(total_product ÷ current_element) % 12345`, which gives the product of all other elements modulo 12345. By dividing the total product by each element, we efficiently get the \"product of all except this one\" without needing to iterate through the entire grid repeatedly for each position.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-03-24T09:06:27.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} grid\n * @return {number[][]}\n */\nvar constructProductMatrix = function(grid) {\n    const m = grid.length;\n    const n = grid[0].length;\n    const len = m * n;\n\n    const prefix = new Array(len).fill(1);\n    const suffix = new Array(len).fill(1);\n\n    const MOD = 12345;\n\n    for (let row = 0; row < m; row++) {\n        for (let col = 0; col < n; col++) {\n            const pos = row * n + col;\n            const before = pos > 0 ? prefix[pos - 1] : 1;\n            prefix[pos] = (before * grid[row][col]) % MOD;\n\n            const rev = len - 1 - pos;\n            const after = rev < len - 1 ? suffix[rev + 1] : 1;\n            suffix[rev] = (after * grid[m - 1 - row][n - 1 - col]) % MOD;\n        }\n    }\n\n    for (let row = 0; row < m; row++) {\n        for (let col = 0; col < n; col++) {\n            const pos = row * n + col;\n            const before = pos > 0 ? prefix[pos - 1] : 1;\n            const after = pos < len - 1 ? suffix[pos + 1] : 1;\n            grid[row][col] = (before * after) % MOD;\n        }\n    }\n\n    return grid;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code computes a **product matrix** where each element is replaced by the **product of all other elements** in the grid (excluding itself), using modulo **12345**. The algorithm flattens the 2D grid into a 1D array and uses two passes: first, it builds a **`prefix` array** that stores the cumulative product of all elements before each position, and a **`suffix` array** that stores the cumulative product of all elements after each position (computed by traversing the grid in reverse). Then, in a second pass, it reconstructs the result grid by multiplying the `prefix` and `suffix` values at each position—the product before and product after that element—giving the desired product of all other elements. The modulo operation `% MOD` keeps values within bounds throughout the computation.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 100,
+    "date": "2026-03-24T09:39:40.000Z"
+  }
+]

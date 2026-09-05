@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums1\n * @param {number[]} nums2\n * @return {number}\n */\nvar maxDotProduct = function (nums1, nums2) {\n    const m = nums1.length;\n    const n = nums2.length;\n    const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(-Infinity));\n\n    for (let i = 1; i <= m; i++) {\n        for (let j = 1; j <= n; j++) {\n            const take = nums1[i - 1] * nums2[j - 1] + Math.max(0, dp[i - 1][j - 1]);\n            dp[i][j] = Math.max(take, dp[i - 1][j], dp[i][j - 1]);\n        }\n    }\n\n    return dp[m][n];\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds the **maximum dot product** between non-empty subsequences of two arrays using **dynamic programming**. It builds a 2D table `dp` where `dp[i][j]` holds the best dot product achievable using the first `i` elements of `nums1` and the first `j` elements of `nums2`, with every cell initialized to `-Infinity` since at least one pair must be chosen. For each pair of positions, it computes `take` — the product of the current two numbers, `nums1[i - 1] * nums2[j - 1]`, plus the best previous result `dp[i - 1][j - 1]` but only if that result is positive (the `Math.max(0, ...)` lets it start fresh instead of adding a negative total). Each cell then becomes the maximum of `take`, skipping the current element of `nums1` (`dp[i - 1][j]`), or skipping the current element of `nums2` (`dp[i][j - 1]`). The answer for the full arrays ends up in `dp[m][n]`.",
+    "status": "DONE",
+    "cpuUsage": 84.62,
+    "memoryUsage": 69.23,
+    "date": "2026-01-08T09:45:01.000Z"
+  }
+]

@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {character[]} letters\n * @param {character} target\n * @return {character}\n */\nvar nextGreatestLetter = function(letters, target) {\n    for (const letter of letters) {\n        if (letter > target) {\n            return letter;\n        }\n    }\n\n    return letters[0];\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses a **linear search** to find the smallest letter in the sorted array that is greater than the target. It iterates through each letter and immediately returns the first one that's larger than the target; if no such letter exists, it wraps around by returning the first letter in the array, which handles the circular nature of the problem.",
+    "status": "DONE",
+    "cpuUsage": 18.81,
+    "memoryUsage": 6.27,
+    "date": "2026-01-31T09:01:46.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {character[]} letters\n * @param {character} target\n * @return {character}\n */\nvar nextGreatestLetter = function(letters, target) {\n    let left = 0;\n    let right = letters.length;\n\n    while (left < right) {\n        const mid = Math.floor((left + right) / 2);\n\n        if (letters[mid] <= target) {\n            left++;\n        } else {\n            right--;\n        }\n    }\n\n    return left === letters.length ? letters[0] : letters[left];\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution applies **binary search** to efficiently find the next greatest letter in O(log n) time. It maintains `left` and `right` pointers that narrow the search space by comparing the middle character to the target: if the middle character is too small, it moves `left` forward; otherwise, it moves `right` backward. Once the pointers converge, `left` points to the smallest character greater than the target, and if `left` reaches the array's end, it wraps around to the first character.",
+    "status": "DONE",
+    "cpuUsage": 18.81,
+    "memoryUsage": 38.94,
+    "date": "2026-01-31T09:05:57.000Z"
+  }
+]

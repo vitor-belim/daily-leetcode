@@ -1,0 +1,35 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar maxRotateFunction = function(nums) {\n    let max = mult(nums);\n\n    for (let i = 1; i < nums.length; i++) {\n        nums = rotate(nums);\n        max = Math.max(max, mult(nums));\n    }\n\n    return max;\n};\n\nconst mult = (arr) => {\n    let res = 0;\n\n    for (let i = 0; i < arr.length; i++) {\n        res += i * arr[i];\n    }\n\n    return res;\n};\n\nconst rotate = (arr) => {\n    const res = arr.slice(1);\n    res.push(arr[0]);\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This **brute-force solution** rotates the array once per iteration and recalculates the weighted sum (`mult`) for each rotation, tracking the maximum result. The `rotate()` helper shifts the first element to the end, while `mult()` computes the sum of each element multiplied by its index. Although straightforward, this approach is inefficient with O(n²) time complexity since it recalculates the entire weighted sum from scratch for each of the n rotations.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-05-01T08:49:17.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar maxRotateFunction = function(nums) {\n    const n = nums.length;\n\n    let total = nums.reduce((acc, el) => acc + el, 0);\n    let curr = nums.reduce((acc, el, i) => acc + (i * el), 0);\n\n    let res = curr;\n\n    for (let i = 0; i < n; i++) {\n        curr = curr - total + n * nums[i];\n        res = Math.max(res, curr);\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This **optimized solution** uses the mathematical insight that when rotating an array, the new weighted sum can be computed incrementally. It first calculates the total sum of all elements and the initial weighted sum (each element times its index). Then, for each subsequent rotation, instead of recalculating from scratch, it updates the weighted sum using the formula `curr = curr - total + n * nums[i]`, which adjusts for the fact that one element shifts its position relative to all others. This reduces the time complexity from O(n²) to O(n).",
+    "status": "DONE",
+    "cpuUsage": 47.76,
+    "memoryUsage": 82.09,
+    "date": "2026-05-01T09:29:59.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar maxRotateFunction = function(nums) {\n    const n = nums.length;\n\n    let total = 0;\n    let mult = 0;\n\n    for (let i = 0; i < n; i++) {\n        total += nums[i];\n        mult += i * nums[i];\n    }\n\n    let res = mult;\n\n    for (let i = 1; i < n; i++) {\n        mult += n * nums[i - 1] - total;\n\n        if (mult > res) {\n            res = mult;\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is a **streamlined version** of the optimized approach that combines variable initialization with the same O(n) strategy. The first loop computes both the total sum of all elements and the initial weighted sum (`mult`). Then, in the second loop, `mult` is updated using the recurrence relation `mult += n * nums[i - 1] - total`, which efficiently calculates how the weighted sum changes when rotating by one position. The code tracks the maximum value across all rotations, avoiding the redundant recalculation that makes the brute-force approach inefficient.",
+    "status": "DONE",
+    "cpuUsage": 26.87,
+    "memoryUsage": 100,
+    "date": "2026-05-01T09:34:39.000Z"
+  }
+]

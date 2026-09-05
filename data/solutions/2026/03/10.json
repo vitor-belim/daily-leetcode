@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} zero\n * @param {number} one\n * @param {number} limit\n * @return {number}\n */\nvar numberOfStableArrays = function (zero, one, limit) {\n    const MOD = 1000000007;\n    let dp = Array.from({ length: zero + 1 }, () =>\n        Array.from({ length: one + 1 }, () => [0, 0]),\n    );\n\n    for (let i = 0; i <= zero; i++) {\n        for (let j = 0; j <= one; j++) {\n            for (let lastBit = 0; lastBit <= 1; lastBit++) {\n                if (i === 0) {\n                    if (lastBit === 0 || j > limit) {\n                        dp[i][j][lastBit] = 0;\n                    } else {\n                        dp[i][j][lastBit] = 1;\n                    }\n                } else if (j === 0) {\n                    if (lastBit === 1 || i > limit) {\n                        dp[i][j][lastBit] = 0;\n                    } else {\n                        dp[i][j][lastBit] = 1;\n                    }\n                } else if (lastBit === 0) {\n                    dp[i][j][lastBit] = dp[i - 1][j][0] + dp[i - 1][j][1];\n                    if (i > limit) {\n                        dp[i][j][lastBit] -= dp[i - limit - 1][j][1];\n                    }\n                } else {\n                    dp[i][j][lastBit] = dp[i][j - 1][0] + dp[i][j - 1][1];\n                    if (j > limit) {\n                        dp[i][j][lastBit] -= dp[i][j - limit - 1][0];\n                    }\n                }\n                dp[i][j][lastBit] %= MOD;\n                if (dp[i][j][lastBit] < 0) {\n                    dp[i][j][lastBit] += MOD;\n                }\n            }\n        }\n    }\n\n    return (dp[zero][one][0] + dp[zero][one][1]) % MOD;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses **dynamic programming** to count arrays containing exactly `zero` zeros and `one` ones where no consecutive sequence of the same bit exceeds `limit`. The algorithm builds a 3D table `dp[i][j][lastBit]` tracking the number of valid arrays using `i` zeros, `j` ones, and ending with bit `lastBit` (0 or 1). For each state, it sums the ways from previous states ending with the same bit, then subtracts sequences that would violate the limit constraint using a sliding window approach. Finally, it returns the sum of both possibilities (ending in 0 or 1) after applying modulo arithmetic to keep numbers manageable.",
+    "status": "DONE",
+    "cpuUsage": 21.43,
+    "memoryUsage": 17.86,
+    "date": "2026-03-10T09:52:17.000Z"
+  }
+]

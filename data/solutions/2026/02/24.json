@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for a binary tree node.\n * function TreeNode(val, left, right) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.left = (left===undefined ? null : left)\n *     this.right = (right===undefined ? null : right)\n * }\n */\n/**\n * @param {TreeNode} root\n * @return {number}\n */\nvar sumRootToLeaf = function(root) {\n    let res = 0;\n\n    const dfs = (node, cur) => {\n        if (!node) {\n            return;\n        }\n\n        cur += node.val;\n\n        if (!node.left && !node.right) {\n            res += parseInt(cur, 2);\n            return;\n        }\n\n        dfs(node.left, cur);\n        dfs(node.right, cur);\n    };\n    dfs(root, '');\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code finds the sum of all root-to-leaf paths in a binary tree, treating each path as a binary number. It uses a **depth-first search (DFS)** that traverses the tree, concatenating node values as strings (e.g., `'101'`). When a leaf node is reached (no left or right child), it converts the accumulated binary string to a decimal number using `parseInt(cur, 2)` and adds it to the result. The outer `res` variable accumulates the total sum from all paths.",
+    "status": "DONE",
+    "cpuUsage": 50.59,
+    "memoryUsage": 64.71,
+    "date": "2026-02-24T08:55:14.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for a binary tree node.\n * function TreeNode(val, left, right) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.left = (left===undefined ? null : left)\n *     this.right = (right===undefined ? null : right)\n * }\n */\n/**\n * @param {TreeNode} root\n * @return {number}\n */\nvar sumRootToLeaf = function(root) {\n    return dfs(root, '');\n};\n\nconst dfs = (node, cur) => {\n    if (!node) {\n        return 0;\n    }\n\n    cur += node.val;\n\n    if (!node.left && !node.right) {\n        return parseInt(cur, 2);\n    }\n\n    return dfs(node.left, cur) + dfs(node.right, cur);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This refactored version accomplishes the same goal but with cleaner code by making the DFS function return the sum directly instead of mutating an external variable. As it traverses the binary tree with **DFS**, it builds up the binary string representation of each path and, upon reaching a leaf node, converts it to decimal using `parseInt(cur, 2)` and returns it. For non-leaf nodes, it returns the combined sum of both subtrees using `dfs(node.left, cur) + dfs(node.right, cur)`, eliminating the need for an external accumulator.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 45.88,
+    "date": "2026-02-24T08:57:31.000Z"
+  }
+]

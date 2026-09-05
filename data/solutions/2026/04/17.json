@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar minMirrorPairDistance = function(nums) {\n    const map = new Map();\n    let min = Infinity;\n\n    for (let i = 0; i < nums.length; i++) {\n        const pos = map.get(nums[i]) ?? -1;\n        if (pos > -1) {\n            min = Math.min(min, i - pos);\n        }\n\n        const reverse = reverseNum(nums[i]);\n        map.set(reverse, i);\n    }\n\n    if (min === Infinity) {\n        return -1;\n    }\n\n    return min;\n};\n\nconst reverseNum = (num) => {\n    let res = 0;\n\n    while (num > 0) {\n        res = res * 10 + (num % 10);\n        num = Math.floor(num / 10);\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds the **minimum distance** between two indices in an array where one number is the **digit reverse** of another (e.g., `123` and `321`). It uses a **Map** to track the reversed versions of previously seen numbers along with their positions; as it iterates through the array, for each number it checks if that number was already seen as the reverse of an earlier number, and if so, it records the distance between their positions using `Math.min()`. The helper function `reverseNum` extracts individual digits using modulo and division to flip a number's digit order. If no mirror pairs are found, the function returns **`-1`**; otherwise, it returns the smallest distance between any such pair.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 100,
+    "date": "2026-04-17T07:55:58.000Z"
+  }
+]

@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} side\n * @param {number[][]} points\n * @param {number} k\n * @return {number}\n */\nvar maxDistance = function (side, points, k) {\n    const arr = [];\n\n    for (const [x, y] of points) {\n        if (x === 0) {\n            arr.push(y);\n        } else if (y === side) {\n            arr.push(side + x);\n        } else if (x === side) {\n            arr.push(side * 3 - y);\n        } else {\n            arr.push(side * 4 - x);\n        }\n    }\n\n    arr.sort((a, b) => a - b);\n\n    const lowerBound = (target) => {\n        let left = 0;\n        let right = arr.length;\n\n        while (left < right) {\n            const mid = Math.floor((left + right) / 2);\n\n            if (arr[mid] < target) {\n                left = mid + 1;\n            } else {\n                right = mid;\n            }\n        }\n\n        return left;\n    };\n\n    const check = (limit) => {\n        const perimeter = side * 4;\n\n        for (const start of arr) {\n            const end = start + perimeter - limit;\n            let cur = start;\n\n            for (let i = 0; i < k - 1; i++) {\n                const idx = lowerBound(cur + limit);\n\n                if (idx === arr.length || arr[idx] > end) {\n                    cur = -1;\n                    break;\n                }\n\n                cur = arr[idx];\n            }\n\n            if (cur >= 0) {\n                return true;\n            }\n        }\n\n        return false;\n    };\n\n    let lo = 1;\n    let hi = side;\n    let ans = 0;\n\n    while (lo <= hi) {\n        const mid = Math.floor((lo + hi) / 2);\n\n        if (check(mid)) {\n            lo = mid + 1;\n            ans = mid;\n        } else {\n            hi = mid - 1;\n        }\n    }\n\n    return ans;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution places **k points** on a square's perimeter to maximize the **minimum distance** between consecutive points. It first converts 2D edge coordinates into 1D perimeter positions (treating the square's outline as a line), then uses **binary search** on the answer combined with a greedy validation: for each candidate minimum distance (`limit`), the `check()` function tries to place k points such that each is at least `limit` units apart by greedily picking the earliest valid position. The `lowerBound()` helper efficiently finds the first point at or beyond a target distance using binary search on the sorted positions.",
+    "status": "DONE",
+    "cpuUsage": 11.11,
+    "memoryUsage": 66.67,
+    "date": "2026-04-25T08:41:10.000Z"
+  }
+]

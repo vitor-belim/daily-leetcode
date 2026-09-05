@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar longestBalanced = function(s) {\n    let res = 0;\n\n    for (let i = 0; i < s.length; i++) {\n        const freq = new Array(26).fill(0);\n\n        outer_loop: for (let j = i; j < s.length; j++) {\n            const code = s.charCodeAt(j) - 97;\n\n            freq[code]++;\n\n            for (let k = 0; k < 26; k++) {\n                if (freq[k] > 0 && freq[k] !== freq[code]) {\n                    continue outer_loop;\n                }\n            }\n\n            res = Math.max(res, j - i + 1);\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds the **longest substring** where all characters that appear have the **same frequency**. It uses nested loops: the outer loop sets each starting position `i`, and for each start, the inner loop extends the substring to position `j`. It maintains a `freq` array to count how many times each letter appears, and checks whether all non-zero frequencies are equal using the `outer_loop` label to skip ahead if they're not. When all characters in the current substring have matching frequencies, it updates `res` with the substring length `j - i + 1`. For example, `\"aabbcc\"` would return `6` because all three characters appear exactly twice, while `\"aaab\"` wouldn't qualify since `'a'` appears 3 times but `'b'` only appears once.",
+    "status": "DONE",
+    "cpuUsage": 27.94,
+    "memoryUsage": 42.65,
+    "date": "2026-02-12T09:06:38.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar longestBalanced = function(s) {\n    const n = s.length;\n    const aChar = \"a\".charCodeAt(0);\n    let res = 0;\n\n    for (let i = 0; i < n; i++) {\n        const freq = new Array(26).fill(0);\n\n        for (let j = i; j < n; j++) {\n            const code = s.charCodeAt(j) - aChar;\n\n            freq[code]++;\n\n            if (freq.every(val => val === 0 || val === freq[code])) {\n                res = Math.max(res, j - i + 1);\n            }\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function also finds the **longest substring** where all **characters have the same frequency**, but uses a cleaner approach than the first solution. It iterates through all possible starting positions `i`, and for each starting point, extends a substring to position `j` while counting character frequencies in a `freq` array. Rather than manually checking frequencies with nested loops, it uses **`Array.prototype.every()`** to elegantly verify that every frequency is either `0` (character not yet seen) or equals the current character's frequency — meaning all present characters appear the same number of times. Whenever this condition is met, it updates `res` with the substring length. This approach is more readable and typically faster because it avoids the labeled loop jump pattern used in the first solution.",
+    "status": "DONE",
+    "cpuUsage": 32.35,
+    "memoryUsage": 23.53,
+    "date": "2026-02-12T09:10:21.000Z"
+  }
+]

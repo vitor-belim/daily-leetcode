@@ -1,0 +1,46 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} word\n * @return {number}\n */\nvar numberOfSpecialChars = function(word) {\n    const lower = word.toLowerCase();\n    const upper = word.toUpperCase();\n    const seen = new Set();\n    let res = 0;\n\n    for (let i = 0; i < word.length; i++) {\n        if ((word[i] === lower[i] && !seen.has(lower[i]) && seen.has(upper[i])) ||\n            (word[i] === upper[i] && !seen.has(upper[i]) && seen.has(lower[i]))) {\n            res++;\n        }\n        seen.add(word[i]);\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function counts letters that appear in **both lowercase and uppercase forms** within a word. It iterates through the word character by character, maintaining a `Set` of characters seen so far. For each character, it checks if the current character is in one case (lowercase or uppercase) and hasn't been seen yet, **but** the opposite case version **has** already been seen—if so, it increments the counter. This effectively identifies \"special\" letters that have at least one occurrence in each case, counting each such letter exactly once.",
+    "status": "DONE",
+    "cpuUsage": 82.56,
+    "memoryUsage": 54.65,
+    "date": "2026-05-26T08:14:05.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} word\n * @return {number}\n */\nvar numberOfSpecialChars = function(word) {\n    const arr = new Array(52).fill(0);\n    let res = 0;\n\n    for (let i = 0; i < word.length; i++) {\n        const code = word.charCodeAt(i);\n        const pos = code - (code >= 97 ? 71 : 65);\n\n        if (arr[pos] === 0 && arr[(pos + 26) % 52] > 0) {\n            res++;\n        }\n\n        arr[pos]++;\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses an array of **52 elements** to track occurrences of each letter in both cases—positions 0–25 for lowercase and 26–51 for uppercase. It converts each character to its ASCII code and maps it to a position using `code - (code >= 97 ? 71 : 65)`. For each character, it checks if the current case version hasn't been counted yet (`arr[pos] === 0`) but the opposite case **has** been seen (`arr[(pos + 26) % 52] > 0`). When this condition is true, it increments the result counter, effectively counting each letter exactly once when it first appears in a different case than previously seen.",
+    "status": "DONE",
+    "cpuUsage": 82.56,
+    "memoryUsage": 66.28,
+    "date": "2026-05-26T08:45:47.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} word\n * @return {number}\n */\nvar numberOfSpecialChars = function(word) {\n    const set = new Set(word);\n    let res = 0;\n\n    for (let i = 0; i < 26; i++) {\n        const lower = String.fromCharCode(65 + i);\n        const upper = String.fromCharCode(97 + i);\n\n        if (set.has(lower) && set.has(upper)) {\n            res++;\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is the **simplest and most direct approach**: it first converts the input word into a `Set` containing all unique characters, then loops through all 26 letters of the alphabet. For each letter, it checks if **both** the uppercase and lowercase versions exist in the Set using two `set.has()` calls. If both are present, it increments the counter. This method avoids the complexity of tracking character order by simply asking: \"Does this letter appear in at least one uppercase and one lowercase form?\"",
+    "status": "DONE",
+    "cpuUsage": 82.56,
+    "memoryUsage": 61.63,
+    "date": "2026-05-26T09:01:27.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} word\n * @return {number}\n */\nvar numberOfSpecialChars = function(word) {\n    const arr = new Int8Array(52);\n    let res = 0;\n\n    for (let i = 0; i < word.length; i++) {\n        const code = word.charCodeAt(i);\n        const pos = code - (code >= 97 ? 71 : 65);\n\n        if (arr[pos] === 0 && arr[(pos + 26) % 52] > 0) {\n            res++;\n        }\n\n        arr[pos]++;\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution is nearly identical to the second approach but uses an **`Int8Array`** instead of a regular `Array` for better memory efficiency. `Int8Array` is a **typed array** that stores only 8-bit signed integers, consuming less memory than a standard JavaScript array. Like the array-based solution, it maintains 52 positions (26 letters × 2 cases), maps each character to its position via ASCII code, and increments the counter when a character's case is seen for the first time while its opposite case has already been encountered.",
+    "status": "DONE",
+    "cpuUsage": 96.51,
+    "memoryUsage": 88.37,
+    "date": "2026-05-26T09:03:53.000Z"
+  }
+]

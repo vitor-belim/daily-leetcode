@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {character[][]} grid\n * @return {number}\n */\nvar numberOfSubmatrices = function(grid) {\n    const m = grid.length;\n    const n = grid[0].length;\n\n    const dp = Array.from({ length: m }, () => Array.from({ length: n }, () => [0, 0]));\n    let res = 0;\n\n    for (let row = 0; row < m; row++) {\n        for (let col = 0; col < n; col++) {\n            const top = row > 0 ? dp[row - 1][col] : [0, 0];\n            const left = col > 0 ? dp[row][col - 1] : [0, 0];\n            const diag = row > 0 && col > 0 ? dp[row - 1][col - 1] : [0, 0];\n\n            const dx = grid[row][col] === 'X' ? 1 : 0;\n            const dy = grid[row][col] === 'Y' ? 1 : 0;\n\n            dp[row][col] = [\n                dp[row][col][0] + dx + top[0] + left[0] - diag[0],\n                dp[row][col][1] + dy + top[1] + left[1] - diag[1],\n            ]\n\n            if (dp[row][col][0] > 0 && dp[row][col][0] === dp[row][col][1]) {\n                res++;\n            }\n        }\n    }\n\n    return res;\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code counts the number of **submatrices** in a grid where the count of `'X'` characters equals the count of `'Y'` characters. It uses **dynamic programming** with a 2D array `dp` where each cell stores a pair `[countX, countY]` representing the cumulative counts of `'X'` and `'Y'` from the top-left corner to that cell (a 2D prefix sum). For each position, it combines values from the **top**, **left**, and **diagonal** neighbors using the inclusion-exclusion principle to avoid double-counting, then adds `1` (for `'X'`) or `1` (for `'Y'`) if the current cell contains that character. Finally, whenever the counts become equal and positive (`dp[row][col][0] > 0 && dp[row][col][0] === dp[row][col][1]`), it means at least one valid submatrix ending at that position has balanced `'X'` and `'Y'` characters, so the result counter increments.",
+    "status": "DONE",
+    "cpuUsage": 8.7,
+    "memoryUsage": 13.04,
+    "date": "2026-03-19T09:03:13.000Z"
+  }
+]

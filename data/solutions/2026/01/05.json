@@ -1,0 +1,90 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} matrix\n * @return {number}\n */\nvar maxMatrixSum = function(matrix) {\n    let neg = 0;\n    let sum = 0;\n    let min = -Infinity;\n\n    for (let i = 0; i < matrix.length; i++) {\n        for (let j = 0; j < matrix[i].length; j++) {\n            if (matrix[i][j] <= 0) {\n                neg++;\n                min = Math.max(min, matrix[i][j]);\n            }\n            sum += Math.abs(matrix[i][j]);\n        }\n    }\n\n    if (neg % 2) {\n        sum += min - Math.abs(min);\n    }\n\n    return sum;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution scans every cell of the matrix once, adding the **absolute value** of each number to `sum` (as if every value could be flipped to positive), while counting how many values are negative or zero in `neg` and tracking the **largest non-positive value** (the one closest to zero) in `min` using `Math.max`. Since flips always affect pairs of adjacent numbers, an **even** count of negatives can be fully cancelled out — but if `neg % 2` is odd, one value must stay negative, so the code applies the correction `sum += min - Math.abs(min)`, which subtracts twice the magnitude of that leftover value. The flaw is that `min` only considers non-positive entries, so when the cheapest value to sacrifice is actually a **small positive number**, the correction subtracts more than necessary.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2024-11-24T10:02:54.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} matrix\n * @return {number}\n */\nvar maxMatrixSum = function(matrix) {\n    let neg = 0;\n    let sum = 0;\n    let min = Infinity;\n\n    for (let i = 0; i < matrix.length; i++) {\n        for (let j = 0; j < matrix[i].length; j++) {\n            if (matrix[i][j] <= 0) {\n                neg++;\n            }\n\n            const abs = Math.abs(matrix[i][j]);\n            sum += abs;\n            min = Math.min(min, abs);\n        }\n    }\n\n    if (neg % 2) {\n        sum -= 2 * Math.abs(min);\n    }\n\n    return sum;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution relies on the insight that flipping the signs of adjacent pairs lets you cancel out negatives **two at a time**, so the best possible answer is usually the sum of every value's absolute value. It walks the whole matrix once, accumulating `Math.abs(matrix[i][j])` into `sum`, counting non-positive entries in `neg`, and tracking the **smallest absolute value** anywhere in the matrix in `min`. If the count of negatives is even, they can all be flipped to positive and `sum` is returned as-is; if `neg % 2` is odd, exactly one value must remain negative, so it sacrifices the cheapest one by subtracting `2 * min` (its contribution flips from `+min` to `-min`). This runs in **O(m × n)** time with constant extra space.",
+    "status": "DONE",
+    "cpuUsage": 82.35,
+    "memoryUsage": 100,
+    "date": "2024-11-24T10:05:32.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} matrix\n * @return {number}\n */\nvar maxMatrixSum = function(matrix) {\n    let neg = 0;\n    let sum = 0;\n    let min = Infinity;\n\n    for (let row = 0; row < matrix.length; row++) {\n        for (let col = 0; col < matrix[row].length; col++) {\n            if (matrix[row][col] < 0) {\n                neg++;\n            }\n\n            const abs = Math.abs(matrix[row][col]);\n            sum += abs;\n            min = Math.min(min, abs);\n        }\n    }\n\n    if (neg % 2 === 1) {\n        sum -= 2 * min;\n    }\n\n    return sum;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is a cleaned-up version of the same greedy idea: because sign flips happen in **pairs**, any even number of negatives can be eliminated entirely, making the theoretical maximum the sum of all **absolute values**. The code traverses the matrix once, adding each cell's absolute value to `sum`, counting strictly negative cells (`matrix[row][col] < 0`) in `neg`, and remembering the **smallest absolute value** seen in `min`. Note that zeros are deliberately not counted as negatives here — a zero can absorb a leftover flip for free, and since its absolute value is `0` it would drive `min` down anyway. When the negative count is odd, one value is doomed to stay negative, so the code picks the smallest-magnitude one and subtracts `2 * min` from the total. The result is an **O(m × n)** single-pass solution with constant memory.",
+    "status": "DONE",
+    "cpuUsage": 70.59,
+    "memoryUsage": 100,
+    "date": "2024-11-24T10:08:34.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} matrix\n * @return {number}\n */\nvar maxMatrixSum = function(matrix) {\n    const arr = matrix.reduce((acc, el) => {\n        el.reduce((_, el) => acc.push(el), null);\n        return acc;\n    }, []);\n\n    arr.sort((a, b) => a - b);\n\n    let total = 0;\n\n    for (let i = 0; i < arr.length; i += 2) {\n        if (arr[i] + arr[i + 1] < 0) {\n            total += -(arr[i] + (arr[i + 1] || 0));\n        } else {\n            total += arr[i] + (arr[i + 1] || 0);\n        }\n    }\n\n    return total;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution takes a **sort-and-pair** approach instead of the usual counting trick. It first flattens the 2D matrix into a single array using nested `reduce` calls (the inner `reduce` is really just being used to push every element into `acc`), then sorts the values in ascending order so the most negative numbers sit next to each other. It then walks the sorted array **two elements at a time**, summing each pair: if the pair's sum is negative, both members must be negative, so it flips the pair's sign (mimicking the allowed operation of negating two adjacent values) and adds the positive result; otherwise it adds the pair as-is. The `arr[i + 1] || 0` guard handles an odd-length array, where the final \"pair\" has only one element. Sorting makes this **O(m·n log(m·n))** — slower than the single-pass approach, but it works because pairing negatives after sorting cancels them optimally.",
+    "status": "DONE",
+    "cpuUsage": 11.76,
+    "memoryUsage": 11.76,
+    "date": "2026-01-05T09:54:08.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} matrix\n * @return {number}\n */\nvar maxMatrixSum = function(matrix) {\n    const arr = [];\n\n    for (let r = 0; r < matrix.length; r++) {\n        for (let c = 0; c < matrix[r].length; c++) {\n            arr.push(matrix[r][c]);\n        }\n    }\n\n    arr.sort((a, b) => a - b);\n\n    let total = 0;\n\n    for (let i = 0; i < arr.length; i += 2) {\n        let sum = arr[i] + (arr[i + 1] || 0);\n\n        if (sum < 0) {\n            sum = -sum;\n        }\n\n        total += sum;\n    }\n\n    return total;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This attempt flattens the matrix into `arr` with plain nested loops, sorts it ascending, and then processes the sorted values in **pairs of two**: it computes each pair's sum via `arr[i] + (arr[i + 1] || 0)`, flips the sign if the sum is negative (simulating the operation of negating two values together), and accumulates the result into `total`. The subtle bug lies in the `|| 0` fallback: when `arr[i + 1]` is literally `0`, the expression `0 || 0` still yields `0`, but more importantly a **negative number paired with a zero** produces a negative pair sum that gets flipped to positive — effectively negating a single value for free, which the problem's pairwise-flip rule doesn't always allow. Taking the absolute value of a pair like `[-5, 3]` also credits `2` instead of the correct `-2`, since flipping both would give `5 - 3 = 2` only by spending a flip that may not be free. These edge cases cause wrong answers on certain inputs, hence the **FAILED** status.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-01-05T09:57:50.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} matrix\n * @return {number}\n */\nvar maxMatrixSum = function(matrix) {\n    const arr = [];\n    let total = 0;\n\n    for (let r = 0; r < matrix.length; r++) {\n        for (let c = 0; c < matrix[r].length; c++) {\n            arr.push(matrix[r][c]);\n            total += matrix[r][c];\n        }\n    }\n\n    arr.sort((a, b) => a - b);\n\n    for (let i = 1; i < arr.length; i += 2) {\n        const sum = arr[i - 1] + arr[i];\n\n        if (sum < 0) {\n            total += -sum * 2;\n        }\n    }\n\n    return total;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This version starts from the **plain sum** of every matrix value (accumulated in `total` while flattening the matrix into `arr`), then figures out how much that sum improves by flipping pairs of negatives. After sorting `arr` ascending, the most negative numbers are adjacent, so it walks the array in **consecutive pairs** (`arr[i - 1]` and `arr[i]`): whenever a pair's sum is negative, flipping both values changes the total by exactly `-sum * 2` — the pair's contribution goes from `sum` to `-sum` — so that delta is added to `total`. Pairs whose sum is already non-negative are left alone, since flipping them would only hurt. Iterating from `i = 1` in steps of two also neatly skips any unpaired final element in an odd-length array. The cost is dominated by the sort, giving **O(m·n log(m·n))** time.",
+    "status": "DONE",
+    "cpuUsage": 11.76,
+    "memoryUsage": 11.76,
+    "date": "2026-01-05T10:02:21.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} matrix\n * @return {number}\n */\nvar maxMatrixSum = function(matrix) {\n    const m = matrix.length;\n    const n = matrix[0].length;\n\n    let total = 0;\n    let negativeCounter = 0;\n    let highestNegative = -Infinity;\n\n    for (let r = 0; r < m; r++) {\n        for (let c = 0; c < n; c++) {\n            if (matrix[r][c] > 0) {\n                total += matrix[r][c];\n            } else {\n                total += -matrix[r][c];\n                negativeCounter++;\n                highestNegative = Math.max(highestNegative, matrix[r][c]);\n            }\n        }\n    }\n\n    if (negativeCounter & 1) {\n        total += highestNegative * 2;\n    }\n\n    return total;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This attempt returns to the single-pass counting strategy: it sweeps the matrix once, adding each value's magnitude to `total` (positives directly, non-positives via `-matrix[r][c]`), counting non-positive entries in `negativeCounter`, and tracking the non-positive value **closest to zero** in `highestNegative` (via `Math.max`, since for example `-2 > -7`). If the bitwise check `negativeCounter & 1` shows an odd count, one value must stay negative, so it adds `highestNegative * 2` — because `highestNegative` is negative, this subtracts twice its magnitude from the total. The bug is the same one from the first attempt: the sacrificed value should be the **smallest absolute value in the entire matrix**, positives included. When a positive number like `1` is smaller in magnitude than every negative, this code overpays, producing a wrong (too small) answer and the **FAILED** status.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-01-05T10:08:24.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} matrix\n * @return {number}\n */\nvar maxMatrixSum = function(matrix) {\n    const m = matrix.length;\n    const n = matrix[0].length;\n\n    let total = 0;\n    let negativeCounter = 0;\n    let smallestNumber = Infinity;\n\n    for (let r = 0; r < m; r++) {\n        for (let c = 0; c < n; c++) {\n            if (matrix[r][c] > 0) {\n                total += matrix[r][c];\n            } else {\n                total += -matrix[r][c];\n                negativeCounter++;\n            }\n\n            smallestNumber = Math.min(smallestNumber, Math.abs(matrix[r][c]));\n        }\n    }\n\n    if (negativeCounter & 1) {\n        total -= smallestNumber * 2;\n    }\n\n    return total;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This final version fixes the earlier mistake by tracking the right value to sacrifice. In a single **O(m × n)** pass it adds every cell's magnitude to `total` (treating each value as if it could be made positive), counts non-positive entries in `negativeCounter`, and — crucially — records the **smallest absolute value across the whole matrix** in `smallestNumber`, checking `Math.abs(matrix[r][c])` for *every* cell rather than only the negative ones. Because the allowed operation flips two adjacent values at once, an even number of negatives can always be cancelled completely; if the bitwise test `negativeCounter & 1` reveals an odd count, exactly one value must end up negative, and the cheapest choice is the one with the smallest magnitude, so `smallestNumber * 2` is subtracted (its contribution swings from positive to negative). This greedy approach solves the problem in one pass with constant extra space.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 94.12,
+    "date": "2026-01-05T10:12:23.000Z"
+  }
+]

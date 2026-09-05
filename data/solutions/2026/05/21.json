@@ -1,0 +1,90 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} arr1\n * @param {number[]} arr2\n * @return {number}\n */\nvar longestCommonPrefix = function(arr1, arr2) {\n    const set1 = new Set();\n\n    for (const num of arr1) {\n        set1.add(num.toString());\n    }\n\n    let max = 0;\n\n    for (const num of arr2) {\n        let s = num.toString();\n\n        while (s.length > max) {\n            if (set1.has(s)) {\n                max = s.length;\n                break;\n            }\n\n            s = s.slice(0, s.length - 1);\n        }\n    }\n\n    return max;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution converts all numbers in `arr1` to strings and stores them in a **Set** for fast lookup. Then, for each number in `arr2`, it converts it to a string and repeatedly removes the last digit, checking if each prefix exists in the set. When a match is found, it updates the maximum prefix length and moves to the next number in `arr2`. The function returns the longest common numeric prefix length found.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2024-09-24T07:26:57.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} arr1\n * @param {number[]} arr2\n * @return {number}\n */\nvar longestCommonPrefix = function(arr1, arr2) {\n    const set1 = new Set();\n\n    for (const num of arr1) {\n        let s = num.toString();\n\n        while (s.length > 0 && !set1.has(s)) {\n            set1.add(s);\n            s = s.slice(0, s.length - 1);\n        }\n    }\n\n    let max = 0;\n\n    for (const num of arr2) {\n        let s = num.toString();\n\n        while (s.length > max) {\n            if (set1.has(s)) {\n                max = s.length;\n                break;\n            }\n\n            s = s.slice(0, s.length - 1);\n        }\n    }\n\n    return max;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution improves on the previous approach by precomputing **all prefixes** of numbers in `arr1` and storing them in a set during the first loop. For each number in `arr2`, it converts to a string and checks progressively shorter prefixes against the precomputed set. When a matching prefix is found, the maximum length is updated. This technique is more efficient because it builds all possible prefixes upfront rather than just storing complete numbers.",
+    "status": "DONE",
+    "cpuUsage": 34.45,
+    "memoryUsage": 100,
+    "date": "2024-09-24T07:36:18.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} arr1\n * @param {number[]} arr2\n * @return {number}\n */\nvar longestCommonPrefix = function(arr1, arr2) {\n    const set = new Set();\n\n    for (const num of arr1) {\n        let s = num.toString();\n\n        while (s.length > 0 && !set.has(s)) {\n            set.add(s);\n            s = s.slice(0, s.length - 1);\n        }\n    }\n\n    let max = 0;\n\n    for (const num of arr2) {\n        let s = num.toString();\n\n        while (s.length > max) {\n            if (set.has(s)) {\n                max = s.length;\n                break;\n            }\n\n            s = s.slice(0, s.length - 1);\n        }\n    }\n\n    return max;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution is functionally identical to the previous one but uses a single `set` variable instead of `set1`. It precomputes all prefixes from `arr1` into a **Set**, then iterates through `arr2` checking progressively shorter prefixes to find the longest match. By storing all intermediate prefixes upfront, the algorithm efficiently identifies the longest common numeric prefix without redundant string operations.",
+    "status": "DONE",
+    "cpuUsage": 45.56,
+    "memoryUsage": 91.11,
+    "date": "2024-09-24T07:41:33.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} arr1\n * @param {number[]} arr2\n * @return {number}\n */\nvar longestCommonPrefix = function(arr1, arr2) {\n    const map = {};\n\n    for (const val of arr1) {\n        const str = val.toString();\n        let currMap = map;\n\n        for (const char of str) {\n            if (!currMap[char]) {\n                currMap[char] = {};\n            }\n            currMap = currMap[char];\n        }\n    }\n\n    let max = 0;\n\n    for (const val of arr2) {\n        const str = val.toString();\n\n        if (str.length <= max) {\n            continue;\n        }\n\n        let currMap = map;\n\n        for (let i = 0; i < str.length; i++) {\n            if (!currMap[str[i]]) {\n                break;\n            }\n            currMap = currMap[str[i]];\n            max = Math.max(max, i + 1);\n        }\n    }\n\n    return max;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses a **trie data structure** represented as nested objects to store all prefixes from `arr1`. Each character becomes a key in a nested map, creating a tree-like structure. For each number in `arr2`, it traverses this trie character by character as far as possible, tracking the longest valid path. The algorithm skips numbers shorter than the current maximum to optimize performance and returns the length of the longest common prefix found.",
+    "status": "DONE",
+    "cpuUsage": 62.22,
+    "memoryUsage": 38.89,
+    "date": "2026-05-21T10:03:18.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} arr1\n * @param {number[]} arr2\n * @return {number}\n */\nvar longestCommonPrefix = function(arr1, arr2) {\n    const map = {};\n\n    for (const val of arr1) {\n        const str = val.toString();\n        let currMap = map;\n\n        for (const char of str) {\n            if (!currMap[char]) {\n                currMap[char] = {};\n            }\n            currMap = currMap[char];\n        }\n    }\n\n    let max = 0;\n\n    for (const val of arr2) {\n        const str = val.toString();\n\n        if (str.length <= max) {\n            continue;\n        }\n\n        let currMap = map;\n        let i = 0;\n\n        while (currMap[str[i]]) {\n            currMap = currMap[str[i]];\n            i++;\n        }\n\n        max = Math.max(max, i);\n    }\n\n    return max;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is an optimized version of the trie-based solution that replaces the `for` loop with a `while` loop for cleaner character traversal. It builds a **trie from arr1** where each digit is a node, then for each number in `arr2`, it traverses the trie as far as possible using the `while` loop until a character is not found. The final `i` value represents the longest matching prefix length, which is compared against the current maximum.",
+    "status": "DONE",
+    "cpuUsage": 61.11,
+    "memoryUsage": 24.45,
+    "date": "2026-05-21T10:27:19.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} arr1\n * @param {number[]} arr2\n * @return {number}\n */\nvar longestCommonPrefix = function(arr1, arr2) {\n    const set = new Set();\n\n    for (const num of arr1) {\n        const word = num.toString();\n        let s = '';\n\n        for (const char of word) {\n            s += char;\n            set.add(s);\n        }\n    }\n\n    let max = 0;\n\n    for (const num of arr2) {\n        const word = num.toString();\n        let s = '';\n\n        for (const char of word) {\n            s += char;\n\n            if (!set.has(s)) {\n                break;\n            }\n        }\n\n        max = Math.max(max, s.length - (set.has(s) ? 0 : 1));\n    }\n\n    return max;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution builds all prefixes from `arr1` by progressively concatenating characters into a **Set**. For each number in `arr2`, it builds the string character by character, checking if each prefix exists in the set. When a prefix is not found, it stops and calculates the length—either the full prefix if it was found, or minus one if the last character caused the mismatch. The algorithm returns the maximum prefix length across all numbers in `arr2`.",
+    "status": "DONE",
+    "cpuUsage": 48.89,
+    "memoryUsage": 77.78,
+    "date": "2026-05-21T10:38:18.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} arr1\n * @param {number[]} arr2\n * @return {number}\n */\nvar longestCommonPrefix = function(arr1, arr2) {\n    const set = new Set();\n\n    for (let num of arr1) {\n        while (num > 0 && !set.has(num)) {\n            set.add(num);\n            num = Math.floor(num / 10);\n        }\n    }\n\n    let max = 0;\n\n    for (let num of arr2) {\n        while (num > 0) {\n            if (set.has(num)) {\n                max = Math.max(max, num.toString().length);\n                break;\n            }\n\n            num = Math.floor(num / 10);\n        }\n    }\n\n    return max;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution takes a **numeric approach** instead of string manipulation. It stores all numeric prefixes of `arr1` by repeatedly dividing by 10 (removing the last digit mathematically) and adding each intermediate number to a set. For each number in `arr2`, it performs the same digit-removal process until finding a match in the set, then converts that matching number to a string to determine its length. This avoids string concatenation overhead by working directly with integers.",
+    "status": "DONE",
+    "cpuUsage": 97.78,
+    "memoryUsage": 71.11,
+    "date": "2026-05-21T10:46:01.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} arr1\n * @param {number[]} arr2\n * @return {number}\n */\nvar longestCommonPrefix = function(arr1, arr2) {\n    const set = new Set();\n\n    for (let num of arr1) {\n        while (num > 0 && !set.has(num)) {\n            set.add(num);\n            num = Math.floor(num / 10);\n        }\n    }\n\n    let max = 0;\n\n    for (let num of arr2) {\n        while (num > 0) {\n            if (set.has(num)) {\n                max = Math.max(max, Math.floor(Math.log10(num)) + 1);\n                break;\n            }\n\n            num = Math.floor(num / 10);\n        }\n    }\n\n    return max;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution is an optimized version of the numeric prefix approach, using **logarithms** to calculate digit length instead of string conversion. It stores all numeric prefixes from `arr1` by dividing by 10 repeatedly. When a matching prefix is found in `arr2`, it uses `Math.floor(Math.log10(num)) + 1` to efficiently compute the number of digits without converting to a string. This optimization reduces overhead when only the length is needed, making it faster than string-based calculations.",
+    "status": "DONE",
+    "cpuUsage": 97.78,
+    "memoryUsage": 78.89,
+    "date": "2026-05-21T10:47:56.000Z"
+  }
+]

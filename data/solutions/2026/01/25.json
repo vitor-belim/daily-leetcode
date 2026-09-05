@@ -1,0 +1,35 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} k\n * @return {number}\n */\nvar minimumDifference = function(nums, k) {\n    nums.sort((a, b) => a - b);\n\n    let diff = Infinity;\n\n    for (let i = 1; i < nums.length; i++) {\n        diff = Math.min(diff, nums[i] - nums[i - 1]);\n    }\n\n    return diff === Infinity ? 0 : diff;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code sorts the array in ascending order, then iterates through consecutive elements to find the **minimum difference** between any two adjacent numbers. It uses `Math.min()` to track the smallest difference encountered, and returns this value or `0` if no difference exists. Note: This solution doesn't use the `k` parameter, so it finds the minimum difference between any consecutive pair rather than among elements `k` positions apart.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-01-25T10:14:03.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} k\n * @return {number}\n */\nvar minimumDifference = function(nums, k) {\n    nums.sort((a, b) => a - b);\n\n    let diff = Infinity;\n\n    for (let i = k - 1; i < nums.length; i++) {\n        diff = Math.min(diff, nums[i] - nums[i - k + 1]);\n    }\n\n    return diff === Infinity ? 0 : diff;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code sorts the array and uses a sliding window approach to find the **minimum difference** among any `k` elements. It iterates through the array starting at index `k-1`, comparing each element with the element `k-1` positions before it (creating a window of `k` consecutive numbers), and tracks the smallest difference found using `Math.min()`. This efficiently finds the minimum spread across all possible windows of size `k`.",
+    "status": "DONE",
+    "cpuUsage": 17.12,
+    "memoryUsage": 32.19,
+    "date": "2026-01-25T10:20:39.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} k\n * @return {number}\n */\nvar minimumDifference = function(nums, k) {\n    nums.sort((a, b) => a - b);\n\n    const n = nums.length;\n    let min = Infinity;\n\n    for (let i = k - 1; i < n; i++) {\n        const diff = nums[i] - nums[i - k + 1];\n\n        if (diff < min) {\n            min = diff;\n        }\n    }\n\n    return min === Infinity ? 0 : min;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution is functionally identical to the previous one but uses a different coding style: it pre-calculates the array length in `n`, replaces `Math.min()` with an explicit `if` statement, and renames `diff` to `min`. After sorting the array, it applies a **sliding window** of size `k` to find the minimum difference between elements `k` positions apart, returning the smallest difference found across all windows.",
+    "status": "DONE",
+    "cpuUsage": 80.82,
+    "memoryUsage": 27.4,
+    "date": "2026-01-25T10:23:53.000Z"
+  }
+]

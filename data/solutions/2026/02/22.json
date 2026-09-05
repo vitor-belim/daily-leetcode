@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @return {number}\n */\nvar binaryGap = function(n) {\n    const bin = n.toString(2);\n    let last = -1;\n    let res = 0;\n\n    for (let i = 0; i < bin.length; i++) {\n        if (bin[i] === '0') {\n            continue;\n        }\n\n        if (last > -1) {\n            res = Math.max(res, i - last);\n        }\n\n        last = i;\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds the **maximum binary gap** in a number, which is the largest distance between consecutive `1` bits in its binary representation. It first converts the number `n` to a binary string using `toString(2)`, then iterates through each character to find positions of `1` bits. It tracks the position of the last `1` bit found in the `last` variable, and whenever a new `1` is encountered, it calculates the distance from the previous `1` using `i - last`, updating the result `res` to keep track of the maximum gap found. Finally, it returns the maximum gap.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 90.79,
+    "date": "2026-02-22T10:07:47.000Z"
+  }
+]

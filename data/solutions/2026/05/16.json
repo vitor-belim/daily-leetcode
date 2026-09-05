@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar findMin = function(nums) {\n    if (nums[0] < nums[nums.length - 1]) return nums[0];\n\n    return helper(nums, 0, nums.length - 1);\n};\n\nconst helper = (nums, left, right) => {\n    if (left >= right) {\n        return nums[left];\n    }\n\n    const mid = Math.floor((left + right) / 2);\n    //console.log(left, mid, right);\n\n    if (nums[left] > nums[mid]) return helper(nums, left + 1, mid);\n    if (nums[mid] > nums[right]) return helper(nums, mid + 1, right);\n\n    return Math.min(\n        helper(nums, left, mid),\n        helper(nums, mid + 1, right),\n    );\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This algorithm finds the **minimum element** in a rotated sorted array using a **recursive divide-and-conquer approach**. It first checks if the array is already sorted (if `nums[0] < nums[last]`), in which case it returns the first element. Otherwise, it splits the array in half at the `mid` point and recursively searches for the minimum: if the left half is rotated (`nums[left] > nums[mid]`), it searches the left side; if the right half is rotated (`nums[mid] > nums[right]`), it searches the right side; otherwise, it searches both halves and returns the smaller minimum. The base case returns `nums[left]` when the range has only one element.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 73.83,
+    "date": "2026-05-16T09:21:30.000Z"
+  }
+]

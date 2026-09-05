@@ -1,0 +1,211 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number}\n */\nvar search = function(nums, target) {\n    let low = 0;\n    let high = nums.length - 1;\n\n    while (low < high) {\n        let mid = Math.floor((low + high) / 2);\n\n        if (nums[mid] === target) {\n            return mid;\n        } else if (nums[mid] > target) {\n            if (nums[low] === target) {\n                return low;\n            } else if (nums[low] < target) {\n                high = mid;\n            } else {\n                low = mid + 1;\n            }\n        } else {\n            if (nums[high] === target) {\n                return low;\n            } else if (nums[high] > target) {\n                low = mid + 1;\n            } else {\n                high = mid;\n            }\n        }\n    }\n\n    return nums[low] === target ? low : -1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This binary search implementation finds a **target** in a **rotated sorted array** by comparing `nums[mid]` with the target and determining which half is sorted, then narrowing the search range using `low` and `high` pointers based on whether the target lies in the sorted half.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2024-09-13T12:36:18.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number}\n */\nvar search = function(nums, target) {\n    let low = 0;\n    let high = nums.length - 1;\n\n    while (low < high) {\n        let mid = Math.floor((low + high) / 2);\n\n        if (nums[mid] === target) {\n            return mid;\n        } else if (nums[mid] > target) {\n            if (nums[low] === target) {\n                return low;\n            } else if (nums[low] < target) {\n                high = mid + 1;\n            } else {\n                low = mid + 1;\n            }\n        } else {\n            if (nums[high] === target) {\n                return high;\n            } else if (nums[high] > target) {\n                low = mid + 1;\n            } else {\n                high = mid - 1;\n            }\n        }\n    }\n\n    return nums[low] === target ? low : -1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "A variation of rotated-array binary search that uses similar logic to #1 but adjusts boundary updates differently — setting `high = mid + 1` when `nums[low] < target` instead of `high = mid`, changing how the search space is narrowed.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2024-09-13T12:38:27.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number}\n */\nvar search = function(nums, target) {\n    let low = 0;\n    let high = nums.length - 1;\n\n    while (low < high) {\n        let mid = Math.floor((low + high) / 2);\n\n        if (nums[mid] === target) {\n            return mid;\n        } else if (nums[mid] > target) {\n            if (nums[low] === target) {\n                return low;\n            } else if (nums[low] < target) {\n                high = mid - 1;\n            } else {\n                low = mid + 1;\n            }\n        } else {\n            if (nums[high] === target) {\n                return high;\n            } else if (nums[high] > target) {\n                low = mid + 1;\n            } else {\n                high = mid - 1;\n            }\n        }\n    }\n\n    return nums[low] === target ? low : -1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Implements binary search on a rotated array using more conservative boundary adjustments, consistently using `high = mid - 1` and `low = mid + 1` throughout to account for potential rotation-point adjacency and avoid skipping the target.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2024-09-13T12:39:23.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number}\n */\nvar search = function(nums, target) {\n    let low = 0;\n    let high = nums.length - 1;\n\n    while (low < high) {\n        let mid = Math.floor((low + high) / 2);\n\n        if (nums[mid] === target) {\n            return mid;\n        } else if (nums[mid] > target) {\n            if (nums[low] === target) {\n                return low;\n            } else if (nums[low] < target) {\n                high = mid - 1;\n            } else {\n                low = mid + 1;\n            } // [6,7,8,9,10,0,1,2,4,5]\n        } else {\n            if (nums[high] === target) {\n                return high;\n            } else if (nums[high] > target || nums[low] < target) {\n                low = mid + 1;\n            } else {\n                high = mid - 1;\n            }\n        }\n    }\n\n    return nums[low] === target ? low : -1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Extends the rotated-array search pattern by combining multiple conditions with `||` operators (e.g., `nums[high] > target || nums[low] < target`) to make decisions about moving pointers, consolidating logic from separate if-branches into compound expressions.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2024-09-13T14:29:21.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number}\n */\nvar search = function(nums, target) {\n    let low = 0;\n    let high = nums.length - 1;\n\n    while (low < high) {\n        let mid = Math.floor((low + high) / 2);\n        console.log('mid', mid);\n\n        if (nums[mid] === target) {\n            return mid;\n        } else if (nums[mid] > target) {\n            // default -> high = mid - 1;\n            if (nums[low] === target) {\n                return low;\n            } else if (nums[low] < target || nums[mid] < nums[high]) {\n                high = mid - 1;\n            } else {\n                low = mid + 1;\n            }\n        } else {\n            if (nums[high] === target) {\n                return high;\n            } else if (nums[high] > target || nums[mid] > nums[low]) {\n                low = mid + 1;\n            } else {\n                high = mid - 1;\n            }\n        }\n    }\n\n    return nums[low] === target ? low : -1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "A **debug version** that includes `console.log()` and checks whether the midpoint value is sorted relative to the right boundary (`nums[mid] < nums[high]`) alongside direct target comparisons to determine which half to explore next.",
+    "status": "DONE",
+    "cpuUsage": 4.57,
+    "memoryUsage": 99.97,
+    "date": "2024-09-13T14:37:19.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number}\n */\nvar search = function(nums, target) {\n    let low = 0;\n    let high = nums.length - 1;\n\n    while (low < high) {\n        let mid = Math.floor((low + high) / 2);\n\n        if (nums[mid] === target) {\n            return mid;\n        } else if (nums[mid] > target) {\n            // default -> high = mid - 1;\n            if (nums[low] === target) {\n                return low;\n            } else if (nums[low] < target || nums[mid] < nums[high]) {\n                high = mid - 1;\n            } else {\n                low = mid + 1;\n            }\n        } else {\n            if (nums[high] === target) {\n                return high;\n            } else if (nums[high] > target || nums[mid] > nums[low]) {\n                low = mid + 1;\n            } else {\n                high = mid - 1;\n            }\n        }\n    }\n\n    return nums[low] === target ? low : -1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Removes the debug logging from #5 and uses cleaner condition checks like `nums[low] < target || nums[mid] < nums[high]` and `nums[high] > target || nums[mid] > nums[low]` to identify the sorted side and decide search direction efficiently.",
+    "status": "DONE",
+    "cpuUsage": 4.57,
+    "memoryUsage": 100,
+    "date": "2024-09-13T14:37:41.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number}\n */\nvar search = function (nums, target) {\n    let low = 0;\n    let high = nums.length - 1;\n\n    while (low < high) {\n        let mid = Math.floor((low + high) / 2);\n        console.log('mid', mid, nums[mid]);\n\n        if (nums[mid] > target) {\n            if (nums[low] < target || nums[mid] < nums[high]) {\n                high = mid - 1;\n            } else {\n                low = mid + 1;\n            }\n        } else {\n            if (nums[high] >= target || nums[mid] > nums[low]) {\n                low = mid + 1;\n            } else {\n                high = mid;\n            }\n        }\n    }\n\n    return nums[low] === target ? low : -1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Simplifies the algorithm by removing the early return when `nums[mid] === target` and relies solely on compound conditions combining `nums[mid] > target` and `nums[mid] < target` checks with sorted-side detection to narrow the search space.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2024-09-13T14:44:43.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number}\n */\nvar search = function (nums, target) {\n    let low = 0;\n    let high = nums.length - 1;\n\n    while (low < high) {\n        let mid = Math.floor((low + high) / 2);\n        //console.log('mid', mid, nums[mid]);\n\n        if (nums[mid] === target) {\n            return mid;\n        }\n\n        if (\n            (nums[mid] > target && (nums[low] < target || nums[mid] < nums[high])) ||\n            (nums[mid] < target && (nums[high] < target && nums[mid] < nums[low]))\n        ) {\n            high = mid - 1;\n        } else {\n            low = mid + 1;\n        }\n    }\n\n    return nums[low] === target ? low : -1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Returns immediately when **target is found**, then uses a complex combined condition `(nums[mid] > target && ...) || (nums[mid] < target && ...)` to decide whether to search the upper or lower half based on both value and rotation state.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2024-09-13T15:05:39.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number}\n */\nvar search = function (nums, target) {\n    let low = 0;\n    let high = nums.length - 1;\n\n    while (low < high) {\n        let mid = Math.floor((low + high) / 2);\n        //console.log('mid', mid, nums[mid]);\n\n        if (nums[mid] === target) {\n            return mid;\n        }\n\n        if (\n            (nums[mid] > target && (nums[low] <= target || nums[mid] < nums[high])) ||\n            (nums[mid] < target && (nums[high] < target && nums[mid] < nums[low]))\n        ) {\n            high = mid - 1;\n        } else {\n            low = mid + 1;\n        }\n    }\n\n    return nums[low] === target ? low : -1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Nearly identical to #8 but changes `nums[low] < target` to `nums[low] <= target` in the compound condition, adjusting how equality at boundaries is handled to potentially cover an additional edge case.",
+    "status": "DONE",
+    "cpuUsage": 4.57,
+    "memoryUsage": 100,
+    "date": "2024-09-13T15:06:31.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number}\n */\nvar search = function (nums, target) {\n    let low = 0;\n    let high = nums.length - 1;\n\n    while (low <= high) {\n        let mid = Math.floor((low + high) / 2);\n\n        if (nums[mid] === target) {\n            return mid;\n        }\n\n        if (nums[low] <= nums[mid]) {\n            // left side is sorted, rotation could be on the right side\n            if (target < nums[low] || target > nums[mid]) {\n                low = mid + 1;\n            } else {\n                high = mid - 1;\n            }\n        } else {\n            // right side is sorted, rotation could be on the left side\n            if (target < nums[mid] || target > nums[high]) {\n                high = mid - 1;\n            } else {\n                low = mid + 1;\n            }\n        }\n    }\n\n    return -1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "A standard binary search approach using `low <= high` that first determines if the **left half is sorted** via `nums[low] <= nums[mid]`, then checks if the **target lies in the sorted range** to decide whether to search left or right.",
+    "status": "DONE",
+    "cpuUsage": 4.57,
+    "memoryUsage": 100,
+    "date": "2024-09-13T15:13:07.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number}\n */\nvar search = function (nums, target) {\n    let low = 0;\n    let high = nums.length - 1;\n\n    while (low <= high) {\n        let mid = Math.floor((low + high) / 2);\n\n        if (nums[mid] === target) {\n            return mid;\n        }\n\n        if (nums[low] <= nums[mid]) {\n            // left side is sorted\n            // if target is out of the interval [low, mid], move to the other side\n            if (target < nums[low] || target > nums[mid]) {\n                low = mid + 1;\n            } else {\n                high = mid - 1;\n            }\n        } else {\n            // right side is sorted\n            // if target is out of the interval [mid, high], move to the other side\n            if (target < nums[mid] || target > nums[high]) {\n                high = mid - 1;\n            } else {\n                low = mid + 1;\n            }\n        }\n    }\n\n    return -1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Identical to #10 — a correct, clean implementation of binary search on a rotated sorted array using straightforward sorted-side detection and target-range checking.",
+    "status": "DONE",
+    "cpuUsage": 4.57,
+    "memoryUsage": 100,
+    "date": "2024-09-13T15:14:36.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number}\n */\nvar search = function(nums, target) {\n    let left = 0;\n    let right = nums.length - 1;\n\n    while (left <= right) {\n        const mid = Math.floor((left + right) / 2);\n\n        const sortedLeft = nums[left] < nums[mid];\n\n        if (nums[mid] === target) {\n            return mid;\n        } else if (sortedLeft && nums[mid] > target && nums[left] <= target) {\n            right = mid - 1;\n        } else {\n            left = mid + 1;\n        }\n    }\n\n    return -1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Improves readability by precomputing a `sortedLeft` variable (`nums[left] < nums[mid]`) and using it in a simplified condition to avoid nested if-else chains, making the sorted-half detection logic more explicit and maintainable.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2024-12-03T07:41:25.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number}\n */\nvar search = function(nums, target) {\n    let left = 0;\n    let right = nums.length - 1;\n\n    while (left <= right) {\n        const mid = Math.floor((left + right) / 2);\n\n        if (nums[mid] === target) {\n            return mid;\n        } else if (nums[left] < nums[mid]) {\n            if (nums[mid] > target && nums[left] <= target) {\n                right = mid - 1;\n            } else {\n                left = mid + 1;\n            }\n        } else {\n            if (nums[mid] < target && nums[right] >= target) {\n                left = mid + 1;\n            } else {\n                right = mid - 1;\n            }\n        }\n    }\n\n    return -1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Checks if the **left half is sorted** and determines if the **target is within that sorted range**; if so, narrows `right`, otherwise moves `left` forward; then handles the right-half case similarly for the alternative scenario.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2024-12-03T07:56:07.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number}\n */\nvar search = function(nums, target) {\n    let left = 0;\n    let right = nums.length - 1;\n\n    while (left <= right) {\n        const mid = Math.floor((left + right) / 2);\n\n        if (nums[mid] === target) {\n            return mid;\n        } else if (nums[left] <= nums[mid]) {\n            if (nums[mid] > target && nums[left] <= target) {\n                right = mid - 1;\n            } else {\n                left = mid + 1;\n            }\n        } else {\n            if (nums[mid] < target && nums[right] >= target) {\n                left = mid + 1;\n            } else {\n                right = mid - 1;\n            }\n        }\n    }\n\n    return -1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Identical to #13 but uses `nums[left] <= nums[mid]` instead of `nums[left] < nums[mid]` to properly handle cases where the left and mid values are equal, covering all boundary equality scenarios.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 100,
+    "date": "2024-12-03T07:58:09.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number}\n */\nvar search = function(nums, target) {\n    let left = 0;\n    let right = nums.length - 1;\n\n    while (left <= right) {\n        const mid = Math.floor((left + right) / 2);\n\n        const moveLeft = (nums[left] <= nums[mid] && nums[mid] > target && nums[left] <= target) ||\n            (nums[left] > nums[mid] && !(nums[mid] < target && nums[right] >= target));\n\n        if (nums[mid] === target) {\n            return mid;\n        } else if (moveLeft) {\n            right = mid - 1;\n        } else {\n            left = mid + 1;\n        }\n    }\n\n    return -1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Pre-computes a `moveLeft` variable that combines conditions from both sorted-half cases into a single boolean expression, then uses it to decide whether to move `right` or `left`, centralizing complex logic into one readable statement.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 100,
+    "date": "2024-12-03T08:00:50.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number}\n */\nvar search = function(nums, target) {\n    let left = 0;\n    let right = nums.length - 1;\n\n    while (left <= right) {\n        const mid = Math.floor((left + right) / 2);\n\n        if (nums[mid] === target) {\n            return mid;\n        } else if ((nums[left] <= nums[mid] && nums[mid] > target && nums[left] <= target) ||\n            (nums[left] > nums[mid] && (nums[mid] >= target || nums[right] < target))) {\n            right = mid - 1;\n        } else {\n            left = mid + 1;\n        }\n    }\n\n    return -1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Merges multiple conditional branches into a single check that determines whether to move `right = mid - 1` by combining sorted-half detection with target-range checks, reducing nested if-else complexity.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 100,
+    "date": "2024-12-03T08:09:45.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number}\n */\nvar search = function(nums, target) {\n    const n = nums.length;\n\n    let left = 0;\n    let right = n - 1;\n\n    while (left <= right) {\n        const mid = Math.floor((left + right) / 2);\n\n        if (nums[left] === target) return left;\n        if (nums[mid] === target) return mid;\n        if (nums[right] === target) return right;\n\n        if (nums[left] < nums[mid]) {\n            if (target < nums[left] || target > nums[mid]) {\n                left = mid + 1;\n            } else {\n                right = mid;\n            }\n        } else {\n            if (target < nums[mid] || target > nums[right]) {\n                right = mid - 1;\n            } else {\n                left = mid;\n            }\n        }\n    }\n\n    return -1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Checks if the target matches `nums[left]`, `nums[mid]`, or `nums[right]` for quick early returns, then adjusts pointers using `mid` directly instead of `mid ± 1`, preventing boundary overshoot near rotation points.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-05-22T08:55:09.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number}\n */\nvar search = function(nums, target) {\n    const n = nums.length;\n\n    let left = 0;\n    let right = n - 1;\n\n    while (left <= right) {\n        const mid = Math.floor((left + right) / 2);\n\n        if (nums[left] === target) return left;\n        if (nums[mid] === target) return mid;\n        if (nums[right] === target) return right;\n\n        if (nums[left] < nums[mid]) {\n            if (target < nums[left] || target > nums[mid]) {\n                left = mid + 1;\n            } else {\n                right = mid - 1;\n            }\n        } else {\n            if (target < nums[mid] || target > nums[right]) {\n                right = mid - 1;\n            } else {\n                left = mid + 1;\n            }\n        }\n    }\n\n    return -1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Similar to #17 in structure and early-return checks, but changes the else-clause logic to use `left = mid + 1` instead of `left = mid`, altering how the algorithm handles the right-side search when target is not found at boundary positions.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 51.85,
+    "date": "2026-05-22T08:56:24.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number}\n */\nvar search = function(nums, target) {\n    let left = 0;\n    let right = nums.length - 1;\n\n    while (left <= right) {\n        const mid = Math.floor((left + right) / 2);\n\n        if (nums[mid] === target) return mid;\n\n        if (nums[left] < nums[mid]) {\n            if (target >= nums[left] && target < nums[mid]) {\n                right = mid - 1;\n            } else {\n                left = mid + 1;\n            }\n        } else {\n            if (target >= nums[mid + 1] && target <= nums[right]) {\n                left = mid + 1;\n            } else {\n                right = mid - 1;\n            }\n        }\n    }\n\n    return -1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Determines search direction by checking if the target is in the range `[nums[mid + 1], nums[right]]` for the right half, requiring careful `mid + 1` indexing to avoid out-of-bounds errors and adjust for rotation-sensitive boundary conditions.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 44.65,
+    "date": "2026-05-22T09:06:57.000Z"
+  }
+]

@@ -1,0 +1,57 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar sumFourDivisors = function(nums) {\n    const map = new Map();\n    let res = 0;\n\n    const getDivisors = (num) => {\n        let divisors = new Set([1, num]);\n\n        if (num === 1) {\n            return divisors;\n        }\n\n        for (let i = 2; i <= num; i++) {\n            if (num % i === 0) {\n                divisors.add(i);\n                divisors.add(num / i);\n\n                if (divisors.size > 4) {\n                    break;\n                }\n            }\n        }\n\n        return divisors;\n    };\n\n    for (const num of nums) {\n        const div = getDivisors(num);\n        if (div.size === 4) {\n            res += [...div].reduce((acc, el) => acc + el, 0);\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function sums up the divisors of every number in `nums` that has **exactly four divisors**. For each number, the helper `getDivisors` builds a `Set` seeded with `1` and the number itself, then brute-forces every candidate `i` from `2` up to `num`, adding both `i` and its paired divisor `num / i` whenever `num % i === 0`. Using a `Set` avoids counting duplicates (like when `i` equals `num / i` for perfect squares), and the loop **breaks early** as soon as more than four divisors are found, since that number can no longer qualify. Back in the main loop, if the resulting set has exactly four entries, `reduce` adds all of them into the running total `res`, which is returned at the end.",
+    "status": "DONE",
+    "cpuUsage": 6.67,
+    "memoryUsage": 16.67,
+    "date": "2026-01-04T11:48:40.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar sumFourDivisors = function(nums) {\n    const map = new Map();\n    let res = 0;\n\n    const getDivisors = (num) => {\n        let divisors = new Set([1, num]);\n\n        if (num === 1) {\n            return divisors;\n        }\n\n        const len = Math.floor(Math.sqrt(num));\n\n        for (let i = 2; i <= len; i++) {\n            if (num % i === 0) {\n                divisors.add(i);\n                divisors.add(num / i);\n\n                if (divisors.size > 4) {\n                    break;\n                }\n            }\n        }\n\n        return divisors;\n    };\n\n    for (const num of nums) {\n        const div = getDivisors(num);\n        if (div.size === 4) {\n            res += [...div].reduce((acc, el) => acc + el, 0);\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This version solves the same problem — summing the divisors of every number in `nums` that has **exactly four divisors** — but with a key optimization: instead of checking every candidate up to `num`, the loop only runs up to `Math.floor(Math.sqrt(num))`. This works because divisors always come in **pairs**: if `i` divides `num`, then `num / i` is also a divisor, so adding both `i` and `num / i` to the `Set` covers everything without ever looking past the square root. The set starts pre-seeded with `1` and `num` (the pair every number has), duplicates are handled automatically by the `Set`, and the loop still **breaks early** once more than four divisors appear. Any number whose set ends up with exactly four entries contributes the sum of those divisors (via `reduce`) to the final result `res`.",
+    "status": "DONE",
+    "cpuUsage": 53.33,
+    "memoryUsage": 10,
+    "date": "2026-01-04T11:51:31.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar sumFourDivisors = function(nums) {\n    const map = new Map();\n    let res = 0;\n\n    const memo = {};\n\n    const getDivisors = (num) => {\n        let divisors = new Set([1, num]);\n\n        if (num === 1) {\n            return divisors;\n        }\n        if (memo[num]) {\n            return memo[num];\n        }\n\n        const len = Math.floor(Math.sqrt(num));\n\n        for (let i = 2; i <= len; i++) {\n            if (num % i === 0) {\n                divisors.add(i);\n                divisors.add(num / i);\n\n                if (divisors.size > 4) {\n                    break;\n                }\n            }\n        }\n\n        memo[num] = divisors;\n\n        return memo[num];\n    };\n\n    for (const num of nums) {\n        const div = getDivisors(num);\n        if (div.size === 4) {\n            res += [...div].reduce((acc, el) => acc + el, 0);\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This iteration adds **memoization** on top of the square-root approach: a plain object `memo` caches the divisor `Set` computed for each number, so if the same value appears more than once in `nums`, `getDivisors` returns the stored result immediately instead of recomputing it. Otherwise the logic is unchanged — the set is seeded with `1` and `num`, the loop runs from `2` up to `Math.floor(Math.sqrt(num))` adding each divisor `i` together with its pair `num / i`, and it **breaks early** once the set grows past four entries. After caching the result in `memo[num]`, the main loop sums the divisors (with `reduce`) of every number whose set contains exactly four values, accumulating the answer in `res`.",
+    "status": "DONE",
+    "cpuUsage": 30,
+    "memoryUsage": 6.67,
+    "date": "2026-01-04T11:55:21.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar sumFourDivisors = function(nums) {\n    const map = new Map();\n    let res = 0;\n\n    const getDivisors = (num) => {\n        if (num === 1) {\n            return new Set([1]);\n        }\n\n        const len = Math.floor(Math.sqrt(num));\n        const divisors = new Set();\n\n        for (let i = 1; i <= len; i++) {\n            if (num % i === 0) {\n                divisors.add(i);\n                divisors.add(num / i);\n\n                if (divisors.size > 4) {\n                    break;\n                }\n            }\n        }\n\n        return divisors;\n    };\n\n    for (const num of nums) {\n        const div = getDivisors(num);\n        if (div.size === 4) {\n            res += [...div].reduce((acc, el) => acc + el, 0);\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This refactor simplifies the divisor collection: rather than pre-seeding the `Set` with `1` and `num`, the loop now starts at `i = 1` with an **empty set**, so the trivial pair `1` and `num` is discovered naturally on the first iteration (with `1` handled as a special case returning just `{1}`). The loop still only runs up to `Math.floor(Math.sqrt(num))`, exploiting the fact that divisors come in **pairs** — whenever `num % i === 0`, both `i` and `num / i` are added — and it **breaks early** once the set exceeds four entries. Numbers whose divisor set contains exactly four values have those divisors summed via `reduce` and added to the running total `res`, which is the value returned.",
+    "status": "DONE",
+    "cpuUsage": 43.33,
+    "memoryUsage": 33.33,
+    "date": "2026-01-04T11:58:03.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar sumFourDivisors = function(nums) {\n    let res = 0;\n\n    for (const num of nums) {\n        const len = Math.floor(Math.sqrt(num));\n        const divisors = new Set();\n\n        for (let i = 1; i <= len; i++) {\n            if (num % i === 0) {\n                divisors.add(i);\n                divisors.add(num / i);\n\n                if (divisors.size > 4) {\n                    break;\n                }\n            }\n        }\n\n        if (divisors.size === 4) {\n            res += [...divisors].reduce((acc, el) => acc + el, 0);\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This final, cleaned-up version drops the helper function and the unused `map`, doing everything **inline** in a single loop over `nums`. For each number it walks `i` from `1` up to `Math.floor(Math.sqrt(num))`, and whenever `i` divides the number evenly it adds both `i` and its complementary divisor `num / i` to a `Set` — the set deduplicates automatically (important for perfect squares where `i === num / i`) — **breaking early** the moment more than four divisors accumulate. If a number ends up with exactly four divisors, `reduce` sums them and adds the total to `res`; numbers with any other divisor count contribute nothing. The accumulated `res` is the answer returned.",
+    "status": "DONE",
+    "cpuUsage": 56.67,
+    "memoryUsage": 33.33,
+    "date": "2026-01-04T12:13:47.000Z"
+  }
+]

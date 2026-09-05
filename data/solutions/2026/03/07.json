@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar minFlips = function(s) {\n    const n = s.length;\n    const dp = new Array(n + 1).fill(0);\n\n    for (let i = 0; i < n; i++) {\n        const isEven = i % 2 === 0;\n        const isZero = s[i] === '0';\n\n        if (isEven ^ isZero) {\n            dp[i + 1] = dp[i] + 1;\n        } else {\n            dp[i + 1] = dp[i];\n        }\n    }\n\n    return Math.min(dp[n], n - dp[n]);\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses **dynamic programming** to find the minimum flips needed to make a binary string alternate. It iterates through each character, checking if it matches the expected alternating pattern (even indices should be `'0'`, odd indices should be `'1'`) using XOR logic. For each position, it accumulates the flip count in the `dp` array. Finally, it returns the minimum of two options: the flips needed to match pattern `\"010...\"` or pattern `\"101...\"`, represented by `dp[n]` and `n - dp[n]`.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-03-07T10:52:24.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar minFlips = s => {\n    const n = s.length;\n    const op = [0, 0];\n    let res = n;\n\n    for (let i = 0; i < n; i++) {\n        op[(s.charCodeAt(i) ^ i) & 1]++;\n    }\n\n    for (let i = 0; i < n; i++) {\n        const c = s.charCodeAt(i);\n        op[(c ^ i) & 1]--;\n        op[(c ^ (n + i)) & 1]++;\n        res = Math.min(res, ...op);\n    }\n\n    return res;\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This optimized solution uses a **sliding window approach** with an array `op` to track flip counts for both parity groups. It first counts the total flips needed for both alternating patterns by using `charCodeAt` and XOR operations to determine parity. Then it slides through each position, removing the contribution of the left element and adding the contribution of a hypothetical right element at position `n + i`, incrementally updating the counts. This allows it to find the minimum flips needed in a single linear pass after the initial setup.",
+    "status": "DONE",
+    "cpuUsage": 94.12,
+    "memoryUsage": 76.47,
+    "date": "2026-03-07T11:03:00.000Z"
+  }
+]

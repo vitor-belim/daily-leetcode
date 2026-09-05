@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} arr\n * @param {number} start\n * @return {boolean}\n */\nvar canReach = function(arr, start) {\n    let stack = [start];\n    const seen = new Set();\n    seen.add(start);\n\n    while (stack.length > 0) {\n        next = [];\n\n        while (stack.length > 0) {\n            const cur = stack.pop();\n\n            if (arr[cur] === 0) {\n                return true;\n            }\n\n            const back = cur - arr[cur];\n            if (back >= 0 && !seen.has(back)) {\n                seen.add(back);\n                next.push(back);\n            }\n\n            const forw = cur + arr[cur];\n            if (forw < arr.length && !seen.has(forw)) {\n                seen.add(forw);\n                next.push(forw);\n            }\n        }\n\n        stack = next;\n    }\n\n    return false;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses a **depth-first search (DFS)** approach with a `seen` set to track visited indices and avoid cycles. Starting from the `start` index, it explores all reachable positions by jumping both backward (`cur - arr[cur]`) and forward (`cur + arr[cur]`) based on the array values. The algorithm processes indices in layers—within each outer while loop, it exhausts all indices from the current layer (via `stack.pop()`) before moving to the next layer (`stack = next`). If it ever reaches an index where `arr[cur] === 0`, it immediately returns `true`; if all reachable indices are explored without finding a zero, it returns `false`.",
+    "status": "DONE",
+    "cpuUsage": 13.92,
+    "memoryUsage": 17.72,
+    "date": "2026-05-17T09:31:16.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} arr\n * @param {number} start\n * @return {boolean}\n */\nvar canReach = function(arr, start) {\n    let stack = [start];\n    const seen = new Set();\n    seen.add(start);\n\n    while (stack.length > 0) {\n        next = [];\n\n        for (const cur of stack) {\n            if (arr[cur] === 0) {\n                return true;\n            }\n\n            const back = cur - arr[cur];\n            if (back >= 0 && !seen.has(back)) {\n                seen.add(back);\n                next.push(back);\n            }\n\n            const forw = cur + arr[cur];\n            if (forw < arr.length && !seen.has(forw)) {\n                seen.add(forw);\n                next.push(forw);\n            }\n        }\n\n        stack = next;\n    }\n\n    return false;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution implements a **breadth-first search (BFS)** approach to explore all indices reachable from the starting position. It maintains a `seen` set to prevent revisiting indices and avoid infinite loops. In each iteration of the outer while loop, it processes all indices in the current layer (using a `for...of` loop) and jumps to adjacent indices by either subtracting or adding the current value (`cur - arr[cur]` and `cur + arr[cur]`). New unvisited indices are collected in the `next` array, which becomes the stack for the next layer. The function returns `true` as soon as it finds an index with value `0`, or `false` if all reachable positions are exhausted.",
+    "status": "DONE",
+    "cpuUsage": 44.3,
+    "memoryUsage": 16.46,
+    "date": "2026-05-17T09:38:41.000Z"
+  }
+]

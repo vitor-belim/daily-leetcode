@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} word\n * @return {number}\n */\nvar minimumDistance = function (word) {\n    let res = Infinity;\n\n    const dfs = (index, left, right, cost) => {\n        if (index === word.length) {\n            res = Math.min(res, cost);\n            return;\n        }\n\n        dfs(index + 1, word[index], right, cost + getMoveCost(left, word[index]));\n        dfs(index + 1, left, word[index], cost + getMoveCost(right, word[index]));\n    };\n    dfs(0, '', '', 0);\n\n    return res;\n};\n\nconst getMoveCost = (from, to) => {\n    if (!from) return 0;\n\n    const [fromX, fromY] = map[from];\n    const [toX, toY] = map[to];\n\n    return Math.abs(fromX - toX) + Math.abs(fromY - toY);\n};\n\nconst map = {\n    A: [0, 0],\n    B: [0, 1],\n    C: [0, 2],\n    D: [0, 3],\n    E: [0, 4],\n    F: [0, 5],\n    G: [1, 0],\n    H: [1, 1],\n    I: [1, 2],\n    J: [1, 3],\n    K: [1, 4],\n    L: [1, 5],\n    M: [2, 0],\n    N: [2, 1],\n    O: [2, 2],\n    P: [2, 3],\n    Q: [2, 4],\n    R: [2, 5],\n    S: [3, 0],\n    T: [3, 1],\n    U: [3, 2],\n    V: [3, 3],\n    W: [3, 4],\n    X: [3, 5],\n    Y: [4, 0],\n    Z: [4, 1],\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses **depth-first search (DFS) with backtracking** to explore all possible finger movements while typing a word on a keyboard. It maintains the positions of both fingers (`left` and `right`) as it recursively processes each character, trying both options at each step: moving the left finger to the current character or moving the right finger. The `getMoveCost` function calculates the **Manhattan distance** between two keys using a coordinate map of the keyboard layout, and the algorithm tracks the minimum total cost across all possible combinations of finger movements.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-04-12T08:00:20.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} word\n * @return {number}\n */\nvar minimumDistance = function (word) {\n    const n = word.length;\n    const getDistance = (p, q) => {\n        const x1 = Math.floor(p / 6),\n            y1 = p % 6;\n        const x2 = Math.floor(q / 6),\n            y2 = q % 6;\n        return Math.abs(x1 - x2) + Math.abs(y1 - y2);\n    };\n\n    const dp = Array.from({ length: n }, () => Array.from({ length: 26 }, () => Math.floor(Number.MAX_SAFE_INTEGER / 2)));\n\n    for (let j = 0; j < 26; j++) {\n        dp[0][j] = 0;\n    }\n\n    for (let i = 1; i < n; i++) {\n        const cur = word.charCodeAt(i) - 65;\n        const prev = word.charCodeAt(i - 1) - 65;\n        const d = getDistance(prev, cur);\n\n        for (let j = 0; j < 26; j++) {\n            dp[i][j] = Math.min(dp[i][j], dp[i - 1][j] + d);\n\n            if (prev === j) {\n                for (let k = 0; k < 26; k++) {\n                    const d0 = getDistance(k, cur);\n                    dp[i][j] = Math.min(dp[i][j], dp[i - 1][k] + d0);\n                }\n            }\n        }\n    }\n\n    let ans = Math.floor(Number.MAX_SAFE_INTEGER / 2);\n\n    for (let j = 0; j < 26; j++) {\n        ans = Math.min(ans, dp[n - 1][j]);\n    }\n\n    return ans;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses **dynamic programming** to efficiently find the minimum distance needed to type a word with two fingers. The `dp[i][j]` table stores the minimum cost to type the first `i` characters with one finger at letter `j`, while the other finger can be at any position. For each character, the algorithm considers two cases: keeping the previous finger at position `j` and moving the other finger to the current character, or moving the finger that was at `j` to the current character. The `getDistance` function computes **Manhattan distance** on the keyboard grid, treating each letter as a coordinate position (row and column).",
+    "status": "DONE",
+    "cpuUsage": 60,
+    "memoryUsage": 80,
+    "date": "2026-04-12T08:10:34.000Z"
+  }
+]

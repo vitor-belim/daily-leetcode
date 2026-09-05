@@ -1,0 +1,68 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @param {number} k\n * @return {string}\n */\nvar getHappyString = function(n, k) {\n    const list = [];\n    const letters = \"abc\";\n\n    const backtrack = (index, word) => {\n        if (index === n) {\n            list.push(word);\n            return;\n        }\n\n        for (let i = 0; i < 3; i++) {\n            if (index > 0 && word[index - 1] === letters[i]) continue;\n\n            backtrack(index + 1, word + letters[i]);\n        }\n    };\n    backtrack(0, \"\");\n\n    return list[k - 1] || \"\";\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function generates all **\"happy strings\"** of length `n` using only the letters **'a', 'b', and 'c'**, where a happy string has the constraint that no two **adjacent characters** can be the same. It uses **backtracking** to recursively build strings character by character — at each position, it tries adding each of the three letters, but **skips any letter that matches the previous character** (via the `if (index > 0 && word[index - 1] === letters[i]) continue;` check). Once a string reaches length `n`, it's added to the `list`. Finally, the function returns the **k-th happy string** from the generated list (using 1-based indexing via `list[k - 1]`), or an **empty string** if there aren't enough valid strings to reach the k-th position.",
+    "status": "DONE",
+    "cpuUsage": 30.91,
+    "memoryUsage": 9.09,
+    "date": "2025-02-19T08:19:52.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @param {number} k\n * @return {string}\n */\nvar getHappyString = function(n, k) {\n    const backtrack = (index, word) => {\n        if (index === n) {\n            k--;\n            return k === 0 ? word : false;\n        }\n\n        for (const char of \"abc\") {\n            if (index > 0 && word[index - 1] === char) continue;\n\n            const res = backtrack(index + 1, word + char);\n            if (res) {\n                return res;\n            }\n        }\n\n        return false;\n    };\n\n    return backtrack(0, \"\") || \"\";\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "The function uses **backtracking** to find the **k-th \"happy string\"** of length `n`, where a happy string has no two consecutive identical characters. It recursively builds strings character by character, trying `'a'`, `'b'`, and `'c'` at each position but skipping any character that matches the previous one (the constraint ensuring \"happiness\"). Each time a complete string of length `n` is formed, the function decrements `k`; when `k` reaches 0, it means we've found our target string and returns it immediately. If the algorithm exhausts all possible combinations without finding the k-th string, it returns an empty string, indicating that fewer than `k` happy strings exist.",
+    "status": "DONE",
+    "cpuUsage": 52.73,
+    "memoryUsage": 54.55,
+    "date": "2025-02-19T08:26:31.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @param {number} k\n * @return {string}\n */\nvar getHappyString = function(n, k) {\n    const backtrack = (word) => {\n        if (word.length === n) {\n            k--;\n            return k === 0 ? word : false;\n        }\n\n        for (const char of \"abc\") {\n            if (word.length > 0 && word[word.length - 1] === char) continue;\n\n            const res = backtrack(word + char);\n            if (res) {\n                return res;\n            }\n        }\n\n        return false;\n    };\n\n    return backtrack(\"\") || \"\";\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds the **k-th \"happy string\"** of length **n**, where a happy string has no two adjacent characters that are the same. It uses **backtracking** to build strings one character at a time, choosing from the letters `'a'`, `'b'`, and `'c'`. For each position, it skips any character that matches the last character in the current word (to maintain the \"no adjacent duplicates\" rule). When it constructs a complete string of length `n`, it decrements a counter `k` — once `k` reaches zero, it has found the k-th valid string and returns it. If fewer than `k` happy strings exist, the function returns an empty string.",
+    "status": "DONE",
+    "cpuUsage": 52.73,
+    "memoryUsage": 54.55,
+    "date": "2025-02-19T08:29:14.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @param {number} k\n * @return {string}\n */\nvar getHappyString = function(n, k) {\n    const res = [];\n\n    const dfs = (s) => {\n        if (s.length === n) {\n            res.push(s);\n            return;\n        }\n        if (!s || s[s.length - 1] !== 'a') dfs(s + 'a');\n        if (!s || s[s.length - 1] !== 'b') dfs(s + 'b');\n        if (!s || s[s.length - 1] !== 'c') dfs(s + 'c');\n    };\n\n    dfs('');\n\n    return res[k - 1] || '';\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code finds the **k-th \"happy string\"** of length **n**, where a happy string contains only the characters `'a'`, `'b'`, and `'c'` with **no two consecutive characters being the same**. It uses a **recursive depth-first search (DFS)** to generate all possible happy strings: starting with an empty string, it recursively builds longer strings by appending each of the three characters, but only if that character differs from the last character in the current string (the condition `!s || s[s.length - 1] !== 'a'` means \"append 'a' if the string is empty OR the last character isn't 'a'\"). Once a string reaches length **n**, it's stored in the `res` array. Finally, the function returns the **k-th string** from this array (using 1-based indexing with `res[k - 1]`), or an empty string if fewer than **k** happy strings exist.",
+    "status": "DONE",
+    "cpuUsage": 32.73,
+    "memoryUsage": 23.64,
+    "date": "2026-03-14T09:18:29.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @param {number} k\n * @return {string}\n */\nvar getHappyString = function(n, k) {\n    const stack = [''];\n    let seen = 0;\n\n    while (stack.length > 0) {\n        const s = stack.pop();\n\n        if (s.length === n) {\n            seen++;\n            if (seen === k) {\n                return s;\n            }\n            continue;\n        }\n\n        if (!s || s[s.length - 1] !== 'c') stack.push(s + 'c');\n        if (!s || s[s.length - 1] !== 'b') stack.push(s + 'b');\n        if (!s || s[s.length - 1] !== 'a') stack.push(s + 'a');\n    }\n\n    return '';\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function uses a **stack-based depth-first search** to generate all possible strings of length **n** using the characters `a`, `b`, and `c`, with the constraint that **no two adjacent characters can be the same**. It builds these strings incrementally by popping partially-built strings from the stack and appending characters that differ from the last character (or appending any character if the string is empty). As it completes strings of length **n**, it counts them with the `seen` counter and returns the **k-th** valid string when found. If there aren't enough valid strings to reach the k-th position, it returns an empty string.",
+    "status": "DONE",
+    "cpuUsage": 40,
+    "memoryUsage": 54.55,
+    "date": "2026-03-14T09:30:02.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @param {number} k\n * @return {string}\n */\nvar getHappyString = function(n, k) {\n    const stack = [''];\n\n    while (stack.length > 0) {\n        const s = stack.pop();\n\n        if (s.length === n) {\n            k--;\n            if (k === 0) {\n                return s;\n            }\n            continue;\n        }\n\n        if (!s || s[s.length - 1] !== 'c') stack.push(s + 'c');\n        if (!s || s[s.length - 1] !== 'b') stack.push(s + 'b');\n        if (!s || s[s.length - 1] !== 'a') stack.push(s + 'a');\n    }\n\n    return '';\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function generates the **k-th happy string** of length **n** using a **stack-based depth-first search**. A \"happy string\" is one where no two adjacent characters are the same, using only the letters `'a'`, `'b'`, and `'c'`. The algorithm starts with an empty string and iteratively builds longer strings by pushing candidates onto a stack—but only pushes a character if it's different from the last character in the current string (checked with conditions like `s[s.length - 1] !== 'a'`). When a string reaches the target length `n`, it **counts down the counter k**; once `k` reaches 0, that string is the answer and gets returned. If the stack empties without finding the k-th string, it returns an empty string (meaning there aren't k valid happy strings of that length).",
+    "status": "DONE",
+    "cpuUsage": 74.55,
+    "memoryUsage": 54.55,
+    "date": "2026-03-14T09:41:35.000Z"
+  }
+]

@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} left\n * @param {number} right\n * @return {number}\n */\nvar countPrimeSetBits = function(left, right) {\n    let res = 0;\n    \n    for (let i = left; i <= right; i++) {\n        const ones = i.toString(2).split('').filter(x => x === '1').length;\n        if (ones === 2 || ones === 3 || ones === 5) {\n            res++;\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "The code counts how many numbers in the range `[left, right]` have a **prime number of set bits** (1s in their binary representation). It iterates through each number, converts it to binary using `toString(2)`, counts the ones, and increments the result counter if that count equals **2, 3, or 5** (which are prime numbers).",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-02-21T09:42:39.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} left\n * @param {number} right\n * @return {number}\n */\nvar countPrimeSetBits = function(left, right) {\n    const primes = [2, 3, 5, 7, 11, 13, 17, 19];\n    let res = 0;\n    \n    for (let i = left; i <= right; i++) {\n        const ones = i.toString(2).split('').filter(x => x === '1').length;\n        if (primes.includes(ones)) {\n            res++;\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution solves the same problem but is more flexible and robust. Instead of hardcoding the prime numbers (2, 3, 5), it uses an array of all possible **primes up to 19** (the maximum bit count for a 32-bit integer). For each number in the range, it converts to binary, counts the ones, and checks if that count exists in the `primes` array using `includes()`.",
+    "status": "DONE",
+    "cpuUsage": 49.06,
+    "memoryUsage": 33.96,
+    "date": "2026-02-21T09:44:18.000Z"
+  }
+]

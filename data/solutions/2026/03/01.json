@@ -1,0 +1,46 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} n\n * @return {number}\n */\nvar minPartitions = function(n) {\n    return Math.max(...n.split('').map(Number));\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution finds the largest single digit in the input string **n** by splitting it into individual characters with `split('')`, converting each to a number with `map(Number)`, and using the spread operator to pass all values to `Math.max()`, which returns the maximum digit. Since the answer is determined by the largest digit in the number, this approach is both concise and efficient.",
+    "status": "DONE",
+    "cpuUsage": 43.82,
+    "memoryUsage": 20.22,
+    "date": "2026-03-01T09:37:35.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} n\n * @return {number}\n */\nvar minPartitions = function(n) {\n    let max = 0;\n\n    for (const char of n) {\n        const num = Number(char);\n\n        if (num > max) {\n            max = num;\n\n            if (max === 9) return 9;\n        }\n    }\n\n    return max;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution iterates through each character in the string, converting each to a number and tracking the maximum value found. It includes an optimization that **returns immediately if 9 is encountered**, since 9 is the largest possible single digit, making further iteration unnecessary. This approach combines a linear scan with an early-exit optimization to improve performance on inputs containing large digits.",
+    "status": "DONE",
+    "cpuUsage": 71.91,
+    "memoryUsage": 68.54,
+    "date": "2026-03-01T09:40:07.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} n\n * @return {number}\n */\nvar minPartitions = function(n) {\n    let max = '0';\n\n    for (const char of n) {\n        if (char > max) {\n            max = char;\n\n            if (max === '9') return 9;\n        }\n    }\n\n    return Number(max);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Similar to the previous solution, this also finds the maximum digit by iterating through the string and comparing values, but it keeps `max` as a **string character instead of converting to a number**. String comparison works here because single digit characters are ordered lexicographically the same way as their numeric values (`'0'` < `'1'` < ... < `'9'`). It still includes the early-return optimization for `'9'` and converts the final result to a number before returning.",
+    "status": "DONE",
+    "cpuUsage": 66.29,
+    "memoryUsage": 44.94,
+    "date": "2026-03-01T09:43:21.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} n\n * @return {number}\n */\nvar minPartitions = function(n) {\n    for (let i = 9; i >= 2; i--) {\n        if (n.match(RegExp(i))) {\n            return i;\n        }\n    }\n    return 1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution takes a **top-down search approach**, starting from the largest digit (9) and working downward. For each digit from 9 to 2, it uses `match()` with a regex pattern to check if that digit exists anywhere in the string; the first match found is returned. If no digit from 2 to 9 is found, it returns 1 as the minimum possible answer. While conceptually clear, this approach may be less efficient than scanning left-to-right since it performs multiple passes for large digits.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 79.78,
+    "date": "2026-03-01T09:48:50.000Z"
+  }
+]

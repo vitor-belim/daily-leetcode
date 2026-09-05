@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {boolean}\n */\nvar checkOnesSegment = function(s) {\n    let started = false;\n    let ended = false;\n\n    for (const char of s) {\n        if (char === '0') {\n            if (started && !ended) {\n                ended = true;\n            }\n            continue;\n        }\n\n        if (ended) {\n            return false;\n        }\n\n        if (!started) {\n            started = true;\n        }\n    }\n\n    return true;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function checks if a binary string contains all `1`s in a single contiguous segment by tracking whether we've **started** seeing `1`s and whether we've **ended** (by encountering a `0`). It iterates through each character, marking when the segment of `1`s begins, and if any `1`s appear after a `0` is encountered, it immediately returns `false`. If the string contains `1`s only in one consecutive block or no `1`s at all, it returns `true`.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 50,
+    "date": "2026-03-06T09:40:06.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {boolean}\n */\nvar checkOnesSegment = function(s) {\n    let lastOne = -1;\n\n    for (let i = 0; i < s.length; i++) {\n        if (s[i] === '1') {\n            if (lastOne > -1 && i - lastOne > 1) {\n                return false;\n            }\n            lastOne = i;\n        }\n    }\n\n    return true;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function validates that all `1`s in a binary string are consecutive by tracking the index of the **last seen `1`** and checking if the current `1` is adjacent to it (distance of 1). If a `1` is found more than one position away from the previous `1`, there's a gap indicating multiple segments, so it returns `false`. Otherwise, it returns `true`, confirming that all `1`s form a single contiguous block.",
+    "status": "DONE",
+    "cpuUsage": 17.71,
+    "memoryUsage": 31.25,
+    "date": "2026-03-06T09:44:57.000Z"
+  }
+]

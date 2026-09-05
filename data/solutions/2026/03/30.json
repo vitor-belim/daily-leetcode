@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s1\n * @param {string} s2\n * @return {boolean}\n */\nvar checkStrings = function(s1, s2) {\n    const n = s1.length;\n\n    const odd = new Array(26).fill(0);\n    const even = new Array(26).fill(0);\n    const aChar = 'a'.charCodeAt(0);\n\n    for (let i = 0; i < n; i++) {\n        if (i & 1) {\n            odd[s1.charCodeAt(i) - aChar]++;\n            odd[s2.charCodeAt(i) - aChar]--;\n        } else {\n            even[s1.charCodeAt(i) - aChar]++;\n            even[s2.charCodeAt(i) - aChar]--;\n        }\n    }\n    \n    return odd.every(x => x === 0) && even.every(x => x === 0);\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function checks if two strings can be transformed into each other by only swapping characters within odd-indexed or even-indexed positions. It maintains two frequency-tracking arrays—one for characters at **odd positions** and one for **even positions**—then iterates through both strings simultaneously, incrementing the count for each character from `s1` and decrementing for the corresponding character from `s2` at each position. If both arrays end up with all zeros, it means `s1` and `s2` have **identical character distributions at odd positions and identical distributions at even positions**, making the strings compatible.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 53.19,
+    "date": "2026-03-30T07:58:42.000Z"
+  }
+]

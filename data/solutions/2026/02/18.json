@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @return {boolean}\n */\nvar hasAlternatingBits = function(n) {\n    const bin = n.toString(2);\n\n    for (let i = 1; i < bin.length; i++) {\n        if (bin[i] === bin[i - 1]) {\n            return false;\n        }\n    }\n\n    return true;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function checks whether a number has **alternating bits** in its binary representation. It first converts the number `n` to its binary string using `toString(2)`, then iterates through each bit starting from the second position, comparing it with the previous bit. If any two consecutive bits are **identical** (both `0` or both `1`), the function immediately returns `false`, meaning the bits are not alternating. If the loop completes without finding any matching consecutive bits, it returns `true`, confirming that all adjacent bits alternate between `0` and `1` (like the patterns `101010` or `010101`).",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 96.12,
+    "date": "2026-02-18T09:39:50.000Z"
+  }
+]

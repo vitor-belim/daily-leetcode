@@ -1,0 +1,35 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} grid\n * @param {number} x\n * @return {number}\n */\nvar minOperations = function(grid, x) {\n    let values = [];\n    \n    for (let row of grid) {\n        for (let val of row) {\n            values.push(val);\n        }\n    }\n\n    values.sort((a, b) => a - b);\n\n    for (let val of values) {\n        if (Math.abs(val - values[0]) % x !== 0) {\n            return -1;\n        }\n    }\n\n    let median = values[Math.floor(values.length / 2)];\n    let operations = 0;\n\n    for (let val of values) {\n        operations += Math.abs(val - median) / x;\n    }\n\n    return operations;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds the minimum number of operations to make all grid values equal, where each operation changes a value by `x`. It first flattens the 2D grid into a 1D array and sorts it. It then checks if all values are compatible (their differences from the minimum are divisible by `x`), returning **-1** if not. Finally, it uses the median as the target value and calculates the total operations needed to bring all values to the median by summing the absolute differences divided by `x`.",
+    "status": "DONE",
+    "cpuUsage": 13.64,
+    "memoryUsage": 9.09,
+    "date": "2025-03-26T07:17:50.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} grid\n * @param {number} x\n * @return {number}\n */\nvar minOperations = function(grid, x) {\n    const arr = grid.reduce((acc, el) => acc.concat(el), []);\n    const remainder = grid[0][0] % x;\n\n    if (arr.some((el) => el % x !== remainder)) {\n        return -1;\n    }\n\n    arr.sort((a, b) => a - b);\n\n    const mid = Math.floor(arr.length / 2);\n\n    if ((arr.length & 1) || arr[mid - 1] === arr[mid]) {\n        return countOperations(grid, x, arr[mid]);\n    }\n\n    return Math.min(\n        countOperations(grid, x, arr[mid - 1]),\n        countOperations(grid, x, arr[mid]),\n    );\n};\n\nconst countOperations = (grid, x, target) => {\n    const m = grid.length;\n    const n = grid[0].length;\n\n    let operations = 0;\n\n    for (let row = 0; row < m; row++) {\n        for (let col = 0; col < n; col++) {\n            operations += Math.round(Math.abs(target - grid[row][col]) / x);\n        }\n    }\n\n    return operations;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution flattens the grid using `reduce` and checks if all values have the same remainder when divided by `x`. After sorting, it determines the optimal median target by testing both middle elements (for even-length arrays) or using the single middle element (for odd-length arrays) to minimize operations. The `countOperations` helper function traverses the original grid and sums up the number of increments or decrements (in multiples of `x`) needed to reach the target value for each cell.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-04-28T08:49:33.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} grid\n * @param {number} x\n * @return {number}\n */\nvar minOperations = function(grid, x) {\n    const m = grid.length;\n    const n = grid[0].length;\n    \n    const arr = Array(m * n);\n    const rem = grid[0][0] % x;\n\n    for (let row = 0; row < m; row++) {\n        for (let col = 0; col < n; col++) {\n            if (grid[row][col] % x !== rem) {\n                return -1;\n            }\n\n            arr[row * n + col] = grid[row][col];\n        }\n    }\n\n    arr.sort((a, b) => a - b);\n\n    const mid = Math.floor(arr.length / 2);\n\n    if ((arr.length & 1) || arr[mid - 1] === arr[mid]) {\n        return countOperations(arr, x, arr[mid]);\n    }\n\n    return Math.min(\n        countOperations(arr, x, arr[mid - 1]),\n        countOperations(arr, x, arr[mid]),\n    );\n};\n\nconst countOperations = (arr, x, target) => {\n    let operations = 0;\n\n    for (const val of arr) {\n        operations += Math.round(Math.abs(target - val) / x);\n    }\n\n    return operations;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This optimized version pre-allocates an array with a known size (`m * n`) and flattens the grid by directly assigning values to calculated indices, avoiding intermediate object creation. Like the previous solution, it validates that all values share the same remainder modulo `x`, then determines the optimal median target. The key difference is that `countOperations` now works directly on the sorted array rather than repeatedly iterating through the original grid, making it more efficient for multiple median candidate evaluations.",
+    "status": "DONE",
+    "cpuUsage": 77.27,
+    "memoryUsage": 81.82,
+    "date": "2026-04-28T08:57:35.000Z"
+  }
+]

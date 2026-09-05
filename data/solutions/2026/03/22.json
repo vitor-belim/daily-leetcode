@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} mat\n * @param {number[][]} target\n * @return {boolean}\n */\nvar findRotation = function(mat, target) {\n    const n = mat.length;\n\n    let rot0 = true;\n    let rot90 = true;\n    let rot180 = true;\n    let rot270 = true;\n\n    for (let r = 0; r < n; r++) {\n        for (let c = 0; c < n; c++) {\n            const inv_r = n - 1 - r;\n            const inv_c = n - 1 - c;\n\n            rot0 &= mat[r][c] === target[r][c];\n            rot90 &= mat[c][inv_r] === target[r][c];\n            rot180 &= mat[inv_r][inv_c] === target[r][c];\n            rot270 &= mat[inv_c][r] === target[r][c];\n\n            if (!rot0 && !rot90 && !rot180 && !rot270) {\n                return false;\n            }\n        }\n    }\n\n    return rot0 || rot90 || rot180 || rot270;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function determines whether a **target matrix** is a rotated version of the input **matrix** by checking all four possible rotations (0°, 90°, 180°, and 270°). It maintains four boolean flags—`rot0`, `rot90`, `rot180`, and `rot270`—and iterates through every position `[r, c]` in the matrix, comparing elements from the source matrix at rotation-adjusted coordinates to the corresponding position in the target. For each rotation, it uses the formula `mat[adjusted_row][adjusted_col] === target[r][c]` to verify if that rotation produces the target; for example, a 90° rotation reads from `mat[c][n-1-r]`, while a 180° rotation reads from `mat[n-1-r][n-1-c]`. If all four rotations are ruled out at any point (all flags become `false`), the function returns early for efficiency. Finally, it returns `true` if **any** of the four rotations produced a match with the target matrix.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 80.88,
+    "date": "2026-03-22T10:40:34.000Z"
+  }
+]

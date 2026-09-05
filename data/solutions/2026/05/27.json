@@ -1,0 +1,35 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} word\n * @return {number}\n */\nvar numberOfSpecialChars = function(word) {\n    const map = new Map();\n\n    for (let i = 0; i < word.length; i++) {\n        if (!map.has(word[i])) {\n            map.set(word[i], []);\n        }\n        map.get(word[i]).push(i);\n    }\n\n    let res = 0;\n\n    for (let i = 0; i < 26; i++) {\n        const char = String.fromCharCode(97 + i);\n        const upChar = String.fromCharCode(65 + i);\n\n        const charArr = map.get(char) || [];\n        const upCharArr = map.get(upChar) || [];\n\n        if (charArr.length > 0 && upCharArr.length > 0 && charArr[charArr.length - 1] < upCharArr[0]) {\n            res++;\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses a **Map** to track all positions where each character appears in the word. It then iterates through each letter of the alphabet, checking if both the lowercase and uppercase versions exist in the word; if they do, it counts the letter as \"special\" only if the **last occurrence of the lowercase letter comes before the first occurrence of the uppercase letter**. This ensures proper alphabetical ordering within each letter pair.",
+    "status": "DONE",
+    "cpuUsage": 34.29,
+    "memoryUsage": 5.71,
+    "date": "2026-05-27T08:09:32.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} word\n * @return {number}\n */\nvar numberOfSpecialChars = function(word) {\n    const arr = new Array(52).fill(-1);\n\n    for (let i = 0; i < word.length; i++) {\n        const code = word.charCodeAt(i);\n        const isLowerCase = code >= 97;\n        const pos = code - (isLowerCase ? 71 : 65);\n\n        if (isLowerCase || arr[pos] === -1) {\n            arr[pos] = i;\n        }\n    }\n\n    let res = 0;\n\n    for (let i = 0; i < 26; i++) {\n        if (arr[26 + i] > -1 && arr[i] > arr[26 + i]) {\n            res++;\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses a **fixed-size array of 52 elements** to store character positions more efficiently than a Map. It maps each character to an array index (0-25 for uppercase, 26-51 for lowercase), storing the **first occurrence for uppercase or last occurrence for lowercase** by only updating when certain conditions are met. Finally, it counts how many letters have their uppercase occurrence before their lowercase occurrence by comparing positions in the 26-51 range with positions in the 0-25 range.",
+    "status": "DONE",
+    "cpuUsage": 71.43,
+    "memoryUsage": 65.71,
+    "date": "2026-05-27T08:22:04.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} word\n * @return {number}\n */\nvar numberOfSpecialChars = function(word) {\n    const arr = new Array(52).fill(-1);\n\n    for (let i = 0; i < word.length; i++) {\n        const code = word.charCodeAt(i);\n        const isLowerCase = code >= 97;\n        const pos = code - (isLowerCase ? 97 : 39);\n\n        if (isLowerCase || arr[pos] === -1) {\n            arr[pos] = i;\n        }\n    }\n\n    let res = 0;\n\n    for (let i = 0; i < 26; i++) {\n        if (arr[i] > -1 && arr[i] < arr[26 + i]) {\n            res++;\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution follows the same **array-based approach as the previous version**, using a 52-element array to track character positions with adjusted offset calculations. It stores the **first lowercase position or first uppercase position** and checks the inverse condition compared to the second solution. It counts letters where the **lowercase character appears before its corresponding uppercase counterpart**, making it a different interpretation of the \"special character\" requirement.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 80,
+    "date": "2026-05-27T08:25:34.000Z"
+  }
+]

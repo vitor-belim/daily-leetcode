@@ -1,0 +1,35 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} encodedText\n * @param {number} rows\n * @return {string}\n */\nvar decodeCiphertext = function(encodedText, rows) {\n    const len = encodedText.length;\n    const inc = len / rows;\n    let line = 0;\n    let pos = 0;\n    let res = '';\n\n    while (line < inc) {\n        res += encodedText[pos];\n        pos += inc + 1;\n\n        if (pos >= len) {\n            line++;\n            pos = line;\n        }\n    }\n\n    return res.trim();\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function decodes a ciphertext that was encoded in a rail-fence pattern. It calculates the increment (`inc`) between characters in the same diagonal by dividing the total length by the number of rows. It then iterates through each column, reading characters at positions spaced by `inc + 1` apart, which follows the diagonal pattern. When a position exceeds the string length, it moves to the next diagonal line by incrementing `line` and adjusting `pos`. Finally, it trims whitespace and returns the decoded message.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-04-04T08:29:04.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} encodedText\n * @param {number} rows\n * @return {string}\n */\nvar decodeCiphertext = function(encodedText, rows) {\n    const len = encodedText.length;\n    const inc = len / rows;\n    let line = 0;\n    let pos = 0;\n    let res = '';\n\n    while (line < inc) {\n        res += encodedText[pos];\n        pos += inc + 1;\n\n        if (pos >= len) {\n            line++;\n            pos = line;\n        }\n    }\n\n    return res.trimEnd();\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function uses the same rail-fence decoding algorithm as the first solution, but instead of using `trim()`, it uses `trimEnd()` to remove only trailing whitespace. It calculates the column increment (`inc`), iterates through diagonals by reading characters spaced `inc + 1` positions apart, and handles line transitions when positions exceed the string length. This version preserves leading whitespace while removing trailing spaces, which is important for correct decoding of the ciphertext.",
+    "status": "DONE",
+    "cpuUsage": 17.14,
+    "memoryUsage": 54.29,
+    "date": "2026-04-04T08:30:19.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} encodedText\n * @param {number} rows\n * @return {string}\n */\nvar decodeCiphertext = function(encodedText, rows) {\n    const m = rows;\n    const n = encodedText.length / rows;\n\n    const arr = encodedText.split('');\n    const mat = [];\n\n    for (let i = 0; i < encodedText.length; i += n) {\n        mat.push(arr.slice(i, i + n));\n    }\n\n    let res = '';\n\n    for (let startCol = 0; startCol < n; startCol++) {\n        let row = 0;\n        let col = startCol;\n\n        while (row < m && col < n) {\n            res += mat[row][col];\n            row++;\n            col++;\n        }\n    }\n\n    return res.trimEnd();\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution takes an alternative approach by first constructing a 2D matrix from the encoded text, where each row contains `n` characters (total length divided by number of rows). It then decodes by reading diagonally: starting from each column position, it reads characters while moving down and to the right across the matrix. This diagonal reading pattern reverses the rail-fence encoding and reconstructs the original message. Finally, it returns the result after trimming trailing whitespace with `trimEnd()`.",
+    "status": "DONE",
+    "cpuUsage": 25.72,
+    "memoryUsage": 28.57,
+    "date": "2026-04-04T08:43:40.000Z"
+  }
+]

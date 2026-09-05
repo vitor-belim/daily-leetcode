@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number[]}\n */\nvar minBitwiseArray = function (nums) {\n    const res = [];\n\n    for (const num of nums) {\n        let cur = -1;\n\n        for (let i = 1; i < num; i++) {\n            if ((i | (i + 1)) === num) {\n                cur = i;\n                break;\n            }\n        }\n\n        res.push(cur);\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds the **minimum bitwise value** for each number in the input array. For each number `num`, it searches for the smallest value **`i`** (starting from 1) where the **bitwise OR** of `i` and `i + 1` equals `num`—if such a value exists, it returns `i`; otherwise it returns **`-1`**. For example, if `num` is `3`, the function checks `1 | 2 = 3`, which is true, so it returns `1`. The algorithm iterates through each potential value and uses the bitwise OR operator (`|`) to combine adjacent numbers until it finds a match, then moves to the next number in the input array and repeats the process.",
+    "status": "DONE",
+    "cpuUsage": 84.62,
+    "memoryUsage": 65.38,
+    "date": "2026-01-20T09:08:54.000Z"
+  }
+]

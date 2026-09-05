@@ -1,0 +1,57 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} robots\n * @param {number[][]} factories\n * @return {number}\n */\nvar minimumTotalDistance = function(robots, factories) {\n    robots.sort((a, b) => a - b);\n    factories.sort((a, b) => a[0] - b[0]);\n\n    let sum = 0;\n    let factPos = 0;\n\n    for (const robot of robots) {\n        while (factories[factPos][1] === 0) {\n            factPos++;\n        }\n\n        sum += Math.abs(factories[factPos][0] - robot);\n        factories[factPos][1]--;\n    }\n\n    return sum;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code attempts to minimize the total distance between robots and repair factories using a **greedy approach**: it first **sorts both robots and factories by position**, then iterates through each robot in order, assigning it to the **first factory that still has available capacity** (tracked by `factories[factPos][1]`). For each robot, it **adds the absolute distance** between the robot's position and the factory's position to a running sum, then **decrements the factory's remaining capacity**. However, this greedy strategy doesn't guarantee an optimal solution for this problem—a proper solution typically requires **dynamic programming** to consider all possible factory assignments, since assigning a robot to one factory affects which factories remain available for subsequent robots.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2024-10-31T07:27:24.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} robots\n * @param {number[][]} factories\n * @return {number}\n */\nvar minimumTotalDistance = function(robots, factories) {\n    let min = Infinity;\n    \n    const dfs = (pos, sum) => {\n        if (pos === robots.length) {\n            min = Math.min(min, sum);\n            return;\n        }\n        if (sum > min) {\n            return;\n        }\n\n        for (const factory of factories) {\n            if (factory[1] === 0) continue;\n\n            const dist = Math.abs(factory[0] - robots[pos]);\n            factory[1]--;\n            sum += dist;\n\n            dfs(pos + 1, sum);\n\n            sum -= dist;\n            factory[1]++;\n        }\n    };\n\n    dfs(0, 0);\n\n    return min;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code uses **depth-first search with backtracking** to find the minimum total distance needed to assign each **robot** to a **factory** for repair. It recursively processes robots one by one, trying to assign each robot to every available factory (those with remaining capacity, indicated by `factory[1] > 0`). For each assignment, it calculates the distance between the robot's position and the factory's position, decrements the factory's capacity to \"use\" it, and recursively processes the next robot. The key insight is **backtracking**: after exploring an assignment path, it undoes the changes (restores the factory capacity and subtracts the distance) so other assignment combinations can be tried. It also uses **pruning** (`if (sum > min) return`) to skip branches that already exceed the current best solution. When all robots are assigned (`pos === robots.length`), it updates the minimum total distance found. The algorithm exhaustively tries all valid assignments and returns the one with the smallest total distance.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2024-10-31T07:36:52.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} robots\n * @param {number[][]} factories\n * @return {number}\n */\nvar minimumTotalDistance = function(robots, factories) {\n    robots.sort((a, b) => a - b);\n    factories.sort((a, b) => a[0] - b[0]);\n\n    let min = Infinity;\n    \n    const dfs = (pos, sum) => {\n        if (pos === robots.length) {\n            min = Math.min(min, sum);\n            return;\n        }\n        if (sum > min) {\n            return;\n        }\n\n        for (const factory of factories) {\n            if (factory[1] === 0) continue;\n\n            const dist = Math.abs(factory[0] - robots[pos]);\n            factory[1]--;\n            sum += dist;\n\n            dfs(pos + 1, sum);\n\n            sum -= dist;\n            factory[1]++;\n        }\n    };\n\n    dfs(0, 0);\n\n    return min;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code solves the **robot-to-factory assignment problem** using **depth-first search with backtracking**. It first **sorts both robots and factories** by position to establish an order, then recursively tries assigning each robot to available factories (where `factory[1]` is the count of robots that factory can repair). For each robot, the algorithm **calculates the distance** to a factory, **decrements the factory's capacity**, and recursively assigns the next robot; if this path's total cost exceeds the best solution found so far, it **prunes the branch** to avoid unnecessary exploration. After trying each assignment, it **backtracks** by undoing the distance and restoring the factory's capacity. The function returns the **minimum total distance** across all valid assignments where each factory respects its capacity limit.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2024-10-31T07:37:43.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "// JavaScript\n\nvar minimumTotalDistance = function(robot, factory) {\n    robot.sort((a, b) => a - b);\n    factory.sort((a, b) => a[0] - b[0]);\n    \n    const m = robot.length;\n    const n = factory.length;\n    \n    const dp = Array(m + 1).fill().map(() => Array(n + 1).fill(0));\n    \n    for (let i = 0; i < m; i++) {\n        dp[i][n] = Infinity;\n    }\n    \n    for (let j = n - 1; j >= 0; j--) {\n        let prefix = 0;\n        const qq = [[m, 0]];\n        \n        for (let i = m - 1; i >= 0; i--) {\n            prefix += Math.abs(robot[i] - factory[j][0]);\n            \n            if (qq[0][0] > i + factory[j][1]) {\n                qq.shift();\n            }\n            \n            while (qq.length && qq[qq.length - 1][1] >= dp[i][j + 1] - prefix) {\n                qq.pop();\n            }\n            \n            qq.push([i, dp[i][j + 1] - prefix]);\n            dp[i][j] = qq[0][1] + prefix;\n        }\n    }\n    \n    return dp[0][0];\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is an **advanced dynamic programming solution** using **monotonic queue optimization** to efficiently solve the robot-to-factory assignment problem. It starts by **sorting both arrays and flattening** the factories into individual positions (since each factory can repair multiple robots). Then it uses **bottom-up DP** where `dp[i][j]` represents the minimum cost to assign the first `i` robots using factories from index 0 to `j`. The key optimization is the **monotonic queue** (`qq`), which maintains potential solutions in a specific order—it stores pairs of `[robot_index, value]` and processes backward through robots and factories. For each robot-factory pair, it **calculates a prefix sum** of distances and uses the queue to quickly find the best previous state, avoiding recalculation. The queue is maintained so that older entries are removed when they're out of range or suboptimal, and new entries are added only if they could lead to better solutions. This reduces the time complexity from O(n²m²) to O(nm), making it suitable for large inputs.",
+    "status": "DONE",
+    "cpuUsage": 14.29,
+    "memoryUsage": 42.86,
+    "date": "2024-10-31T08:48:57.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} robots\n * @param {number[][]} factories\n * @return {number}\n */\nvar minimumTotalDistance = function(robots, factories) {\n    robots.sort((a, b) => a - b);\n    factories.sort((a, b) => a[0] - b[0]);\n\n    const factoryPositions = [];\n    for (const [pos, rep] of factories) {\n        for (let i = 0; i < rep; i++) {\n            factoryPositions.push(pos);\n        }\n    }\n\n    let robotCount = robots.length;\n    let factoryCount = factoryPositions.length;\n    let next = new Array(factoryCount + 1).fill(0);\n    let current = new Array(factoryCount + 1).fill(0);\n\n    current[factoryCount] = Infinity;\n\n    for (let i = robotCount - 1; i >= 0; i--) {\n        for (let j = factoryCount - 1; j >= 0; j--) {\n            current[j] = Math.min(\n                current[j + 1],\n                Math.abs(robots[i] - factoryPositions[j]) + next[j + 1],\n            );\n        }\n\n        next = current.slice(0, factoryCount + 1);\n    }\n\n    return current[0];\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code solves the **robot-to-factory assignment problem** using **dynamic programming** and is optimized for space efficiency. It first **sorts both arrays** and **expands factories** into individual positions (if a factory can repair multiple robots, it's added that many times to an array). Then it uses **bottom-up DP** with two arrays (`current` and `next`) representing minimum costs: `current[j]` is the minimum total distance to assign all remaining robots to factories from index `j` onward. For each robot (processed from last to first), it decides whether to **assign the robot to the current factory** (paying its distance cost and recursing) or **skip to the next factory**. The recurrence is `current[j] = min(skip factory, assign to factory)`, where skipping means `current[j+1]` and assigning means `abs(robot_position - factory_position) + next[j+1]`. After processing each robot, it **swaps the arrays** so the previous state becomes the current state for the next iteration. The final answer is `current[0]`, representing the minimum cost to assign all robots starting from the first factory.",
+    "status": "DONE",
+    "cpuUsage": 14.29,
+    "memoryUsage": 14.29,
+    "date": "2026-04-14T08:56:38.000Z"
+  }
+]

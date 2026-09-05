@@ -1,0 +1,156 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} grid\n * @return {boolean}\n */\nvar canPartitionGrid = function(grid) {\n    const m = grid.length;\n    const n = grid[0].length;\n\n    const rows = Array(m).fill(0);\n    const cols = Array(n).fill(0);\n\n    for (let row = 0; row < m; row++) {\n        for (let col = 0; col < n; col++) {\n            rows[row] += grid[row][col];\n            cols[col] += grid[row][col];\n        }\n    }\n\n    return checkSums(rows) || checkSums(cols);\n};\n\nconst checkSums = (arr) => {\n    const len = arr.length;\n    const prefix = Array(len).fill(0);\n    const suffix = Array(len).fill(0);\n\n    for (let i = 0; i < len; i++) {\n        const inv = len - 1 - i;\n        prefix[i] = (i > 0 ? prefix[i - 1] : 0) + arr[i];\n        suffix[inv] = (inv < len - 1 ? suffix[inv + 1] : 0) + arr[inv];\n    }\n\n    for (let i = 1; i < len; i++) {\n        if (prefix[i - 1] === suffix[i]) {\n            return true;\n        }\n    }\n\n    return false;\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution sums each row and column, then uses a helper function `checkSums()` that builds **prefix** and **suffix** arrays to find a partition point where the sum of elements before it equals the sum after it, returning `true` if such a point exists in rows or columns.",
+    "status": "DONE",
+    "cpuUsage": 16,
+    "memoryUsage": 14,
+    "date": "2026-03-25T09:27:30.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} grid\n * @return {boolean}\n */\nvar canPartitionGrid = function(grid) {\n    const m = grid.length;\n    const n = grid[0].length;\n\n    const rows = Array(m).fill(0);\n    const cols = Array(n).fill(0);\n\n    for (let row = 0; row < m; row++) {\n        for (let col = 0; col < n; col++) {\n            rows[row] += grid[row][col];\n            cols[col] += grid[row][col];\n        }\n    }\n\n    return checkSums(rows) || checkSums(cols);\n};\n\nconst checkSums = (arr) => {\n    const len = arr.length;\n    const prefix = Array(len).fill(0);\n    let total = 0;\n\n    for (let i = 0; i < len; i++) {\n        prefix[i] = (i > 0 ? prefix[i - 1] : 0) + arr[i];\n        total += arr[i];\n    }\n\n    for (let i = 1; i < len; i++) {\n        if (2 * prefix[i - 1] === total) {\n            return true;\n        }\n    }\n\n    return false;\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This optimizes the partition check by computing **prefix sums** and the total sum, then checking if `2 * prefix[i-1] === total` at any position to find where the grid can split into two equal-sum parts.",
+    "status": "DONE",
+    "cpuUsage": 28,
+    "memoryUsage": 24,
+    "date": "2026-03-25T09:30:44.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} grid\n * @return {boolean}\n */\nvar canPartitionGrid = function(grid) {\n    const m = grid.length;\n    const n = grid[0].length;\n\n    const rows = Array(m).fill(0);\n    const cols = Array(n).fill(0);\n\n    for (let row = 0; row < m; row++) {\n        for (let col = 0; col < n; col++) {\n            rows[row] += grid[row][col];\n            cols[col] += grid[row][col];\n        }\n    }\n\n    return checkSums(rows) || checkSums(cols);\n};\n\nconst checkSums = (arr) => {\n    const set = new Set();\n    let total = arr[0];\n\n    for (let i = 1; i < arr.length; i++) {\n        set.add(total);\n        total += arr[i];\n    }\n\n    return set.has(total / 2);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This uses a **Set** to track cumulative sums as it iterates through the row or column sums, then checks if the target (half the total) was ever seen as a prefix sum, avoiding the need for separate prefix and suffix arrays.",
+    "status": "DONE",
+    "cpuUsage": 8,
+    "memoryUsage": 10,
+    "date": "2026-03-25T09:34:21.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} grid\n * @return {boolean}\n */\nvar canPartitionGrid = function(grid) {\n    const m = grid.length;\n    const n = grid[0].length;\n\n    const rows = Array(m).fill(0);\n    const cols = Array(n).fill(0);\n    let total = 0;\n\n    for (let row = 0; row < m; row++) {\n        for (let col = 0; col < n; col++) {\n            rows[row] += grid[row][col];\n            cols[col] += grid[row][col];\n            total += grid[row][col];\n        }\n    }\n\n    let sum = 0;\n    for (const num of rows) {\n        sum += num;\n        if (2 * sum === total) {\n            return true;\n        }\n    }\n\n    sum = 0;\n    for (const num of cols) {\n        sum += num;\n        if (2 * sum === total) {\n            return true;\n        }\n    }\n\n    return false;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This calculates the total grid sum while building row and column sum arrays, then iterates through both to check if `2 * sum === total` at any point, indicating a valid partition.",
+    "status": "DONE",
+    "cpuUsage": 16,
+    "memoryUsage": 14,
+    "date": "2026-03-25T09:37:38.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} grid\n * @return {boolean}\n */\nvar canPartitionGrid = function(grid) {\n    const m = grid.length;\n    const n = grid[0].length;\n\n    const rows = Array(m).fill(0);\n    const cols = Array(n).fill(0);\n    let total = 0;\n\n    for (let row = 0; row < m; row++) {\n        for (let col = 0; col < n; col++) {\n            rows[row] += grid[row][col];\n            cols[col] += grid[row][col];\n            total += grid[row][col];\n        }\n    }\n\n    if (total % 2 === 1) {\n        return false;\n    }\n\n    const target = total / 2;\n\n    let sum = 0;\n    for (const num of rows) {\n        sum += num;\n        if (sum === target) {\n            return true;\n        }\n    }\n\n    sum = 0;\n    for (const num of cols) {\n        sum += num;\n        if (sum === target) {\n            return true;\n        }\n    }\n\n    return false;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This improves efficiency by checking if the total is **odd** first (which would make partitioning impossible), then searches for a partition point where the running sum equals exactly half the total.",
+    "status": "DONE",
+    "cpuUsage": 14,
+    "memoryUsage": 14,
+    "date": "2026-03-25T09:39:48.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} grid\n * @return {boolean}\n */\nvar canPartitionGrid = function(grid) {\n    const m = grid.length;\n    const n = grid[0].length;\n\n    const rows = Array(m).fill(0);\n    const cols = Array(n).fill(0);\n    let total = 0;\n\n    for (let row = 0; row < m; row++) {\n        for (let col = 0; col < n; col++) {\n            rows[row] += grid[row][col];\n            cols[col] += grid[row][col];\n            total += grid[row][col];\n        }\n    }\n\n    if (total % 2 === 1) {\n        return false;\n    }\n\n    const target = total / 2;\n\n    let sum = 0;\n    for (const num of rows) {\n        sum += num;\n        if (sum === target) {\n            return true;\n        } else if (sum > target) {\n            break;\n        }\n    }\n\n    sum = 0;\n    for (const num of cols) {\n        sum += num;\n        if (sum === target) {\n            return true;\n        } else if (sum > target) {\n            break;\n        }\n    }\n\n    return false;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This adds an early **break** optimization to Solution 5—if the running sum exceeds the target, it stops searching that direction since sums are monotonically increasing.",
+    "status": "DONE",
+    "cpuUsage": 24,
+    "memoryUsage": 24,
+    "date": "2026-03-25T09:40:49.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} grid\n * @return {boolean}\n */\nvar canPartitionGrid = function(grid) {\n    const m = grid.length;\n    const n = grid[0].length;\n\n    const cols = Array(n).fill(0);\n    const set = new Set();\n    let total = 0;\n\n    for (let row = 0; row < m; row++) {\n        let rowCount = 0;\n\n        for (let col = 0; col < n; col++) {\n            rowCount += grid[row][col];\n            cols[col] += grid[row][col];\n        }\n\n        total += rowCount;\n        set.add(total);\n    }\n\n    if (total & 1) {\n        return false;\n    }\n\n    const target = total / 2;\n\n    if (set.has(target)) {\n        return true;\n    }\n\n    let sum = 0;\n    for (const num of cols) {\n        sum += num;\n\n        if (sum === target) {\n            return true;\n        } else if (sum > target) {\n            return false;\n        }\n    }\n\n    return false;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This combines **bitwise operations** (`&` for odd checking) with a **Set** to track which rows achieve the target sum, then checks columns using the same cumulative approach.",
+    "status": "DONE",
+    "cpuUsage": 34,
+    "memoryUsage": 14,
+    "date": "2026-03-25T09:51:40.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} grid\n * @return {boolean}\n */\nvar canPartitionGrid = function(grid) {\n     let m = grid.length\n    let n = grid[0].length\n\n    let total = 0\n\n    for(let i=0;i<m;i++){\n        for(let j=0;j<n;j++){\n            total += grid[i][j]\n        }\n    }\n\n    if(total % 2 !== 0) return false\n\n    let target = total / 2\n\n    // horizontal cut\n    let running = 0\n\n    for(let i=0;i<m-1;i++){\n\n        for(let j=0;j<n;j++){\n            running += grid[i][j]\n        }\n\n        if(running === target) return true\n    }\n\n    // vertical cut\n    running = 0\n\n    for(let j=0;j<n-1;j++){\n\n        for(let i=0;i<m;i++){\n            running += grid[i][j]\n        }\n\n        if(running === target) return true\n    }\n\n    return false\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This straightforward approach calculates the total, returns `false` if odd, then iterates through each row (except the last) and each column (except the last) to find where the running sum equals half the total.",
+    "status": "DONE",
+    "cpuUsage": 92,
+    "memoryUsage": 66,
+    "date": "2026-03-25T09:54:59.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} grid\n * @return {boolean}\n */\nvar canPartitionGrid = function(grid) {\n    const m = grid.length;\n    const n = grid[0].length;\n\n    let total = 0;\n\n    for (let row = 0; row < m; row++) {\n        for (let col = 0; col < n; col++) {\n            total += grid[row][col];\n        }\n    }\n\n    if (total & 1) {\n        return false;\n    }\n\n    const target = total / 2;\n\n    let sum = 0;\n    for (let row = 0; row < m - 1; row++) {\n        for (let col = 0; col < n; col++) {\n            sum += grid[row][col];\n        }\n\n        if (sum === target) {\n            return true;\n        } else if (sum > target) {\n            break;\n        }\n    }\n\n    sum = 0;\n    for (let col = 0; col < n - 1; col++) {\n        for (let row = 0; row < m; row++) {\n            sum += grid[row][col];\n        }\n\n        if (sum === target) {\n            return true;\n        } else if (sum > target) {\n            break;\n        }\n    }\n\n    return false;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This improves Solution 8 by adding an early **break** when the running sum exceeds the target, avoiding unnecessary iterations.",
+    "status": "DONE",
+    "cpuUsage": 78,
+    "memoryUsage": 56,
+    "date": "2026-03-25T09:58:23.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} grid\n * @return {boolean}\n */\nvar canPartitionGrid = function(grid) {\n    const m = grid.length;\n    const n = grid[0].length;\n\n    let total = 0;\n    const set = new Set();\n\n    for (let row = 0; row < m; row++) {\n        for (let col = 0; col < n; col++) {\n            total += grid[row][col];\n        }\n        set.add(total);\n    }\n\n    if (total & 1) {\n        return false;\n    }\n\n    const target = total / 2;\n\n    if (set.has(target)) {\n        return true;\n    }\n\n    let sum = 0;\n    for (let col = 0; col < n - 1; col++) {\n        for (let row = 0; row < m; row++) {\n            sum += grid[row][col];\n        }\n\n        if (sum === target) {\n            return true;\n        }\n    }\n\n    return false;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This uses a **Set** to collect all cumulative row sums while calculating the total, then immediately checks if the target was reached by any row, followed by checking columns.",
+    "status": "DONE",
+    "cpuUsage": 56,
+    "memoryUsage": 30,
+    "date": "2026-03-25T10:00:10.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} grid\n * @return {boolean}\n */\nvar canPartitionGrid = function(grid) {\n    const m = grid.length;\n    const n = grid[0].length;\n\n    let total = 0;\n    const set = new Set();\n\n    for (let row = 0; row < m; row++) {\n        for (let col = 0; col < n; col++) {\n            total += grid[row][col];\n        }\n        set.add(total);\n    }\n\n    if (total & 1) {\n        return false;\n    }\n\n    const target = total >> 1;\n\n    if (set.has(target)) {\n        return true;\n    }\n\n    let sum = 0;\n    for (let col = 0; col < n - 1; col++) {\n        for (let row = 0; row < m; row++) {\n            sum += grid[row][col];\n        }\n\n        if (sum === target) {\n            return true;\n        }\n    }\n\n    return false;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is identical to Solution 10 but uses **bitwise right shift** (`>> 1`) instead of division to calculate the target, a minor performance optimization.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-03-25T10:01:35.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} grid\n * @return {boolean}\n */\nvar canPartitionGrid = function(grid) {\n    const m = grid.length;\n    const n = grid[0].length;\n\n    const total = grid.reduce((acc, el) => acc + el.reduce((acc, el) => acc + el, 0), 0);\n\n    if (total & 1) {\n        return false;\n    }\n\n    const target = total / 2;\n\n    let sum = 0;\n    for (let row = 0; row < m - 1; row++) {\n        for (let col = 0; col < n; col++) {\n            sum += grid[row][col];\n        }\n\n        if (sum === target) {\n            return true;\n        }\n    }\n\n    sum = 0;\n    for (let col = 0; col < n - 1; col++) {\n        for (let row = 0; row < m; row++) {\n            sum += grid[row][col];\n        }\n\n        if (sum === target) {\n            return true;\n        }\n    }\n\n    return false;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This uses `reduce()` for a more compact **functional style** calculation of the total sum, then applies the standard partition checking logic on rows and columns.",
+    "status": "DONE",
+    "cpuUsage": 62,
+    "memoryUsage": 56,
+    "date": "2026-03-25T10:04:03.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} grid\n * @return {boolean}\n */\nvar canPartitionGrid = function(grid) {\n    const m = grid.length;\n    const n = grid[0].length;\n\n    let total = 0;\n\n    for (let row = 0; row < m; row++) {\n        for (let col = 0; col < n; col++) {\n            total += grid[row][col];\n        }\n    }\n\n    if (total & 1) {\n        return false;\n    }\n\n    const target = total / 2;\n\n    let sum = 0;\n    for (let row = 0; row < m - 1; row++) {\n        for (let col = 0; col < n; col++) {\n            sum += grid[row][col];\n        }\n\n        if (sum === target) {\n            return true;\n        }\n    }\n\n    sum = 0;\n    for (let col = 0; col < n - 1; col++) {\n        for (let row = 0; row < m; row++) {\n            sum += grid[row][col];\n        }\n\n        if (sum === target) {\n            return true;\n        }\n    }\n\n    return false;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This sums the entire grid, confirms it's even, then iterates through rows and columns (excluding the last of each) to find a partition point where the running sum equals half the total.",
+    "status": "DONE",
+    "cpuUsage": 98,
+    "memoryUsage": 56,
+    "date": "2026-03-25T10:07:21.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} grid\n * @return {boolean}\n */\nvar canPartitionGrid = function(grid) {\n    const m = grid.length;\n    const n = grid[0].length;\n\n    let total = 0;\n\n    for (let row = 0; row < m; row++) {\n        for (let col = 0; col < n; col++) {\n            total += grid[row][col];\n        }\n    }\n\n    if (total & 1) {\n        return false;\n    }\n\n    const target = total / 2;\n\n    let sum = 0;\n    for (let row = 0; row < m - 1; row++) {\n        for (let col = 0; col < n; col++) {\n            sum += grid[row][col];\n        }\n\n        if (sum === target) {\n            return true;\n        }\n    }\n\n    sum = 0;\n    for (let col = 0; col < n - 1; col++) {\n        for (let row = 0; row < m; row++) {\n            sum += grid[row][col];\n        }\n\n        if (sum === target) {\n            return true;\n        }\n    }\n\n    return false;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses the same logic as Solution 13—calculating the total sum, checking for oddness using **bitwise AND**, then searching for a horizontal or vertical cut where the running sum reaches exactly half the grid total.",
+    "status": "DONE",
+    "cpuUsage": 98,
+    "memoryUsage": 56,
+    "date": "2026-03-25T10:07:21.000Z"
+  }
+]

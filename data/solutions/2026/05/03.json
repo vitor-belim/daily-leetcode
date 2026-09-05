@@ -1,0 +1,46 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @param {string} goal\n * @return {boolean}\n */\nvar rotateString = function(s, goal) {\n    const temp = s + s;\n    return temp.indexOf(goal) > -1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution concatenates string `s` with itself to create `temp`, then checks if `goal` appears anywhere in `temp` using `indexOf()`. If the method returns a position other than `-1`, the function returns `true`. However, this approach has a flaw: it doesn't verify that both strings have the same length first, so it could incorrectly return `true` for strings of different lengths.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2024-11-03T08:51:02.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @param {string} goal\n * @return {boolean}\n */\nvar rotateString = function(s, goal) {\n    if (s.length !== goal.length) {\n        return false;\n    }\n\n    const temp = s + s;\n    return temp.indexOf(goal) > -1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution improves upon the first by adding an upfront length check: if `s` and `goal` don't have the same length, it immediately returns `false`. Only if they match in length does it concatenate `s` with itself and check whether `goal` appears in the concatenated string using `indexOf()`. This correctly handles all cases because any valid rotation must be the same length as the original string.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 100,
+    "date": "2024-11-03T08:51:44.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @param {string} goal\n * @return {boolean}\n */\nvar rotateString = function(s, goal) {\n    return (s + s).includes(goal);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses the same concatenation technique as Solution 1 but calls `includes()` instead of `indexOf()`, which is more readable and concise. The `includes()` method returns `true` if `goal` is found anywhere in the concatenated string and `false` otherwise. Like Solution 1, however, it skips the length check and will incorrectly return `true` if `goal` is a substring of a longer string.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-05-03T08:38:34.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @param {string} goal\n * @return {boolean}\n */\nvar rotateString = function(s, goal) {\n    return s.length === goal.length && (s + s).includes(goal);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is the most elegant solution, combining both the length check and the concatenation technique into a single return statement using the `&&` operator. It first verifies that `s` and `goal` have equal length, and only if that condition is true does it check whether `goal` appears in the concatenated `s + s` using `includes()`. This approach is both correct and concise.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 74.46,
+    "date": "2026-05-03T08:40:19.000Z"
+  }
+]

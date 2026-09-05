@@ -1,0 +1,35 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar minimumDistance = function(nums) {\n    const map = new Map();\n    let res = Infinity;\n\n    for (let i = 0; i < nums.length; i++) {\n        const arr = map.get(nums[i]) || [];\n\n        if (arr.length === 0) {\n            map.set(nums[i], arr);\n        }\n\n        if (arr.length > 1) {\n            res = Math.min(res, i - arr[arr.length - 2]);\n        }\n\n        arr.push(i);\n    }\n\n    if (res === Infinity) {\n        return -1;\n    }\n\n    return 2 * res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This algorithm finds the **minimum distance** between two identical elements in an array by using a `Map` to store arrays of indices for each unique number. As it iterates through the array, when a number appears at least twice (checked via `arr.length > 1`), it calculates the distance from the second-to-last occurrence to the current position. The function returns twice the minimum distance found, or `-1` if no duplicate exists.",
+    "status": "DONE",
+    "cpuUsage": 86.67,
+    "memoryUsage": 46.67,
+    "date": "2026-04-11T09:11:09.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar minimumDistance = function(nums) {\n    const map = new Map();\n    let res = Infinity;\n\n    for (let i = 0; i < nums.length; i++) {\n        const arr = map.get(nums[i]) || [-1, -1];\n\n        if (arr[0] !== -1) {\n            res = Math.min(res, i - arr[0]);\n        }\n\n        map.set(nums[i], [arr[1], i]);\n    }\n\n    if (res === Infinity) {\n        return -1;\n    }\n\n    return 2 * res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This optimized approach finds the **minimum distance** between two identical elements by tracking only the last two positions `[previous2, previous1]` for each number in a `Map`. When a second occurrence is found (when `arr[0] !== -1`), it calculates the distance between the two most recent positions. Each iteration shifts the tracked positions forward (`[arr[1], i]`), and the function returns twice the minimum distance encountered, or `-1` if no duplicate exists.",
+    "status": "DONE",
+    "cpuUsage": 97.78,
+    "memoryUsage": 100,
+    "date": "2026-04-11T09:19:42.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar minimumDistance = function(nums) {\n    const map = new Map();\n    let res = Infinity;\n\n    for (let i = 0; i < nums.length; i++) {\n        const arr = map.get(nums[i]) || [-1, -1];\n\n        if (arr[1] === -1) {\n            map.set(nums[i], arr);\n        }\n\n        if (arr[0] !== -1) {\n            res = Math.min(res, i - arr[0]);\n        }\n\n        arr[0] = arr[1];\n        arr[1] = i;\n    }\n\n    if (res === Infinity) {\n        return -1;\n    }\n\n    return 2 * res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This variant efficiently finds the **minimum distance** between identical elements by storing exactly two positions `[older, newer]` for each number. As it iterates through the array, it checks if there's a previous occurrence (`arr[0] !== -1`) and calculates the distance between that position and the current index. The stored positions are then updated—shifting the newer position to older and storing the current index as newer—allowing the algorithm to track consecutive occurrences. It returns twice the minimum distance found, or `-1` if no duplicate exists.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 100,
+    "date": "2026-04-11T09:22:22.000Z"
+  }
+]

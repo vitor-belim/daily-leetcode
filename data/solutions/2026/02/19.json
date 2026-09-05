@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar countBinarySubstrings = function(s) {\n    let count = 0;\n    let prev = 0;\n    let cur = '0';\n    let res = 0;\n\n    for (let i = 0; i < s.length; i++) {\n        if (s[i] === cur) {\n            count++;\n        } else {\n            cur = s[i];\n            prev = count;\n            count = 1;\n        }\n\n        if (count <= prev) {\n            res++;\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function counts **consecutive binary substrings** where groups of identical digits are followed by equal-length groups of the other digit (e.g., `00` followed by `11` counts as one). It tracks the **current digit group size** (`count`), the **previous digit group size** (`prev`), and the **current digit being processed** (`cur`). As it iterates through the string, whenever the digit changes, it updates `prev` to the old group size and resets `count` to 1. After each character, if the current group is at most as large as the previous group (`count <= prev`), it increments the result, meaning we found a valid balanced pair of digit groups.",
+    "status": "DONE",
+    "cpuUsage": 96.55,
+    "memoryUsage": 78.45,
+    "date": "2026-02-19T09:23:49.000Z"
+  }
+]

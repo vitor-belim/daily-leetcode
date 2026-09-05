@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} poured\n * @param {number} query_row\n * @param {number} query_glass\n * @return {number}\n */\nvar champagneTower = function (poured, query_row, query_glass) {\n    const dp = Array.from({ length: 102 }, () => new Array(102).fill(0));\n    dp[0][0] = poured;\n\n    for (let row = 0; row <= query_row; row++) {\n        for (let col = 0; col <= row; col++) {\n            let overflow = (dp[row][col] - 1) / 2;\n            if (overflow > 0) {\n                dp[row + 1][col] += overflow;\n                dp[row + 1][col + 1] += overflow;\n            }\n        }\n    }\n\n    return Math.min(1, dp[query_row][query_glass]);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "The code simulates champagne pouring through a pyramid-shaped tower of glasses using **dynamic programming**. It maintains a 2D array `dp` to track the amount of champagne in each glass. Starting from the top glass, it iterates through each row and column up to the query position, calculating how much champagne overflows from each glass when it exceeds 1 unit of capacity. The overflow is split equally between the two glasses below (`dp[row + 1][col]` and `dp[row + 1][col + 1]`). Finally, it returns the amount in the query glass capped at 1.0 using `Math.min()`, since each glass can hold at most 1 unit.",
+    "status": "DONE",
+    "cpuUsage": 29.03,
+    "memoryUsage": 51.61,
+    "date": "2026-02-14T11:53:13.000Z"
+  }
+]

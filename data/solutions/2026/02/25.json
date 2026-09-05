@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} arr\n * @return {number[]}\n */\nvar sortByBits = function(arr) {\n    arr.sort((a, b) => a - b);\n\n    const map = {};\n\n    for (const num of arr) {\n        const bin = num.toString(2);\n        let ones = bin.match(/1/g);\n        ones = (ones && ones.length) || 0;\n        map[ones] !== undefined ? map[ones].push(num) : (map[ones] = [num]);\n    }\n\n    return Object.keys(map)\n        .map(key => map[key])\n        .reduce((acc, res) => [ ...acc, ...res ], []);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "The function **sortByBits** sorts an array of numbers in two stages: first, it performs a numerical sort on the input array, then groups each number by counting how many `1` bits appear in its binary representation (using `toString(2)` to convert to binary and regex to count the `1`s). These numbers are stored in a `map` object where each key represents a bit count and the value is an array of numbers with that many `1` bits. Finally, the function extracts all the grouped arrays from the map and flattens them back into a single result array, producing a final array sorted by bit count (ascending) as the primary criterion and numerical value (ascending) as the secondary criterion.",
+    "status": "DONE",
+    "cpuUsage": 5.36,
+    "memoryUsage": 49.11,
+    "date": "2024-03-18T19:12:23.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} arr\n * @return {number[]}\n */\nvar sortByBits = function(arr) {\n    arr.sort((a, b) => a - b);\n\n    const dp = Array.from({ length: 17 }, () => new Array());\n\n    for (const num of arr) {\n        const ones = num.toString(2).split('').filter(x => x === '1').length;\n        dp[ones].push(num);\n    }\n\n    return dp.flat(1);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function sorts an array by the **number of 1 bits** in each number's binary representation, with ties broken by numerical order. It first sorts the array numerically, then creates 17 empty buckets (since a 32-bit number can have at most 32 ones, but the function handles up to 16 based on the array initialization) — one for each possible count of 1 bits. For each number, it converts it to a **binary string** (e.g., `5` becomes `\"101\"`), **counts the '1' characters**, and places the number in the corresponding bucket (e.g., `5` has two 1s, so it goes in `dp[2]`). Finally, it **flattens** the 2D bucket structure back into a single array, which automatically produces the sorted result since the buckets are indexed in order (0, 1, 2, ..., 16).",
+    "status": "DONE",
+    "cpuUsage": 36.61,
+    "memoryUsage": 6.25,
+    "date": "2026-02-25T09:01:46.000Z"
+  }
+]

@@ -1,0 +1,35 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} A\n * @param {number[]} B\n * @return {number[]}\n */\nvar findThePrefixCommonArray = function(A, B) {\n    const seen = new Set();\n    const len = Math.max(A.length, B.length);\n    let common = 0;\n    const res = [];\n\n    for (let i = 0; i < len; i++) {\n        if (seen.has(A[i])) {\n            seen.delete(A[i]);\n            common++;\n        } else {\n            seen.add(A[i]);\n        }\n\n        if (seen.has(B[i])) {\n            seen.delete(B[i]);\n            common++;\n        } else {\n            seen.add(B[i]);\n        }\n\n        res.push(common);\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds the **prefix common array** between two input arrays `A` and `B`. It uses a `Set` called `seen` as a toggle mechanism: as it iterates through each position `i`, it processes `A[i]` and `B[i]` one at a time. When it encounters a number from `A`, it checks if that number is already in `seen` (meaning it was previously encountered from `B`); if so, it **increments a `common` counter** and removes the number from the set, otherwise it adds the number to the set. The same logic applies to `B[i]`. After processing both elements at position `i`, it pushes the current `common` count to the result array, which represents how many values appear in both the prefix `A[0..i]` and `B[0..i]`. Finally, it returns the result array containing the common counts for each prefix position.",
+    "status": "DONE",
+    "cpuUsage": 18.81,
+    "memoryUsage": 100,
+    "date": "2025-01-14T08:04:42.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} A\n * @param {number[]} B\n * @return {number[]}\n */\nvar findThePrefixCommonArray = function(A, B) {\n    const seen = new Set();\n    const len = Math.max(A.length, B.length);\n    let common = 0;\n    const res = Array(len).fill(0);\n\n    for (let i = 0; i < len; i++) {\n        if (seen.has(A[i])) {\n            seen.delete(A[i]);\n            common++;\n        } else {\n            seen.add(A[i]);\n        }\n\n        if (seen.has(B[i])) {\n            seen.delete(B[i]);\n            common++;\n        } else {\n            seen.add(B[i]);\n        }\n\n        res[i] = common;\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function calculates a **prefix common array** by tracking which numbers appear in both arrays up to each position. It uses a `Set` to efficiently track elements as it iterates through both arrays simultaneously: for each index `i`, it checks if the current element from `A[i]` has already been seen (meaning it came from a previous element in `B`), and if so, increments a **common counter** and removes it from the set; it then repeats this process for `B[i]`. By the end of each iteration, the **common counter** holds the total count of numbers that appear in both the prefix `A[0..i]` and `B[0..i]`, which is stored in the result array at that position. This elegant approach avoids the need to rebuild a frequency map at each step, making it efficient by maintaining just one shared `Set` that dynamically tracks which elements are \"pending\" a match.",
+    "status": "DONE",
+    "cpuUsage": 25.74,
+    "memoryUsage": 100,
+    "date": "2025-01-14T08:06:19.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} A\n * @param {number[]} B\n * @return {number[]}\n */\nvar findThePrefixCommonArray = function(A, B) {\n    const n = A.length;\n    const freq = Array(n + 1).fill(0);\n    const res = Array(n);\n    let count = 0;\n\n    for (let i = 0; i < n; i++) {\n        freq[A[i]]++;\n        if (freq[A[i]] <= 0) count++;\n\n        freq[B[i]]--;\n        if (freq[B[i]] >= 0) count++;\n\n        res[i] = count;\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds the **prefix common array** between two arrays `A` and `B`. It uses a **frequency array** to track which numbers have appeared in both arrays: incrementing the count for elements from `A` and decrementing for elements from `B`. The key insight is that when `freq[A[i]]` transitions from negative to positive (or reaches 0), it means `A[i]` was previously seen in `B`, indicating a new common element; similarly, when `freq[B[i]]` transitions from positive to negative (or reaches 0), it means `B[i]` was previously seen in `A`. The `count` variable accumulates these matches, and for each index `i`, the result stores how many elements are common to both the prefix `A[0...i]` and `B[0...i]`.",
+    "status": "DONE",
+    "cpuUsage": 97.03,
+    "memoryUsage": 42.57,
+    "date": "2026-05-20T07:51:07.000Z"
+  }
+]

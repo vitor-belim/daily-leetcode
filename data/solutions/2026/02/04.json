@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar maxSumTrionic = function (nums) {\n    const n = nums.length;\n    let ans = -Infinity;\n\n    for (let i = 0; i < n; i++) {\n        let j = i + 1;\n        let res = 0;\n\n        while (j < n && nums[j - 1] < nums[j]) {\n            j++;\n        }\n        const p = j - 1;\n\n        if (p === i) {\n            continue;\n        }\n\n        res += nums[p] + nums[p - 1];\n        while (j < n && nums[j - 1] > nums[j]) {\n            res += nums[j];\n            j++;\n        }\n        const q = j - 1;\n\n        if (q === p || q === n - 1 || (j < n && nums[j] <= nums[q])) {\n            i = q;\n            continue;\n        }\n\n        res += nums[q + 1];\n\n        let maxSum = 0;\n        let sum = 0;\n        for (let k = q + 2; k < n && nums[k] > nums[k - 1]; k++) {\n            sum += nums[k];\n            maxSum = Math.max(maxSum, sum);\n        }\n        res += maxSum;\n\n        maxSum = 0;\n        sum = 0;\n        for (let k = p - 2; k >= i; k--) {\n            sum += nums[k];\n            maxSum = Math.max(maxSum, sum);\n        }\n        res += maxSum;\n\n        ans = Math.max(ans, res);\n        i = q - 1;\n    }\n\n    return ans;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "The function finds the **maximum sum** of a \"tronic\" sequence (a mountain-like pattern: ascending, then descending) in an array. It works by scanning through the array to identify **ascending sections** where each element is larger than the previous one, followed by **descending sections** where each element is smaller. For each valid mountain shape found, it calculates the sum of elements in both sections, then adds **bonus sums** from shorter ascending sequences immediately before the peak and immediately after the valley to maximize the total. It keeps track of the highest sum found across all valid mountain patterns and returns it, or `-Infinity` if no valid pattern exists.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 100,
+    "date": "2026-02-04T08:56:17.000Z"
+  }
+]

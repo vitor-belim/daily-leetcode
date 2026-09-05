@@ -1,0 +1,35 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar minimumCost = function(nums) {\n    const n = nums.length;\n    let min = Infinity;\n\n    for (let i = 1; i < n - 1; i++) {\n        for (let j = i + 1; j < n; j++) {\n            min = Math.min(min, nums[0] + nums[i] + nums[j]);\n        }\n    }\n\n    return min;\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is a **brute-force approach** that finds the minimum cost by trying all possible combinations of three elements where the first element is always `nums[0]`, and the other two elements are chosen from the remaining positions. The nested loops iterate through all valid pairs `(i, j)` where `1 <= i < j < n`, calculate `nums[0] + nums[i] + nums[j]` for each combination, and keep track of the minimum value encountered. While this guarantees finding the correct answer, it has **O(n²) time complexity** since it examines every possible pair.",
+    "status": "DONE",
+    "cpuUsage": 62.07,
+    "memoryUsage": 13.79,
+    "date": "2026-02-01T10:15:57.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar minimumCost = function(nums) {\n    const copy = nums.slice(1).sort((a, b) => a - b);\n\n    return nums[0] + copy[0] + copy[1];\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This **optimized solution** recognizes that to minimize the total cost, you need the first element `nums[0]` plus the two smallest elements from the rest of the array. It creates a copy of all elements except the first one, sorts this copy in ascending order, and then simply returns `nums[0]` plus the first two elements of the sorted array (which are the two smallest). This approach has **O(n log n) time complexity** due to sorting, which is much more efficient than trying all combinations, and the code is also cleaner and easier to understand.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 10.34,
+    "date": "2026-02-01T10:16:58.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar minimumCost = function(nums) {\n    let min1 = Infinity;\n    let min2 = Infinity;\n\n    for (let i = 1; i < nums.length; i++) {\n        if (nums[i] <= min1) {\n            min2 = min1;\n            min1 = nums[i];\n        } else if (nums[i] < min2) {\n            min2 = nums[i];\n        }\n    }\n\n    return nums[0] + min1 + min2;\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is the **most efficient solution** that finds the two minimum values in a single pass through the array without any sorting. It maintains two variables `min1` (smallest value) and `min2` (second smallest value), iterating through the array once and updating them as it encounters smaller values. When a new element is smaller than or equal to `min1`, it shifts `min1` to `min2` and updates `min1`; otherwise, if it's smaller than `min2`, just update `min2`. Finally, it returns `nums[0]` plus these two minimums. With **O(n) time complexity** and **O(1) space complexity**, this is both faster and more memory-efficient than the sorting approach.",
+    "status": "DONE",
+    "cpuUsage": 93.1,
+    "memoryUsage": 44.83,
+    "date": "2026-02-01T10:23:12.000Z"
+  }
+]

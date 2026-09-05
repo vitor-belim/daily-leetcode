@@ -1,0 +1,79 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} matrix\n * @return {void} Do not return anything, modify matrix in-place instead.\n */\nvar rotate = function(matrix) {\n    const n = matrix.length;\n\n    const flip = (r, c) => {\n        //console.log('flipping', r, c);\n        const temp = matrix[r][c];\n        matrix[r][c] = matrix[n - 1 - c][r];                // 0,0 = 2,0 | 0,1 = 1,0\n        matrix[n - 1 - c][r] = matrix[n - 1 - r][n - 1 - c];// 2,0 = 2,2 | 1,0 = 2,1\n        matrix[n - 1 - r][n - 1 - c] = matrix[c][n - 1 - r];// 2,2 = 0,2 | 2,1 = 1,2\n        matrix[c][n - 1 - r] = temp;                        // 0,2 = 0,0 | 1,2 = 0,1\n        //console.log('flipped', matrix);\n    };\n\n    for (let i = 0; i < n - 1; i++) {\n        for (let j = i; j < n - i - 1; j++) {\n            flip(i, j);\n        }\n    }\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code **rotates an n×n matrix 90 degrees clockwise in-place** by cycling elements through four positions at a time. The `flip` function performs a **4-way swap**: it takes an element at position `(r, c)` and cycles it through three other positions—`(c, n-1-r)`, `(n-1-r, n-1-c)`, and `(n-1-c, r)`—which effectively rotates that group of four elements clockwise around a central point. The nested loops process the matrix in **concentric layers** from the outside inward: the outer loop `i` tracks which layer is being rotated, and the inner loop `j` iterates through the positions within that layer that need rotating, calling `flip` on each one. By cycling through all elements in this layered approach, the entire matrix ends up rotated 90 degrees clockwise.",
+    "status": "DONE",
+    "cpuUsage": 4.3,
+    "memoryUsage": 100,
+    "date": "2024-09-04T10:28:51.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} matrix\n * @return {void} Do not return anything, modify matrix in-place instead.\n */\nvar rotate = function(matrix) {\n    const n = matrix.length;\n\n    const flip = (r, c) => {\n        const temp = matrix[r][c];\n        const len = n - 1;\n        const fc = len - c;\n        const fr = len - r;\n\n        matrix[r][c] = matrix[fc][r];\n        matrix[fc][r] = matrix[fr][fc];\n        matrix[fr][fc] = matrix[c][fr];\n        matrix[c][fr] = temp;\n    };\n\n    for (let i = 0; i < n - 1; i++) {\n        for (let j = i; j < n - i - 1; j++) {\n            flip(i, j);\n        }\n    }\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code **rotates a square matrix 90 degrees clockwise in-place** by processing the matrix in concentric layers from outside to inside. The inner `flip` helper function performs a **4-element cycle rotation**—it takes an element at position `(r, c)` and moves it along with three other elements positioned symmetrically around the matrix (right side, bottom, left side) in a circular pattern, storing the original value in a temporary variable so it doesn't get overwritten. The nested loops iterate through each layer of the matrix (`i` controls the layer depth), and for each layer, `j` processes elements along the current ring, carefully stopping before reaching already-processed elements to avoid redundant swaps. By repeatedly applying this 4-way rotation to all elements in all layers, the entire matrix ends up rotated without needing extra space.",
+    "status": "DONE",
+    "cpuUsage": 4.3,
+    "memoryUsage": 100,
+    "date": "2024-09-04T10:31:41.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} matrix\n * @return {void} Do not return anything, modify matrix in-place instead.\n */\nvar rotate = function(matrix) {\n    const n = matrix.length;\n    const len = n - 1;\n\n    const flip = (r, c) => {\n        const temp = matrix[r][c];\n        const fc = len - c;\n        const fr = len - r;\n\n        matrix[r][c] = matrix[fc][r];\n        matrix[fc][r] = matrix[fr][fc];\n        matrix[fr][fc] = matrix[c][fr];\n        matrix[c][fr] = temp;\n    };\n\n    for (let i = 0; i < len; i++) {\n        for (let j = i; j < len - i; j++) {\n            flip(i, j);\n        }\n    }\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code **rotates a matrix 90 degrees clockwise in-place** by performing a series of four-element cyclic swaps. It defines an inner `flip` function that takes coordinates `(r, c)` and cycles four values: the element at `(r, c)` moves to position `(fc, r)`, the element at `(fc, r)` moves to `(fr, fc)`, the element at `(fr, fc)` moves to `(c, fr)`, and finally the element at `(c, fr)` moves to `(r, c)`—where `fc` and `fr` represent the reflected column and row positions from the opposite edge. The nested loops then traverse the matrix in concentric square rings from the **outside inward** (controlled by the `i` and `j` loop variables), calling `flip` on each position to rotate the four elements at the corners of each ring simultaneously, effectively rotating the entire matrix without requiring additional space.",
+    "status": "DONE",
+    "cpuUsage": 4.3,
+    "memoryUsage": 100,
+    "date": "2024-09-04T13:45:20.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} matrix\n * @return {void} Do not return anything, modify matrix in-place instead.\n */\nvar rotate = function(matrix) {\n    const n = matrix.length - 1;\n\n    for (let i = 0; i < n; i++) {\n        const revX = n - i;\n\n        for (let j = i; j < revX; j++) {\n            const revY = n - j;\n\n            fourWayFlip(matrix, i, j, revX, revY);\n        }\n    }\n};\n\nconst fourWayFlip = (matrix, x, y, revX, revY) => {\n    const temp = matrix[x][y];\n    matrix[x][y] = matrix[revY][x];\n    matrix[revY][x] = matrix[revX][revY];\n    matrix[revX][revY] = matrix[y][revX];\n    matrix[y][revX] = temp;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code **rotates a square matrix 90 degrees clockwise in-place** using a layer-by-layer approach. It defines a separate `fourWayFlip` function that cycles four matrix elements in a circular pattern, ensuring elements from corresponding positions around the center rotate clockwise. The main function calculates `n` as the matrix length minus one, then iterates through concentric layers where the outer loop `i` determines the current layer being processed (from outside inward), and the inner loop `j` iterates through elements in that layer from the starting position `i` to just before the reverse position `revX = n - i`. For each position, `revY = n - j` is calculated to find the opposite coordinate, and these four symmetric positions are passed to `fourWayFlip`, which rotates all four values one position clockwise around the matrix center. This in-place approach efficiently rotates the matrix without needing extra memory for a copy.",
+    "status": "DONE",
+    "cpuUsage": 4.3,
+    "memoryUsage": 100,
+    "date": "2024-09-24T16:38:50.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} matrix\n * @return {void} Do not return anything, modify matrix in-place instead.\n */\nvar rotate = function(matrix) {\n    const len = matrix.length - 1;\n\n    for (let i = 0; i < len; i++) {\n        for (let j = i; j < len - i; j++) {\n            fourWayFlip(matrix, len, i, j);\n        }\n    }\n};\n\nconst fourWayFlip = (matrix, len, x, y) => {\n    const revX = len - x;\n    const revY = len - y;\n\n    const temp = matrix[x][y];\n    matrix[x][y] = matrix[revY][x];\n    matrix[revY][x] = matrix[revX][revY];\n    matrix[revX][revY] = matrix[y][revX];\n    matrix[y][revX] = temp;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code **rotates a square matrix 90 degrees clockwise in-place** by processing it in concentric layers. The `rotate` function iterates through layers of the matrix from outside to inside: the outer loop `i` controls the layer depth, and the inner loop `j` processes elements along each layer's edge. For each position `(i, j)`, it calculates the corresponding reversed row and column (`revX = len - x` and `revY = len - y`) and passes these four symmetric positions to a separate `fourWayFlip` function, which cyclically rotates the four values at those positions clockwise by one spot, using a temporary variable to avoid data loss. By applying this 4-way rotation to every position in every layer, the algorithm efficiently rotates the entire matrix in-place without needing additional space.",
+    "status": "DONE",
+    "cpuUsage": 4.3,
+    "memoryUsage": 100,
+    "date": "2024-09-24T16:42:29.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} matrix\n * @return {void} Do not return anything, modify matrix in-place instead.\n */\nvar rotate = function(matrix) {\n    const len = matrix.length - 1;\n\n    for (let row = 0; row < len; row++) {\n        const rRow = len - row;\n\n        for (let col = row; col < rRow; col++) {\n            const rCol = len - col;\n\n            fourWayFlip(matrix, row, col, rRow, rCol);\n        }\n    }\n};\n\nconst fourWayFlip = (matrix, row, col, rRow, rCol) => {\n    const temp = matrix[row][col];\n    matrix[row][col] = matrix[rCol][row];\n    matrix[rCol][row] = matrix[rRow][rCol];\n    matrix[rRow][rCol] = matrix[col][rRow];\n    matrix[col][rRow] = temp;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code **rotates an n×n matrix 90 degrees clockwise in-place** by cycling elements through four symmetric positions around the matrix center. The `rotate` function uses nested loops to process the matrix in concentric layers from the outside inward: the outer loop tracks the current `row` being processed, and the inner loop iterates through `col` values from `row` to just before the mirrored position. For each position, it calculates the mirror coordinates (`rRow = len - row` and `rCol = len - col`), then calls the `fourWayFlip` helper function, which performs a **cyclic rotation** of the four values at positions `(row, col)`, `(rCol, row)`, `(rRow, rCol)`, and `(col, rRow)`, moving each value one position clockwise around the matrix's center. By applying this rotation pattern to all layers, the entire matrix is efficiently rotated without requiring additional storage space.",
+    "status": "DONE",
+    "cpuUsage": 4.3,
+    "memoryUsage": 100,
+    "date": "2024-09-24T16:47:55.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} matrix\n * @return {void} Do not return anything, modify matrix in-place instead.\n */\nvar rotate = function(matrix) {\n    const n = matrix.length;\n    const halfLen = n / 2;\n\n    for (let row = 0; row < halfLen; row++) {\n        const invRow = n - 1 - row;\n\n        for (let col = row; col < invRow; col++) {\n            const invCol = n - 1 - col;\n\n            const temp = matrix[row][col];\n            matrix[row][col] = matrix[invCol][row];\n            matrix[invCol][row] = matrix[invRow][invCol];\n            matrix[invRow][invCol] = matrix[col][invRow];\n            matrix[col][invRow] = temp;\n        }\n    }\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code **rotates a square matrix 90 degrees clockwise in-place** by cycling elements through four positions in concentric layers. The function processes the matrix from the **outside inward** using nested loops: the outer loop `row` tracks which layer is being rotated, and the inner loop `col` iterates through elements in that layer, stopping halfway through the layer to avoid rotating elements twice. For each position `(row, col)`, the code calculates the corresponding mirrored coordinates (`invRow = n - 1 - row` and `invCol = n - 1 - col`), then performs an **inline 4-way swap** where the value at `(row, col)` moves to `(invCol, row)`, the value at `(invCol, row)` moves to `(invRow, invCol)`, the value at `(invRow, invCol)` moves to `(col, invRow)`, and the value at `(col, invRow)` returns to `(row, col)`, effectively rotating those four values 90 degrees clockwise. By repeating this for all elements in all layers, the entire matrix is rotated in-place.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 76.06,
+    "date": "2026-05-04T09:23:29.000Z"
+  }
+]

@@ -1,0 +1,57 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for a binary tree node.\n * function TreeNode(val, left, right) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.left = (left===undefined ? null : left)\n *     this.right = (right===undefined ? null : right)\n * }\n */\n/**\n * @param {TreeNode} root\n * @return {TreeNode}\n */\nvar balanceBST = function(root) {\n    const dfs = (node, depth) => {\n        if (!node) {\n            return depth - 1;\n        }\n\n        return Math.max(dfs(node.left, depth + 1), dfs(node.right, depth + 1));\n    };\n\n    let nodes = [root];\n    while (nodes.length > 0) {\n        let node = nodes.pop();\n        if (!node) {\n            continue;\n        }\n\n        const left = dfs(node.left, 0);\n        const right = dfs(node.right, 0);\n\n        if (Math.abs(right - left) > 1) {\n            node.right.left = node;\n            root = node.right;\n            node.right = null;\n            nodes = [];\n        }\n\n        nodes.push(node.left, node.right);\n    }\n\n    return root;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code attempts to balance a binary search tree by iteratively checking each node's balance factor (the difference between left and right subtree heights). When a node is found to be unbalanced (height difference > 1), it performs a rotation by restructuring the tree pointers, making the right child the new parent and moving the original node to its left. The `dfs` helper calculates subtree heights recursively, and the main loop processes nodes level-by-level to identify and fix imbalances.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2024-06-26T08:40:05.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for a binary tree node.\n * function TreeNode(val, left, right) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.left = (left===undefined ? null : left)\n *     this.right = (right===undefined ? null : right)\n * }\n */\n/**\n * @param {TreeNode} root\n * @return {TreeNode}\n */\nvar balanceBST = function (root) {\n    let stack = [];\n    const inOrder = function (root) {\n        if (!root) return;\n        inOrder(root.left);\n        stack.push(root);\n        inOrder(root.right);\n    }\n\n    const build = function (start, end) {\n        if (start >= end) return null;\n        let mid = Math.floor((start + end) / 2);\n        let cur = stack[mid];\n        cur.left = build(start, mid);\n        cur.right = build(mid + 1, end);\n        return cur;\n    }\n\n    inOrder(root);\n    return build(0, stack.length);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution takes two key steps to balance the tree. First, it performs an **in-order traversal** to collect all tree nodes in a sorted array (`stack`). Then, it **recursively rebuilds** the tree by always selecting the middle element as the root, creating left and right subtrees from the left and right halves — this divide-and-conquer approach naturally produces a balanced BST since each subtree is built from a contiguous range of sorted nodes.",
+    "status": "DONE",
+    "cpuUsage": 5.88,
+    "memoryUsage": 100,
+    "date": "2024-06-26T09:07:45.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for a binary tree node.\n * function TreeNode(val, left, right) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.left = (left===undefined ? null : left)\n *     this.right = (right===undefined ? null : right)\n * }\n */\n/**\n * @param {TreeNode} root\n * @return {TreeNode}\n */\nvar balanceBST = function (root) {\n    const nodes = [];\n\n    const dfs = (node) => {\n        if (!node) return;\n\n        dfs(node.left);\n        nodes.push(node);\n        dfs(node.right);\n\n        node.left = null;\n        node.right = null;\n    };\n    dfs(root);\n\n    const createTree = (from, to) => {\n        if (from > to) return null;\n\n        const pos = Math.floor((from + to) / 2);\n\n        return new TreeNode(\n            nodes[pos].val,\n            createTree(from, pos - 1),\n            createTree(pos + 1, to),\n        );\n    };\n\n    return createTree(0, nodes.length - 1);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This approach first collects all nodes via **in-order traversal** into a sorted array, clearing their pointers along the way. Then it **recursively constructs a new tree** by selecting the middle element as the root and building left and right subtrees from the remaining halves — since the nodes are sorted, placing the median node at each level ensures the tree is perfectly balanced.",
+    "status": "DONE",
+    "cpuUsage": 56.47,
+    "memoryUsage": 44.71,
+    "date": "2026-02-09T10:10:25.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for a binary tree node.\n * function TreeNode(val, left, right) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.left = (left===undefined ? null : left)\n *     this.right = (right===undefined ? null : right)\n * }\n */\n/**\n * @param {TreeNode} root\n * @return {TreeNode}\n */\nvar balanceBST = function (root) {\n    const nodes = [];\n\n    const dfs = (node) => {\n        if (!node) return;\n\n        dfs(node.left);\n        nodes.push(node);\n        dfs(node.right);\n\n        node.left = null;\n        node.right = null;\n    };\n    dfs(root);\n\n    const createTree = (from, to) => {\n        if (from > to) return null;\n\n        const pos = Math.floor((from + to) / 2);\n\n        nodes[pos].left = createTree(from, pos - 1);\n        nodes[pos].right = createTree(pos + 1, to);\n\n        return nodes[pos];\n    };\n\n    return createTree(0, nodes.length - 1);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses the same **in-order traversal and divide-and-conquer** strategy as the previous version, but instead of creating new `TreeNode` objects, it **reuses the existing nodes** from the original tree by updating their pointers. The `dfs` function collects and clears nodes, then `createTree` recursively rebuilds the tree by taking the middle node at each level and assigning its left and right children from the remaining sorted halves.",
+    "status": "DONE",
+    "cpuUsage": 76.47,
+    "memoryUsage": 84.71,
+    "date": "2026-02-09T10:12:48.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for a binary tree node.\n * function TreeNode(val, left, right) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.left = (left===undefined ? null : left)\n *     this.right = (right===undefined ? null : right)\n * }\n */\n/**\n * @param {TreeNode} root\n * @return {TreeNode}\n */\nvar balanceBST = function (root) {\n    const nodes = [];\n\n    const dfs = (node) => {\n        if (!node) return;\n\n        dfs(node.left);\n        nodes.push(node);\n        dfs(node.right);\n    };\n    dfs(root);\n\n    const createBalancedBST = (from, to) => {\n        if (from > to) return null;\n\n        const pos = Math.floor((from + to) / 2);\n\n        nodes[pos].left = createBalancedBST(from, pos - 1);\n        nodes[pos].right = createBalancedBST(pos + 1, to);\n\n        return nodes[pos];\n    };\n\n    return createBalancedBST(0, nodes.length - 1);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is an optimized version that collects nodes via **in-order traversal** into a sorted array, then **recursively reconstructs** the tree using a divide-and-conquer approach where each subtree's root is the middle element of its range. Unlike the previous version, it skips the step of clearing node pointers during traversal, making it slightly more efficient while achieving the same balanced tree structure.",
+    "status": "DONE",
+    "cpuUsage": 76.47,
+    "memoryUsage": 84.71,
+    "date": "2026-02-09T10:14:59.000Z"
+  }
+]

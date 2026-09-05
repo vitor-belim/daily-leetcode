@@ -1,0 +1,79 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} limit\n * @return {number}\n */\nvar minMoves = function(nums, limit) {\n    const n = nums.length;\n    const halfLen = n / 2;\n    const doubleLimit = limit * 2;\n    const dp = Array.from({ length: doubleLimit + 1 }, () => Array(3).fill(0));\n\n    for (let i = 0; i < halfLen; i++) {\n        const sum = nums[i] + nums[n - 1 - i];\n\n        let min;\n        let max;\n\n        if (nums[i] < nums[n - 1 - i]) {\n            min = nums[i] + limit;\n            max = nums[n - 1 - i] + limit;\n        } else {\n            min = nums[n - 1 - i] + limit;\n            max = nums[i] + limit;\n        }\n\n        for (let j = 2; j <= doubleLimit; j++) {\n            if (j === sum) {\n                dp[j][0]++;\n            } else if (j >= min && j <= max) {\n                dp[j][1]++;\n            } else {\n                dp[j][2]++;\n            }\n        }\n    }\n\n    let res = Infinity;\n\n    for (let i = 2; i <= doubleLimit; i++) {\n        res = Math.min(res, dp[i][1] + 2 * dp[i][2]);\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Uses dynamic programming with a 2D array to categorize each pair's relationship to possible target sums: category 0 for pairs already matching the sum, category 1 for sums achievable by moving one number (within the range `min` to `max`), and category 2 for sums requiring both numbers to move. The final answer finds the target sum that minimizes `dp[i][1] + 2*dp[i][2]`, computing the total cost as **one-move pairs plus twice the two-move pairs**.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-05-13T09:10:16.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} limit\n * @return {number}\n */\nvar minMoves = function(nums, limit) {\n    const n = nums.length;\n    const halfLen = n / 2;\n    const doubleLimit = limit * 2;\n    const dp = Array.from({ length: doubleLimit + 1 }, () => Array(3).fill(0));\n\n    for (let i = 0; i < halfLen; i++) {\n        const curr = nums[i];\n        const comp = nums[n - 1 - i];\n\n        const sum = curr + comp;\n        const min = (curr < comp ? curr : comp) + 1;\n        const max = (curr < comp ? comp : curr) + limit;\n\n        for (let j = 2; j <= doubleLimit; j++) {\n            if (j === sum) {\n                dp[j][0]++;\n            } else if (j >= min && j <= max) {\n                dp[j][1]++;\n            } else {\n                dp[j][2]++;\n            }\n        }\n    }\n    //console.log(dp);\n\n    let res = Infinity;\n\n    for (let i = 2; i <= doubleLimit; i++) {\n        res = Math.min(res, dp[i][1] + 2 * dp[i][2]);\n    }\n\n    // 37 + 17 =  54\n    //  2 + 48 =  50\n    //  9 + 57 =  66\n    // 49 + 58 = 107\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Mirrors Solution 0's DP approach but calculates the achievable range differently by using `(smaller_number + 1)` as the minimum and `(larger_number + limit)` as the maximum. The categorization and cost calculation logic remain the same, iterating through all target sums from 2 to `doubleLimit` and selecting the sum that minimizes `one-moves + 2*two-moves`.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-05-13T09:26:40.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} limit\n * @return {number}\n */\nvar minMoves = function(nums, limit) {\n    const n = nums.length;\n    const halfLen = n / 2;\n    const doubleLimit = limit * 2;\n    const dp = Array.from({ length: doubleLimit + 1 }, () => Array(3).fill(halfLen));\n\n    for (let i = 0; i < halfLen; i++) {\n        const curr = nums[i];\n        const comp = nums[n - 1 - i];\n\n        const sum = curr + comp;\n        const min = (curr < comp ? curr : comp) + 1;\n        const max = (curr < comp ? comp : curr) + limit;\n\n        dp[sum][0]++;\n\n        for (let j = 2; j < min; j++) {\n            dp[j][2]++;\n        }\n\n        for (let j = max + 1; j <= doubleLimit; j++) {\n            dp[j][2]++;\n        }\n    }\n\n    let res = Infinity;\n\n    for (let i = 2; i <= doubleLimit; i++) {\n        res = Math.min(res, (dp[i][1] - dp[i][0] - dp[i][2]) + 2 * dp[i][2]);\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Initializes the DP table with `halfLen` (representing all pairs potentially needing changes) and uses a **subtraction-based approach** where it only increments two-move counters for target sums outside the achievable range `[min, max]`. The final cost is calculated as `(halfLen - zero_moves - two_moves) + 2*two_moves`, effectively counting pairs needing exactly one move plus twice the pairs needing two moves.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-05-13T09:29:35.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} limit\n * @return {number}\n */\nvar minMoves = function(nums, limit) {\n    const n = nums.length;\n    const halfLen = n / 2;\n    const doubleLimit = limit * 2;\n    const dp = Array.from({ length: doubleLimit + 1 }, () => Array(3).fill(halfLen));\n    const map = new Map();\n\n    const possibilities = new Set();\n\n    for (let i = 0; i < halfLen; i++) {\n        const curr = nums[i];\n        const comp = nums[n - 1 - i];\n\n        possibilities.add(curr + comp);\n    }\n\n    let res = Infinity;\n\n    for (const s of possibilities) {\n        let changes = 0;\n\n        for (let i = 0; i < halfLen; i++) {\n            const curr = nums[i];\n            const comp = nums[n - 1 - i];\n\n            const sum = curr + comp;\n            const min = (curr < comp ? curr : comp) + 1;\n            const max = (curr < comp ? comp : curr) + limit;\n\n            if (s === sum) {\n                continue;\n            } else if (s >= min && s <= max) {\n                changes++;\n            } else {\n                changes += 2;\n            }\n\n            if (changes > res) break;\n        }\n\n        res = Math.min(res, changes);\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Takes a **brute-force enumeration approach** by collecting all possible target sums from the input pairs into a `Set`, then for each candidate sum, iterates through all pairs to compute the total cost: 0 if the pair already has that sum, 1 if achievable by one move, or 2 if both numbers must be moved. Returns the minimum cost across all candidates with early termination when cost exceeds the current best.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-05-13T10:29:06.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} limit\n * @return {number}\n */\nvar minMoves = function(nums, limit) {\n    const n = nums.length;\n    const halfLen = n / 2;\n    const doubleLimit = limit * 2;\n    const dp = Array.from({ length: doubleLimit + 1 }, () => Array(3).fill(halfLen));\n    const map = new Map();\n\n    const possibilities = new Set();\n\n    for (let i = 0; i < halfLen; i++) {\n        const curr = nums[i];\n        const comp = nums[n - 1 - i];\n\n        possibilities.add(curr + comp);\n    }\n\n    let res = halfLen;\n\n    for (const s of possibilities) {\n        let changes = 0;\n\n        for (let i = 0; i < halfLen; i++) {\n            const curr = nums[i];\n            const comp = nums[n - 1 - i];\n\n            const sum = curr + comp;\n            const min = (curr < comp ? curr : comp) + 1;\n            const max = (curr < comp ? comp : curr) + limit;\n\n            if (s === sum) {\n                continue;\n            } else if (s >= min && s <= max) {\n                changes++;\n            } else {\n                changes += 2;\n            }\n\n            if (changes > res) break;\n        }\n\n        res = Math.min(res, changes);\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Functionally identical to Solution 3 but initializes `res` to `halfLen` instead of `Infinity`, providing a **tighter initial upper bound** since the answer cannot exceed the number of pairs. This optimization can reduce unnecessary iterations when checking if intermediate costs exceed the current minimum.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-05-13T10:31:30.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} limit\n * @return {number}\n */\nvar minMoves = function(nums, limit) {\n    const n = nums.length;\n    const halfLen = n / 2;\n    const dp = Array(limit * 2 + 2).fill(0);\n\n    let res = n;\n    let cur = n;\n\n    for (let i = 0; i < halfLen; i++) {\n        const curr = nums[i];\n        const comp = nums[n - 1 - i];\n\n        const sum = curr + comp;\n        const min = (curr < comp ? curr : comp) + 1;\n        const max = (curr < comp ? comp : curr) + limit;\n\n        dp[min]--;\n        dp[sum]--;\n        dp[sum + 1]++;\n        dp[max + 1]++;\n    }\n\n    for (const val of dp) {\n        cur += val;\n        res = Math.min(res, cur);\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Uses a **difference array (delta encoding) technique** to efficiently track cost transitions across target sums: for each pair, it marks positions in `dp` to indicate where one-move ranges begin/end (`dp[min]--`, `dp[max+1]++`) and where zero-move sums are (`dp[sum]--`, `dp[sum+1]++`). Then it accumulates these deltas while tracking `cur` (number of pairs needing changes), storing the minimum at each target sum.",
+    "status": "DONE",
+    "cpuUsage": 11.11,
+    "memoryUsage": 11.11,
+    "date": "2026-05-13T10:49:40.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} limit\n * @return {number}\n */\nvar minMoves = function(nums, limit) {\n    const n = nums.length;\n    const halfLen = n / 2;\n    const dp = Array(limit * 2 + 2).fill(0);\n\n    let res = n;\n    let cur = n;\n\n    for (let i = 0; i < halfLen; i++) {\n        const sum = nums[i] + nums[n - 1 - i];\n\n        let low;\n        let high;\n\n        if (nums[i] < nums[n - 1 - i]) {\n            low = nums[i];\n            high = nums[n - 1 - i];\n        } else {\n            low = nums[n - 1 - i];\n            high = nums[i];\n        }\n\n        dp[low + 1]--;\n        dp[sum]--;\n        dp[sum + 1]++;\n        dp[high + limit + 1]++;\n    }\n\n    for (const val of dp) {\n        cur += val;\n        res = Math.min(res, cur);\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Nearly identical to Solution 5 but with **clearer variable naming** (`low` and `high` instead of conditional assignments), using the same difference array technique to mark one-move ranges and zero-move points. It accumulates the delta array to efficiently compute the cost of changes needed for each target sum, tracking the minimum as it iterates through all possible targets.",
+    "status": "DONE",
+    "cpuUsage": 11.11,
+    "memoryUsage": 11.11,
+    "date": "2026-05-13T12:11:06.000Z"
+  }
+]

@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number[]}\n */\nvar constructTransformedArray = function(nums) {\n    const n = nums.length;\n    const res = Array(n);\n\n    for (let i = 0; i < n; i++) {\n        res[i] = nums[(n + i + (nums[i] % n)) % n];\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function creates a **transformed array** where each element is determined by following a circular offset pattern. For each position `i`, it takes the value `nums[i]`, calculates how many positions to shift forward from `i` using `(nums[i] % n)`, and retrieves the element at that new position (wrapping around to the start if necessary). The formula `(n + i + (nums[i] % n)) % n` handles the calculation safely: the `nums[i] % n` part normalizes the value into a valid offset (handling both positive and negative numbers by using the modulo operator), then it adds `n` before the final modulo to ensure the result is always positive and within array bounds. Essentially, it treats the array as a **circular list** and uses each element's value as an instruction for how many steps to jump forward to find the element that goes into that position of the result array.",
+    "status": "DONE",
+    "cpuUsage": 10,
+    "memoryUsage": 45,
+    "date": "2026-02-05T09:03:48.000Z"
+  }
+]

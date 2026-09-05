@@ -1,0 +1,57 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @param {number} k\n * @return {boolean}\n */\nvar hasAllCodes = function(s, k) {\n    const codes = new Set();\n\n    for (let i = 0; i < 2 ** k; i++) {\n        codes.add(i.toString(2).padStart(k, '0'));\n    }\n\n    for (let i = k; i < s.length; i++) {\n        const cur = s.slice(i - k, i);\n\n        if (codes.has(cur)) {\n            codes.delete(cur);\n\n            if (codes.size === 0) {\n                return true;\n            }\n        }\n    }\n\n    return false;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "**Solution 1** pre-generates all possible `2^k` binary codes in a set, then iterates through the string checking if each k-length substring matches a code, deleting matched codes and returning `true` if the set becomes empty. However, it has a bug: the loop uses `i < s.length` which misses checking the final substring of length k.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-02-23T08:44:31.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @param {number} k\n * @return {boolean}\n */\nvar hasAllCodes = function(s, k) {\n    const codes = new Set();\n\n    for (let i = 0; i < 2 ** k; i++) {\n        codes.add(i.toString(2).padStart(k, '0'));\n    }\n\n    for (let i = k; i <= s.length; i++) {\n        const cur = s.slice(i - k, i);\n\n        if (codes.has(cur)) {\n            codes.delete(cur);\n\n            if (codes.size === 0) {\n                return true;\n            }\n        }\n    }\n\n    return false;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "**Solution 2** is identical to Solution 1 but corrects the off-by-one error by using `i <= s.length`, ensuring all k-length substrings including the final one are properly checked against the pre-generated codes set, making it functionally correct.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-02-23T08:46:21.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @param {number} k\n * @return {boolean}\n */\nvar hasAllCodes = function(s, k) {\n    const codes = new Set();\n\n    for (let i = k; i <= s.length; i++) {\n        codes.add(s.slice(i - k, i));\n    }\n\n    return codes.size === 2 ** k;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "**Solution 3** directly collects all k-length substrings from the string into a set by iterating with `i <= s.length`, then returns `true` if the set size equals `2^k`, indicating all possible binary codes are present—the simplest and most straightforward approach.",
+    "status": "DONE",
+    "cpuUsage": 47.06,
+    "memoryUsage": 44.7,
+    "date": "2026-02-23T08:47:53.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @param {number} k\n * @return {boolean}\n */\nvar hasAllCodes = function(s, k) {\n    const codes = new Set();\n    const target = 2 ** k;\n    let cur = '';\n\n    for (let i = 0; i < s.length; i++) {\n        cur += s[i];\n\n        if (cur.length < k) {\n            continue;\n        }\n\n        codes.add(cur);\n\n        if (codes.size === target) {\n            return true;\n        }\n\n        cur = cur.slice(1);\n    }\n\n    return false;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "**Solution 4** uses a **sliding window** technique to build k-length substrings incrementally character-by-character rather than slicing, adding new codes to a set and returning `true` immediately when `codes.size === 2^k`, enabling efficient early termination.",
+    "status": "DONE",
+    "cpuUsage": 16.47,
+    "memoryUsage": 80,
+    "date": "2026-02-23T08:52:52.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @param {number} k\n * @return {boolean}\n */\nvar hasAllCodes = function(s, k) {\n    const codes = new Set();\n    const target = 2 ** k;\n\n    for (let i = k; i <= s.length; i++) {\n        codes.add(s.slice(i - k, i));\n\n        if (codes.size === target) {\n            return true;\n        }\n    }\n\n    return false;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "**Solution 5** combines the simplicity of Solution 3 with early termination—it collects k-length substrings into a set using `i <= s.length` and returns `true` as soon as the set reaches size `2^k`, avoiding unnecessary iterations once all codes are found.",
+    "status": "DONE",
+    "cpuUsage": 58.82,
+    "memoryUsage": 62.35,
+    "date": "2026-02-23T08:53:50.000Z"
+  }
+]

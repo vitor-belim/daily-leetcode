@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} grid\n * @return {number}\n */\nvar largestMagicSquare = function(grid) {\n    const m = grid.length;\n    const n = grid[0].length;\n    let max = 0;\n\n    const checkMagicSquare = (r, c, s) => {\n        const rows = Array(s).fill(0);\n        const cols = Array(s).fill(0);\n        let diag1 = 0;\n        let diag2 = 0;\n\n        for (let row = 0; row < s; row++) {\n            for (let col = 0; col < s; col++) {\n                rows[row] += grid[row + r][col + c];\n                cols[col] += grid[row + r][col + c];\n\n                if (row === col) {\n                    diag1 += grid[row + r][col + c];\n                }\n                if (row === s - 1 - col) {\n                    diag2 += grid[row + r][col + c];\n                }\n            }\n        }\n\n        return diag1 === diag2 && rows.every(el => el === diag1) && cols.every(el => el === diag1);\n    };\n\n    for (let row = 0; row < m; row++) {\n        for (let col = 0; col < n; col++) {\n            for (let size = Math.min(m - row, n - col); size > 0; size--) {\n                if (size > max && checkMagicSquare(row, col, size)) {\n                    max = size;\n                    break;\n                }\n            }\n        }\n    }\n\n    return max;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds the **largest magic square** within a given grid, where a magic square is a square region where all rows, columns, and diagonals sum to the same value. The `checkMagicSquare` helper function verifies if a square at position `(r, c)` with size `s` is magical by computing the sums of each row, column, and both diagonals, then checking if they're all equal. The main algorithm iterates through every possible starting position in the grid and tries progressively larger square sizes from largest to smallest (using a break to avoid recalculating), keeping track of the maximum magic square size found and returning it.",
+    "status": "DONE",
+    "cpuUsage": 0,
+    "memoryUsage": 20,
+    "date": "2026-01-18T11:02:11.000Z"
+  }
+]

@@ -1,0 +1,57 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for a binary tree node.\n * function TreeNode(val, left, right) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.left = (left===undefined ? null : left)\n *     this.right = (right===undefined ? null : right)\n * }\n */\n/**\n * @param {TreeNode} root\n * @return {number}\n */\nvar maxProduct = function(root) {\n    const dfs = (node) => {\n        if (!node) return 0;\n\n        node.val += dfs(node.left) + dfs(node.right);\n\n        return node.val;\n    };\n\n    dfs(root);\n\n    let max = 0;\n    const mod = 10 ** 9 + 7;\n\n    const dfs2 = (node, val) => {\n        if (!node) return;\n\n        const left = node.left ? node.left.val : 0;\n        const right = node.right ? node.right.val : 0;\n\n        max = Math.max(\n            max,\n            (val - left) * left,\n            (val - right) * right,\n        );\n\n        dfs2(node.left, val);\n        dfs2(node.right, val);\n    };\n\n    dfs2(root, root.val);\n\n    return max % mod;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution finds the best way to split a binary tree into two pieces (by removing one edge) so that the **product of the two pieces' sums** is maximized. It works in two passes: the first `dfs` walks the tree bottom-up and **mutates each `node.val` in place** so it holds the sum of that node's entire subtree, which means `root.val` ends up being the total sum of the whole tree. The second pass, `dfs2`, carries that total down as `val` and, at every node, considers cutting the edge to its left or right child: if a child's subtree sums to `left`, one piece is `left` and the other is `val - left`, so it updates `max` with the products `(val - left) * left` and `(val - right) * right` (missing children default to `0`, contributing nothing). After visiting every possible cut, the answer is returned modulo `10^9 + 7` as the problem requires.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 100,
+    "date": "2026-01-07T10:08:16.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for a binary tree node.\n * function TreeNode(val, left, right) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.left = (left===undefined ? null : left)\n *     this.right = (right===undefined ? null : right)\n * }\n */\n/**\n * @param {TreeNode} root\n * @return {number}\n */\nvar maxProduct = function(root) {\n    const dfs = (node) => {\n        if (!node) return 0;\n\n        node.val += dfs(node.left) + dfs(node.right);\n\n        return node.val;\n    };\n\n    const total = dfs(root);\n\n    let max = 0;\n    const mod = 10 ** 9 + 7;\n\n    const dfs2 = (node) => {\n        if (!node) return;\n\n        if (node.left) {\n            max = Math.max(\n                max,\n                (total - node.left.val) * node.left.val,\n            );\n            dfs2(node.left);\n        }\n        \n        if (node.right) {\n            max = Math.max(\n                max,\n                (total - node.right.val) * node.right.val,\n            );\n            dfs2(node.right);\n        }\n    };\n\n    dfs2(root);\n\n    return max % mod;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution splits a binary tree into two parts by removing one edge and maximizes the **product of the two parts' sums**. A first `dfs` pass rewrites every `node.val` to be the **sum of its whole subtree** (returning the grand `total` for the entire tree), so each node afterwards directly knows how much its piece would be worth if it were cut off. The second pass, `dfs2`, walks the tree and treats **each existing child edge as a candidate cut**: cutting above the left child yields pieces of `node.left.val` and `total - node.left.val`, and similarly for the right child, so it updates `max` with each product. By explicitly checking `if (node.left)` and `if (node.right)` before recursing, it skips null branches entirely instead of relying on default values. Finally, the largest product found is returned modulo `10^9 + 7`.",
+    "status": "DONE",
+    "cpuUsage": 72.73,
+    "memoryUsage": 100,
+    "date": "2026-01-07T10:14:12.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for a binary tree node.\n * function TreeNode(val, left, right) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.left = (left===undefined ? null : left)\n *     this.right = (right===undefined ? null : right)\n * }\n */\n/**\n * @param {TreeNode} root\n * @return {number}\n */\nvar maxProduct = function(root) {\n    const dfs = (node) => {\n        if (!node) return 0;\n\n        node.val += dfs(node.left) + dfs(node.right);\n\n        return node.val;\n    };\n\n    const total = dfs(root);\n    const mod = 10 ** 9 + 7;\n\n    const dfs2 = (node, max) => {\n        if (!node) return max;\n\n        if (node.left) {\n            max = Math.max(max, (total - node.left.val) * node.left.val);\n        }\n\n        if (node.right) {\n            max = Math.max(max, (total - node.right.val) * node.right.val);\n        }\n\n        return Math.max(max, dfs2(node.left, max), dfs2(node.right, max));\n    };\n\n    return dfs2(root, 0) % mod;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution maximizes the **product of the two subtree sums** created by removing a single edge from a binary tree. The first `dfs` converts every `node.val` into the sum of its entire subtree (mutating the tree in place) and returns the overall `total`. The second traversal, `dfs2`, is written in a **purely functional style**: instead of updating a shared variable, it takes the best product found so far as a `max` parameter, improves it by trying to cut the edge to each existing child — pairing a child's sum `node.left.val` with the remainder `total - node.left.val` (and likewise for the right) — and then **returns** the best of its own result and whatever its two recursive calls find. The final answer bubbles up from `dfs2(root, 0)` and is reduced modulo `10^9 + 7`.",
+    "status": "DONE",
+    "cpuUsage": 54.55,
+    "memoryUsage": 100,
+    "date": "2026-01-07T10:29:19.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for a binary tree node.\n * function TreeNode(val, left, right) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.left = (left===undefined ? null : left)\n *     this.right = (right===undefined ? null : right)\n * }\n */\n/**\n * @param {TreeNode} root\n * @return {number}\n */\nvar maxProduct = function(root) {\n    const dfs = (node) => {\n        if (!node) return 0;\n\n        node.val += dfs(node.left) + dfs(node.right);\n\n        return node.val;\n    };\n\n    const total = dfs(root);\n    const mod = 10 ** 9 + 7;\n    let max = 0;\n\n    const dfs2 = (node) => {\n        if (!node) return;\n\n        const left = node.left ? node.left.val : 0;\n        const right = node.right ? node.right.val : 0;\n\n        max = Math.max(\n            max,\n            (total - left) * left,\n            (total - right) * right,\n        );\n\n        dfs2(node.left);\n        dfs2(node.right);\n    };\n\n    dfs2(root);\n\n    return max % mod;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution looks for the edge whose removal splits a binary tree into two parts with the **largest possible product of sums**. It first runs `dfs`, a bottom-up pass that overwrites each `node.val` with the total of its subtree and captures the whole tree's sum in `total`. Then `dfs2` visits every node and evaluates cutting the edge to its left or right child: it reads each child's precomputed subtree sum (using `0` when a child is missing, via the ternary checks) and updates the shared `max` with `(total - left) * left` and `(total - right) * right` — one factor being the detached subtree, the other being everything that remains. Since a missing child contributes a product of `0`, the defaults never affect the result. Once every edge has been considered, the best product is returned modulo `10^9 + 7`.",
+    "status": "DONE",
+    "cpuUsage": 81.82,
+    "memoryUsage": 100,
+    "date": "2026-01-07T10:30:53.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for a binary tree node.\n * function TreeNode(val, left, right) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.left = (left===undefined ? null : left)\n *     this.right = (right===undefined ? null : right)\n * }\n */\n/**\n * @param {TreeNode} root\n * @return {number}\n */\nvar maxProduct = function(root) {\n    const dfs = (node) => {\n        if (!node) return 0;\n\n        node.val += dfs(node.left) + dfs(node.right);\n\n        return node.val;\n    };\n\n    const total = dfs(root);\n    const mod = 10 ** 9 + 7;\n    let max = 0;\n\n    const dfs2 = (node) => {\n        if (!node) return;\n\n        max = Math.max(max, (total - node.val) * node.val);\n\n        dfs2(node.left);\n        dfs2(node.right);\n    };\n\n    dfs2(root, 0);\n\n    return max % mod;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is the cleanest variant of the two-pass approach for splitting a binary tree into two pieces with the **maximum product of their sums**. The first `dfs` pass turns every `node.val` into the sum of its entire subtree and saves the grand `total`. The key simplification is in `dfs2`: instead of looking down at each node's children, it evaluates the cut **at the node itself** — detaching the subtree rooted at `node` leaves two pieces summing to `node.val` and `total - node.val`, so a single expression `(total - node.val) * node.val` covers every possible split as the traversal visits each node. Checking the root this way is harmless, since cutting \"above\" the root leaves an empty piece and a product of `0`. The largest product found is returned modulo `10^9 + 7`.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 100,
+    "date": "2026-01-07T10:36:19.000Z"
+  }
+]

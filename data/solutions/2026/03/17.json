@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} matrix\n * @return {number}\n */\nconst largestSubmatrix = matrix => {\n    const m = matrix.length;\n    const n = matrix[0].length;\n    let max = 0;\n\n    for (let i = 1; i < m; i++)\n        for (let j = 0; j < n; j++)\n            if (matrix[i][j] === 1)\n                matrix[i][j] += matrix[i - 1][j];\n\n    for (let i = 0; i < m; i++) {\n        matrix[i].sort((j, k) => k - j);\n        for (let j = 0; j < n; j++)\n            max = Math.max(max, matrix[i][j] * (j + 1));\n    }\n\n    return max;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This algorithm finds the **largest rectangular submatrix** of 1s in a binary matrix. First, it transforms the matrix by stacking consecutive 1s vertically—each cell becomes the count of 1s above it (including itself), creating a \"height map\" for each row. Then for each row, it sorts these heights in descending order and calculates the maximum area by treating each height as the rectangle's dimension: for a height at position `j`, the width is `j + 1` (since smaller or equal heights exist at positions 0 to j), so area = `height × (j + 1)`. The algorithm tracks the maximum area found across all rows and positions.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 97.96,
+    "date": "2026-03-17T10:49:34.000Z"
+  }
+]

@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} target\n * @param {number} start\n * @return {number}\n */\nvar getMinDistance = function(nums, target, start) {\n    let res = Infinity;\n\n    for (let i = 0; i < nums.length; i++) {\n        if (nums[i] === target) {\n            res = Math.min(res, Math.abs(i - start));\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds the **minimum distance** from a starting index to any occurrence of a target number in an array. It iterates through the entire array using a simple loop, checking each element to see if it matches the `target`. Whenever a match is found, it calculates the **absolute difference** between the current index and the `start` position using `Math.abs(i - start)`, updating the `res` variable with the smaller of the current minimum and this new distance. Finally, it returns the smallest distance found.",
+    "status": "DONE",
+    "cpuUsage": 39.36,
+    "memoryUsage": 93.62,
+    "date": "2026-04-13T08:12:35.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} target\n * @param {number} start\n * @return {number}\n */\nvar getMinDistance = function(nums, target, start) {\n    let end = Math.max(start, nums.length - 1 - start);\n\n    for (let i = 0; i <= end; i++) {\n        if (nums[start + i] === target || nums[start - i] === target) {\n            return i;\n        }\n    }\n\n    return 0;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is an optimized approach that **expands outward from the starting position** in both directions simultaneously. The variable `end` determines the maximum distance needed to search (the distance to the farther end of the array from the start position). The loop then checks both directions at each distance level: `nums[start + i]` for the right side and `nums[start - i]` for the left side. Since it checks increasing distances uniformly in both directions, the first match found is guaranteed to be at the **minimum distance**, allowing the function to return immediately without checking the entire array.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 57.45,
+    "date": "2026-04-13T08:16:32.000Z"
+  }
+]

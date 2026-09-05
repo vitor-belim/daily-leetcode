@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} grid\n * @return {number}\n */\nvar maxProductPath = function(grid) {\n    const m = grid.length;\n    const n = grid[0].length;\n\n    let res = -Infinity;\n\n    const dfs = (row, col, cur) => {\n        cur *= grid[row][col];\n\n        if (row === m - 1 && col === n - 1) {\n            res = Math.max(res, cur);\n            return;\n        }\n\n        if (row < m - 1) {\n            dfs(row + 1, col, cur);\n        }\n        if (col < n - 1) {\n            dfs(row, col + 1, cur);\n        }\n    };\n    dfs(0, 0, 1);\n\n    return res < 0 ? -1 : (res % (10 ** 9 + 7));\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code finds the **maximum product** you can get by multiplying numbers along a path from the **top-left to bottom-right** corner of a 2D `grid`, where you can only move **right or down**. It uses **depth-first search (DFS)** to explore all possible paths, multiplying the current value by each grid cell visited (`cur *= grid[row][col]`), and keeps track of the maximum product found in `res`. When the function reaches the **bottom-right corner** (`row === m - 1 && col === n - 1`), it updates the result if the current product is larger. Finally, it returns **-1 if all products are negative** (meaning the path unavoidably produces a negative result), otherwise it returns the maximum product **modulo 10^9 + 7** to prevent integer overflow.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-03-23T09:29:16.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} grid\n * @return {number}\n */\nvar maxProductPath = function(grid) {\n    const m = grid.length;\n    const n = grid[0].length;\n\n    const min = Array.from({ length: m }, () => new Array(n).fill(1));\n    min[0][0] = grid[0][0];\n    const max = Array.from({ length: m }, () => new Array(n).fill(1));\n    max[0][0] = grid[0][0];\n\n    for (let row = 1; row < m; row++) {\n        const minTop = grid[row][0] * min[row - 1][0];\n        const maxTop = grid[row][0] * max[row - 1][0];\n\n        min[row][0] = Math.min(minTop, maxTop);\n        max[row][0] = Math.max(minTop, maxTop);\n    }\n\n    for (let col = 1; col < n; col++) {\n        const minLeft = grid[0][col] * min[0][col - 1];\n        const maxLeft = grid[0][col] * max[0][col - 1];\n\n        min[0][col] = Math.min(minLeft, maxLeft);\n        max[0][col] = Math.max(minLeft, maxLeft);\n    }\n\n    for (let row = 1; row < m; row++) {\n        for (let col = 1; col < n; col++) {\n            const minLeft = grid[row][col] * min[row][col - 1];\n            const minTop = grid[row][col] * min[row - 1][col];\n            const maxLeft = grid[row][col] * max[row][col - 1];\n            const maxTop = grid[row][col] * max[row - 1][col];\n\n            min[row][col] = Math.min(minLeft, minTop, maxLeft, maxTop);\n            max[row][col] = Math.max(minLeft, minTop, maxLeft, maxTop);\n        }\n    }\n\n    if (min[m - 1][n - 1] < 0 && max[m - 1][n - 1] < 0) {\n        return -1;\n    }\n\n    return Math.max(min[m - 1][n - 1], max[m - 1][n - 1]) % (10 ** 9 + 7);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code finds the **maximum product** of numbers along a path from the top-left to bottom-right corner of a grid, where you can only move **right or down**. It uses **dynamic programming** with two tables (`min` and `max`) to track both the smallest and largest products reaching each cell, since multiplying by a negative number can flip which is larger. It initializes both tables with the starting grid value, then fills the first row and column by considering only left or top neighbors, and fills the remaining cells by computing products from all four possible previous paths. Finally, it handles the edge case where all paths yield negative products by returning `-1`, otherwise it returns the maximum product found at the bottom-right corner, modulo `10^9 + 7` to prevent overflow.",
+    "status": "DONE",
+    "cpuUsage": 91.67,
+    "memoryUsage": 29.17,
+    "date": "2026-03-23T09:48:28.000Z"
+  }
+]

@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} arr\n * @return {number}\n */\nvar minJumps = function(arr) {\n    const n = arr.length;\n    const map = new Map();\n\n    for (let i = 0; i < n; i++) {\n        if (!map.has(arr[i])) {\n            map.set(arr[i], []);\n        }\n        map.get(arr[i]).push(i);\n    }\n\n    let stack = [0];\n    const seen = Array(n).fill(false);\n    seen[0] = true;\n    let steps = 0;\n\n    while (stack.length > 0) {\n        const next = [];\n\n        for (const pos of stack) {\n            if (pos === n - 1) {\n                return steps;\n            }\n\n            const mapArr = map.get(arr[pos]);\n            if (mapArr) {\n                for (const con of mapArr) {\n                    if (con !== pos && !seen[con]) {\n                        seen[con] = true;\n                        next.push(con);\n                    }\n                }\n                map.set(arr[pos], []);\n            }\n\n            const back = pos - 1;\n            if (back >= 0 && !seen[back]) {\n                seen[back] = true;\n                next.push(back);\n            }\n\n            const forw = pos + 1;\n            if (forw < n && !seen[forw]) {\n                seen[forw] = true;\n                next.push(forw);\n            }\n        }\n\n        stack = next;\n        steps++;\n    }\n\n    return -1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code finds the **minimum number of jumps** needed to reach the last index of an array using a **breadth-first search (BFS)** approach. It first builds a `map` that groups indices by their values, allowing quick lookups of all positions with the same value. Then, it performs BFS starting from index 0, where at each step you can move to an **adjacent position** (index ± 1) or **jump to any position with the same value as the current one**. The algorithm tracks visited positions in a `seen` array to avoid revisiting them, clears each value's index list after processing to avoid redundant work, and increments the `steps` counter for each BFS level. Once it reaches the last index, it returns the number of steps taken; if the last index is unreachable, it returns -1.",
+    "status": "DONE",
+    "cpuUsage": 60.87,
+    "memoryUsage": 86.96,
+    "date": "2026-05-18T09:14:34.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} arr\n * @return {number}\n */\nvar minJumps = function(arr) {\n    const n = arr.length;\n    const map = new Map();\n\n    for (let i = 0; i < n; i++) {\n        if (!map.has(arr[i])) {\n            map.set(arr[i], []);\n        }\n        map.get(arr[i]).push(i);\n    }\n\n    let stack = [0];\n    const seen = Array(n).fill(false);\n    seen[0] = true;\n    let steps = 0;\n\n    while (stack.length > 0) {\n        const next = [];\n\n        for (const pos of stack) {\n            if (pos === n - 1) {\n                return steps;\n            }\n\n            const mapArr = map.get(arr[pos]);\n            if (mapArr) {\n                for (const con of mapArr) {\n                    if (con !== pos && !seen[con]) {\n                        seen[con] = true;\n                        next.push(con);\n                    }\n                }\n                map.delete(arr[pos]);\n            }\n\n            const back = pos - 1;\n            if (back >= 0 && !seen[back]) {\n                seen[back] = true;\n                next.push(back);\n            }\n\n            const forw = pos + 1;\n            if (forw < n && !seen[forw]) {\n                seen[forw] = true;\n                next.push(forw);\n            }\n        }\n\n        stack = next;\n        steps++;\n    }\n\n    return -1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code solves a **minimum jumps problem** using **BFS (Breadth-First Search)**. It first builds a **map** that stores all indices for each unique value in the array, then explores positions level-by-level starting from index `0`. At each position, you can jump to three types of locations: any other index with the same value (found via the map), the left neighbor (`pos - 1`), or the right neighbor (`pos + 1`). The algorithm tracks visited positions using a `seen` array to avoid cycles and deletes each value from the map after exploring it to avoid redundant checks. It counts steps until reaching the final position (`n - 1`), returning the number of jumps needed, or `-1` if unreachable.",
+    "status": "DONE",
+    "cpuUsage": 69.57,
+    "memoryUsage": 69.57,
+    "date": "2026-05-18T09:15:44.000Z"
+  }
+]

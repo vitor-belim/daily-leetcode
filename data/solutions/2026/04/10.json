@@ -1,0 +1,68 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar minimumDistance = function(nums) {\n    const map = new Map();\n    let min = Infinity;\n\n    for (let k = 0; k < nums.length; k++) {\n        const arr = map.get(nums[k]) || [];\n\n        if (arr.length === 0) {\n            map.set(nums[k], arr);\n        }\n\n        for (let i = 0; i < arr.length - 1; i++) {\n            min = Math.min(min, 2 * k - 2 * arr[i]);\n        }\n\n        arr.push(k);\n    }\n\n    return min === Infinity ? -1 : min;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses a **map to track all indices** of each unique value in the array. As it iterates through the array, for each value it compares the distance to all previous occurrences (except the most recent one) using the formula `2 * k - 2 * arr[i]`, keeping track of the minimum distance found. If no duplicate value is found, it returns `-1`, otherwise it returns the smallest distance between any pair of duplicate values.",
+    "status": "DONE",
+    "cpuUsage": 93.1,
+    "memoryUsage": 39.66,
+    "date": "2026-04-10T09:09:07.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar minimumDistance = function(nums) {\n    const n = nums.length;\n    const map = new Map();\n    let min = Infinity;\n\n    for (let k = 0; k < n; k++) {\n        const arr = map.get(nums[k]) || [];\n\n        if (arr.length === 0) {\n            map.set(nums[k], arr);\n        }\n\n        if (arr.length > 1) {\n            min = Math.min(min, 2 * k - 2 * arr[arr.length - 2]);\n        }\n\n        arr.push(k);\n    }\n\n    return min === Infinity ? -1 : min;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution is similar to the first but **optimized to only compare with the second-to-last index** of each duplicate value. It uses a map to store all indices for each value, and when there are at least two previous occurrences, it calculates the distance only to the second-to-last index using `2 * k - 2 * arr[arr.length - 2]`. This reduces redundant comparisons while still finding the minimum distance between any two occurrences.",
+    "status": "DONE",
+    "cpuUsage": 77.59,
+    "memoryUsage": 89.66,
+    "date": "2026-04-10T09:27:17.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar minimumDistance = function(nums) {\n    const map = new Map();\n    let min = Infinity;\n\n    for (let i = 0; i < nums.length; i++) {\n        const arr = map.get(nums[i]) || [-1, -1];\n\n        if (arr[0] !== -1) {\n            min = Math.min(min, 2 * i - 2 * arr[0]);\n        }\n\n        map.set(nums[i], [arr[1], i]);\n    }\n\n    return min === Infinity ? -1 : min;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution **optimizes memory usage by storing only the last two indices** as a pair `[previous, current]` in the map. For each element, it checks if there was a second-to-last occurrence (`arr[0]`) and calculates the distance using `2 * i - 2 * arr[0]`. It then updates the stored pair to `[arr[1], i]`, effectively shifting the indices forward and discarding older occurrences since we only care about the closest pair.",
+    "status": "DONE",
+    "cpuUsage": 93.1,
+    "memoryUsage": 70.69,
+    "date": "2026-04-10T09:37:40.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar minimumDistance = function(nums) {\n    const map = new Map();\n    let min = Infinity;\n\n    for (let i = 0; i < nums.length; i++) {\n        const arr = map.get(nums[i]) || [-1, -1];\n\n        if (arr[0] !== -1) {\n            min = Math.min(min, i - arr[0]);\n        }\n\n        map.set(nums[i], [arr[1], i]);\n    }\n\n    if (min === Infinity) {\n        return -1;\n    }\n\n    return 2 * min;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution **simplifies the distance calculation** by computing `i - arr[0]` directly instead of the formula `2 * i - 2 * arr[0]`, and then multiplying the final result by 2. The logic remains the same: it tracks the last two indices for each value and finds the minimum distance between any pair of duplicate values, but the simplified arithmetic makes the code cleaner and easier to understand.",
+    "status": "DONE",
+    "cpuUsage": 77.59,
+    "memoryUsage": 70.69,
+    "date": "2026-04-10T09:40:59.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar minimumDistance = function(nums) {\n    const map = new Map();\n    let min = Infinity;\n\n    for (let k = 0; k < nums.length; k++) {\n        const [i, j] = map.get(nums[k]) || [-1, -1];\n\n        if (i !== -1) {\n            min = Math.min(min, k - i);\n        }\n\n        map.set(nums[k], [j, k]);\n    }\n\n    if (min === Infinity) {\n        return -1;\n    }\n\n    return 2 * min;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses **destructuring syntax** to unpack the stored pair `[i, j]` more cleanly. It maintains the same logic as the previous solution: it tracks the second-to-last and current indices for each duplicate value, calculates the distance between them, and returns twice the minimum distance. The destructuring makes the code more readable while keeping the algorithm efficient in both time and space.",
+    "status": "DONE",
+    "cpuUsage": 51.72,
+    "memoryUsage": 29.31,
+    "date": "2026-04-10T09:51:21.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar minimumDistance = function(nums) {\n    const map = new Map();\n    let min = Infinity;\n\n    for (let k = 0; k < nums.length; k++) {\n        const arr = map.get(nums[k]) || [];\n\n        if (arr.length === 0) {\n            map.set(nums[k], arr);\n        } else if (arr.length >= 2) {\n            min = Math.min(min, k - arr[arr.length - 2]);\n        }\n\n        arr.push(k);\n    }\n\n    if (min === Infinity) {\n        return -1;\n    }\n\n    return 2 * min;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses an **array instead of a tuple** to store indices, and checks `arr.length >= 2` before accessing the second-to-last index. It iterates through the array, and for each duplicate value with at least two prior occurrences, it calculates the distance `k - arr[arr.length - 2]` and tracks the minimum. Finally, it returns `-1` if no duplicates are found, or `2 * min` for the minimum distance between any two occurrences.",
+    "status": "DONE",
+    "cpuUsage": 93.1,
+    "memoryUsage": 82.76,
+    "date": "2026-04-10T09:54:34.000Z"
+  }
+]

@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @return {number}\n */\nvar mirrorDistance = function(n) {\n    return Math.abs(n - reverse(n));\n};\n\nconst reverse = (n) => {\n    let res = 0;\n\n    while (n > 0) {\n        res = res * 10 + (n % 10);\n        n = Math.floor(n / 10);\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code calculates the **mirror distance** between a number and its digit-reversed counterpart. The `mirrorDistance` function takes a number `n`, reverses its digits using the helper function `reverse`, and then returns the **absolute difference** between the original and reversed numbers. The `reverse` function works by repeatedly extracting the last digit of the number using the modulo operator (`n % 10`), shifting the result left by multiplying by 10, and removing the processed digit with `Math.floor(n / 10)` until all digits are extracted and reassembled in reverse order. For example, with `n = 123`, the `reverse` function produces `321`, and `mirrorDistance` returns `Math.abs(123 - 321) = 198`.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 92.75,
+    "date": "2026-04-18T08:33:58.000Z"
+  }
+]

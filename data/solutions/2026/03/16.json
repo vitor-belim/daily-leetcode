@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} grid\n * @return {number[]}\n */\nvar getBiggestThree = function(grid) {\n    const m = grid.length;\n    const n = grid[0].length;\n    const len = Math.ceil(Math.min(m, n) / 2);\n    const set = new Set();\n\n    const calcArea = (r, c, s) => {\n        const inv = s * 2;\n\n        if (r + s >= m || r - s < 0 || c + inv >= n) {\n            return null;\n        }\n\n        let sum = grid[r][c];\n\n        if (s > 0) {\n            sum += grid[r][c + inv];\n            sum += grid[r + s][c + s];\n            sum += grid[r - s][c + s];\n        }\n\n        for (let i = 1; i < s; i++) {\n            sum += grid[r + i][c + i];\n            sum += grid[r - i][c + i];\n\n            sum += grid[r + i][c + inv - i];\n            sum += grid[r - i][c + inv - i];\n        }\n\n        return sum;\n    };\n\n    const explore = (r, c) => {\n        for (let size = 0; size < len; size++) {\n            const area = calcArea(r, c, size);\n            if (area !== null) {\n                set.add(area);\n            }\n        }\n    };\n\n    for (let row = 0; row < m; row++) {\n        for (let col = 0; col < n; col++) {\n            explore(row, col);\n        }\n    }\n\n    const res = [...set].sort((a, b) => b - a);\n\n    return res.slice(0, 3);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds the **three largest diagonal sums** in a grid by exploring diamond-shaped regions centered at every grid position. For each position `(r, c)`, it iterates through different diamond sizes and calculates the sum of elements along each diamond's perimeter using the `calcArea` helper function. The `calcArea` function returns `null` if the diamond extends beyond grid boundaries, otherwise it sums the center point, the four corner points, and all edge points along the diagonals. All unique sums are stored in a **Set** to eliminate duplicates, then the function sorts these sums in descending order and returns the top **3** values.",
+    "status": "DONE",
+    "cpuUsage": 34.61,
+    "memoryUsage": 19.23,
+    "date": "2026-03-16T09:39:29.000Z"
+  }
+]

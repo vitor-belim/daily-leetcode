@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar repeatedNTimes = function(nums) {\n    const n = nums.length / 2;\n    const map = new Map();\n\n    for (const num of nums) {\n        map.set(num, (map.get(num) || 0) + 1);\n\n        if (map.get(num) === n) {\n            return num;\n        }\n    }\n\n    return -1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds the element that appears exactly **n times** in an array of size `2n`. It first computes `n` as half the array's length, then walks through the array while tallying how many times each number has been seen using a `Map`. For every number, it increments its count with `map.set(num, (map.get(num) || 0) + 1)` — the `|| 0` handles numbers seen for the first time — and immediately checks whether that count has reached `n`. As soon as a number's count hits `n`, it must be the repeated element, so the function returns it right away without scanning the rest of the array. The final `return -1` is just a fallback that should never be reached for valid input.",
+    "status": "DONE",
+    "cpuUsage": 26.53,
+    "memoryUsage": 19.39,
+    "date": "2026-01-02T10:32:46.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar repeatedNTimes = function(nums) {\n    const n = nums.length / 2;\n    const map = new Map();\n\n    for (const num of nums) {\n        const count = map.get(num) || 0;\n\n        if (count === n - 1) {\n            return num;\n        }\n\n        map.set(num, count + 1);\n    }\n\n    return -1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds the element repeated **n times** in an array of size `2n`, using a `Map` to count occurrences. For each number it first looks up how many times it has already been seen (`map.get(num) || 0`, where the `|| 0` defaults to zero for new numbers). If that prior count is `n - 1`, the current occurrence is the **nth** one, so the function returns the number immediately — checking *before* updating the map saves an extra lookup compared to incrementing first. Otherwise it stores the incremented count and moves on. The trailing `return -1` is only a safety net, since a valid input always contains an element repeated `n` times.",
+    "status": "DONE",
+    "cpuUsage": 43.88,
+    "memoryUsage": 35.71,
+    "date": "2026-01-02T10:33:52.000Z"
+  }
+]

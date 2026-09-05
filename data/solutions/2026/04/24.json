@@ -1,0 +1,35 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} moves\n * @return {number}\n */\nvar furthestDistanceFromOrigin = function(moves) {\n    let left = 0;\n    let right = 0;\n    let res = 0;\n\n    for (const move of moves) {\n        if (move === 'L') {\n            left++;\n            right = 0;\n        } else if (move === 'R') {\n            left = 0;\n            right++;\n        } else {\n            left++;\n            right++;\n        }\n\n        res = Math.max(res, left, right);\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution tracks two separate counters (`left` and `right`) that represent potential positions if either 'L' or 'R' is chosen for each underscore move, but it uses a flawed strategy: it resets one counter to 0 when the opposite direction is chosen, which doesn't correctly model the problem. The algorithm tries to find the maximum position by only considering one direction at a time, but this approach fails because it doesn't properly account for how underscore moves allow choosing either direction. The **correct** solution should count all left and right moves and then calculate the furthest distance as **|left_count - right_count| + underscore_count**.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-04-24T09:11:45.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} moves\n * @return {number}\n */\nvar furthestDistanceFromOrigin = function(moves) {\n    let left = 0;\n    let right = 0;\n\n    for (const move of moves) {\n        if (move === 'L') {\n            left++;\n        } else if (move === 'R') {\n            right++;\n        }\n    }\n\n    return moves.length - 2 * Math.min(left, right);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution counts the number of `L` and `R` moves in the input string. The key insight is that underscores can be assigned to either direction, so to maximize distance, we should use them to amplify the dominant direction. The formula `moves.length - 2 * Math.min(left, right)` calculates this: it takes the total moves and subtracts twice the minimum of left/right moves, which represents the moves that can be \"canceled out,\" leaving only the net distance with all underscores optimally assigned to the dominant direction.",
+    "status": "DONE",
+    "cpuUsage": 13.46,
+    "memoryUsage": 21.15,
+    "date": "2026-04-24T09:18:17.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} moves\n * @return {number}\n */\nvar furthestDistanceFromOrigin = function(moves) {\n    let counter = 0;\n    let same = 0;\n\n    for (const move of moves) {\n        if (move === 'L') {\n            counter--;\n        } else if (move === 'R') {\n            counter++;\n        } else {\n            same++;\n        }\n    }\n\n    return Math.abs(counter) + same;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This elegant solution uses a `counter` to track the net displacement from known moves ('L' decrements, 'R' increments) and `same` to count underscore moves. After processing all moves, the absolute value of `counter` gives the minimum distance guaranteed by known moves, and `same` represents the number of free choices that can all be assigned to amplify that distance in the optimal direction. Therefore, adding `Math.abs(counter) + same` yields the furthest possible distance.",
+    "status": "DONE",
+    "cpuUsage": 75,
+    "memoryUsage": 9.61,
+    "date": "2026-04-24T09:21:14.000Z"
+  }
+]

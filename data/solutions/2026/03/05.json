@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar minOperations = function(s) {\n    let count = 0;\n\n    for (let i = 0; i < s.length; i++) {\n        const isEven = i % 2 === 0;\n        const isOne = s[i] === '1';\n\n        if (isEven ^ isOne) {\n            count++;\n        }\n    }\n\n    return Math.min(count, s.length - count);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds the **minimum number of changes** needed to make a binary string alternate between **`0`** and **`1`**. It works by checking how many positions violate the alternating pattern \"010101...\" (where even indices should be `0` and odd indices should be `1`): for each character, it counts a mismatch when the character is `'1'` at an even index OR `'0'` at an odd index, using XOR (`^`) to detect these violations. Then it compares this count with the opposite pattern \"101010...\" (where even indices should be `1` and odd indices should be `0`), and returns **`Math.min(count, s.length - count)`** — whichever pattern requires fewer changes to achieve. For example, \"001\" needs 1 change to become \"010\" (or 2 changes to become \"101\"), so it returns `1`.",
+    "status": "DONE",
+    "cpuUsage": 63.95,
+    "memoryUsage": 90.7,
+    "date": "2026-03-05T09:09:25.000Z"
+  }
+]

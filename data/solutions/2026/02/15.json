@@ -1,0 +1,178 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} a\n * @param {string} b\n * @return {string}\n */\nvar addBinary = function(a, b) {\n    let num1 = binToDec(a);\n    let num2 = binToDec(b);\n\n    return (num1 + num2).toString(2);\n};\n\nconst binToDec = (bin) => {\n    let dec = 0;\n\n    for (let i = bin.length - 1; i >= 0; i--) {\n        dec += bin[i] * 2 ** (bin.length - 1 - i);\n    }\n\n    return dec;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution converts both binary strings to decimal numbers using a helper function that iterates through each bit and calculates its decimal value using powers of 2, adds the decimal values together, and then converts the result back to a binary string using `toString(2)`.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2024-09-19T15:36:12.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} a\n * @param {string} b\n * @return {string}\n */\nvar addBinary = function(a, b) {\n    if (a.length !== b.length) {\n        if (a.length < b.length) {\n            a = padZeros(a, b);\n        } else {\n            b = padZeros(b, a);\n        }\n    }\n\n    let res = '';\n    let carry = 0;\n\n    for (let i = a.length - 1; i >= 0; i--) {\n        const x = Number(a[i]);\n        const y = Number(b[i]);\n\n        const sum = x + y + carry;\n        carry = sum > 1 ? 1 : 0;\n        res = sum % 2 + res;\n    }\n\n    return (carry === 1 ? '1' : '') + res;\n};\n\nconst padZeros = (smaller, larger) => {\n    return '0'.repeat(larger.length - smaller.length) + smaller;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution pads the shorter binary string with leading zeros to match the longer one, then iterates from right to left adding corresponding digits with carry tracking, building the result string by prepending bits and properly handling the final carry if present.",
+    "status": "DONE",
+    "cpuUsage": 5.07,
+    "memoryUsage": 99.86,
+    "date": "2024-09-19T15:39:12.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} a\n * @param {string} b\n * @return {string}\n */\nvar addBinary = function(a, b) {\n    return (parseInt(a, 2) + parseInt(b, 2)).toString(2);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "The most concise approach — uses `parseInt(a, 2)` and `parseInt(b, 2)` to directly convert binary strings to decimal numbers, adds them, and converts the sum back to binary format using `toString(2)`.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2025-06-10T10:05:46.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} a\n * @param {string} b\n * @return {string}\n */\nvar addBinary = function(a, b) {\n    let i = a.length - 1;\n    let j = b.length - 1;\n\n    let res = \"\";\n    let add = 0;\n\n    while (i >= 0 || j >= 0) {\n        let x = a[i] || '0';\n        let y = b[j] || '0';\n\n        res = (x == y ? add : ((add + 1) & 1)) + res;\n        add = x === y ? +x : add;\n\n        i--;\n        j--;\n    }\n\n    return (add || \"\") + res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses two pointers starting from the end of each string, treats missing characters as `'0'` to handle different lengths, and uses bitwise operations (`&` operator) and conditional logic to compute both the result bit and carry in a compact way.",
+    "status": "DONE",
+    "cpuUsage": 40.43,
+    "memoryUsage": 95.58,
+    "date": "2025-06-10T10:38:34.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} a\n * @param {string} b\n * @return {string}\n */\nvar addBinary = function(a, b) {\n    let i = a.length - 1;\n    let j = b.length - 1;\n\n    let res = \"\";\n    let add = 0;\n\n    while (i >= 0 || j >= 0) {\n        let x = a[i] || '0';\n        let y = b[j] || '0';\n\n        if (x === y) {\n            res = add + res;\n            add = +x;\n        } else {\n            res = ((add + 1) & 1) + res;\n        }\n\n        i--;\n        j--;\n    }\n\n    return (add || \"\") + res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Similar to Solution 4 but with clearer branching logic — uses two pointers from the right, checks if the current bits are equal to determine if the result bit equals the carry, otherwise uses a bitwise operation to compute the result bit when bits differ.",
+    "status": "DONE",
+    "cpuUsage": 22.39,
+    "memoryUsage": 95.58,
+    "date": "2025-06-10T10:41:11.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} a\n * @param {string} b\n * @return {string}\n */\nvar addBinary = function(a, b) {\n    let i = a.length - 1;\n    let j = b.length - 1;\n\n    let res = \"\";\n    let add = 0;\n\n    while (i >= 0 || j >= 0) {\n        const sum = Number(a[i] || 0) + Number(b[j] || 0) + add;\n\n        if (sum === 0) {\n            res = \"0\" + res;\n            add = 0;\n        } else if (sum === 1) {\n            res = \"1\" + res;\n            add = 0;\n        } else if (sum === 2) {\n            res = \"0\" + res;\n            add = 1;\n        } else if (sum === 3) {\n            res = \"1\" + res;\n            add = 1;\n        }\n\n        i--;\n        j--;\n    }\n\n    return (add || \"\") + res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution explicitly handles all four possible sum cases (0, 1, 2, 3) when adding two bits plus carry with separate if-else branches, directly setting both the result bit and carry value appropriate for each case.",
+    "status": "DONE",
+    "cpuUsage": 70.14,
+    "memoryUsage": 33.91,
+    "date": "2025-06-10T11:28:09.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} a\n * @param {string} b\n * @return {string}\n */\nvar addBinary = function(a, b) {\n    const len = Math.max(a.length, b.length);\n\n    a = a.padStart(len, \"0\");\n    b = b.padStart(len, \"0\");\n\n    let res = \"\";\n    let add = 0;\n\n    for (let i = len - 1; i >= 0; i--) {\n        const sum = +a[i] + +b[i] + add;\n\n        res = (sum & 1) + res;\n        add = Math.floor(sum / 2);\n    }\n\n    return (add || \"\") + res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution pads both strings to equal length using `padStart()`, then iterates from right to left, uses the bitwise AND operator `(sum & 1)` to extract the least significant bit and `Math.floor(sum / 2)` to calculate the carry.",
+    "status": "DONE",
+    "cpuUsage": 70.14,
+    "memoryUsage": 95.58,
+    "date": "2025-06-10T11:39:38.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} a\n * @param {string} b\n * @return {string}\n */\nvar addBinary = function(a, b) {\n    const len = Math.max(a.length, b.length);\n\n    a = a.padStart(len, \"0\");\n    b = b.padStart(len, \"0\");\n\n    let res = \"\";\n    let carry = 0;\n\n    for (let i = len - 1; i >= 0; i--) {\n        if (a[i] === b[i]) {\n            res = carry + res;\n            carry = +a[i];\n        } else {\n            res = ((carry + 1) & 1) + res;\n        }\n    }\n\n    return (carry || \"\") + res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution pads both strings to equal length, iterates from right to left, and when bits are equal the result bit is the current carry and the new carry becomes the bit value, while unequal bits use a bitwise operation to compute the result bit.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 41.23,
+    "date": "2025-06-10T12:03:29.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} a\n * @param {string} b\n * @return {string}\n */\nvar addBinary = function(a, b) {\n    const len = Math.max(a.length, b.length) + 1;\n\n    a = a.padStart(len, \"0\");\n    b = b.padStart(len, \"0\");\n\n    let res = \"\";\n    let carry = \"0\";\n\n    for (let i = len - 1; i >= 0; i--) {\n        if (a[i] === b[i]) {\n            res = carry + res;\n            carry = a[i];\n        } else {\n            res = (carry === \"0\" ? \"1\" : \"0\") + res;\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution pads both strings with an extra leading position to naturally accommodate any final carry without special handling at the end, works with string-based carry and result values, and returns the entire padded result after iteration completes.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2025-06-10T12:11:17.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} a\n * @param {string} b\n * @return {string}\n */\nvar addBinary = function(a, b) {\n    const len = Math.max(a.length, b.length);\n\n    a = a.padStart(len, \"0\");\n    b = b.padStart(len, \"0\");\n\n    let res = \"\";\n    let carry = \"0\";\n\n    for (let i = len - 1; i >= 0; i--) {\n        if (a[i] === b[i]) {\n            res = carry + res;\n            carry = a[i];\n        } else {\n            res = (carry === \"0\" ? \"1\" : \"0\") + res;\n        }\n    }\n\n    return (carry === \"1\" ? carry : \"\") + res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution pads both strings to equal length using `padStart()`, iterates from right to left with string-based carry and result, checks if digits are equal to propagate carry, and appends the final carry to the result only if it equals `'1'`.",
+    "status": "DONE",
+    "cpuUsage": 70.14,
+    "memoryUsage": 88.26,
+    "date": "2025-06-10T12:12:53.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} a\n * @param {string} b\n * @return {string}\n */\nvar addBinary = function(a, b) {\n    const m = a.length;\n    const n = b.length;\n\n    const len = Math.max(m, n);\n\n    if (m < n) {\n        a = a.padStart(len, \"0\");\n    } else if (m > n) {\n        b = b.padStart(len, \"0\");\n    }\n\n    let res = \"\";\n    let carry = \"0\";\n\n    for (let i = len - 1; i >= 0; i--) {\n        if (a[i] === b[i]) {\n            res = carry + res;\n            carry = a[i];\n        } else {\n            res = (carry === \"0\" ? \"1\" : \"0\") + res;\n        }\n    }\n\n    return (carry === \"1\" ? carry : \"\") + res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses explicit length comparisons to determine which string needs padding with `padStart()`, then performs standard right-to-left binary addition by checking digit equality and propagating carry appropriately at each position.",
+    "status": "DONE",
+    "cpuUsage": 70.14,
+    "memoryUsage": 95.58,
+    "date": "2025-06-10T12:18:26.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} a\n * @param {string} b\n * @return {string}\n */\nvar addBinary = function(a, b) {\n    const m = a.length;\n    const n = b.length;\n\n    const len = Math.max(m, n);\n\n    if (m < len) {\n        a = a.padStart(len, \"0\");\n    } else if (n < len) {\n        b = b.padStart(len, \"0\");\n    }\n\n    let res = \"\";\n    let carry = \"0\";\n\n    for (let i = len - 1; i >= 0; i--) {\n        if (a[i] === b[i]) {\n            res = carry + res;\n            carry = a[i];\n        } else {\n            res = (carry === \"0\" ? \"1\" : \"0\") + res;\n        }\n    }\n\n    return (carry === \"1\" ? carry : \"\") + res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution compares each string's length against the maximum length to conditionally apply `padStart()` padding, then executes the standard right-to-left binary addition algorithm with string-based carry tracking and conditional final carry appending.",
+    "status": "DONE",
+    "cpuUsage": 70.14,
+    "memoryUsage": 44.49,
+    "date": "2025-06-10T12:19:57.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} a\n * @param {string} b\n * @return {string}\n */\nvar addBinary = function(a, b) {\n    const m = a.length;\n    const n = b.length;\n\n    const len = Math.max(m, n);\n\n    if (m < len) {\n        a = \"0\".repeat(len - m) + a;\n    } else if (n < len) {\n        b = \"0\".repeat(len - n) + b;\n    }\n\n    let res = \"\";\n    let carry = \"0\";\n\n    for (let i = len - 1; i >= 0; i--) {\n        if (a[i] === b[i]) {\n            res = carry + res;\n            carry = a[i];\n        } else {\n            res = (carry === \"0\" ? \"1\" : \"0\") + res;\n        }\n    }\n\n    return (carry === \"1\" ? carry : \"\") + res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses `String.repeat()` instead of `padStart()` to add leading zeros to the shorter string, then performs right-to-left binary addition with carry propagation, checking digit equality to determine how carry flows.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 88.26,
+    "date": "2025-06-10T12:24:38.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} a\n * @param {string} b\n * @return {string}\n */\nvar addBinary = function(a, b) {\n    const lenA = a.length;\n    const lenB = b.length;\n    let maxLen = Math.max(a.length, b.length);\n    let carry = 0;\n    let res = '';\n\n    for (let i = 1; i <= maxLen; i++) {\n        const num1 = a[lenA - i] || '0';\n        const num2 = b[lenB - i] || '0';\n\n        if (num1 === '1' && num2 === '1') {\n            res = carry + res;\n            carry = 1;\n        } else if (carry === 1 && (num1 === '1' || num2 === '1')) {\n            res = 0 + res;\n            carry = 1;\n        } else {\n            res = (carry === 1 || num1 === '1' || num2 === '1' ? 1 : 0) + res;\n            carry = 0;\n        }\n    }\n\n    return (carry ? '1' : '') + res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses a counter-based loop to access digits from the right, explicitly checks all combinations of two bits plus carry with separate if-else branches, and builds the result string by prepending computed bits while properly tracking carry state.",
+    "status": "DONE",
+    "cpuUsage": 40.43,
+    "memoryUsage": 77.61,
+    "date": "2026-02-15T10:25:42.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} a\n * @param {string} b\n * @return {string}\n */\nvar addBinary = function(a, b) {\n    let maxLen = Math.max(a.length, b.length);\n    let carry = 0;\n    let res = '';\n\n    for (let i = 1; i <= maxLen; i++) {\n        const num1 = Number(a[a.length - i] || '0');\n        const num2 = Number(b[b.length - i] || '0');\n        const sum = num1 + num2 + carry;\n\n        res = (sum & 1 ? '1' : '0') + res;\n        carry = sum >= 2 ? 1 : 0;\n    }\n\n    return (carry ? '1' : '') + res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses a counter-based loop to access digits from right to left, converts digits to numbers for arithmetic, uses bitwise AND `(sum & 1)` to check if the sum is odd for the result bit, and determines carry by checking if sum is at least 2.",
+    "status": "DONE",
+    "cpuUsage": 70.14,
+    "memoryUsage": 74.71,
+    "date": "2026-02-15T10:34:42.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} a\n * @param {string} b\n * @return {string}\n */\nvar addBinary = function(a, b) {\n    let maxLen = Math.max(a.length, b.length);\n    let carry = 0;\n    let res = '';\n\n    for (let i = 1; i <= maxLen; i++) {\n        const num1 = Number(a[a.length - i] || '0');\n        const num2 = Number(b[b.length - i] || '0');\n        const sum = num1 + num2 + carry;\n\n        res = (sum & 1 ? '1' : '0') + res;\n        carry = sum >= 2 ? 1 : 0;\n    }\n\n    return (carry ? '1' : '') + res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "The algorithm performs **binary addition** by processing both input strings from right to left (least significant bit first), iterating up to the length of the longer string. For each position, it extracts the digit from each string—using `'0'` as a default if a string is too short—and adds them together with any **carry** from the previous iteration. The **bitwise AND operation** (`sum & 1`) efficiently determines if the current bit is `1` (odd sum) or `0` (even sum), and the carry is set to `1` only when the sum is **2 or greater** (representing a binary overflow). The result digits are prepended to build the answer string from right to left, and any final carry is prepended to the result before returning.",
+    "status": "DONE",
+    "cpuUsage": 70.14,
+    "memoryUsage": 74.71,
+    "date": "2026-02-15T10:34:42.000Z"
+  }
+]

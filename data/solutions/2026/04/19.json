@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums1\n * @param {number[]} nums2\n * @return {number}\n */\nvar maxDistance = function(nums1, nums2) {\n    let max = 0;\n\n    for (let i = 0; i < nums1.length; i++) {\n        for (let j = i; j < nums2.length; j++) {\n            if (nums1[i] > nums2[j]) {\n                break;\n            }\n\n            max = Math.max(max, j - i);\n        }\n    }\n\n    return max;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds the **maximum distance** between elements of two arrays by checking all pairs where an element from **`nums1`** at index `i` is less than or equal to an element from **`nums2`** at index `j` (where `j >= i`). It uses nested loops: for each element in `nums1`, it searches through `nums2` starting from the same index, and whenever it finds an element in `nums2` that is at least as large, it calculates the distance as `j - i`; if it encounters a smaller element in `nums2`, it stops searching for that position in `nums1` (since `nums2` would only get smaller). The function tracks the largest distance found across all valid pairs and **returns** that maximum value, or **0** if no valid pair exists.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-04-19T09:22:21.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums1\n * @param {number[]} nums2\n * @return {number}\n */\nvar maxDistance = function(nums1, nums2) {\n    let pos1 = 0;\n    let pos2 = 0;\n    let max = 0;\n\n    while (pos1 < nums1.length && pos2 < nums2.length) {\n        if (nums1[pos1] > nums2[pos2]) {\n            pos1++;\n            if (pos2 < pos1) {\n                pos2 = pos1;\n            }\n            continue;\n        }\n\n        max = Math.max(max, pos2 - pos1);\n        pos2++;\n    }\n\n    return max;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code finds the **maximum distance between indices** in two arrays using a **two-pointer technique**. It maintains two pointers (`pos1` and `pos2`) that iterate through `nums1` and `nums2` respectively. When `nums1[pos1] > nums2[pos2]`, the current elements can't be validly paired, so it advances `pos1` forward (and syncs `pos2` to maintain proper indexing). Otherwise, when `nums1[pos1] <= nums2[pos2]`, the elements form a valid pair, and the code calculates the distance (`pos2 - pos1`) and tracks the maximum. The algorithm continues advancing `pos2` to explore other potential pairs, ultimately returning the largest distance found between any two valid index pairs where the value constraint is satisfied.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 100,
+    "date": "2026-04-19T09:29:13.000Z"
+  }
+]

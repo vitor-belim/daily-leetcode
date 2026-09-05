@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} bottomLeft\n * @param {number[][]} topRight\n * @return {number}\n */\nvar largestSquareArea = function (bottomLeft, topRight) {\n    const n = bottomLeft.length;\n    let maxSide = 0;\n\n    for (let i = 0; i < n; i++) {\n        for (let j = i + 1; j < n; j++) {\n            const [b1w, b1h] = bottomLeft[i];\n            const [t1w, t1h] = topRight[i];\n            const [b2w, b2h] = bottomLeft[j];\n            const [t2w, t2h] = topRight[j];\n\n            const w = Math.min(t1w, t2w) - Math.max(b1w, b2w);\n            const h = Math.min(t1h, t2h) - Math.max(b1h, b2h);\n\n            maxSide = Math.max(maxSide, Math.min(w, h));\n        }\n    }\n\n    return maxSide * maxSide;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds the **largest square area** that can fit in the **intersection** of two rectangles by iterating through all pairs of rectangles. For each pair, it extracts the bottom-left and top-right coordinates (`bottomLeft` and `topRight`) to determine the bounding box of the intersection: the width is calculated as `min(right edges) - max(left edges)` and the height as `min(top edges) - max(bottom edges)`. Since a square requires equal width and height, the side length is `min(width, height)`, and the area is the side length squared. The algorithm keeps track of the **maximum area** found across all pairs and returns it at the end.",
+    "status": "DONE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-01-17T10:18:52.000Z"
+  }
+]

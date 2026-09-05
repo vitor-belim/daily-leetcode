@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for a binary tree node.\n * function TreeNode(val, left, right) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.left = (left===undefined ? null : left)\n *     this.right = (right===undefined ? null : right)\n * }\n */\n/**\n * @param {TreeNode} root\n * @return {TreeNode}\n */\nvar subtreeWithAllDeepest = function(root) {\n    if (!root) return null;\n\n    let queue = [[root, []]];\n\n    while (queue.length > 0) {\n        const parents = new Set();\n        const next = [];\n\n        for (const [node, path] of queue) {\n            path.push(node);\n\n            if (node.left) {\n                next.push([node.left, [...path]]);\n            }\n            if (node.right) {\n                next.push([node.right, [...path]]);\n            }\n        }\n\n        if (next.length === 0) {\n            while (true) {\n                const set = new Set();\n\n                for (const [_, path] of queue) {\n                    set.add(path.pop());\n                }\n\n                if (set.size === 1) {\n                    return [...set][0];\n                }\n            }\n        }\n\n        queue = next;\n    }\n\n    return root;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution finds the **smallest subtree containing all of a binary tree's deepest nodes** using a level-by-level **breadth-first search** that remembers how it got to each node. The `queue` holds pairs of `[node, path]`, where `path` is the full list of ancestors from the root down to that node, and each pass through the `while` loop builds the `next` level by pushing every child along with a **copy of its parent's path** (`[...path]`). When `next` comes back empty, the current `queue` holds exactly the **deepest level** of the tree, so the inner `while (true)` loop repeatedly pops the last node off every deepest node's path and collects them into a `Set`; as long as the set has more than one entry, the paths haven't converged yet, but the moment `set.size === 1` every deepest node shares that ancestor — making it their **lowest common ancestor** and the answer to return.",
+    "status": "DONE",
+    "cpuUsage": 36,
+    "memoryUsage": 92,
+    "date": "2026-01-09T09:52:57.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for a binary tree node.\n * function TreeNode(val, left, right) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.left = (left===undefined ? null : left)\n *     this.right = (right===undefined ? null : right)\n * }\n */\n/**\n * @param {TreeNode} root\n * @return {TreeNode}\n */\nvar subtreeWithAllDeepest = function (root) {\n    let height = 0;\n    let maxNode = null;\n\n    const dfs = (node, depth) => {\n        if (!node) return depth - 1;\n\n        height = Math.max(height, depth);\n\n        const leftDepth = dfs(node.left, depth + 1);\n        const rightDepth = dfs(node.right, depth + 1);\n\n        if (leftDepth === height && rightDepth === height) {\n            maxNode = node;\n        }\n\n        return Math.max(leftDepth, rightDepth);\n    };\n\n    dfs(root, 0);\n\n    return maxNode;\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses a single **depth-first search** to find the smallest subtree containing all the deepest nodes of a binary tree. The recursive `dfs` function walks the tree while tracking each node's `depth`, updating a shared `height` variable so it always holds the **maximum depth seen so far**; when it steps past a leaf (`!node`), it returns `depth - 1`, the depth of the last real node on that path. After recursing, each node learns `leftDepth` and `rightDepth` — the **deepest levels reachable** through its left and right subtrees — and if *both* equal the overall `height`, that node has deepest nodes on both sides (or is itself a deepest leaf), so it becomes the candidate `maxNode`. Because the check runs **bottom-up** as the recursion unwinds toward the root, the last node to satisfy it is the **lowest common ancestor** of all the deepest nodes, which is returned as the answer in a single `O(n)` pass.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 28,
+    "date": "2026-01-09T09:59:26.000Z"
+  }
+]

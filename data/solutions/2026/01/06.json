@@ -1,0 +1,35 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for a binary tree node.\n * function TreeNode(val, left, right) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.left = (left===undefined ? null : left)\n *     this.right = (right===undefined ? null : right)\n * }\n */\n/**\n * @param {TreeNode} root\n * @return {number}\n */\nvar maxLevelSum = function(root) {\n    let stack = [root];\n    let level = 1;\n    let max = -Infinity;\n    let maxLevel = 0;\n\n    while (stack.length > 0) {\n        const next = [];\n        let sum = 0;\n\n        for (let i = 0; i < stack.length; i++) {\n            const node = stack[i];\n\n            sum += node.val;\n\n            if (node.left) next.push(node.left);\n            if (node.right) next.push(node.right);\n        }\n\n        if (sum > max) {\n            max = sum;\n            maxLevel = level;\n        }\n\n        stack = next;\n        level++;\n    }\n\n    return maxLevel;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution finds the level of a binary tree with the **largest sum of node values** using an iterative **breadth-first search** (level-order traversal). It keeps the current level's nodes in `stack` and, on each pass of the `while` loop, adds up all their values into `sum` while collecting their children into a `next` array for the following level. After summing a level, it compares `sum` against the best seen so far (`max`, initialized to `-Infinity` so even all-negative levels work): if the new sum is larger, it records both the sum and the level number in `maxLevel`. It then replaces `stack` with `next`, increments `level`, and repeats until there are no more nodes, finally returning the **smallest level with the maximum sum** since only strictly greater sums replace the record.",
+    "status": "DONE",
+    "cpuUsage": 82.8,
+    "memoryUsage": 68.28,
+    "date": "2025-05-06T11:41:13.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for a binary tree node.\n * function TreeNode(val, left, right) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.left = (left===undefined ? null : left)\n *     this.right = (right===undefined ? null : right)\n * }\n */\n/**\n * @param {TreeNode} root\n * @return {number}\n */\nvar maxLevelSum = function(root) {\n    const map = new Map();\n\n    const dfs = (node, level) => {\n        if (!node) return;\n\n        map.set(level, (map.get(level) || 0) + node.val);\n\n        dfs(node.left, level + 1);\n        dfs(node.right, level + 1);\n    };\n\n    dfs(root, 1);\n\n    let level = 1;\n    let max = 0;\n    let maxLvl = 1;\n\n    while (map.has(level)) {\n        const count = map.get(level);\n\n        if (count > max) {\n            max = count;\n            maxLvl = level;\n        }\n\n        level++;\n    }\n\n    return maxLvl;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses a recursive **depth-first search** to total up the node values on each level of the tree. The `dfs` helper walks the tree while tracking the current `level`, and a `Map` accumulates the running sum per level via `map.set(level, (map.get(level) || 0) + node.val)`. After the traversal, a `while` loop walks levels `1, 2, 3, ...` in order, tracking the biggest sum in `max` and the level where it occurred in `maxLvl`, then returns that level. The subtle flaw here is that `max` starts at `0` instead of `-Infinity`: if **every level has a negative sum**, no level ever beats `0`, so the function incorrectly falls back to returning level `1` — which is why this attempt failed.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-01-06T09:06:05.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for a binary tree node.\n * function TreeNode(val, left, right) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.left = (left===undefined ? null : left)\n *     this.right = (right===undefined ? null : right)\n * }\n */\n/**\n * @param {TreeNode} root\n * @return {number}\n */\nvar maxLevelSum = function(root) {\n    const map = new Map();\n\n    const dfs = (node, level) => {\n        if (!node) return;\n\n        map.set(level, (map.get(level) || 0) + node.val);\n\n        dfs(node.left, level + 1);\n        dfs(node.right, level + 1);\n    };\n\n    dfs(root, 1);\n\n    let level = 1;\n    let max = -Infinity;\n    let maxLvl = 1;\n\n    while (map.has(level)) {\n        const count = map.get(level);\n\n        if (count > max) {\n            max = count;\n            maxLvl = level;\n        }\n\n        level++;\n    }\n\n    return maxLvl;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution finds the tree level with the **largest sum of node values** in two phases. First, a recursive **depth-first search** (`dfs`) visits every node while carrying its `level` (starting at `1` for the root), and a `Map` keeps a running total per level — the expression `(map.get(level) || 0) + node.val` adds each node's value to its level's sum, defaulting to `0` the first time a level is seen. Second, a `while` loop scans the levels in ascending order using `map.has(level)`, updating `max` and `maxLvl` whenever a level's sum is **strictly greater** than the best so far, which guarantees the smallest such level wins ties. Crucially, `max` starts at `-Infinity`, so the comparison works correctly even when **all level sums are negative** — the fix that makes this attempt pass where the previous one failed.",
+    "status": "DONE",
+    "cpuUsage": 74.73,
+    "memoryUsage": 36.02,
+    "date": "2026-01-06T09:07:42.000Z"
+  }
+]

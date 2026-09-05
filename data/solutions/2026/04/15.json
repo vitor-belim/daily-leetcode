@@ -1,0 +1,46 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string[]} words\n * @param {string} target\n * @param {number} startIndex\n * @return {number}\n */\nvar closestTarget = function(words, target, startIndex) {\n    const n = words.length;\n\n    for (let i = 0; i < n; i++) {\n        if (words[i] === target) {\n            const dist = Math.abs(i - startIndex);\n            return Math.min(dist, n - dist);\n        }\n    }\n\n    return -1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds the **closest occurrence** of a `target` word in a circular array of `words` starting from a given `startIndex`. It loops through the array looking for an exact match, and when found, it calculates the distance in two ways: the **direct distance** using `Math.abs(i - startIndex)` and the **wraparound distance** using `n - dist` (treating the array as circular, so you can \"wrap around\" from the end back to the start). It returns whichever distance is smaller, allowing you to find the target by going either forward or backward through the array; if no match is found, it returns **-1**.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-04-15T08:33:14.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string[]} words\n * @param {string} target\n * @param {number} startIndex\n * @return {number}\n */\nvar closestTarget = function(words, target, startIndex) {\n    const n = words.length;\n    let min = Infinity;\n\n    for (let i = 0; i < n; i++) {\n        if (words[i] === target) {\n            const dist = Math.abs(i - startIndex);\n            min = Math.min(min, dist, n - dist);\n        }\n    }\n\n    if (min === Infinity) {\n        return -1;\n    }\n\n    return min;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds the **closest distance** to a target word in a circular array. It iterates through the `words` array looking for any element matching the `target` string. When a match is found, it calculates two distances: the direct distance from that position to `startIndex`, and the wraparound distance (treating the array as circular) by subtracting the direct distance from the array length `n`. It keeps track of the minimum distance found across all matches. If no matching word is found, it returns `-1`; otherwise, it returns the smallest distance discovered.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 56.25,
+    "date": "2026-04-15T08:35:06.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string[]} words\n * @param {string} target\n * @param {number} start\n * @return {number}\n */\nvar closestTarget = function(words, target, start) {\n    const n = words.length;\n    const len = Math.ceil(n / 2);\n\n    for (let i = 0; i < len; i++) {\n        if (words[(start - i + n) % n] === target || words[(start + i) % n] === target) {\n            return i;\n        }\n    }\n\n    return -1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function searches for a **target word** in a circular array of words, starting from a given **start** index and expanding outward in both directions simultaneously. It loops up to half the array length, checking both the position `i` steps to the left (using `(start - i + n) % n` for wraparound) and `i` steps to the right (using `(start + i) % n`), returning the minimum distance `i` where the target is found, or **`-1`** if the target doesn't exist in the array.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-04-15T08:49:50.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string[]} words\n * @param {string} target\n * @param {number} start\n * @return {number}\n */\nvar closestTarget = function(words, target, start) {\n    const n = words.length;\n    const len = Math.ceil(n / 2);\n\n    for (let i = 0; i <= len; i++) {\n        if (words[(start - i + n) % n] === target || words[(start + i) % n] === target) {\n            return i;\n        }\n    }\n\n    return -1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function searches for a **target word** in a circular array starting from a given position and returns the **minimum distance** to that word. It uses the **modulo operator** (`%`) to wrap around the array boundaries, checking in both directions simultaneously—moving **left** with `(start - i + n) % n` and **right** with `(start + i) % n`—where `i` increases from 0 to half the array length. On each iteration, if either direction finds a match, the function immediately returns `i` (the distance traveled), making this an efficient **bidirectional search** that avoids checking the entire array. If no match is found after checking half the array in both directions, it returns **-1**.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 100,
+    "date": "2026-04-15T08:50:17.000Z"
+  }
+]

@@ -1,0 +1,57 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @return {number}\n */\nvar concatenatedBinary = function(n) {\n    let bin = '';\n\n    for (let i = 1; i <= n; i++) {\n        bin += i.toString(2);\n    }\n\n    let res = 0;\n    const MOD = 10 ** 9 + 7;\n\n    for (let i = bin.length - 1; i >= 0; i--) {\n        if (bin[i] === '1') {\n            res += 2 ** (bin.length - 1 - i);\n        }\n    }\n\n    return res % MOD;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function concatenates the **binary representations** of all numbers from 1 to `n` into a single binary string, then converts that string back into a **decimal number** with modulo applied. For example, if `n = 3`, it builds the binary string `\"11011\"` (1 in binary is \"1\", 2 is \"10\", 3 is \"11\"), then treats that as a single binary number and converts it to decimal (27 in this case). The first loop constructs the concatenated binary string, the second loop decodes it back to decimal by checking each bit position and adding `2^position` whenever a bit is `1`, and finally the result is returned modulo `10^9 + 7` to handle large numbers.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-02-28T09:56:35.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @return {number}\n */\nvar concatenatedBinary = function(n) {\n    let bin = '';\n\n    for (let i = 1; i <= n; i++) {\n        bin += i.toString(2);\n    }\n\n    let res = 0;\n    const MOD = 10 ** 9 + 7;\n\n    for (let i = bin.length - 1; i >= 0; i--) {\n        if (bin[i] === '1') {\n            res = (res + ((2 ** (bin.length - 1 - i)) % MOD)) % MOD;\n        }\n    }\n\n    return res % MOD;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "The function **concatenates the binary representations of all numbers from 1 to n** into a single binary string, then **converts that concatenated string back to a decimal number** while applying modulo `10^9 + 7` to handle large numbers. For example, with `n=3`, it creates `\"1\"` (binary of 1) + `\"10\"` (binary of 2) + `\"11\"` (binary of 3) = `\"11011\"`, which converts to decimal 27. The second loop iterates through the binary string from right to left, and for each `'1'` bit, it adds the corresponding power of 2 to the result (calculated as `2^(position from right)`), ensuring the final answer stays within the modulo constraint by taking the modulo at each step to prevent overflow.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-02-28T09:59:30.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @return {number}\n */\nvar concatenatedBinary = function(n) {\n    let bin = '';\n\n    for (let i = 1; i <= n; i++) {\n        bin += i.toString(2);\n    }\n\n    let res = 0n;\n    const MOD = 1_000_000_007n;\n    let last = BigInt(bin.length - 1);\n\n    for (let i = last; i >= 0n; i--) {\n        if (bin[i] === '1') {\n            res = (res + ((2n ** (last - i)) % MOD)) % MOD;\n        }\n    }\n\n    return Number(res % MOD);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function converts a **concatenated binary string** to a decimal number. It starts by building a binary string where it concatenates the binary representations of all integers from **1 to n** (for example, if n=3, the string would be \"11011\" from binary 1, 10, and 11). Then it interprets this concatenated binary string as a single binary number and converts it to decimal, calculating the result by iterating through each bit from right to left — if a bit is '1', it adds **2 raised to that bit's position** to the result. Throughout the calculation, it applies **modulo 1,000,000,007** to keep the number manageable, and finally returns the result as a regular JavaScript number. Essentially, it's a binary string concatenation problem that requires efficient modular arithmetic using **BigInt** to handle very large intermediate values.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-02-28T10:05:51.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @return {number}\n */\nvar concatenatedBinary = function (n) {\n    const MOD = 1000000007n;\n    let res = 0n;\n    let bits = 0n;\n\n    for (let i = 1n; i <= BigInt(n); i++) {\n        if ((i & (i - 1n)) === 0n) {\n            bits++;\n        }\n        res = ((res << bits) | i) % MOD;\n    }\n\n    return Number(res);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function concatenates the **binary representations** of all numbers from 1 to `n` into a single large number. It uses `BigInt` for precision since the result can be enormous. The key insight is the `bits` counter: it tracks how many bits are needed to represent each number by detecting **powers of 2** using the bitwise trick `(i & (i - 1)) === 0` (when true, `i` is a power of 2, so the bit width increases). For each number `i`, the function shifts the accumulated result left by `bits` positions and then ORs it with `i` to append `i`'s binary form, keeping the result manageable by taking modulo `1000000007n` at each step. Finally, it converts the `BigInt` result back to a regular `Number` for return. For example, if `n = 3`, it concatenates `1` (binary: `1`) + `10` (binary: `2`) + `11` (binary: `3`) to get `11011` in binary (27 in decimal).",
+    "status": "DONE",
+    "cpuUsage": 47.83,
+    "memoryUsage": 47.83,
+    "date": "2026-02-28T10:06:51.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @return {number}\n */\nvar concatenatedBinary = function (n) {\n    const MOD = 1e9 + 7;\n    let result = 0;\n\n    for (let i = 1; i <= n; i++) {\n        const bitLength = Math.floor(Math.log2(i)) + 1;\n        result = ((result * (1 << bitLength)) % MOD + i) % MOD;\n    }\n\n    return result;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function **concatenates the binary representations** of all numbers from 1 to `n` into a single binary number and returns the result modulo `1e9 + 7`. Here's how it works: it loops through each number `i` from 1 to `n`, calculates how many bits are needed to represent `i` using `Math.log2(i)`, then shifts the accumulated `result` left by that many bit positions (using `result * (1 << bitLength)`) and adds `i` to it. For example, if `n=3`, it concatenates binary `1` + binary `10` + binary `11` = `\"11011\"` (which equals 27 in decimal). The modulo operation (`% MOD`) keeps the number from overflowing by taking the remainder when divided by `1e9 + 7`.",
+    "status": "DONE",
+    "cpuUsage": 84.78,
+    "memoryUsage": 97.83,
+    "date": "2026-02-28T10:07:45.000Z"
+  }
+]

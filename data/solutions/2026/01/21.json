@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number[]}\n */\nvar minBitwiseArray = function(nums) {\n    let res = [];\n    \n    for (const num of nums) {\n        let cur = -1;\n\n        if (num % 2 === 0) {\n            res.push(cur);\n            continue;\n        }\n\n        const bin = num.toString(2);\n        for (let i = 0; i < bin.length; i++) {\n            if (bin[i] === '1') {\n                const candidate = num - 2 ** (bin.length - 1 - i);\n\n                if ((candidate | (candidate + 1)) === num) {\n                    cur = candidate;\n                    break;\n                }\n            }\n        }\n\n        res.push(cur);\n    }\n\n    return res;\n};\n\n//  3 -  011 ->  001\n//  5 -  101 ->  100\n//  7 -  111 ->  011\n// 11 - 1011 -> 1001\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds the **minimum value** for each number in the input array such that when bitwise-OR'd with that value plus one, it equals the original number. For each number, it first checks if it's **even** — if so, it returns **-1** since no valid value exists. For **odd numbers**, it converts the number to binary and iterates through each bit position containing a `1`. For each position, it tries subtracting the corresponding power of 2 as a candidate, then tests if `candidate | (candidate + 1)` equals the original number. When a valid candidate is found, it's the minimum value because the algorithm tests positions from the most significant bit downward, and the bitwise operation `x | (x+1)` fills the gap between consecutive bits.",
+    "status": "DONE",
+    "cpuUsage": 0,
+    "memoryUsage": 66.67,
+    "date": "2026-01-21T07:31:38.000Z"
+  }
+]

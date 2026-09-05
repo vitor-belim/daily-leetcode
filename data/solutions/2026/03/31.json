@@ -1,0 +1,79 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} str1\n * @param {string} str2\n * @return {string}\n */\nvar generateString = function (str1, str2) {\n    const n = str1.length;\n    const m = str2.length;\n    const len = n + m - 1;\n    const dp = new Array(len).fill('a');\n    const fixed = new Array(len).fill(0);\n\n    for (let i = 0; i < n; i++) {\n        if (str1[i] === 'T') {\n            for (let j = i; j < i + m; j++) {\n                if (fixed[j] === 1 && dp[j] !== str2[j - i]) {\n                    return '';\n                }\n\n                dp[j] = str2[j - i];\n                fixed[j] = 1;\n            }\n        }\n    }\n\n    for (let i = 0; i < n; i++) {\n        if (str1[i] === 'F') {\n            let flag = false;\n            let idx = -1;\n\n            for (let j = i + m - 1; j >= i; j--) {\n                if (str2[j - i] !== dp[j]) {\n                    flag = true;\n                }\n                if (idx === -1 && fixed[j] === 0) {\n                    idx = j;\n                }\n            }\n\n            if (flag) continue;\n            if (idx === -1) return '';\n\n            dp[idx] = 'b';\n        }\n    }\n\n    return dp.join('');\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution builds a string by processing two constraint strings: for each `'T'` in `str1`, it locks a substring window to match `str2` at that position (returning empty if conflict), and for each `'F'` it checks if the current window already matches `str2`; if so, it finds the rightmost unfixed character and changes it to `'b'` to make the window unequal.",
+    "status": "DONE",
+    "cpuUsage": 18.75,
+    "memoryUsage": 81.25,
+    "date": "2026-03-31T08:17:18.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} str1\n * @param {string} str2\n * @return {string}\n */\nvar generateString = function (str1, str2) {\n    const n = str1.length;\n    const m = str2.length;\n    const len = n + m - 1;\n    const dp = new Array(len).fill('a');\n    const fixed = new Array(len).fill(0);\n\n    for (let i = 0; i < n; i++) {\n        if (str1[i] === 'T') {\n            for (let j = i; j < i + m; j++) {\n                if (fixed[j] === 1 && dp[j] !== str2[j - i]) {\n                    return '';\n                }\n\n                dp[j] = str2[j - i];\n                fixed[j] = 1;\n            }\n        }\n    }\n\n    for (let i = 0; i < n; i++) {\n        if (str1[i] === 'F') {\n            let flag = false;\n            let idx = -1;\n\n            for (let j = i + m - 1; j >= i; j--) {\n                if (str2[j - i] !== dp[j]) {\n                    flag = true;\n                    break;\n                }\n                if (idx === -1 && fixed[j] === 0) {\n                    idx = j;\n                }\n            }\n\n            if (flag) continue;\n            if (idx === -1) return '';\n\n            dp[idx] = 'b';\n        }\n    }\n\n    return dp.join('');\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Similar to Solution 1 but adds a `break` statement when a mismatch is found during the `'F'` processing, optimizing the inner loop by exiting early once a non-matching character is discovered instead of checking all characters.",
+    "status": "DONE",
+    "cpuUsage": 37.5,
+    "memoryUsage": 87.5,
+    "date": "2026-03-31T08:18:44.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} str1\n * @param {string} str2\n * @return {string}\n */\nvar generateString = function (str1, str2) {\n    const n = str1.length;\n    const m = str2.length;\n    const len = n + m - 1;\n    const dp = new Array(len).fill('a');\n    const fixed = new Array(len).fill(0);\n\n    for (let i = 0; i < n; i++) {\n        if (str1[i] === 'T') {\n            for (let j = i; j < i + m; j++) {\n                if (fixed[j] === 1 && dp[j] !== str2[j - i]) {\n                    return '';\n                }\n\n                dp[j] = str2[j - i];\n                fixed[j] = 1;\n            }\n        }\n    }\n\n    outer_loop: for (let i = 0; i < n; i++) {\n        if (str1[i] === 'F') {\n            let idx = -1;\n\n            for (let j = i + m - 1; j >= i; j--) {\n                if (str2[j - i] !== dp[j]) {\n                    continue outer_loop;\n                }\n\n                if (idx === -1 && fixed[j] === 0) {\n                    idx = j;\n                    break;\n                }\n            }\n\n            if (idx === -1) return '';\n\n            dp[idx] = 'b';\n        }\n    }\n\n    return dp.join('');\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This uses a labeled `outer_loop` to skip to the next `'F'` constraint when the window doesn't match, and finds the rightmost unfixed position to set to `'b'` with an additional `break` after finding it, combining early exit for both matching checks and position searching.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-03-31T08:20:27.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} str1\n * @param {string} str2\n * @return {string}\n */\nvar generateString = function (str1, str2) {\n    const n = str1.length;\n    const m = str2.length;\n    const len = n + m - 1;\n    const dp = new Array(len).fill('a');\n    const fixed = new Array(len).fill(0);\n\n    for (let i = 0; i < n; i++) {\n        if (str1[i] === 'T') {\n            for (let j = i; j < i + m; j++) {\n                if (fixed[j] === 1 && dp[j] !== str2[j - i]) {\n                    return '';\n                }\n\n                dp[j] = str2[j - i];\n                fixed[j] = 1;\n            }\n        }\n    }\n\n    outer_loop: for (let i = 0; i < n; i++) {\n        if (str1[i] === 'F') {\n            let idx = -1;\n\n            for (let j = i + m - 1; j >= i; j--) {\n                if (str2[j - i] !== dp[j]) {\n                    continue outer_loop;\n                }\n\n                if (idx === -1 && fixed[j] === 0) {\n                    idx = j;\n                }\n            }\n\n            if (idx === -1) return '';\n\n            dp[idx] = 'b';\n        }\n    }\n\n    return dp.join('');\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Like Solution 2 but continues iterating through all positions in the window to find the rightmost unfixed character, without breaking after finding the first one; this ensures the very last free position gets selected even if multiple exist.",
+    "status": "DONE",
+    "cpuUsage": 81.25,
+    "memoryUsage": 68.75,
+    "date": "2026-03-31T08:22:09.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} str1\n * @param {string} str2\n * @return {string}\n */\nvar generateString = function (str1, str2) {\n    const n = str1.length;\n    const m = str2.length;\n    const len = n + m - 1;\n    const dp = new Array(len).fill('a');\n    const fixed = new Array(len).fill(0);\n\n    for (let i = 0; i < n; i++) {\n        if (str1[i] === 'T') {\n            for (let j = i; j < i + m; j++) {\n                if (fixed[j] === 1 && dp[j] !== str2[j - i]) {\n                    return '';\n                }\n\n                dp[j] = str2[j - i];\n                fixed[j] = 1;\n            }\n        }\n    }\n\n    outer_loop: for (let i = 0; i < n; i++) {\n        if (str1[i] === 'F') {\n            if (dp.slice(i, i + m).join('') !== str2) {\n                continue;\n            }\n\n            let idx = -1;\n\n            for (let j = i + m - 1; j >= i; j--) {\n                if (fixed[j] === 0) {\n                    idx = j;\n                    break;\n                }\n            }\n\n            if (idx === -1) {\n                return '';\n            }\n\n            dp[idx] = 'b';\n        }\n    }\n\n    return dp.join('');\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Uses `dp.slice(i, i + m).join('')` to compare the entire window as a single string against `str2`, which is more concise than character-by-character comparison; then finds the rightmost unfixed position and sets it to `'b'`.",
+    "status": "DONE",
+    "cpuUsage": 6.25,
+    "memoryUsage": 12.5,
+    "date": "2026-03-31T08:27:28.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} str1\n * @param {string} str2\n * @return {string}\n */\nvar generateString = function (str1, str2) {\n    const n = str1.length;\n    const m = str2.length;\n    const len = n + m - 1;\n    const dp = new Array(len).fill('a');\n    const fixed = new Array(len).fill(0);\n\n    for (let i = 0; i < n; i++) {\n        if (str1[i] === 'T') {\n            for (let j = i; j < i + m; j++) {\n                if (fixed[j] === 1 && dp[j] !== str2[j - i]) {\n                    return '';\n                }\n\n                dp[j] = str2[j - i];\n                fixed[j] = 1;\n            }\n        }\n    }\n\n    outer_loop: for (let i = 0; i < n; i++) {\n        if (str1[i] === 'F') {\n            for (let j = i; j < i + m; j++) {\n                if (dp[j] !== str2[j - i]) {\n                    continue outer_loop;\n                }\n            }\n\n            let idx = -1;\n\n            for (let j = i + m - 1; j >= i; j--) {\n                if (fixed[j] === 0) {\n                    idx = j;\n                    break;\n                }\n            }\n\n            if (idx === -1) {\n                return '';\n            }\n\n            dp[idx] = 'b';\n        }\n    }\n\n    return dp.join('');\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Explicitly loops through each position in the window to verify all characters match `str2` before attempting to place `'b'`, continuing to the next `'F'` via labeled break if any mismatch is found; this makes the matching logic more explicit.",
+    "status": "DONE",
+    "cpuUsage": 87.5,
+    "memoryUsage": 43.75,
+    "date": "2026-03-31T08:29:38.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} str1\n * @param {string} str2\n * @return {string}\n */\nvar generateString = function (str1, str2) {\n    const n = str1.length;\n    const m = str2.length;\n    const len = n + m - 1;\n    const dp = new Array(len).fill('a');\n    const fixed = new Array(len).fill(0);\n\n    for (let i = 0; i < n; i++) {\n        if (str1[i] === 'T') {\n            for (let j = i; j < i + m; j++) {\n                if (fixed[j] === 1 && dp[j] !== str2[j - i]) {\n                    return '';\n                }\n\n                dp[j] = str2[j - i];\n                fixed[j] = 1;\n            }\n        }\n    }\n\n    outer_loop: for (let i = 0; i < n; i++) {\n        if (str1[i] === 'F') {\n            for (let j = i; j < i + m; j++) {\n                if (dp[j] !== str2[j - i]) {\n                    continue outer_loop;\n                }\n            }\n\n            for (let j = i + m - 1; j >= i; j--) {\n                if (fixed[j] === 0) {\n                    dp[j] = 'b';\n                    continue outer_loop;\n                }\n            }\n\n            return '';\n        }\n    }\n\n    return dp.join('');\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Sets the character to `'b'` immediately upon finding the rightmost unfixed position and continues to the next `'F'` constraint, returning empty string only if no unfixed position exists; this interleaves the modification with the search rather than separating validation and mutation.",
+    "status": "DONE",
+    "cpuUsage": 87.5,
+    "memoryUsage": 93.75,
+    "date": "2026-03-31T08:34:53.000Z"
+  }
+]

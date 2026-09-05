@@ -1,0 +1,35 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} arr\n * @param {number} d\n * @return {number}\n */\nvar maxJumps = function(arr, d) {\n    const n = arr.length;\n    const dp = new Array(n);\n\n    const dfs = (pos) => {\n        if (dp[pos] !== undefined) {\n            return dp[pos];\n        }\n\n        let start = pos;\n        let end = pos;\n\n        while (start > 0 && arr[start - 1] < arr[pos] && pos - start < d) {\n            start--;\n        }\n        while (end < n - 1 && arr[end + 1] < arr[pos] && end - pos < d) {\n            end++;\n        }\n\n        let max = 0;\n\n        for (let i = start; i <= end; i++) {\n            if (i !== pos) {\n                max = Math.max(max, dfs(i) + 1);\n            }\n        }\n\n        dp[pos] = max;\n\n        return max;\n    };\n\n    for (let i = 0; i < n; i++) {\n        dfs(i);\n    }\n\n    //console.log(dp);\n\n    return Math.max(...dp) + 1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses **memoization** with a `dp` array to avoid recalculating jumps from the same position. The `dfs` function first identifies the contiguous range of positions that can be jumped to by scanning left and right to find indices where the adjacent value is strictly smaller and within the maximum distance `d`. Once the valid range `[start, end]` is determined, it recursively explores each position in that range, computing the maximum jumps possible from each candidate and caching the result. The overall answer is the maximum value found across all starting positions, plus one to account for the initial position.",
+    "status": "DONE",
+    "cpuUsage": 56,
+    "memoryUsage": 64,
+    "date": "2026-05-24T09:06:00.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} arr\n * @param {number} d\n * @return {number}\n */\nvar maxJumps = function(arr, d) {\n    const n = arr.length;\n    const dp = new Array(n);\n\n    const dfs = (pos) => {\n        if (dp[pos] !== undefined) {\n            return dp[pos];\n        }\n\n        let s = pos - 1;\n        let e = pos + 1;\n        let max = 0;\n\n        while (s >= 0 && arr[s] < arr[pos] && pos - s <= d) {\n            max = Math.max(max, dfs(s) + 1);\n            s--;\n        }\n        while (e < n && arr[e] < arr[pos] && e - pos <= d) {\n            max = Math.max(max, dfs(e) + 1);\n            e++;\n        }\n\n        dp[pos] = max;\n        return max;\n    };\n\n    let res = 0;\n\n    for (let i = 0; i < n; i++) {\n        res = Math.max(res, dfs(i));\n    }\n\n    return res + 1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution also uses **memoization** to cache results, but instead of pre-computing a contiguous range, the `dfs` function directly explores positions in both directions—moving left by decrementing `s` and moving right by incrementing `e`—while verifying that adjacent values are strictly smaller and within distance `d`. For each valid position encountered, it immediately makes a recursive call and updates a running `max` variable with the result plus one. This approach interleaves boundary checking with recursive exploration, ultimately returning the maximum value found plus one to account for the starting position.",
+    "status": "DONE",
+    "cpuUsage": 52,
+    "memoryUsage": 56,
+    "date": "2026-05-24T09:16:39.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} arr\n * @param {number} d\n * @return {number}\n */\nvar maxJumps = function(arr, d) {\n    const n = arr.length;\n    const dp = new Array(n);\n\n    const dfs = (pos) => {\n        if (dp[pos] !== undefined) {\n            return dp[pos];\n        }\n\n        let max = 1;\n\n        for (let i = 1; i <= d; i++) {\n            if (pos - i < 0 || arr[pos - i] >= arr[pos]) break;\n\n            max = Math.max(max, dfs(pos - i) + 1);\n        }\n\n        for (let i = 1; i <= d; i++) {\n            if (pos + i >= n || arr[pos + i] >= arr[pos]) break;\n\n            max = Math.max(max, dfs(pos + i) + 1);\n        }\n\n        dp[pos] = max;\n        return max;\n    };\n\n    let res = 1;\n\n    for (let i = 0; i < n; i++) {\n        res = Math.max(res, dfs(i));\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses **memoization** and explores neighbors by stepping exactly `i` positions in each direction (from 1 to `d`), stopping early when a boundary is hit or a value greater than or equal to the current position is encountered. The `dfs` function initializes `max` to 1 (representing the current position alone) and recursively calculates the maximum jumps from each valid neighbor, taking the overall maximum. Since the count begins at 1, the final answer is returned directly without incrementing, making this approach slightly more efficient in its initialization logic.",
+    "status": "DONE",
+    "cpuUsage": 68,
+    "memoryUsage": 68,
+    "date": "2026-05-24T09:42:02.000Z"
+  }
+]

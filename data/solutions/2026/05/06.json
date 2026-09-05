@@ -1,0 +1,46 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {character[][]} box\n * @return {character[][]}\n */\nvar rotateTheBox = function(box) {\n    const rows = box.length;\n    const cols = box[0].length;\n\n    const moveStone = (r, c) => {\n        let nc = c;\n\n        while (nc + 1 < cols && box[r][nc + 1] === '.') {\n            nc++;\n        }\n\n        box[r][c] = '.';\n        box[r][nc] = '#';\n    };\n\n    for (let row = 0; row < rows; row++) {\n        for (let col = cols - 1; col >= 0; col--) {\n            if (box[row][col] === '#') {\n                moveStone(row, col);\n            }\n        }\n    }\n\n    const turnedBox = Array(cols).fill().map(_ => Array(rows).fill(0));\n\n    for (let row = 0; row < rows; row++) {\n        for (let col = 0; col < cols; col++) {\n            turnedBox[col][rows - 1 - row] = box[row][col];\n        }\n    }\n\n    return turnedBox;\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution rotates a box containing stones and obstacles in two phases: first, it **applies gravity** to each row by moving all stones (`#`) to the right as far as they can go before hitting an obstacle (`*`) or the edge, using a helper function `moveStone` that finds the rightmost empty space for each stone; then it **rotates the entire grid 90 degrees clockwise** by transposing and reversing positions using the transformation `turnedBox[col][rows - 1 - row] = box[row][col]`, which effectively moves rows to columns and applies the rotation.",
+    "status": "DONE",
+    "cpuUsage": 6.45,
+    "memoryUsage": 100,
+    "date": "2024-11-23T09:33:49.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {character[][]} box\n * @return {character[][]}\n */\nvar rotateTheBox = function(box) {\n    const rows = box.length;\n    const cols = box[0].length;\n    const rotatedBox = Array(cols).fill().map(_ => Array(rows).fill(0));\n\n    const moveStone = (r, c) => {\n        let nr = r;\n\n        while (nr + 1 < cols && rotatedBox[nr + 1][c] === '.') {\n            nr++;\n        }\n\n        rotatedBox[r][c] = '.';\n        rotatedBox[nr][c] = '#';\n    };\n\n    for (let row = 0; row < rows; row++) {\n        const newRow = rows - 1 - row;\n        for (let col = cols - 1; col >= 0; col--) {\n            rotatedBox[col][newRow] = box[row][col];\n\n            if (rotatedBox[col][newRow] === '#') {\n                moveStone(col, newRow);\n            }\n        }\n    }\n\n    return rotatedBox;\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution combines rotation and gravity in a **single pass** by first copying each cell from the original box to the rotated position (`rotatedBox[col][newRow]`), then immediately applying gravity to stones by moving them downward in the rotated grid using `moveStone`, which shifts each stone (`#`) down as far as possible until it hits an obstacle (`*`) or the bottom edge—this optimized approach avoids the separate gravity and rotation phases by interleaving both operations.",
+    "status": "DONE",
+    "cpuUsage": 6.45,
+    "memoryUsage": 100,
+    "date": "2024-11-23T09:41:31.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {character[][]} box\n * @return {character[][]}\n */\nvar rotateTheBox = function(box) {\n    const rows = box.length;\n    const cols = box[0].length;\n    const rotatedBox = Array(cols).fill().map(_ => Array(rows).fill('.'));\n\n    const moveStone = (r, c) => {\n        let nr = r;\n\n        while (nr + 1 < cols && rotatedBox[nr + 1][c] === '.') {\n            nr++;\n        }\n\n        rotatedBox[r][c] = '.';\n        rotatedBox[nr][c] = '#';\n    };\n\n    for (let row = 0; row < rows; row++) {\n        const newRow = rows - 1 - row;\n        for (let col = cols - 1; col >= 0; col--) {\n            if (box[row][col] !== '.') {\n                rotatedBox[col][newRow] = box[row][col];\n\n                if (rotatedBox[col][newRow] === '#') {\n                    moveStone(col, newRow);\n                }\n            }\n        }\n    }\n\n    return rotatedBox;\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Similar to the previous solution, this version **combines rotation and gravity in one pass**, but with a key optimization: it pre-fills the rotated grid with `'.'` (empty spaces) and **only copies non-empty cells** from the original box (checking `if (box[row][col] !== '.')`), avoiding unnecessary writes and ensuring stones are placed in their final positions while obstacles (`*`) remain in place, making the code cleaner and slightly more efficient.",
+    "status": "DONE",
+    "cpuUsage": 6.45,
+    "memoryUsage": 95.16,
+    "date": "2024-11-23T09:45:06.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {character[][]} box\n * @return {character[][]}\n */\nvar rotateTheBox = function(box) {\n    const m = box.length;\n    const n = box[0].length;\n\n    const res = Array.from({ length: n }, () => Array(m).fill('.'));\n\n    for (let row = 0; row < m; row++) {\n        const irow = m - 1 - row;\n        let max = n - 1;\n\n        for (let col = max; col >= 0; col--) {\n            if (box[row][col] === '#') {\n                box[row][col] = res[col][irow] = box[row][max];\n                box[row][max] = res[max][irow] = '#';\n                max--;\n            } else if (box[row][col] === '*') {\n                res[col][irow] = box[row][col];\n                max = col - 1;\n            }\n        }\n    }\n\n    return res;\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is the **most optimized solution**, using a clever in-place technique that processes each row from right to left while building the rotated result: for each stone (`#`), it **bubbles it to the rightmost available position** (`max`), then places it in the result grid at the rotated coordinate; when an obstacle (`*`) is encountered, it **resets the rightmost boundary** (`max = col - 1`) since stones cannot pass through obstacles—this single-pass algorithm efficiently handles both rotation and gravity simultaneously with minimal operations.",
+    "status": "DONE",
+    "cpuUsage": 96.77,
+    "memoryUsage": 54.84,
+    "date": "2026-05-06T08:15:15.000Z"
+  }
+]

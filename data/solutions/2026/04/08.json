@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number[][]} queries\n * @return {number}\n */\nvar xorAfterQueries = function(nums, queries) {\n    const mod = 10 ** 9 + 7;\n\n    for (const [l, r, k, v] of queries) {\n        let idx = l;\n\n        while (idx <= r) {\n            nums[idx] = (nums[idx] * v) % mod;\n            idx += k;\n        }\n    }\n\n    return nums.reduce((acc, el) => acc ^ el, 0);\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function processes an array of numbers through a series of **queries**, where each query specifies a **range** (`l` to `r`), a **step size** (`k`), and a **multiplier** (`v`). For each query, the function iterates through elements at indices `l`, `l + k`, `l + 2k`, etc., up to index `r`, **multiplying each element by `v`** and keeping the result within bounds using modulo `10^9 + 7`. After all queries have been applied, the function returns the **XOR of all elements** in the modified array (computed using `reduce` to combine all values with the `^` operator).",
+    "status": "DONE",
+    "cpuUsage": 56.25,
+    "memoryUsage": 25,
+    "date": "2026-04-08T09:29:56.000Z"
+  }
+]

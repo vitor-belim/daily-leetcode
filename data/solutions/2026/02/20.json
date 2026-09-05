@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {string}\n */\nvar makeLargestSpecial = function (s) {\n    let count = 0;\n    let i = 0;\n    let res = [];\n\n    for (let j = 0; j < s.length; j++) {\n        if (s[j] === '1') {\n            count++;\n        } else {\n            count--;\n        }\n\n        if (count === 0) {\n            const current = s.substring(i + 1, j);\n            const special = makeLargestSpecial(current);\n            res.push(\"1\" + special + \"0\");\n            i = j + 1;\n        }\n    }\n\n    res.sort().reverse();\n\n    return res.join(\"\");\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function recursively rearranges a string of `1`s and `0`s to create the **lexicographically largest special string**, where a special string has equal `1`s and `0`s with all prefixes having at least as many `1`s as `0`s. The algorithm uses a **counter** that increments for each `1` and decrements for each `0`; whenever the counter reaches zero, it has found a balanced \"special\" section delimited by matching `1` at the start and `0` at the end. For each balanced section, it **recursively processes the inner content** (the substring between the outer `1` and `0`) and wraps it back with `\"1\" + special + \"0\"`. Finally, it **sorts all processed sections in reverse order** and joins them together, ensuring the lexicographically largest result appears first.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 67.12,
+    "date": "2026-02-20T09:11:48.000Z"
+  }
+]

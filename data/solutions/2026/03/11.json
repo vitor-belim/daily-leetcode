@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @return {number}\n */\nvar bitwiseComplement = function(n) {\n    return parseInt(n.toString(2).split('').map(x => x === '1' ? '0' : '1').join(''), 2);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution converts the number to a **binary string** using `toString(2)`, then **splits it into characters**, **maps each bit** (flipping '1' to '0' and vice versa), **joins them back** into a string, and finally **converts the result back to decimal** using `parseInt` with radix 2. It's a concise functional approach that chains string operations to flip all bits in one expression.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 46.27,
+    "date": "2026-03-11T09:06:44.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @return {number}\n */\nvar bitwiseComplement = function(n) {\n    const bin = n.toString(2);\n    const last = bin.length - 1;\n    let res = 0;\n\n    for (let i = last; i >= 0; i--) {\n        if (bin[i] === '0') {\n            res += 1 << (last - i);\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution takes a more explicit approach by first converting the number to a **binary string**, then iterating through each bit from **right to left**. For every '0' bit found, it uses **bitwise left shift** (`1 << position`) to add the corresponding power of 2 to the result, effectively flipping all zero bits to one. This avoids string manipulation and builds the complemented number directly through bit operations.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 13.43,
+    "date": "2026-03-11T09:10:19.000Z"
+  }
+]

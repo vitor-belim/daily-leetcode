@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} squares\n * @return {number}\n */\nvar separateSquares = function (squares) {\n    let max_y = 0,\n        total_area = 0;\n    for (const [x, y, l] of squares) {\n        total_area += l * l;\n        max_y = Math.max(max_y, y + l);\n    }\n\n    const check = (limit_y) => {\n        let area = 0;\n        for (const [x, y, l] of squares) {\n            if (y < limit_y) {\n                area += l * Math.min(limit_y - y, l);\n            }\n        }\n        return area >= total_area / 2;\n    };\n\n    let lo = 0,\n        hi = max_y;\n    const eps = 1e-5;\n    while (Math.abs(hi - lo) > eps) {\n        const mid = (hi + lo) / 2;\n        if (check(mid)) {\n            hi = mid;\n        } else {\n            lo = mid;\n        }\n    }\n    return hi;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses **binary search** to find a horizontal line that divides squares into two equal areas. It first calculates the total area of all squares and the maximum y-coordinate, then repeatedly checks how much area lies below a candidate line using the `check` function. The search converges when the area below equals approximately half the total area, using an epsilon threshold (`1e-5`) for floating-point precision to determine when to stop.",
+    "status": "DONE",
+    "cpuUsage": 80,
+    "memoryUsage": 60,
+    "date": "2026-01-13T09:30:49.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} squares\n * @return {number}\n */\nvar separateSquares = function (squares) {\n    let lo = 0;\n    let hi = 2e9;\n\n    for (let i = 0; i < 60; i++) {\n        let mid = (lo + hi) / 2;\n        let diff = helper(mid, squares);\n\n        if (diff > 0) {\n            lo = mid;\n        } else {\n            hi = mid;\n        }\n    }\n\n    return hi;\n};\n\nconst helper = (line, squares) => {\n    const n = squares.length;\n    let aAbove = 0;\n    let aBelow = 0;\n\n    for (let i = 0; i < n; i++) {\n        let x = squares[i][0], y = squares[i][1];\n        let l = squares[i][2];\n        let total = l * l;\n\n        if (line <= y) {\n            aAbove += total;\n        } else if (line >= y + l) {\n            aBelow += total;\n        } else {\n            let aboveHeight = (y + l) - line;\n            let belowHeight = line - y;\n            aAbove += l * aboveHeight;\n            aBelow += l * belowHeight;\n        }\n    }\n\n    return aAbove - aBelow;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution also uses **binary search** to find the dividing line, but with a fixed iteration count (60) rather than epsilon-based convergence. The `helper` function calculates the difference between area above and below a candidate line—if positive, there's more area above so the search moves the line up; if negative, more area is below so it moves down. After exactly 60 iterations of halving the search range, it returns the final line position, which provides sufficient precision for the given constraints.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 100,
+    "date": "2026-01-13T09:33:22.000Z"
+  }
+]

@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @return {number}\n */\nvar numOfWays = function(n) {\n    let res = 0;\n\n    const dfs = (cell, grid) => {\n        const row = Math.floor(cell / 3);\n        const col = cell % 3;\n\n        if (row >= n) {\n            res++;\n            return;\n        }\n\n        if ((row === 0 || grid[row - 1][col] !== 'R') && (col === 0 || grid[row][col - 1] !== 'R')) {\n            grid[row][col] = 'R';\n            dfs(cell + 1, grid);\n        }\n\n        if ((row === 0 || grid[row - 1][col] !== 'Y') && (col === 0 || grid[row][col - 1] !== 'Y')) {\n            grid[row][col] = 'Y';\n            dfs(cell + 1, grid);\n        }\n\n        if ((row === 0 || grid[row - 1][col] !== 'G') && (col === 0 || grid[row][col - 1] !== 'G')) {\n            grid[row][col] = 'G';\n            dfs(cell + 1, grid);\n        }\n    };\n\n    dfs(0, Array.from({ length: n }, () => Array(3)));\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution counts the ways to paint an `n × 3` grid with three colors (**Red**, **Yellow**, **Green**) so that no two adjacent cells share a color, using **brute-force backtracking**. It walks through the grid one cell at a time — `dfs(cell, grid)` converts the flat index `cell` into a `row` and `col` (via `Math.floor(cell / 3)` and `cell % 3`) — and for each cell it tries all three colors, but only places a color if it doesn't clash with the cell **above** (`grid[row - 1][col]`) or the cell to the **left** (`grid[row][col - 1]`). Whenever a color is allowed, it paints the cell and recurses to the next one; once `row >= n`, the whole grid has been validly painted, so the counter `res` is incremented. Because it literally enumerates every valid coloring one by one, the number of paths grows **exponentially** with `n`, which is why this approach runs out of time (**TLE**) on large inputs.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-01-03T11:01:50.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @return {number}\n */\nvar numOfWays = function(n) {\n    const MOD = 10 ** 9 + 7;\n    let A = 6;\n    let B = 6;\n\n    for (let i = 2; i <= n; i++) {\n        const newA = (2 * A + 2 * B) % MOD;\n        const newB = (2 * A + 3 * B) % MOD;\n        A = newA;\n        B = newB;\n    }\n\n    return (A + B) % MOD;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses **dynamic programming** built on a key insight: any valid coloring of a single 3-cell row falls into one of two shapes — an *ABA* pattern (the two outer cells share a color, like Red-Yellow-Red) or an *ABC* pattern (all three cells differ), and there are exactly **6 of each** for the first row, giving the starting values `A = 6` and `B = 6`. Counting how one row can sit on top of another shows that a row below an *ABA* row can be one of `3` *ABA* + `2` *ABC* patterns, while a row below an *ABC* row allows `2` of each — which yields the recurrences `newA = 2 * A + 2 * B` and `newB = 2 * A + 3 * B`. The loop applies these transitions once per additional row, keeping every value reduced modulo `10^9 + 7` to avoid overflow, and the final answer is simply `(A + B) % MOD`. By tracking only two aggregate counts instead of enumerating actual grids, it runs in **O(n)** time with **O(1)** memory — a massive improvement over the exponential backtracking approach.",
+    "status": "DONE",
+    "cpuUsage": 30,
+    "memoryUsage": 70,
+    "date": "2026-01-03T11:03:11.000Z"
+  }
+]

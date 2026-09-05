@@ -1,0 +1,35 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} mat\n * @param {number} k\n * @return {boolean}\n */\nvar areSimilar = function(mat, k) {\n    const m = mat.length;\n    const n = mat[0].length;\n    const mv = k % m;\n\n    for (let r = 0; r < m; r++) {\n        for (let c = 0; c < n; c++) {\n            const val = c & 1 ? mat[r][(c - mv + n) % n] : mat[r][(c + mv) % n];\n\n            if (val !== mat[r][c]) {\n                return false;\n            }\n        }\n    }\n\n    return true;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function checks if a matrix appears similar after applying cyclic rotations `k` times. It computes `mv` as the effective number of row-based shift operations (k modulo the row count). For each element in the matrix, it determines what value should be at that position after the rotations by shifting column indices differently based on whether the column is odd or even—using bitwise AND (`c & 1`) to check parity. If any element doesn't match its expected rotated value, it returns `false`; otherwise, it returns `true` indicating the matrix remains similar.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-03-27T09:29:00.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} mat\n * @param {number} k\n * @return {boolean}\n */\nvar areSimilar = function(mat, k) {\n    const m = mat.length;\n    const n = mat[0].length;\n    const mv = k % n;\n\n    for (let r = 0; r < m; r++) {\n        for (let c = 0; c < n; c++) {\n            const val = c & 1 ? mat[r][(c - mv + n) % n] : mat[r][(c + mv) % n];\n\n            if (val !== mat[r][c]) {\n                return false;\n            }\n        }\n    }\n\n    return true;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function validates whether a matrix remains similar after `k` cyclic rotations by computing `mv` as the effective column-based shift (k modulo the column count). It iterates through every element in the matrix and determines the expected position of each value after rotation by using column index arithmetic—with alternating left and right shifts based on column parity (using `c & 1` for odd/even detection). The function returns `true` only if every element matches its expected rotated position, otherwise `false`.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 65.79,
+    "date": "2026-03-27T09:29:59.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} mat\n * @param {number} k\n * @return {boolean}\n */\nvar areSimilar = function(mat, k) {\n    const m = mat.length;\n    const n = mat[0].length;\n    const mv = k % n;\n\n    for (let row = 0; row < m; row++) {\n        for (let col = 0; col < n; col++) {\n            const shift = col & 1 ? mv : -mv;\n            const nc = (col + shift + n) % n;\n\n            if (mat[row][nc] !== mat[row][col]) {\n                return false;\n            }\n        }\n    }\n\n    return true;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution checks matrix similarity after `k` cyclic rotations using a cleaner approach with explicit variable names. It calculates `mv` as the effective column shift (k modulo column count), then for each matrix element, it determines the new column position after rotation by applying either a positive or negative shift depending on column parity (odd columns shift one way, even columns the opposite way). The modulo operation with `n` ensures the new column index wraps around. If all elements match their expected positions after rotation, the function returns `true`; otherwise `false`.",
+    "status": "DONE",
+    "cpuUsage": 42.11,
+    "memoryUsage": 76.32,
+    "date": "2026-03-27T09:44:45.000Z"
+  }
+]

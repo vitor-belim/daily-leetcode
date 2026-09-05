@@ -1,0 +1,79 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for singly-linked list.\n * function ListNode(val, next) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.next = (next===undefined ? null : next)\n * }\n */\n/**\n * @param {ListNode} head\n * @param {number} k\n * @return {ListNode}\n */\nvar rotateRight = function(head, k) {\n    const dummy = new ListNode(-1, head);\n\n    let node = head;\n    let count = 0;\n    while (node) {\n        count++;\n        node = node.next;\n    }\n\n    k = count - (k % count);\n\n    node = head;\n    while (k > 1) {\n        node = node.next;\n        k--;\n    }\n\n    const temp = node.next;\n    node.next = null;\n    dummy.next = temp;\n\n    node = temp;\n    while (node && node.next) {\n        node = node.next;\n    }\n    node.next = head;\n\n    return dummy.next;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses a **dummy node** as a helper and counts the list length to calculate the effective rotation amount with `k = count - (k % count)`. It traverses to the split point, **disconnects** the list there, and then **reconnects** the second part as the new head while attaching the original head at the end. However, it lacks explicit edge-case handling for empty lists or when no rotation is needed.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2024-11-05T07:55:40.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for singly-linked list.\n * function ListNode(val, next) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.next = (next===undefined ? null : next)\n * }\n */\n/**\n * @param {ListNode} head\n * @param {number} k\n * @return {ListNode}\n */\nvar rotateRight = function(head, k) {\n    if (!head) return head;\n\n    const dummy = new ListNode(-1, head);\n\n    let node = head;\n    let count = 0;\n    while (node) {\n        count++;\n        node = node.next;\n    }\n\n    k = count - (k % count);\n\n    node = head;\n    while (k > 1) {\n        node = node.next;\n        k--;\n    }\n\n    const temp = node.next;\n    node.next = null;\n    dummy.next = temp;\n\n    node = temp;\n    while (node && node.next) {\n        node = node.next;\n    }\n    node.next = head;\n\n    return dummy.next;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is identical to Solution 1 but adds an early return check for **empty lists** (`if (!head) return head`), making it more defensive against null inputs and preventing potential errors when the list is empty.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2024-11-05T07:56:14.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for singly-linked list.\n * function ListNode(val, next) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.next = (next===undefined ? null : next)\n * }\n */\n/**\n * @param {ListNode} head\n * @param {number} k\n * @return {ListNode}\n */\nvar rotateRight = function(head, k) {\n    if (!head) return head;\n\n    const dummy = new ListNode(-1, head);\n\n    let node = head;\n    let count = 0;\n    while (node) {\n        count++;\n        node = node.next;\n    }\n\n    k = count - (k % count);\n\n    if (count === 1 || k === 0) {\n        return head;\n    }\n\n    node = head;\n    while (k > 1) {\n        node = node.next;\n        k--;\n    }\n\n    const temp = node.next;\n    node.next = null;\n    dummy.next = temp;\n\n    node = temp;\n    while (node && node.next) {\n        node = node.next;\n    }\n\n    if (node) {\n        node.next = head;\n    }\n\n    return dummy.next;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Building on Solution 2, this version adds **additional safety checks**: it returns early if the list has only **one element** (`count === 1`) or when **no rotation is needed** (`k === 0`), plus it includes a **null check** before reconnecting the tail to avoid undefined behavior.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2024-11-05T07:58:44.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for singly-linked list.\n * function ListNode(val, next) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.next = (next===undefined ? null : next)\n * }\n */\n/**\n * @param {ListNode} head\n * @param {number} k\n * @return {ListNode}\n */\nvar rotateRight = function(head, k) {\n    if (!head) return head;\n\n    const dummy = new ListNode(-1, head);\n\n    let node = head;\n    let count = 0;\n    while (node) {\n        count++;\n        node = node.next;\n    }\n\n    k = count - (k % count);\n\n    if (count === 1 || k === 0 || k === count) {\n        return head;\n    }\n\n    node = head;\n    while (k > 1) {\n        node = node.next;\n        k--;\n    }\n\n    const temp = node.next;\n    node.next = null;\n    dummy.next = temp;\n\n    node = temp;\n    while (node && node.next) {\n        node = node.next;\n    }\n\n    if (node) {\n        node.next = head;\n    }\n\n    return dummy.next;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This extends Solution 3 by adding one more condition to the early-return check: `k === count`, which catches cases where the **calculated rotation results in no change** and avoids unnecessary pointer manipulation.",
+    "status": "DONE",
+    "cpuUsage": 21.96,
+    "memoryUsage": 100,
+    "date": "2024-11-05T07:59:57.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for singly-linked list.\n * function ListNode(val, next) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.next = (next===undefined ? null : next)\n * }\n */\n/**\n * @param {ListNode} head\n * @param {number} k\n * @return {ListNode}\n */\nvar rotateRight = function(head, k) {\n    if (!head || k === 0) return head;\n\n    const dummy = new ListNode(-1, head);\n\n    let node = head;\n    let count = 0;\n    while (node) {\n        count++;\n        node = node.next;\n    }\n\n    k = count - (k % count);\n\n    if (count === 1 || k === 0 || k === count) {\n        return head;\n    }\n\n    node = head;\n    while (k > 1) {\n        node = node.next;\n        k--;\n    }\n\n    const temp = node.next;\n    node.next = null;\n    dummy.next = temp;\n\n    node = temp;\n    while (node && node.next) {\n        node = node.next;\n    }\n\n    if (node) {\n        node.next = head;\n    }\n\n    return dummy.next;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This combines **early termination checks** for both null input and zero rotation (`if (!head || k === 0)`) at the very beginning before any counting, then applies the same logic as Solution 4 for improved efficiency and clearer intent.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 100,
+    "date": "2024-11-05T08:00:38.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for singly-linked list.\n * function ListNode(val, next) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.next = (next===undefined ? null : next)\n * }\n */\n/**\n * @param {ListNode} head\n * @param {number} k\n * @return {ListNode}\n */\nvar rotateRight = function(head, k) {\n    if (!head || k === 0) return head;\n\n    const dummy = new ListNode(-1, head);\n\n    let node = head;\n    let count = 0;\n    while (node) {\n        count++;\n        node = node.next;\n    }\n\n    k = count - (k % count);\n\n    if (count === 1 || k === 0 || k === count) {\n        return head;\n    }\n\n    node = head;\n    while (k > 1) {\n        node = node.next;\n        k--;\n    }\n\n    dummy.next = node.next;\n    node.next = null;\n\n    node = dummy.next;\n    while (node.next) {\n        node = node.next;\n    }\n\n    node.next = head;\n\n    return dummy.next;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Nearly identical to Solution 5, this version has a subtle **optimization in the reconnection logic**: instead of using a temporary variable, it directly assigns `dummy.next = node.next` before `node.next = null`, eliminating the extra variable and making the pointer updates slightly more efficient.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 100,
+    "date": "2024-11-05T08:05:25.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for singly-linked list.\n * function ListNode(val, next) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.next = (next===undefined ? null : next)\n * }\n */\n/**\n * @param {ListNode} head\n * @param {number} k\n * @return {ListNode}\n */\nvar rotateRight = function(head, k) {\n    if (!head) return null;\n    if (k === 0) return head;\n\n    let node = head;\n    let prev = null;\n    let count = 0;\n\n    while (node) {\n        prev = node;\n        node = node.next;\n        count++;\n    }\n\n    k %= count;\n\n    if (k === 0) return head;\n\n    let tail = prev;\n    let flips = count - k;\n\n    node = head;\n    prev = null;\n\n    while (flips > 0) {\n        prev = node;\n        node = node.next;\n        flips--;\n    }\n\n    if (prev) prev.next = null;\n    if (tail) tail.next = head;\n\n    return node;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This takes a **fundamentally different approach** by eliminating the dummy node entirely. It counts the list while tracking the **tail node**, calculates effective rotation, then traverses to find the **new tail position**. It directly **disconnects** at the new tail and **reconnects** the old tail to the original head, returning the new head without helper structures.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 50.44,
+    "date": "2026-05-05T09:15:22.000Z"
+  }
+]

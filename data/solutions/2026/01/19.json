@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} mat\n * @param {number} threshold\n * @return {number}\n */\nvar maxSideLength = function (mat, threshold) {\n    const m = mat.length;\n    const n = mat[0].length;\n    const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));\n\n    for (let i = 1; i <= m; i++) {\n        for (let j = 1; j <= n; j++) {\n            dp[i][j] = dp[i - 1][j] + dp[i][j - 1] - dp[i - 1][j - 1] + mat[i - 1][j - 1];\n        }\n    }\n\n    const getRect = (x1, y1, x2, y2) => {\n        return dp[x2][y2] - dp[x1 - 1][y2] - dp[x2][y1 - 1] + dp[x1 - 1][y1 - 1];\n    };\n\n    const r = Math.min(m, n);\n    let res = 0;\n\n    for (let i = 1; i <= m; i++) {\n        for (let j = 1; j <= n; j++) {\n            for (let c = res + 1; c <= r; c++) {\n                if (i + c - 1 <= m &&\n                    j + c - 1 <= n &&\n                    getRect(i, j, i + c - 1, j + c - 1) <= threshold) {\n                    res = c;\n                } else {\n                    break;\n                }\n            }\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds the **largest square** you can fit in a 2D matrix where the sum of all elements inside doesn't exceed a `threshold`. It works by first building a **prefix sum array** (`dp`) that lets it calculate the sum of any rectangular region in constant time using the formula `sum(rect) = dp[x2][y2] - dp[x1-1][y2] - dp[x2][y1-1] + dp[x1-1][y1-1]`. Then it systematically checks every possible position in the matrix, and at each position it tests increasingly larger squares (incrementing the side length) until it finds one that exceeds the threshold. Since it tracks the best result found so far, it returns the **maximum side length** of any square that stays within the threshold limit.",
+    "status": "DONE",
+    "cpuUsage": 75,
+    "memoryUsage": 75,
+    "date": "2026-01-19T09:14:32.000Z"
+  }
+]

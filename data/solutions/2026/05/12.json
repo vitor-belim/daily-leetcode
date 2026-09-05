@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} tasks\n * @return {number}\n */\nvar minimumEffort = function(tasks) {\n    let total = 0;\n    let curr = 0;\n\n    tasks.sort((a, b) => {\n        const diffA = Math.abs(a[0] - a[1]);\n        const diffB = Math.abs(b[0] - b[1]);\n\n        return diffA === diffB ? b[1] - a[1] : diffB - diffA;\n    });\n\n    for (const [actual, minimum] of tasks) {\n        const diff = Math.max(0, minimum - curr);\n\n        total += diff;\n        curr += diff - actual;\n    }\n\n    return total;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds the **minimum total energy effort** needed to complete all tasks in an optimal order. It sorts tasks by their **energy cost difference** (`|actual - minimum|`) in descending order—prioritizing tasks with larger differences, and breaking ties by preferring tasks with higher minimum energy requirements. Then, for each task in this sorted order, it calculates how much **additional energy must be gained** from previous tasks to meet that task's minimum energy threshold using `Math.max(0, minimum - curr)`, adds this to the total effort, and updates the current energy level by subtracting the actual energy consumed by the task (`curr += diff - actual`). The greedy approach of tackling high-difference tasks first ensures that the energy gained from earlier tasks can be reused efficiently for later ones, minimizing the overall energy expenditure needed.",
+    "status": "DONE",
+    "cpuUsage": 28.57,
+    "memoryUsage": 21.43,
+    "date": "2026-05-12T09:01:00.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} tasks\n * @return {number}\n */\nvar minimumEffort = function(tasks) {\n    tasks.sort((a, b) => {\n        const diffA = a[1] - a[0];\n        const diffB = b[1] - b[0];\n\n        return diffA === diffB ? b[1] - a[1] : diffB - diffA;\n    });\n\n    let total = 0;\n    let curr = 0;\n\n    for (const [actual, minimum] of tasks) {\n        const diff = Math.max(0, minimum - curr);\n\n        total += diff;\n        curr += diff - actual;\n    }\n\n    return total;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function solves an optimal **task scheduling problem** by sorting tasks in a strategic order and then calculating the minimum total effort needed. Each task has an **actual cost** and a **minimum required energy level**, and the algorithm sorts them by their **difference** (`minimum - actual`) in descending order, with ties broken by minimum energy level. It then processes tasks sequentially, maintaining a **current energy level** (`curr`): for each task, it calculates how much extra effort is needed to meet that task's minimum energy requirement (`diff = max(0, minimum - curr)`), adds that to the total effort, and updates the current energy by adding the gained effort and subtracting the task's actual cost. This greedy approach ensures you tackle high-payoff tasks first, minimizing the total energy you need to gain throughout the process.",
+    "status": "DONE",
+    "cpuUsage": 71.43,
+    "memoryUsage": 14.29,
+    "date": "2026-05-12T09:04:39.000Z"
+  }
+]

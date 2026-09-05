@@ -1,0 +1,57 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {character[][]} grid\n * @return {boolean}\n */\nvar containsCycle = function(grid) {\n    const m = grid.length;\n    const n = grid[0].length;\n\n    const dfs = (x, y, px, py, seen) => {\n        if (x < 0 || x >= m || y < 0 || y >= n) return false;\n        if (px > -1 && py > -1 && grid[x][y] !== grid[px][py]) return false;\n        if (seen.has(x + ',' + y)) return true;\n\n        seen.add(x + ',' + y);\n\n        let res = false;\n        if (x + 1 !== px) res |= dfs(x + 1, y, x, y, seen);\n        if (y + 1 !== py) res |= dfs(x, y + 1, x, y, seen);\n        if (x - 1 !== px) res |= dfs(x - 1, y, x, y, seen);\n        if (y - 1 !== py) res |= dfs(x, y - 1, x, y, seen);\n\n        //seen.delete(x + ',' + y);\n\n        return res;\n    };\n\n    let seen = new Set();\n\n    for (let i = 0; i < m; i++) {\n        for (let j = 0; j < n; j++) {\n            if (!seen.has(i + ',' + j)) {\n                const curSet = new Set();\n\n                if (dfs(i, j, -1, -1, curSet)) {\n                    console.log(i, j);\n                    return true;\n                }\n\n                seen = seen.union(curSet);\n            }\n        }\n    }\n\n    return false;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code detects whether a **2D grid contains a cycle of connected cells** with the same character value. It uses **depth-first search (DFS)** to explore each unvisited cell and its adjacent neighbors that share the same character — if it encounters a cell it's already visited in the current search (tracked in `curSet`), a cycle is found and the function returns `true`. The algorithm iterates through every cell in the grid using nested loops, and for each unvisited cell, it initiates a DFS traversal that checks all four directions (down, right, up, left) while skipping the parent cell to avoid immediately backtracking. The `seen` set accumulates all visited cells across all traversals to avoid restarting searches on already-explored cells, and if no cycle is detected after examining the entire grid, it returns `false`. Essentially, it's checking if there's any closed loop formed by adjacent cells containing the same character.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-04-26T09:00:47.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {character[][]} grid\n * @return {boolean}\n */\nvar containsCycle = function(grid) {\n    const m = grid.length;\n    const n = grid[0].length;\n\n    const dfs = (x, y, px, py, seen) => {\n        if (x < 0 || x >= m || y < 0 || y >= n) return false;\n        if (px > -1 && py > -1 && grid[x][y] !== grid[px][py]) return false;\n        if (seen.has(x + ',' + y)) return true;\n\n        seen.add(x + ',' + y);\n\n        let res = false;\n        if (x + 1 !== px) res |= dfs(x + 1, y, x, y, seen);\n        if (y + 1 !== py) res |= dfs(x, y + 1, x, y, seen);\n        if (x - 1 !== px) res |= dfs(x - 1, y, x, y, seen);\n        if (y - 1 !== py) res |= dfs(x, y - 1, x, y, seen);\n\n        //seen.delete(x + ',' + y);\n\n        return res;\n    };\n\n    let seen = new Set();\n\n    for (let i = 0; i < m; i++) {\n        for (let j = 0; j < n; j++) {\n            if (!seen.has(i + ',' + j) && dfs(i, j, -1, -1, seen)) {\n                return true;\n            }\n        }\n    }\n\n    return false;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function detects whether a **2D grid contains a cycle** formed by cells with **identical characters**. It uses **depth-first search (DFS)** starting from each unvisited cell, tracking visited cells in a `Set`. The DFS explores all four directions (up, down, left, right) while checking three conditions: if we go out of bounds or encounter a cell with a different character, we return `false`; if we revisit an already-visited cell (that isn't our parent), we've found a **cycle** and return `true`; and it cleverly avoids going backward to the parent cell by checking if the next position is the parent position. By iterating through the entire grid and launching DFS from each unvisited cell, the function returns `true` as soon as any cycle is detected, or `false` if the entire grid is traversed without finding one.",
+    "status": "DONE",
+    "cpuUsage": 36,
+    "memoryUsage": 52,
+    "date": "2026-04-26T09:05:50.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {character[][]} grid\n * @return {boolean}\n */\nvar containsCycle = function(grid) {\n    const m = grid.length;\n    const n = grid[0].length;\n\n    const dfs = (x, y, px, py, seen) => {\n        if (seen.has(x + ',' + y)) return true;\n\n        seen.add(x + ',' + y);\n\n        let res = false;\n        if (x + 1 < m && x + 1 !== px && grid[x + 1][y] === grid[x][y]) res |= dfs(x + 1, y, x, y, seen);\n        if (y + 1 < n && y + 1 !== py && grid[x][y + 1] === grid[x][y]) res |= dfs(x, y + 1, x, y, seen);\n        if (x > 0 && x - 1 !== px && grid[x - 1][y] === grid[x][y]) res |= dfs(x - 1, y, x, y, seen);\n        if (y > 0 && y - 1 !== py && grid[x][y - 1] === grid[x][y]) res |= dfs(x, y - 1, x, y, seen);\n\n        return res;\n    };\n\n    let seen = new Set();\n\n    for (let i = 0; i < m; i++) {\n        for (let j = 0; j < n; j++) {\n            if (!seen.has(i + ',' + j) && dfs(i, j, -1, -1, seen)) {\n                return true;\n            }\n        }\n    }\n\n    return false;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function **detects if a cycle exists in a grid** by using **depth-first search (DFS)** to explore connected cells containing the same character. It maintains a `seen` set to track visited cells and for each unvisited cell, it initiates a DFS that recursively explores all four directions (up, down, left, right). The key is the `px, py` parameters (previous x and y coordinates), which prevent the algorithm from counting the cell we just came from as a false cycle—if we encounter a **cell that's already visited** and it's **not our parent**, we've found a genuine cycle. The outer loops iterate through every cell in the grid, and if any DFS returns `true`, the function immediately returns `true`; otherwise, it returns `false`, indicating no cycles exist.",
+    "status": "DONE",
+    "cpuUsage": 36,
+    "memoryUsage": 48,
+    "date": "2026-04-26T09:20:48.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {character[][]} grid\n * @return {boolean}\n */\nvar containsCycle = function(grid) {\n    const m = grid.length;\n    const n = grid[0].length;\n\n    const dfs = (x, y, px, py, seen) => {\n        if (seen[x][y]) return true;\n\n        seen[x][y] = true;\n\n        let res = false;\n        if (x + 1 < m && x + 1 !== px && grid[x + 1][y] === grid[x][y]) res |= dfs(x + 1, y, x, y, seen);\n        if (y + 1 < n && y + 1 !== py && grid[x][y + 1] === grid[x][y]) res |= dfs(x, y + 1, x, y, seen);\n        if (x > 0 && x - 1 !== px && grid[x - 1][y] === grid[x][y]) res |= dfs(x - 1, y, x, y, seen);\n        if (y > 0 && y - 1 !== py && grid[x][y - 1] === grid[x][y]) res |= dfs(x, y - 1, x, y, seen);\n\n        return res;\n    };\n\n    const seen = Array.from({ length: m }, () => Array(n).fill(false));\n\n    for (let i = 0; i < m; i++) {\n        for (let j = 0; j < n; j++) {\n            if (!seen[i][j] && dfs(i, j, -1, -1, seen)) {\n                return true;\n            }\n        }\n    }\n\n    return false;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function **detects if a cycle exists in a grid** of characters using **depth-first search (DFS)**. It treats cells with the same character as connected nodes in a graph, where the algorithm explores all unvisited adjacent cells (up, down, left, right) that share the same character value. The `dfs` function marks each visited cell and recursively explores neighbors while avoiding backtracking to the parent cell (using `px` and `py` to track where it came from). If the algorithm reaches a cell that's already been visited—and it's not the cell we just came from—then a cycle is detected. The main loop iterates through each unvisited cell in the grid, initiating a DFS from that cell, and returns `true` if any DFS finds a cycle, otherwise returns `false`.",
+    "status": "DONE",
+    "cpuUsage": 96,
+    "memoryUsage": 78,
+    "date": "2026-04-26T09:23:09.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {character[][]} grid\n * @return {boolean}\n */\nvar containsCycle = function(grid) {\n    const m = grid.length;\n    const n = grid[0].length;\n    const seen = Array.from({ length: m }, () => Array(n).fill(false));\n\n    const dfs = (x, y, px, py) => {\n        if (seen[x][y]) return true;\n\n        seen[x][y] = true;\n\n        let res = false;\n        if (x + 1 < m && x + 1 !== px && grid[x + 1][y] === grid[x][y]) res |= dfs(x + 1, y, x, y);\n        if (!res && y + 1 < n && y + 1 !== py && grid[x][y + 1] === grid[x][y]) res |= dfs(x, y + 1, x, y);\n        if (!res && x > 0 && x - 1 !== px && grid[x - 1][y] === grid[x][y]) res |= dfs(x - 1, y, x, y);\n        if (!res && y > 0 && y - 1 !== py && grid[x][y - 1] === grid[x][y]) res |= dfs(x, y - 1, x, y);\n\n        return res;\n    };\n\n    for (let i = 0; i < m; i++) {\n        for (let j = 0; j < n; j++) {\n            if (!seen[i][j] && dfs(i, j, -1, -1)) {\n                return true;\n            }\n        }\n    }\n\n    return false;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code **detects if a grid contains a cycle** — a path of adjacent cells with the **same character** that loops back on itself. It uses **depth-first search (DFS)** to explore connected cells: it maintains a `seen` array to track visited cells, and the `dfs` function recursively explores all four directions (up, down, left, right) from each position, but skips the cell it just came from (using `px` and `py` to track the parent) to avoid false positives. If it encounters a cell that's already `seen`, it found a cycle and returns `true`; if it revisits any cell through a different path without going backwards, that confirms a cycle exists. The outer loop starts DFS from each unvisited cell in the grid, returning `true` if any path finds a cycle, otherwise `false`.",
+    "status": "DONE",
+    "cpuUsage": 96,
+    "memoryUsage": 76,
+    "date": "2026-04-26T09:26:29.000Z"
+  }
+]

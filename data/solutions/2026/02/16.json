@@ -1,0 +1,68 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n - a positive integer\n * @return {number} - a positive integer\n */\nvar reverseBits = function(n) {\n    let bin = n.toString(2);\n    bin = \"0\".repeat(32 - bin.length) + bin;\n\n    let sum = 0;\n\n    for (let i = 0; i < bin.length; i++) {\n        sum += bin[i] * (2 ** i);\n    }\n\n    return sum;\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function converts the integer `n` to a **binary string**, pads it to **32 bits** with leading zeros, then reconstructs the number by treating each binary digit as a coefficient for powers of 2, effectively **reversing the bit order** by iterating from index 0 (rightmost position) and multiplying each digit by `2^i` to place it in the reversed position.",
+    "status": "DONE",
+    "cpuUsage": 22.7,
+    "memoryUsage": 100,
+    "date": "2024-09-08T10:48:11.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n - a positive integer\n * @return {number} - a positive integer\n */\nvar reverseBits = function(n) {\n    let arr = n.toString(2);\n    arr = \"0\".repeat(32 - arr.length) + arr;\n    let num = 0;\n\n    for (let i = 0; i < arr.length; i++) {\n        num += arr[i] * (2 ** i);\n    }\n\n    return num;\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function is functionally **identical to the first approach** — it converts `n` to a padded 32-bit binary string and reconstructs the value by summing each digit multiplied by powers of 2, reversing the bit positions in the process; the only difference is variable naming (`arr` and `num` instead of `bin` and `sum`).",
+    "status": "DONE",
+    "cpuUsage": 5.93,
+    "memoryUsage": 100,
+    "date": "2024-12-11T08:53:43.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n - a positive integer\n * @return {number} - a positive integer\n */\nvar reverseBits = function (n) {\n    let res = 0;\n\n    for (let i = 0; i < 32; i++) {\n        res = res << 1;        // Shift res left\n        res += (n & 1);        // Add the least significant bit of n to res\n        n = n >>> 1;           // Shift n to the right (unsigned shift)\n    }\n\n    return res >>> 0;          // Ensure the result is unsigned\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function performs **bitwise reversal** by iterating 32 times: in each iteration, it **left-shifts** `res` by 1 bit, adds the **least significant bit** of `n` using `n & 1`, then **right-shifts** `n` by 1 using the unsigned operator `>>>`, progressively building the reversed value from the rightmost bit of the input.",
+    "status": "DONE",
+    "cpuUsage": 22.7,
+    "memoryUsage": 100,
+    "date": "2024-12-11T08:55:51.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n - a positive integer\n * @return {number} - a positive integer\n */\nvar reverseBits = function (n) {\n    return parseInt(\n        n.toString(2)\n            .padStart(32, \"0\")\n            .split('')\n            .reverse()\n            .join(''),\n        2\n    );\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function reverses bits by first converting `n` to a **binary string**, padding it to 32 characters, **splitting** it into an array of characters, **reversing** the array order, joining back into a string, and finally **parsing** that reversed binary string back to a decimal number.",
+    "status": "DONE",
+    "cpuUsage": 5.93,
+    "memoryUsage": 100,
+    "date": "2024-12-11T08:58:57.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n - a positive integer\n * @return {number} - a positive integer\n */\nvar reverseBits = function (n) {\n    let result = 0;\n\n    for (let i = 0; i < 32; i++) {\n        result = (result << 1) | (n & 1);\n        n >>= 1;\n    }\n\n    return result >>> 0;\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function uses **bitwise operations** to reverse bits over 32 iterations: it combines left-shifting `result` by 1 and performing a **bitwise OR** (`|`) with the least significant bit of `n` (via `n & 1`) in one operation, then right-shifts `n` using the assignment operator `>>=`, ultimately reconstructing the reversed bit pattern.",
+    "status": "DONE",
+    "cpuUsage": 13.2,
+    "memoryUsage": 100,
+    "date": "2024-12-11T09:00:03.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n - a positive integer\n * @return {number} - a positive integer\n */\nvar reverseBits = function (n) {\n    return parseInt(n.toString(2).padStart(32, 0).split('').reverse().join(''), 2);\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is a **one-liner condensed version** of the string-manipulation approach that converts `n` to a 32-bit padded binary string, reverses the character order using `split().reverse().join()`, and parses the reversed string back to a decimal integer — achieving the same bit reversal as the longer implementations but in a single expression.",
+    "status": "DONE",
+    "cpuUsage": 62.61,
+    "memoryUsage": 26.85,
+    "date": "2026-02-16T09:26:46.000Z"
+  }
+]

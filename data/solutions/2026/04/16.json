@@ -1,0 +1,57 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number[]} queries\n * @return {number[]}\n */\nvar solveQueries = function(nums, queries) {\n    const n = nums.length;\n    const map = new Map();\n\n    for (let i = 0; i < n; i++) {\n        if (!map.has(nums[i])) {\n            map.set(nums[i], []);\n        }\n\n        const arr = map.get(nums[i]);\n\n        arr.push([i, Infinity]);\n\n        if (arr.length === 1) continue;\n\n        arr[0][1] = Math.min(arr[0][1], i - arr[0][0], n - (i - arr[0][0]));\n        arr[arr.length - 2][1] = Math.min(arr[arr.length - 2][1], i - arr[arr.length - 2][0], n - (i - arr[arr.length - 2][0]));\n        arr[arr.length - 1][1] = Math.min(i - arr[arr.length - 2][0], n - (i - arr[0][0]));\n    }\n\n    const res = [];\n\n    for (const query of queries) {\n        const arr = map.get(nums[query]) || [];\n        let temp = Infinity;\n\n        for (const [ position, closest ] of arr) {\n            if (position !== query) continue;\n\n            temp = closest;\n            break;\n        }\n\n        res.push(temp === Infinity ? -1 : temp);\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses a **Map** to group indices by their values, storing each occurrence as a **[index, closest_distance]** pair. As it iterates through the array, it updates the minimum distance to the nearest same-value element for the first, second-to-last, and newly added elements (calculating both linear and circular distances using modulo arithmetic). When processing queries, it searches through the stored array for each queried index to find its corresponding closest-distance value, returning **-1** if the element hasn't been encountered yet.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-04-16T09:47:55.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number[]} queries\n * @return {number[]}\n */\nvar solveQueries = function(nums, queries) {\n    const n = nums.length;\n    const map = new Map();\n\n    for (let i = 0; i < n; i++) {\n        if (!map.has(nums[i])) {\n            map.set(nums[i], []);\n        }\n\n        const arr = map.get(nums[i]);\n\n        arr.push([i, Infinity]);\n\n        if (arr.length === 1) continue;\n\n        arr[0][1] = Math.min(arr[0][1], i - arr[0][0], n - (i - arr[0][0]));\n        arr[arr.length - 2][1] = Math.min(arr[arr.length - 2][1], i - arr[arr.length - 2][0], n - (i - arr[arr.length - 2][0]));\n        arr[arr.length - 1][1] = Math.min(i - arr[arr.length - 2][0], n - (i - arr[0][0]));\n    }\n\n    const tempArr = [];\n\n    for (let i = n - 1; i >= 0; i--) {\n        const arr = map.get(nums[i]).pop();\n        tempArr.push(arr[1]);\n    }\n    tempArr.reverse();\n\n    const res = [];\n\n    for (const query of queries) {\n        res.push(tempArr[query] === Infinity ? -1 : tempArr[query]);\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution builds the same **Map** structure as Solution 1, tracking each value's occurrences with their closest-distance pairs, but optimizes the query phase by pre-computing all results in a `tempArr` array. It iterates backward through the original array, popping each element from its value's occurrence list and collecting its distance, then reverses the array to match the original indices—this allows queries to be answered in **O(1)** time with a simple array lookup instead of searching through the Map.",
+    "status": "DONE",
+    "cpuUsage": 16.67,
+    "memoryUsage": 5.55,
+    "date": "2026-04-16T10:04:44.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number[]} queries\n * @return {number[]}\n */\nvar solveQueries = function(nums, queries) {\n    const n = nums.length;\n    const map = new Map();\n\n    for (let i = 0; i < n; i++) {\n        let arr = map.get(nums[i]);\n\n        if (!arr) {\n            arr = [];\n            map.set(nums[i], arr);\n        }\n\n        arr.push([i, Infinity]);\n\n        if (arr.length === 1) continue;\n\n        arr[0][1] = Math.min(arr[0][1], i - arr[0][0], n - (i - arr[0][0]));\n        arr[arr.length - 2][1] = Math.min(arr[arr.length - 2][1], i - arr[arr.length - 2][0], n - (i - arr[arr.length - 2][0]));\n        arr[arr.length - 1][1] = Math.min(i - arr[arr.length - 2][0], n - (i - arr[0][0]));\n    }\n\n    const tempArr = [];\n\n    for (let i = n - 1; i >= 0; i--) {\n        const arr = map.get(nums[i]).pop();\n        tempArr.push(arr[1]);\n    }\n    tempArr.reverse();\n\n    return queries.map(query => tempArr[query] === Infinity ? -1 : tempArr[query]);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Functionally identical to Solution 2, this solution preprocesses distances in the same way (building a Map of occurrences and computing closest-distances as elements are added), then pre-computes results by popping and reversing into `tempArr`. The only differences are the initialization pattern (`map.get()` with a falsy check instead of `.has()`) and replacing the final loop with `.map()` for a more functional approach—both are equivalent implementations.",
+    "status": "DONE",
+    "cpuUsage": 5.56,
+    "memoryUsage": 11.11,
+    "date": "2026-04-16T10:09:11.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number[]} queries\n * @return {number[]}\n */\nvar solveQueries = function(nums, queries) {\n    const n = nums.length;\n    const map = new Map();\n\n    for (let i = 0; i < n; i++) {\n        let arr = map.get(nums[i]);\n\n        if (!arr) {\n            arr = [];\n            map.set(nums[i], arr);\n        }\n\n        arr.push([i, Infinity]);\n\n        if (arr.length === 1) continue;\n\n        const first = arr[0];\n        const prev = arr[arr.length - 2];\n        const curr = arr[arr.length - 1];\n\n        const diff1 = i - first[0];\n        const diff2 = i - prev[0];\n\n        first[1] = Math.min(first[1], diff1, n - diff1);\n        prev[1] = Math.min(prev[1], diff2, n - diff2);\n        curr[1] = Math.min(diff2, n - diff1);\n    }\n\n    const tempArr = [];\n\n    for (let i = n - 1; i >= 0; i--) {\n        const arr = map.get(nums[i]).pop();\n        tempArr.push(arr[1]);\n    }\n    tempArr.reverse();\n\n    return queries.map(query => tempArr[query] === Infinity ? -1 : tempArr[query]);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution mirrors Solutions 2 and 3 in its preprocessing and result-building logic, but improves code readability by extracting repeated distance calculations into variables (`diff1` and `diff2`). These variables represent the distance from the current position to the first and previous occurrences, respectively, avoiding redundant arithmetic operations and making the distance calculations more explicit and maintainable while preserving the same **O(1)** query performance.",
+    "status": "DONE",
+    "cpuUsage": 5.56,
+    "memoryUsage": 5.55,
+    "date": "2026-04-16T10:14:20.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number[]} queries\n * @return {number[]}\n */\nvar solveQueries = function(nums, queries) {\n    const n = nums.length;\n    const map = new Map();\n\n    for (let i = 0; i < n; i++) {\n        const arr = map.get(nums[i]);\n\n        if (!arr) {\n            map.set(nums[i], [[i, Infinity]]);\n            continue;\n        }\n\n        const first = arr[0];\n        const last = arr[arr.length - 1];\n\n        const diff1 = i - first[0];\n        const diff2 = i - last[0];\n\n        first[1] = Math.min(first[1], diff1, n - diff1);\n        last[1] = Math.min(last[1], diff2, n - diff2);\n\n        arr.push([i, Math.min(diff2, n - diff1)]);\n    }\n\n    const tempArr = [];\n\n    for (let i = n - 1; i >= 0; i--) {\n        const arr = map.get(nums[i]).pop();\n        tempArr.push(arr[1]);\n    }\n    tempArr.reverse();\n\n    return queries.map(query => tempArr[query] === Infinity ? -1 : tempArr[query]);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This optimized version takes a streamlined approach by handling the **first occurrence** of a value separately (directly initializing the Map entry instead of adding it to an empty array), then for subsequent occurrences it updates only the first and last elements' distances and immediately calculates the new entry's distance once (rather than updating it later). This reduces unnecessary distance recalculations compared to earlier solutions—particularly avoiding the second-to-last element tracking—while maintaining the same overall **O(n)** preprocessing and **O(1)** query performance.",
+    "status": "DONE",
+    "cpuUsage": 5.56,
+    "memoryUsage": 11.11,
+    "date": "2026-04-16T10:18:33.000Z"
+  }
+]

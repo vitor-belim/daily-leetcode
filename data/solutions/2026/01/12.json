@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} points\n * @return {number}\n */\nvar minTimeToVisitAllPoints = function(points) {\n    let res = 0;\n\n    for (let i = 1; i < points.length; i++) {\n        res += Math.max(\n            Math.abs(points[i][0] - points[i - 1][0]),\n            Math.abs(points[i][1] - points[i - 1][1]),\n        );\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function calculates the **minimum time to visit all points** by computing the **Chebyshev distance** (chessboard distance) between consecutive points. It iterates through each point starting from the second one, calculating the time for each step as the **maximum of the absolute differences** in x and y coordinates between the current and previous point. This works because in chessboard movement, moving diagonally or horizontally/vertically all take 1 time unit, so the longest axis determines the total time. The function returns the total accumulated time needed to visit all points in the given order.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 79.71,
+    "date": "2026-01-12T09:45:14.000Z"
+  }
+]

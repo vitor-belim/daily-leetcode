@@ -1,0 +1,46 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @param {number} minJump\n * @param {number} maxJump\n * @return {boolean}\n */\nvar canReach = function(s, minJump, maxJump) {\n    const n = s.length;\n    const memo = Array(n);\n\n    const dfs = (pos) => {\n        if (pos === n - 1) return true;\n        if (pos > n - 1) return false;\n        if (memo[pos] !== undefined) return memo[pos];\n\n        for (let i = Math.min(pos + maxJump, n - 1); i >= pos + minJump; i--) {\n            if (s[i] === '0' && dfs(i)) {\n                memo[pos] = true;\n                return true;\n            }\n        }\n\n        memo[pos] = false;\n        return false;\n    };\n\n    return dfs(0);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function determines whether you can reach the **last position** of a string by jumping only to positions containing `'0'`, where each jump must be between `minJump` and `maxJump` steps long. It uses **depth-first search (DFS) with memoization**: starting from position `0`, the `dfs` function recursively tries all valid jump destinations (positions between `pos + minJump` and `pos + maxJump` that contain `'0'`), returning `true` if any path reaches the end of the string (`pos === n - 1`), and `false` if no path works. **Memoization** (`memo` array) caches results for each position so we don't recalculate the same positions multiple times, making the algorithm efficient by avoiding redundant work.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-05-25T08:43:13.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @param {number} minJump\n * @param {number} maxJump\n * @return {boolean}\n */\nvar canReach = function(s, minJump, maxJump) {\n    if (s[s.length - 1] !== '0') {\n        return false;\n    }\n\n    const n = s.length;\n    const memo = Array(n);\n\n    const dfs = (pos) => {\n        if (pos === n - 1) return true;\n        if (pos > n - 1) return false;\n        if (memo[pos] !== undefined) return memo[pos];\n\n        for (let i = Math.min(pos + maxJump, n - 1); i >= pos + minJump; i--) {\n            if (s[i] === '0' && dfs(i)) {\n                memo[pos] = true;\n                return true;\n            }\n        }\n\n        memo[pos] = false;\n        return false;\n    };\n\n    return dfs(0);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code determines whether you can reach the **end** of a string by jumping between positions marked with `'0'`, where each jump must be between `minJump` and `maxJump` steps. It starts by checking if the last character is `'0'` (if not, reaching it is impossible, so return `false`). Then it uses **depth-first search with memoization** to explore all valid jump paths from the start: from any position, it tries jumping to every reachable `'0'` within the allowed jump range, recursively checking if each jump leads to the end. The `memo` array caches results for each position to avoid recalculating the same position multiple times, making the solution efficient. The function returns `true` if a valid path from position `0` to the last position exists, and `false` otherwise.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-05-25T08:45:33.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @param {number} minJump\n * @param {number} maxJump\n * @return {boolean}\n */\nvar canReach = function(s, minJump, maxJump) {\n    if (s[s.length - 1] !== '0') {\n        return false;\n    }\n\n    const n = s.length;\n    const memo = Array(n);\n\n    const dfs = (pos) => {\n        if (pos === 0) return true;\n        if (pos < 0) return false;\n        if (memo[pos] !== undefined) return memo[pos];\n\n        for (let i = Math.max(pos - maxJump, 0); i <= pos - minJump; i++) {\n            if (s[i] === '0' && dfs(i)) {\n                memo[pos] = true;\n                return true;\n            }\n        }\n\n        memo[pos] = false;\n        return false;\n    };\n\n    return dfs(n - 1);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code determines whether you can **jump from the end of a string to the beginning** by only landing on `'0'` characters. It starts by checking if the **last character is `'0'`** (if not, it's impossible to start), then uses a **recursive depth-first search with memoization** to explore all possible jumps backward. For each position, it checks every valid landing spot between `minJump` and `maxJump` steps away — if that landing spot contains a `'0'` and can eventually reach the start (position 0), then the current position is reachable. The **`memo` array caches results** to avoid recalculating the same positions, and the function finally returns whether we can reach **position 0 from the last position** (`n - 1`).",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-05-25T08:51:29.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @param {number} minJump\n * @param {number} maxJump\n * @return {boolean}\n */\nvar canReach = function(s, minJump, maxJump) {\n    if (s[s.length - 1] !== '0') return false;\n\n    const n = s.length;\n    const arr = Array(n + 1).fill(0);\n    arr[0] = 1;\n    arr[1] = -1;\n    let total = 0;\n\n    for (let i = 0; i < n; i++) {\n        total += arr[i];\n\n        if (s[i] === '0' && total > 0 && i + minJump < n) {\n            arr[i + minJump]++;\n            arr[Math.min(i + maxJump + 1, n)]--;\n        }\n    }\n\n    return total > 0;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code solves a **jump game problem** where you need to determine if you can reach the last character of a string by jumping only on **`'0'`s**, with each jump being between `minJump` and `maxJump` positions. It first checks if the last character is `'0'` (required to win); if not, it returns `false` immediately. Then it uses a **difference array** optimization to efficiently track reachable positions: as it iterates through the string, it maintains a running sum (`total`) that represents whether the current position can be reached from any previous position within the valid jump range. When it finds a reachable `'0'` at position `i`, it marks the range `[i + minJump, i + maxJump]` as containing new reachable positions by incrementing and decrementing specific indices in the `arr` array—this allows the algorithm to update an entire range in O(1) time instead of iterating through each position individually. Finally, it returns whether `total > 0` at the end, indicating at least one valid path exists to reach the destination.",
+    "status": "DONE",
+    "cpuUsage": 94.74,
+    "memoryUsage": 70.18,
+    "date": "2026-05-25T09:08:23.000Z"
+  }
+]

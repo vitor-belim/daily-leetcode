@@ -1,0 +1,112 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} commands\n * @param {number[][]} obstacles\n * @return {number}\n */\nvar robotSim = function(commands, obstacles) {\n    let coord = [0, 0];\n    let dir = 0;\n    let max = 0;\n\n    const dirs = [[0, 1], [1, 0], [0, -1], [-1, 0]];\n    const obsMap = {};\n\n    for (const [oX, oY] of obstacles) {\n        if (!obsMap[oX]) obsMap[oX] = {};\n        obsMap[oX][oY] = true;\n    }\n\n    for (const com of commands) {\n        if (com === -2) {\n            dir = dir === 0 ? 3 : dir - 1;\n        } else if (com === -1) {\n            dir = (dir + 1) % 4;\n        } else {\n            const [x, y] = dirs[dir];\n            const newX = coord[0] + com * x;\n            const newY = coord[1] + com * y;\n\n            while (coord[0] !== newX) {\n                if (obsMap[coord[0] + x]?.[coord[1]]) {\n                    break;\n                }\n                coord[0] += x;\n            }\n\n            while (coord[1] !== newY) {\n                if (obsMap[coord[0]]?.[coord[1] + y]) {\n                    break;\n                }\n                coord[1] += y;\n            }\n\n            const dist = coord[0] ** 2 + coord[1] ** 2;\n            if (dist > max) {\n                max = dist;\n            }\n        }\n    }\n\n    return max;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function simulates a robot moving on a 2D grid with obstacles. It tracks the robot's **position** (`coord`), **direction** (using an index into `dirs` array: north, east, south, west), and the **maximum squared distance** from the origin. The obstacles are precomputed into a nested object map (`obsMap`) for fast lookup. For each command, the robot either **turns left** (−2), **turns right** (−1), or moves forward by the command's value. When moving forward, the robot steps one unit at a time in the current direction, checking `obsMap` to stop if it encounters an obstacle; after completing the movement, it calculates the squared Euclidean distance (`x² + y²`) and updates the maximum if needed. Finally, it returns the maximum squared distance the robot reached during its journey.",
+    "status": "DONE",
+    "cpuUsage": 32.08,
+    "memoryUsage": 100,
+    "date": "2024-09-04T07:34:05.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} commands\n * @param {number[][]} obstacles\n * @return {number}\n */\nvar robotSim = function(commands, obstacles) {\n    let coord = [0, 0];\n    let dir = 0;\n    let max = 0;\n\n    const dirs = [[0, 1], [1, 0], [0, -1], [-1, 0]];\n    const obsMap = {};\n\n    for (const [oX, oY] of obstacles) {\n        if (!obsMap[oX]) obsMap[oX] = {};\n        obsMap[oX][oY] = true;\n    }\n\n    for (let com of commands) {\n        if (com === -2) {\n            dir = dir === 0 ? 3 : dir - 1;\n        } else if (com === -1) {\n            dir = (dir + 1) % 4;\n        } else {\n            const [x, y] = dirs[dir];\n\n            while (com > 0) {\n                const [newX, newY] = [coord[0] + x, coord[1] + y];\n\n                if (obsMap[newX] && obsMap[newX][newY]) {\n                    break;\n                }\n\n                coord = [newX, newY];\n                com--;\n            }\n\n            const dist = coord[0] ** 2 + coord[1] ** 2;\n            if (dist > max) {\n                max = dist;\n            }\n        }\n    }\n\n    return max;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code simulates a **robot moving on a 2D grid** that processes commands to turn and move forward while avoiding obstacles. The robot starts at the origin `[0, 0]` facing north, with commands being either **-2 (turn left)**, **-1 (turn right)**, or a **positive number (steps to move)**. The code uses a **`dirs` array** to track the four direction vectors (north, east, south, west) and cycles through them as the robot turns, and it pre-processes obstacles into a nested **`obsMap` object** for fast collision detection. For each move command, the robot advances one step at a time in its current direction, breaking immediately if it encounters an obstacle. After every move command, the code calculates the **squared Euclidean distance** from the origin (`x² + y²`) and tracks the maximum distance reached, which it returns at the end.",
+    "status": "DONE",
+    "cpuUsage": 20.75,
+    "memoryUsage": 100,
+    "date": "2024-09-04T07:49:44.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} commands\n * @param {number[][]} obstacles\n * @return {number}\n */\nvar robotSim = function(commands, obstacles) {\n    let coord = [0, 0];\n    let dir = 0;\n    let max = 0;\n\n    const dirs = [[0, 1], [1, 0], [0, -1], [-1, 0]];\n    const obsMap = {};\n\n    for (const [oX, oY] of obstacles) {\n        obsMap[oX + '_' + oY] = true;\n    }\n\n    for (let com of commands) {\n        if (com === -2) {\n            dir = dir === 0 ? 3 : dir - 1;\n        } else if (com === -1) {\n            dir = (dir + 1) % 4;\n        } else {\n            const [x, y] = dirs[dir];\n\n            while (com > 0) {\n                const [newX, newY] = [coord[0] + x, coord[1] + y];\n\n                if (obsMap[newX + '_' + newY]) {\n                    break;\n                }\n\n                coord = [newX, newY];\n                com--;\n            }\n\n            const dist = coord[0] ** 2 + coord[1] ** 2;\n            if (dist > max) {\n                max = dist;\n            }\n        }\n    }\n\n    return max;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code simulates a **robot moving on a 2D grid** that processes a series of movement commands while avoiding obstacles. The robot starts at the origin `[0, 0]` and faces **up** (one of four cardinal directions stored in the `dirs` array). For each command, it either **turns left** (`-2`), **turns right** (`-1`), or moves forward by a positive number of steps. Obstacles are stored in a hash map (`obsMap`) using a string key (`x_y`) for **O(1) lookup efficiency**. When moving, the robot advances one step at a time in its current direction, checking for collisions and **stopping if it would hit an obstacle**. After processing each movement command, the code calculates the **Euclidean distance squared** (`x² + y²`) from the origin and tracks the maximum distance reached. Finally, it returns the **maximum distance squared** the robot ever reached during its journey.",
+    "status": "DONE",
+    "cpuUsage": 16.98,
+    "memoryUsage": 43.4,
+    "date": "2024-09-04T07:51:08.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "var robotSim = function(commands, obstacles) {\n    // Store obstacles in a set for O(1) lookup\n    let obs = new Set();\n    for (let obstacle of obstacles) {\n        obs.add(obstacle[0] + \",\" + obstacle[1]);\n    }\n\n    // Direction vectors for [N, E, S, W]\n    const directionVectors = [\n        [0, 1],   // North -> +Y direction\n        [1, 0],   // East -> +X direction\n        [0, -1],  // South -> -Y direction\n        [-1, 0]   // West -> -X direction\n    ];\n\n    // Map for changing directions\n    const dirChangeMap = [\n        [3, 1], // N -> Left: W (index 3), Right: E (index 1)\n        [0, 2], // E -> Left: N (index 0), Right: S (index 2)\n        [1, 3], // S -> Left: E (index 1), Right: W (index 3)\n        [2, 0]  // W -> Left: S (index 2), Right: N (index 0)\n    ];\n\n    let currDirection = 0; // Start facing North\n    let x = 0, y = 0;\n    let maxDist = 0;\n\n    for (let command of commands) {\n        if (command > 0) {\n            let dx = directionVectors[currDirection][0];\n            let dy = directionVectors[currDirection][1];\n            for (let i = 0; i < command; i++) {\n                let nextX = x + dx;\n                let nextY = y + dy;\n                if (obs.has(nextX + \",\" + nextY)) {\n                    break;\n                }\n                x = nextX;\n                y = nextY;\n            }\n            maxDist = Math.max(maxDist, x * x + y * y);\n        } else {\n            currDirection = dirChangeMap[currDirection][command === -1 ? 1 : 0];\n        }\n    }\n\n    return maxDist;\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code simulates a **robot** moving on a 2D grid that starts at the origin `(0, 0)` facing **north**. The function processes a list of `commands` (positive integers for movement steps, negative for turns) while avoiding `obstacles` stored in a **Set** for fast lookup. It uses **direction vectors** to represent the four cardinal directions and a **direction map** to handle left/right turns by updating the current direction index. For each move command, the robot steps forward one unit at a time in its current direction, stopping immediately if it would hit an obstacle; after each movement sequence (or turn), it calculates and tracks the **maximum distance squared** from the origin by computing `x² + y²`. Finally, it returns this maximum squared distance as the farthest point the robot reached during its journey.",
+    "status": "DONE",
+    "cpuUsage": 98.11,
+    "memoryUsage": 100,
+    "date": "2024-09-04T07:59:39.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} commands\n * @param {number[][]} obstacles\n * @return {number}\n */\nvar robotSim = function(commands, obstacles) {\n    let coord = [0, 0];\n    let dir = 0;\n    let max = 0;\n\n    const dirs = [[0, 1], [1, 0], [0, -1], [-1, 0]];\n    const obsMap = new Set();\n\n    for (const [oX, oY] of obstacles) {\n        obsMap.add(oX + '_' + oY);\n    }\n\n    for (let com of commands) {\n        if (com === -2) {\n            dir = dir === 0 ? 3 : dir - 1;\n        } else if (com === -1) {\n            dir = (dir + 1) % 4;\n        } else {\n            const [x, y] = dirs[dir];\n\n            while (com > 0) {\n                const [newX, newY] = [coord[0] + x, coord[1] + y];\n\n                if (obsMap.has(newX + '_' + newY)) {\n                    break;\n                }\n\n                coord = [newX, newY];\n                com--;\n            }\n\n            const dist = coord[0] ** 2 + coord[1] ** 2;\n            if (dist > max) {\n                max = dist;\n            }\n        }\n    }\n\n    return max;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code simulates a **robot** moving on a 2D grid that processes movement and rotation commands while avoiding obstacles. The robot starts at the origin **[0, 0]** facing north and uses four possible directions stored in the `dirs` array: north **[0, 1]**, east **[1, 0]**, south **[0, -1]**, and west **[-1, 0]**. Obstacles are precomputed into a `Set` using string keys like `\"x_y\"` for fast collision detection. For each command, the robot either **turns left** (command `-2`), **turns right** (command `-1`), or **moves forward** a certain number of steps (positive numbers). When moving, the robot advances one step at a time in its current direction, stopping immediately if it would collide with an obstacle. After each movement command, the algorithm calculates the **squared distance** from the origin and tracks the maximum distance reached, returning that value as the final result.",
+    "status": "DONE",
+    "cpuUsage": 83.02,
+    "memoryUsage": 100,
+    "date": "2024-09-04T08:01:28.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} commands\n * @param {number[][]} obstacles\n * @return {number}\n */\nvar robotSim = function(commands, obstacles) {\n    let x = 0;\n    let y = 0;\n    let dir = 0;\n    let max = 0;\n\n    const dirs = [[0, 1], [1, 0], [0, -1], [-1, 0]];\n    const obsMap = new Set();\n\n    for (const [oX, oY] of obstacles) {\n        obsMap.add(oX + '_' + oY);\n    }\n\n    for (let com of commands) {\n        if (com === -2) {\n            dir = dir === 0 ? 3 : dir - 1;\n        } else if (com === -1) {\n            dir = (dir + 1) % 4;\n        } else {\n            const [nx, ny] = dirs[dir];\n\n            while (com > 0) {\n                const newX = x + nx;\n                const newY = y + ny;\n\n                if (obsMap.has(newX + '_' + newY)) {\n                    break;\n                }\n\n                x = newX;\n                y = newY;\n                com--;\n            }\n\n            const dist = x * x + y * y;\n            if (dist > max) {\n                max = dist;\n            }\n        }\n    }\n\n    return max;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code simulates a **robot moving on a 2D grid** that starts at the origin and follows a series of commands. The robot maintains its current **position (x, y)**, **direction** (represented as an index into a direction array: 0=north, 1=east, 2=south, 3=west), and the **maximum distance** it reaches from the origin. For each command, if it's **-2 the robot turns left**, if it's **-1 the robot turns right**, and if it's a **positive number the robot moves forward that many steps**—but crucially, it **stops early if it encounters an obstacle**, which are pre-stored in a `Set` using string keys (`\"x_y\"`) for fast O(1) lookup. After each move command, the code **updates the maximum Euclidean distance squared** (x² + y²) reached so far and returns it at the end, giving you the **farthest point from origin that the robot ever reached during its journey**.",
+    "status": "DONE",
+    "cpuUsage": 88.68,
+    "memoryUsage": 100,
+    "date": "2024-09-04T08:03:47.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} commands\n * @param {number[][]} obstacles\n * @return {number}\n */\nvar robotSim = function(commands, obstacles) {\n    let x = 0;\n    let y = 0;\n    let dir = 0;\n    let max = 0;\n\n    const dirs = [[0, 1], [1, 0], [0, -1], [-1, 0]];\n    const obsMap = new Set();\n\n    for (const obs of obstacles) {\n        obsMap.add(obs[0] + '_' + obs[1]);\n    }\n\n    for (let com of commands) {\n        if (com === -2) {\n            dir = dir === 0 ? 3 : dir - 1;\n        } else if (com === -1) {\n            dir = (dir + 1) % 4;\n        } else {\n            const nx = dirs[dir][0];\n            const ny = dirs[dir][1];\n\n            for (let i = 0; i < com; i++) {\n                const newX = x + nx;\n                const newY = y + ny;\n\n                if (obsMap.has(newX + '_' + newY)) {\n                    break;\n                }\n\n                x = newX;\n                y = newY;\n            }\n\n            const dist = x * x + y * y;\n            if (dist > max) {\n                max = dist;\n            }\n        }\n    }\n\n    return max;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code simulates a robot's movement on a 2D grid. The robot starts at **origin (0, 0)** and processes a series of **commands** — turning left (`-2`), turning right (`-1`), or moving forward by a given number of steps. The robot tracks its direction using an index into a **`dirs` array** representing four cardinal directions: north, east, south, and west. **Obstacles** are pre-loaded into a `Set` using stringified coordinates (`x_y`) for fast O(1) lookup. When executing a move command, the code steps forward **one unit at a time**, checking the obstacle set before each step and stopping early if it hits one. After each move command, the code calculates the **Euclidean distance squared** (`x² + y²`) from the origin and tracks the **maximum distance** reached. Finally, the function returns this **maximum distance squared** — the farthest point the robot traveled from its starting position.",
+    "status": "DONE",
+    "cpuUsage": 96.23,
+    "memoryUsage": 100,
+    "date": "2024-09-04T08:06:19.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} commands\n * @param {number[][]} obstacles\n * @return {number}\n */\nvar robotSim = function(commands, obstacles) {\n    let x = 0;\n    let y = 0;\n    let dir = 0;\n    let max = 0;\n\n    const dirs = [[0, 1], [1, 0], [0, -1], [-1, 0]];\n    const obsMap = new Set();\n\n    for (const obs of obstacles) {\n        obsMap.add(obs[0] + ',' + obs[1]);\n    }\n\n    for (let com of commands) {\n        if (com === -2) {\n            dir = dir === 0 ? 3 : dir - 1;\n        } else if (com === -1) {\n            dir = (dir + 1) % 4;\n        } else {\n            const nx = dirs[dir][0];\n            const ny = dirs[dir][1];\n\n            for (let i = 0; i < com; i++) {\n                const newX = x + nx;\n                const newY = y + ny;\n\n                if (obsMap.has(newX + ',' + newY)) {\n                    break;\n                }\n\n                x = newX;\n                y = newY;\n            }\n\n            const dist = x * x + y * y;\n            if (dist > max) {\n                max = dist;\n            }\n        }\n    }\n\n    return max;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code simulates a **robot moving on a 2D grid** starting at the origin. It maintains the robot's position (`x`, `y`), direction (`dir`), and tracks the **maximum distance squared** from origin reached during the journey. The `dirs` array defines four **cardinal directions** (north, east, south, west), and an `obsMap` **Set stores all obstacles as strings** (like `\"1,2\"`) for fast O(1) collision checking. For each command: **-2 turns left** (decreases direction with wrapping), **-1 turns right** (increases direction mod 4), and **positive integers move that many steps** forward in the current direction, stopping immediately if an obstacle blocks the path. After each movement command, it updates `max` to track the **largest distance squared** (`x² + y²`) ever reached, which is finally returned — this clever use of distance squared avoids expensive square-root calculations while still identifying the farthest point.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 100,
+    "date": "2024-09-04T08:09:19.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} commands\n * @param {number[][]} obstacles\n * @return {number}\n */\nvar robotSim = function(commands, obstacles) {\n    const moves = [[0, 1], [1, 0], [0, -1], [-1, 0]];\n    const obs = new Set(obstacles.map(x => x.toString()));\n\n    let dir = 0;\n    let x = 0;\n    let y = 0;\n    let maxDist = 0;\n\n    for (const cmd of commands) {\n        if (cmd < 0) {\n            const shift = cmd === -1 ? 1 : -1;\n            dir = (dir + shift + 4) % 4;\n            continue;\n        }\n\n        for (let i = 1; i <= cmd; i++) {\n            const nx = x + moves[dir][0];\n            const ny = y + moves[dir][1];\n\n            if (obs.has(nx + ',' + ny)) {\n                break;\n            }\n\n            x = nx;\n            y = ny;\n        }\n\n        maxDist = Math.max(maxDist, x * x + y * y);\n    }\n\n    return maxDist;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code simulates a **robot walking on a 2D grid** that receives movement and rotation commands. The robot tracks its direction using an index into the `moves` array (representing North, East, South, West), and converts obstacles into a **Set of coordinate strings** for fast collision detection. For each command, if it's **negative** (a turn: `-1` for left, `-2` for right), the robot rotates by updating its direction index; if **positive** (a distance), the robot moves step-by-step in that direction, stopping if it hits an obstacle. After each movement command completes, the code updates the `maxDist` variable by calculating the **Euclidean distance squared** (`x² + y²`) from the origin — effectively tracking the farthest point the robot reaches during its journey. The function returns this maximum squared distance, which avoids computing the expensive square root operation.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 100,
+    "date": "2026-04-06T09:43:19.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} commands\n * @param {number[][]} obstacles\n * @return {number}\n */\nvar robotSim = function(commands, obstacles) {\n    const moves = [[0, 1], [1, 0], [0, -1], [-1, 0]];\n    const obs = new Set(obstacles.map(coord => coord[0] + ',' + coord[1]));\n\n    let dir = 0;\n    let x = 0;\n    let y = 0;\n    let maxDist = 0;\n\n    for (const cmd of commands) {\n        if (cmd < 0) {\n            const shift = cmd === -1 ? 1 : -1;\n            dir = (dir + shift + 4) % 4;\n            continue;\n        }\n\n        for (let i = 1; i <= cmd; i++) {\n            const nx = x + moves[dir][0];\n            const ny = y + moves[dir][1];\n\n            if (obs.has(nx + ',' + ny)) {\n                break;\n            }\n\n            x = nx;\n            y = ny;\n        }\n\n        maxDist = Math.max(maxDist, x * x + y * y);\n    }\n\n    return maxDist;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code simulates a robot moving on a 2D grid that starts at the origin (0, 0) and executes a series of **movement and rotation commands** while navigating around obstacles. The robot maintains its current **direction** (north, east, south, or west) stored in an array of direction vectors, and processes each command by either **turning** (if the command is -1 for right or -2 for left) or **moving forward** one step at a time (for positive numbers), checking against a pre-computed `Set` of obstacles to prevent collisions. As the robot moves, it tracks the **maximum squared Euclidean distance** from the origin by calculating `x² + y²` after each command, and finally returns this maximum distance value, which represents how far the robot ever got from its starting position during the entire simulation.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 100,
+    "date": "2026-04-06T09:50:20.000Z"
+  }
+]

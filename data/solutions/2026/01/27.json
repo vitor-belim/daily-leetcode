@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @param {number[][]} edges\n * @return {number}\n */\nvar minCost = function (n, edges) {\n    const g = Array.from({ length: n }, () => []);\n    for (const e of edges) {\n        const [x, y, w] = e;\n        g[x].push([y, w]);\n        g[y].push([x, 2 * w]);\n    }\n\n    const dist = Array(n).fill(Infinity);\n    const visited = Array(n).fill(false);\n    dist[0] = 0;\n    const pq = new PriorityQueue((a, b) => {\n        return a[0] < b[0] ? -1 : 1;\n    });\n    pq.enqueue([0, 0]);\n\n    while (!pq.isEmpty()) {\n        const [currentDist, x] = pq.dequeue();\n        if (x === n - 1) {\n            return currentDist;\n        }\n\n        if (visited[x]) {\n            continue;\n        }\n        visited[x] = true;\n\n        for (const [y, w] of g[x]) {\n            if (currentDist + w < dist[y]) {\n                dist[y] = currentDist + w;\n                pq.enqueue([dist[y], y]);\n            }\n        }\n    }\n\n    return -1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code uses **Dijkstra's algorithm** with a priority queue to find the shortest path from node `0` to node `n-1` in a weighted graph. It builds an adjacency list `g` where each edge has a cost going one direction (weight `w`) and double that cost going the reverse direction (`2*w`). The algorithm maintains a `dist` array tracking the minimum distance to each node and processes nodes in order of their distance from the start. For each visited node, it checks all adjacent nodes and updates their distances if a shorter path is found, then enqueues them for processing. Once it reaches the destination node `n-1`, it returns the minimum cost found.",
+    "status": "DONE",
+    "cpuUsage": 58.82,
+    "memoryUsage": 41.18,
+    "date": "2026-01-28T19:54:05.000Z"
+  }
+]

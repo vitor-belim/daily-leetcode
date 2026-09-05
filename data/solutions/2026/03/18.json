@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} grid\n * @param {number} k\n * @return {number}\n */\nvar countSubmatrices = function(grid, k) {\n    const m = grid.length;\n    const n = grid[0].length;\n    let res = 0;\n\n    for (let row = 0; row < m; row++) {\n        for (let col = 0; col < n; col++) {\n            const top = row > 0 ? grid[row - 1][col] : 0;\n            const left = col > 0 ? grid[row][col - 1] : 0;\n\n            if (top > k || left > k) {\n                break;\n            }\n\n            const diag = row > 0 && col > 0 ? grid[row - 1][col - 1] : 0;\n\n            grid[row][col] += top + left - diag;\n\n            if (grid[row][col] <= k) {\n                res++;\n            } else {\n                break;\n            }\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "The code uses a **2D prefix sum** technique to count rectangular submatrices where the sum of all elements is at most `k`. It iterates through each cell in the grid, calculating the cumulative sum of the rectangle from `(0,0)` to the current cell by adding contributions from the cell above, the cell to the left, and subtracting the overlapping diagonal cell (to avoid double-counting). It stops early at each row when it detects a sum exceeding `k`, optimizing by recognizing that further cells to the right will also exceed `k`.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-03-18T09:46:51.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} grid\n * @param {number} k\n * @return {number}\n */\nvar countSubmatrices = function(grid, k) {\n    const m = grid.length;\n    const n = grid[0].length;\n    let res = 0;\n\n    for (let row = 0; row < m; row++) {\n        for (let col = 0; col < n; col++) {\n            const top = row > 0 ? grid[row - 1][col] : 0;\n            const left = col > 0 ? grid[row][col - 1] : 0;\n            const diag = row > 0 && col > 0 ? grid[row - 1][col - 1] : 0;\n\n            grid[row][col] += top + left - diag;\n\n            if (grid[row][col] <= k) {\n                res++;\n            }\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "The code uses a **2D prefix sum** approach to count submatrices with a sum of at most `k`. For each cell in the grid, it computes the cumulative sum from `(0,0)` to that cell using the formula: `current = grid[row][col] + top + left - diagonal`, which adds values from above and to the left while subtracting the diagonal cell to avoid double-counting. After updating each cell's value to its prefix sum, it increments a counter if the sum is within the limit `k`.",
+    "status": "DONE",
+    "cpuUsage": 59.46,
+    "memoryUsage": 62.16,
+    "date": "2026-03-18T09:51:35.000Z"
+  }
+]

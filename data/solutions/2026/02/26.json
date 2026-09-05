@@ -1,0 +1,79 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar numSteps = function(s) {\n    let num = parseInt(s, 2);\n    let count = 0;\n\n    while (num > 1) {\n        if (num % 2 === 1) {\n            num++;\n        } else {\n            num = num >> 1;\n        }\n        count++;\n    }\n\n    return count;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution converts the binary string to an integer using `parseInt`, then repeatedly checks if the number is odd (increment it) or even (right-shift by 1) until reaching 1, **counting each operation** as a step.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2024-05-29T06:32:45.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar numSteps = function(s) {\n    let count = 0;\n    let carry = 0;\n\n    for (let i = s.length - 1; i > 0; i--) {\n        let cur = s[i];\n\n        if (cur === '0' && carry > 0) {\n            carry--;\n            cur = '1';\n        }\n\n        if (cur === '1') {\n            carry++;\n            count += 2;\n        } else {\n            count++;\n        }\n    }\n\n    console.log(count, carry);\n\n    return count + carry % 2;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This approach processes the binary string **from right to left** using a carry variable, counting **2 steps for each '1' bit** and **1 step for each '0' bit**, while propagating a carry when incrementing encounters cascading 1s.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2024-05-29T07:41:56.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar numSteps = function(s) {\n    let count = 0;\n    let carry = 0;\n\n    for (let i = s.length - 1; i > 0; i--) {\n        let cur = s[i];\n\n        if (carry > 0) {\n            if (cur === '0') {\n                carry--;\n                cur = '1';\n            } else {\n                cur = '0';\n            }\n        }\n\n        if (cur === '1') {\n            carry++;\n            count += 2;\n        } else {\n            count++;\n        }\n    }\n\n    console.log(count, carry);\n\n    return count + carry % 2;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution is similar to Code 2 but **explicitly updates the current bit** during carry propagation—when a carry exists and the bit is '1', it sets the bit to '0' instead of leaving it unchanged.",
+    "status": "DONE",
+    "cpuUsage": 5.88,
+    "memoryUsage": 100,
+    "date": "2024-05-29T07:46:43.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar numSteps = function(s) {\n    let count = 0;\n    let carry = 0;\n\n    for (let i = s.length - 1; i > 0; i--) {\n        if ((s[i] === '1' && carry === 0) || (s[i] === '0' && carry > 0)) {\n            if (s[i] === '1') {\n                carry++;\n            }\n            count += 2;\n        } else {\n            count++;\n        }\n    }\n\n    return count + carry % 2;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This optimized version **consolidates the carry logic** into a single condition that checks whether the current bit XORs with the carry (equivalent to needing a 2-step operation), **eliminating redundant variable updates** compared to earlier approaches.",
+    "status": "DONE",
+    "cpuUsage": 5.88,
+    "memoryUsage": 100,
+    "date": "2024-05-29T08:13:29.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar numSteps = function(s) {\n    let res = 0;\n\n    while (s !== '1') {\n        if (s[s.length - 1] === '1') {\n            const pos = s.lastIndexOf('0');\n            if (pos === -1) {\n                s = '1' + '0'.repeat(s.length);\n            } else {\n                s = s.slice(0, pos) + '1' + '0'.repeat(s.length - 1 - pos);\n            }\n        } else {\n            s = s.slice(0, s.length - 1);\n        }\n        res++;\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution repeatedly checks if the last character is '1'; if so, it finds the **rightmost '0' and replaces it with '1', shifting all trailing bits to '0'**; otherwise it simply **removes the last character**, simulating binary division and increment operations on the string directly.",
+    "status": "DONE",
+    "cpuUsage": 9.41,
+    "memoryUsage": 11.76,
+    "date": "2026-02-26T09:24:14.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar numSteps = function(s) {\n    let res = 0;\n\n    while (s !== '1') {\n        res++;\n\n        if (s[s.length - 1] === '0') {\n            s = s.slice(0, s.length - 1);\n            continue;\n        }\n\n        const pos = s.lastIndexOf('0');\n\n        if (pos === -1) {\n            s = '1' + '0'.repeat(s.length);\n        } else {\n            s = s.slice(0, pos) + '1' + '0'.repeat(s.length - 1 - pos);\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This approach uses the same string manipulation strategy as Code 5 but separates the division case with an **explicit `continue` statement**, making the control flow clearer by handling the even case immediately before processing the addition.",
+    "status": "DONE",
+    "cpuUsage": 11.76,
+    "memoryUsage": 29.41,
+    "date": "2026-02-26T09:26:04.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar numSteps = function(s) {\n    const arr = s.split('');\n    let res = 0;\n\n    while (arr.length > 1) {\n        res++;\n\n        if (arr[arr.length - 1] === '0') {\n            arr.pop();\n            continue;\n        }\n\n        let carry = 1;\n\n        for (let i = arr.length - 1; i >= 0; i--) {\n            if (arr[i] === '0') {\n                arr[i] = '1';\n                carry = 0;\n                break;\n            }\n\n            arr[i] = '0';\n        }\n\n        if (carry) {\n            arr.unshift('1');\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution converts the binary string to an **array for efficient manipulation**, then repeatedly either **pops the last '0'** or performs addition by finding the rightmost '0' and **flipping all trailing '1's to '0's while propagating a carry** back to that position.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 89.41,
+    "date": "2026-02-26T09:30:59.000Z"
+  }
+]

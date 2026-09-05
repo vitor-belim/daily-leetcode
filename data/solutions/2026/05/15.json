@@ -1,0 +1,46 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar findMin = function(nums) {\n    let left = 0;\n    let right = nums.length - 1;\n    let min = Infinity;\n\n    while (left < right) {\n        const mid = Math.floor((left + right) / 2);\n\n        if (nums[left] < nums[mid]) {\n            // sorted to the left\n            min = Math.min(min, nums[left]);\n            left = mid + 1;\n        } else {\n            // sorted to the right\n            min = Math.min(min, nums[mid]);\n            right = mid - 1;\n        }\n    }\n\n    return min;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function uses **binary search** to find the minimum value in a rotated sorted array by tracking a running `min` variable across iterations. It compares `nums[left]` with the midpoint: if the left element is smaller, the minimum is on that side (updating `min`), otherwise it checks the middle value. However, the `left < right` loop condition may miss the final element when `left === right`, potentially returning an incorrect result.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2024-12-05T07:33:05.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar findMin = function(nums) {\n    let left = 0;\n    let right = nums.length - 1;\n    let min = Infinity;\n\n    while (left <= right) {\n        const mid = Math.floor((left + right) / 2);\n\n        if (nums[left] < nums[mid]) {\n            // sorted to the left\n            min = Math.min(min, nums[left]);\n            left = mid + 1;\n        } else {\n            // sorted to the right\n            min = Math.min(min, nums[mid]);\n            right = mid - 1;\n        }\n    }\n\n    return min;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This corrected version uses `left <= right` to ensure the loop processes all elements, including the final one when loop boundaries converge. The algorithm performs **binary search** on a rotated sorted array by comparing `nums[left]` with `nums[mid]` and updating a running `min` value throughout iterations, guaranteeing the actual minimum is found and returned.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2024-12-05T07:33:43.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar findMin = function(nums) {\n    let left = 0;\n    let right = nums.length - 1;\n    let min = Infinity;\n\n    while (left <= right) {\n        const mid = Math.ceil((left + right) / 2);\n\n        if (nums[left] < nums[mid]) {\n            // sorted to the left\n            min = Math.min(min, nums[left]);\n            left = mid + 1;\n        } else {\n            // sorted to the right\n            min = Math.min(min, nums[mid]);\n            right = mid - 1;\n        }\n    }\n\n    return min;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Similar to Code 2, this function searches for the minimum in a rotated sorted array using **binary search** with the `left <= right` condition. The key difference is using `Math.ceil` instead of `Math.floor` for the midpoint calculation, which rounds up rather than down—this changes how the array is partitioned in each iteration and may alter which values get compared.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 100,
+    "date": "2024-12-05T07:34:47.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar findMin = function(nums) {\n    let left = 0;\n    let right = nums.length - 1;\n\n    while (left < right) {\n        const mid = Math.floor((left + right) / 2);\n\n        if (nums[mid] > nums[right]) {\n            left = mid + 1;\n        } else {\n            right = mid;\n        }\n    }\n\n    return nums[left];\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is a cleaner **binary search** solution that finds the minimum in a rotated sorted array by comparing the midpoint directly with `nums[right]`. If `nums[mid] > nums[right]`, the minimum must be in the right half so `left` advances to `mid + 1`; otherwise the minimum is in the left half or at `mid`, so `right` moves to `mid`, efficiently narrowing the search space without tracking a separate `min` variable.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 59.8,
+    "date": "2026-05-15T08:02:55.000Z"
+  }
+]

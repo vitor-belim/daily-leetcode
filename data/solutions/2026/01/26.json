@@ -1,0 +1,68 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} arr\n * @return {number[][]}\n */\nvar minimumAbsDifference = function(arr) {\n    arr.sort((a, b) => a - b);\n\n    let minDiff = arr[1] - arr[0];\n\n    for (let i = 1; i < arr.length - 1; i++) {\n        const diff = arr[i + 1] - arr[i];\n        if (diff > 0 && diff < minDiff) {\n            minDiff = diff;\n        }\n    }\n\n    const res = [];\n\n    for (let i = 0; i < arr.length - 1; i++) {\n        if (arr[i + 1] - arr[i] === minDiff) {\n            res.push([arr[i], arr[i + 1]]);\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution **sorts** the array numerically, finds the **minimum difference** between any two consecutive elements in a single pass, then collects all pairs of adjacent elements that have this minimum difference.",
+    "status": "DONE",
+    "cpuUsage": 5.07,
+    "memoryUsage": 100,
+    "date": "2024-09-11T10:30:08.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} arr\n * @return {number[][]}\n */\nconst minimumAbsDifference = arr => {\n    const RANGE = 10 ** 6;\n    const freq = new Array(RANGE * 2 + 1).fill(false);\n\n    let min = arr[0];\n    let max = arr[0];\n\n    for (let i = 0; i < arr.length; i++) {\n        freq[arr[i] + RANGE] = true;\n\n        if (arr[i] < min) {\n            min = arr[i];\n        }\n        if (arr[i] > max) {\n            max = arr[i];\n        }\n    }\n\n    let res = [];\n    let diff = max - min;\n    let prev = min + RANGE;\n\n    for (let i = prev + 1; i <= max + RANGE; i++) {\n        if (!freq[i]) {\n            continue;\n        }\n\n        if (i - prev === diff) {\n            res.push([prev - RANGE, i - RANGE]);\n        } else if (i - prev < diff) {\n            diff = i - prev;\n            res = [[prev - RANGE, i - RANGE]];\n        }\n\n        prev = i;\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses a **frequency array** to mark which numbers exist, then iterates through the range between the minimum and maximum values to find consecutive existing numbers with the smallest gap, collecting all such pairs while tracking the minimum distance found.",
+    "status": "DONE",
+    "cpuUsage": 5.07,
+    "memoryUsage": 11.96,
+    "date": "2024-09-11T10:40:24.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} arr\n * @return {number[][]}\n */\nconst minimumAbsDifference = arr => {\n    const RANGE = 10 ** 6;\n    const freq = new Array(RANGE * 2 + 1).fill(0);\n\n    let min = arr[0];\n    let max = arr[0];\n\n    for (let i = 0; i < arr.length; i++) {\n        freq[arr[i] + RANGE] = 1;\n\n        if (arr[i] < min) {\n            min = arr[i];\n        }\n        if (arr[i] > max) {\n            max = arr[i];\n        }\n    }\n\n    let res = [];\n    let diff = max - min;\n    let prev = min + RANGE;\n\n    for (let i = prev + 1; i <= max + RANGE; i++) {\n        if (freq[i] === 0) {\n            continue;\n        }\n\n        if (i - prev === diff) {\n            res.push([prev - RANGE, i - RANGE]);\n        } else if (i - prev < diff) {\n            diff = i - prev;\n            res = [[prev - RANGE, i - RANGE]];\n        }\n\n        prev = i;\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution is functionally identical to Solution 2 but uses a regular **array with 0s and 1s** instead of booleans to mark the presence of numbers, achieving the same frequency-tracking approach with slightly different data representation.",
+    "status": "DONE",
+    "cpuUsage": 5.07,
+    "memoryUsage": 11.59,
+    "date": "2024-09-11T10:41:06.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} arr\n * @return {number[][]}\n */\nconst minimumAbsDifference = arr => {\n    const RANGE = 10 ** 6;\n    const freq = new Int8Array(RANGE * 2 + 1);\n\n    let min = arr[0];\n    let max = arr[0];\n\n    for (let i = 0; i < arr.length; i++) {\n        freq[arr[i] + RANGE] = 1;\n\n        if (arr[i] < min) {\n            min = arr[i];\n        }\n        if (arr[i] > max) {\n            max = arr[i];\n        }\n    }\n\n    let res = [];\n    let diff = max - min;\n    let prev = min + RANGE;\n\n    for (let i = prev + 1; i <= max + RANGE; i++) {\n        if (freq[i] === 0) {\n            continue;\n        }\n\n        if (i - prev === diff) {\n            res.push([prev - RANGE, i - RANGE]);\n        } else if (i - prev < diff) {\n            diff = i - prev;\n            res = [[prev - RANGE, i - RANGE]];\n        }\n\n        prev = i;\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution applies the same frequency-array logic as Solutions 2 and 3 but uses an **Int8Array** typed array instead of a regular array, providing better memory efficiency for the large fixed-size range needed to store frequency data.",
+    "status": "DONE",
+    "cpuUsage": 5.8,
+    "memoryUsage": 100,
+    "date": "2024-09-11T10:41:27.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} arr\n * @return {number[][]}\n */\nvar minimumAbsDifference = function(arr) {\n    arr.sort((a, b) => a - b);\n\n    const n = arr.length;\n    let minDiff = Infinity;\n\n    for (let i = 1; i < n; i++) {\n        minDiff = Math.min(minDiff, arr[i] - arr[i - 1]);\n    }\n\n    const res = [];\n    let left = 0;\n    let right = 1;\n\n    while (right < n) {\n        const diff = arr[right] - arr[left];\n\n        if (diff === minDiff) {\n            res.push([arr[left], arr[right]]);\n        }\n\n        if (diff >= minDiff) {\n            left++;\n        } else {\n            right++;\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution **sorts** the array, finds the minimum difference between consecutive elements, then uses a **two-pointer sliding window** approach to efficiently locate all pairs of consecutive sorted elements that match this minimum difference without needing to revisit the entire array.",
+    "status": "DONE",
+    "cpuUsage": 72.46,
+    "memoryUsage": 40.58,
+    "date": "2026-01-26T08:44:06.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} arr\n * @return {number[][]}\n */\nvar minimumAbsDifference = function(arr) {\n    arr.sort((a, b) => a - b);\n\n    let min = Infinity;\n    let res = [];\n\n    for (let i = 1; i < arr.length; i++) {\n        const diff = arr[i] - arr[i - 1];\n\n        if (diff < min) {\n            min = diff;\n            res = [[arr[i - 1], arr[i]]];\n        } else if (diff === min) {\n            res.push([arr[i - 1], arr[i]]);\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution **sorts** the array and then in a single efficient pass tracks the minimum difference encountered while simultaneously building the result list, updating both the minimum and result whenever a smaller difference is found or the current difference equals the known minimum.",
+    "status": "DONE",
+    "cpuUsage": 79.71,
+    "memoryUsage": 34.06,
+    "date": "2026-01-26T08:51:17.000Z"
+  }
+]

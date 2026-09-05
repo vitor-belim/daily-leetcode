@@ -1,0 +1,46 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {boolean}\n */\nvar check = function(nums) {\n    const n = nums.length;\n\n    let i = 0;\n    while (nums[i] >= nums[(i - 1 + n) % n]) {\n        i = (i - 1 + n) % n;\n    }\n\n    for (let j = i; j < i + n - 1; j++) {\n        if (nums[j] > nums[(j + 1) % n]) {\n            return false;\n        }\n    }\n\n    return true;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code checks if an array **can be rotated to form a sorted (non-decreasing) sequence**. It works by first finding the position `i` where the sequence \"breaks\" — where a number is smaller than its previous number in circular order. Then, it verifies that from that break point onward, all remaining elements are in non-decreasing order. If an array can be rotated to be sorted, there should be exactly one such break point, and everything after it should continue ascending until wrapping back to the start. The function returns `true` if these conditions hold (meaning the array is a rotated sorted array), and `false` otherwise.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2025-02-02T07:51:46.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {boolean}\n */\nvar check = function(nums) {\n    const n = nums.length;\n\n    let i;\n    for (i = 1; i < n; i++) {\n        if (nums[i - 1] > nums[i]) {\n            break;\n        }\n    }\n\n    for (let j = i; j < i + n - 1; j++) {\n        if (nums[j] > nums[(j + 1) % n]) {\n            return false;\n        }\n    }\n\n    return true;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function checks if an **array is a rotated sorted array** (meaning if you rotated it left or right, it would be completely sorted). It works in two steps: first, it **scans from the beginning to find the first position where a number is larger than the next number** — this marks where the \"rotation\" breaks the ascending order. Then, it **verifies that from this breaking point onward (wrapping around to the start using modulo `%`), all numbers continue in ascending order**. If any number out of order is found during this verification, it returns `false`; otherwise, it returns `true`, confirming the array is either sorted or a sorted rotation.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 100,
+    "date": "2025-02-02T07:54:37.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {boolean}\n */\nvar check = function(nums) {\n    const n = nums.length;\n    let seenCut = false;\n\n    for (let i = 0; i < n; i++) {\n        if (nums[i] <= nums[(i + 1) % n]) {\n            continue;\n        }\n\n        if (seenCut) {\n            return false;\n        }\n\n        seenCut = true;\n    }\n\n    return true;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code checks if an array is a **rotated sorted array** — essentially verifying whether the array could be formed by taking a sorted array, rotating it, and keeping the same sorted order. It does this by scanning through the array looking for **\"drops\"** (points where a larger number is followed by a smaller number). The algorithm uses a flag `seenCut` to track whether it has found one drop: if the array is validly rotated (or already sorted), there should be **at most one** such drop point. If `seenCut` is already `true` and the code encounters another drop, it returns `false`, since a properly rotated sorted array can only have one break in the sequence. Otherwise, it returns `true`. For example, `[3,4,5,1,2]` would pass (one drop from 5 to 1), while `[2,1,3,4]` would fail (two drops: from 2 to 1 and from 4 to 2 when wrapping around).",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 43.58,
+    "date": "2026-05-23T09:22:52.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {boolean}\n */\nvar check = function(nums) {\n    let seen = false;\n\n    nums.push(nums[0]);\n\n    for (let i = 0; i < nums.length - 1; i++) {\n        if (nums[i] > nums[i + 1]) {\n            if (seen) {\n                return false;\n            }\n            seen = true;\n        }\n    }\n\n    return true;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function checks whether an array of numbers is a **rotated sorted array** (meaning it could be sorted if rotated). It works by appending the first element to the end of the array, then scanning through to count how many times a number is **greater than the next number** — these are called \"break points.\" If there's **zero or one break point**, the array is a valid rotation of a sorted array and returns `true`; if there are **two or more break points**, it means the array can't be sorted by rotation and returns `false`. For example, `[3,4,5,1,2]` has exactly one break point (where `5 > 1`), so it returns `true`, while `[2,1,3,4]` has multiple breaks and returns `false`.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 52.72,
+    "date": "2026-05-23T09:37:03.000Z"
+  }
+]

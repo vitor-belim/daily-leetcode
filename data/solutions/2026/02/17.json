@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} turnedOn\n * @return {string[]}\n */\nvar readBinaryWatch = function(turnedOn) {\n    const res = [];\n\n    const toTime = (s) => {\n        let hours = 0;\n        if (s[0] === '1') hours += 8;\n        if (s[1] === '1') hours += 4;\n        if (s[2] === '1') hours += 2;\n        if (s[3] === '1') hours += 1;\n\n        let minutes = 0;\n        if (s[4] === '1') minutes += 32;\n        if (s[5] === '1') minutes += 16;\n        if (s[6] === '1') minutes += 8;\n        if (s[7] === '1') minutes += 4;\n        if (s[8] === '1') minutes += 2;\n        if (s[9] === '1') minutes += 1;\n\n        if (hours >= 12 || minutes >= 60) {\n            return null;\n        }\n\n        return hours + ':' + minutes.toString().padStart(2, '0');\n    };\n\n    const dfs = (left, cur) => {\n        if (cur.length === 10) {\n            if (left === 0) {\n                const time = toTime(cur);\n                if (time) {\n                    res.push(time);\n                }\n            }\n            return;\n        }\n\n        if (left > 0) {\n            dfs(left - 1, cur + '1');\n        }\n        dfs(left, cur + '0');\n    };\n\n    dfs(turnedOn, '');\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code solves the **Binary Watch** problem by finding all valid times that can be displayed when exactly `turnedOn` LEDs are lit on a 10-LED binary watch. The first 4 LEDs represent hours (with place values 8, 4, 2, 1), and the remaining 6 LEDs represent minutes (with place values 32, 16, 8, 4, 2, 1). The `dfs()` helper function uses **depth-first search** to recursively generate all possible 10-bit binary strings containing exactly `turnedOn` ones, building the string one bit at a time. For each complete 10-character string, the `toTime()` helper converts it into a time format by summing the place values of all lit (1) positions for hours and minutes separately. If the resulting hours are less than 12 and minutes are less than 60 (valid time bounds), the time is formatted as **HH:MM** (with zero-padding for minutes) and added to the result array. The function returns all valid times that match the constraint.",
+    "status": "DONE",
+    "cpuUsage": 56.32,
+    "memoryUsage": 86.21,
+    "date": "2026-02-17T10:11:11.000Z"
+  }
+]

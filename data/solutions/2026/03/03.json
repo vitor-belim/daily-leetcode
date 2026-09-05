@@ -1,0 +1,101 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @param {number} k\n * @return {character}\n */\nvar findKthBit = function(n, k) {\n    const dp = Array(n).fill(\"\");\n    dp[0] = \"0\";\n    const rev = Array(n).fill(\"\");\n    rev[0] = \"1\";\n\n    for (let i = 1; i <= n; i++) {\n        dp[i] = dp[i - 1] + \"1\" + rev[i - 1];\n        rev[i] = dp[i - 1] + \"0\" + rev[i - 1];\n\n        if (dp[i].length >= k) {\n            return dp[i][k - 1];\n        }\n    }\n\n    return dp[n - 1][k - 1];\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds the **k-th character** (1-indexed) in a sequence that builds recursively. It maintains two arrays: **`dp`** stores sequences where each level is constructed by concatenating the previous sequence, a `\"1\"` bit, and the **inverted previous sequence** (stored in `rev`), while **`rev`** follows the same pattern but with a `\"0\"` bit in the middle instead. The algorithm iteratively builds these sequences up to level `n`, and as soon as the current sequence reaches or exceeds length `k`, it returns the character at position `k-1` (converting to 0-indexed). If no sequence becomes long enough during the loop, it falls back to returning the character from the final sequence. This avoids building the entire massive final string and instead stops as soon as the target position is reached.",
+    "status": "DONE",
+    "cpuUsage": 30.77,
+    "memoryUsage": 71.15,
+    "date": "2024-10-19T08:20:56.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @param {number} k\n * @return {character}\n */\nvar findKthBit = function(n, k) {\n    let s = '0';\n\n    for (let i = 2; i <= n; i++) {\n        s += '1' + reverse(inverse(s));\n    }\n\n    return s[k - 1];\n};\n\nconst inverse = (s) => {\n    let res = '';\n\n    for (const char of s) {\n        if (char === '0') {\n            res += '1';\n        } else {\n            res += '0';\n        }\n    }\n\n    return res;\n};\n\nconst reverse = (s) => {\n    let res = '';\n\n    for (const char of s) {\n        res = char + res;\n    }\n\n    return res;\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code finds the **k-th bit** in a special sequence that follows a recursive pattern. Starting with the string `'0'`, the algorithm builds the sequence iteratively `n` times by repeatedly appending `'1'` followed by the **inverse** (flipping 0s and 1s) and **reverse** of the current string — so each iteration roughly doubles the string's length. For example, after iteration 2 we get `'011'`, and after iteration 3 we get `'0111100'`. Finally, the function returns the character at index `k-1` from the constructed string. The key insight is that this construction creates a deterministic pattern without needing to build the entire sequence if you understand its recursive structure, making it efficient for finding any bit at position `k`.",
+    "status": "DONE",
+    "cpuUsage": 5.77,
+    "memoryUsage": 25,
+    "date": "2026-03-03T08:34:48.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @param {number} k\n * @return {character}\n */\nvar findKthBit = function(n, k) {\n    let s = '0';\n\n    for (let i = 2; i <= n; i++) {\n        s += '1' + reverse(inverse(s));\n    }\n\n    return s[k - 1];\n};\n\nconst inverse = (s) => {\n    let res = '';\n\n    for (const char of s) {\n        if (char === '0') {\n            res += '1';\n        } else {\n            res += '0';\n        }\n    }\n\n    return res;\n};\n\nconst reverse = (s) => {\n    return s.split('').reverse().join('');\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function **builds a string iteratively** by starting with `'0'` and, for each iteration up to **n**, appending the pattern `'1'` followed by the **inverse** (flip all 0s to 1s and vice versa) and **reverse** of the current string. For example, starting with `'0'`, the next iteration creates `'0'` + `'1'` + reverse(inverse(`'0'`)) = `'0'` + `'1'` + `'1'` = `'011'`, and the next becomes `'011'` + `'1'` + reverse(inverse(`'011'`)) = `'0111001'`. After building the complete string through all **n** iterations, the function returns the character at position **k** (using 1-based indexing, so it accesses index `k - 1`). This is a clever fractal-like construction that efficiently generates a specific sequence without building the entire string from scratch for large values of **n**.",
+    "status": "DONE",
+    "cpuUsage": 5.77,
+    "memoryUsage": 15.38,
+    "date": "2026-03-03T08:35:25.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @param {number} k\n * @return {character}\n */\nvar findKthBit = function(n, k) {\n    let s = '0';\n\n    for (let i = 2; i <= n; i++) {\n        s += '1' + reverse(inverse(s));\n    }\n\n    return s[k - 1];\n};\n\nconst inverse = (s) => {\n    const temp = (1 << s.length) - 1;\n    return (parseInt(s, 2) ^ temp).toString(2);\n};\n\nconst reverse = (s) => {\n    return s.split('').reverse().join('');\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds the **k-th bit in a recursively constructed binary sequence** of length 2^n. It starts with the string `'0'` and iteratively builds the sequence by appending **`'1'` plus the bitwise inverse and reverse of the current string** — so each iteration doubles the string length with the pattern: current string + `'1'` + (inverted and reversed current string). The `inverse()` helper **flips all bits** (0→1, 1→0) using XOR, and `reverse()` simply **reverses the string order**. For example, starting with `'0'`, the next iteration becomes `'0' + '1' + '1' = '011'`, then `'011' + '1' + '001' = '0111001'`, and so on until reaching the n-th level. Finally, it **returns the character at position k** (adjusting for 0-based indexing with `k-1`).",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-03-03T08:39:21.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @param {number} k\n * @return {character}\n */\nvar findKthBit = function(n, k) {\n    let s = '0';\n\n    for (let i = 2; i <= n; i++) {\n        s += '1' + reverse(inverse(s));\n    }\n\n    return s[k - 1];\n};\n\nconst inverse = (s) => {\n    return s.split('').map(x => x === '1' ? '0' : '1').join('');\n};\n\nconst reverse = (s) => {\n    return s.split('').reverse().join('');\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function builds a **recursive binary sequence** step-by-step, starting with `'0'`. At each iteration (from 2 to n), it appends **`'1'` followed by the inverse and reverse of the current sequence**—where **inverse** flips each bit (0↔1) and **reverse** reverses the string order. After constructing the complete sequence, it returns the **character at the kth position** (converting from 1-based to 0-based indexing with `k - 1`). For example, with n=3, the sequence builds as: `'0'` → `'011'` → `'0111001'`, and calling `findKthBit(3, 5)` would return the 5th character, `'0'`.",
+    "status": "DONE",
+    "cpuUsage": 11.54,
+    "memoryUsage": 5.77,
+    "date": "2026-03-03T08:41:50.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @param {number} k\n * @return {character}\n */\nvar findKthBit = function(n, k) {\n    let s = ['0'];\n\n    for (let i = 2; i <= n; i++) {\n        const inv = s.map(x => x === '1' ? '0' : '1');\n        const rev = inv.reverse();\n        s.push('1', ...rev);\n    }\n\n    return s[k - 1];\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds the **k-th character** in a recursively generated **binary string sequence** where each level is built by concatenating the previous level, a **`'1'` separator**, and the previous level with all bits **inverted and reversed**. Starting with `s = ['0']`, it iteratively constructs levels 2 through n by inverting each bit (0→1, 1→0), reversing the result, and appending it after a `'1'` to the current string. Finally, it returns the character at position **k-1** (converting from 1-indexed to 0-indexed array access) in the final constructed string.",
+    "status": "DONE",
+    "cpuUsage": 25,
+    "memoryUsage": 5.77,
+    "date": "2026-03-03T08:46:17.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @param {number} k\n * @return {character}\n */\nvar findKthBit = function(n, k) {\n    let s = ['0'];\n\n    for (let i = 2; i <= n; i++) {\n        let r = '';\n\n        for (let j = s.length - 1; j >= 0; j--) {\n            r += s[j] === '1' ? '0' : '1';\n        }\n\n        s.push('1', ...r);\n    }\n\n    return s[k - 1];\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code constructs a special binary string pattern by iteratively building upon itself. Starting with `s = ['0']`, for each iteration from 2 to **n**, it creates the next version by taking the current string, **reversing it and inverting each bit** (flipping '0' to '1' and vice versa), then appending **'1' followed by this reversed-inverted copy** to the original string. This creates a recursive structure where each iteration roughly doubles the string's size. After building the complete string, the function returns the **k-th character** (converting from 1-indexed to 0-indexed with `k - 1`). For example, with n=3, the string evolves as: `\"0\"` → `\"011\"` → `\"0111001\"`, and you can fetch any character at position k from this constructed pattern without building the entire string explicitly.",
+    "status": "DONE",
+    "cpuUsage": 5.77,
+    "memoryUsage": 5.77,
+    "date": "2026-03-03T08:50:26.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @param {number} k\n * @return {character}\n */\nvar findKthBit = function(n, k) {\n    let s = ['0'];\n\n    for (let i = 2; i <= n; i++) {\n        let r = [];\n\n        for (let j = s.length - 1; j >= 0; j--) {\n            r.push(s[j] === '1' ? '0' : '1');\n        }\n\n        s.push('1', ...r);\n    }\n\n    return s[k - 1];\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "The function builds a sequence of **bits** (0s and 1s) iteratively, where each iteration appends a `'1'` followed by the **reverse and inverted** version of the previous sequence (flipping all 0s to 1s and vice versa). Starting with `s = ['0']`, for each iteration from 2 to `n`, it creates an inverted reverse copy of the current sequence in `r`, then appends `'1'` followed by all elements of `r` to `s`. After building the complete sequence up to iteration `n`, it returns the **kth bit** (accessed as `s[k-1]` to convert from 1-indexed to 0-indexed array access).",
+    "status": "DONE",
+    "cpuUsage": 25,
+    "memoryUsage": 5.77,
+    "date": "2026-03-03T08:51:08.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @param {number} k\n * @return {character}\n */\nvar findKthBit = function(n, k) {\n    let s = ['0'];\n    let r = ['1'];\n    let pos = 1;\n\n    while (s[pos - 1].length < k) {\n        s[pos] = s[pos - 1] + '1' + r[pos - 1];\n        r[pos] = s[pos - 1] + '0' + r[pos - 1];\n        pos++;\n    }\n\n    return s[pos - 1][k - 1];\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds the **kth character** in the **nth iteration** of a recursive binary sequence. It maintains two complementary sequences stored in arrays `s` and `r`: each new level of `s` is built by concatenating the previous `s`, a pivot bit `'1'`, and the previous `r` (which represents the **bitwise complement** of `s`). Similarly, `r` is built from the previous `s`, a pivot `'0'`, and the previous `r`. The loop runs until the current sequence `s` is long enough to contain the kth position, then returns the character at index `k-1` (converting 1-indexed input to 0-indexed array access). For example, with `n=1`, `s[0]=\"0\"`; with `n=2`, `s[1]=\"011\"`; with `n=3`, `s[2]=\"0111001\"`, and so on.",
+    "status": "DONE",
+    "cpuUsage": 30.77,
+    "memoryUsage": 30.77,
+    "date": "2026-03-03T09:23:50.000Z"
+  }
+]

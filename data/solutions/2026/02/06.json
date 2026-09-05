@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} k\n * @return {number}\n */\nvar minRemoval = function(nums, k) {\n    nums.sort((a, b) => a - b);\n\n    let left = 0;\n    let right = 0;\n    let res = 0;\n\n    while (right < nums.length) {\n        if (nums[right] <= nums[left] * k) {\n            res = Math.max(res, right - left + 1);\n            right++;\n        } else {\n            left++;\n        }\n    }\n\n    return nums.length - res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code uses a **sliding window algorithm** to find the minimum number of elements to remove from an array so the remaining elements satisfy a constraint: each element must be at most `k` times the smallest element in the window. It first **sorts the array** to make comparisons meaningful, then uses two pointers (`left` and `right`) to maintain a valid window. As `right` advances, if `nums[right]` is within `k` times `nums[left]`, the window is valid and the code tracks the maximum window size; otherwise, it shrinks the window by moving `left` forward. Finally, it returns the total length minus the largest valid window size—the minimum number of removals needed.",
+    "status": "DONE",
+    "cpuUsage": 45.45,
+    "memoryUsage": 54.55,
+    "date": "2026-02-06T08:24:10.000Z"
+  }
+]

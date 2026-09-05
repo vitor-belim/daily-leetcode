@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number[]}\n */\nvar maxValue = function (nums) {\n    const n = nums.length;\n    const ans = new Array(n);\n\n    const stack = [];\n\n    for (let i = 0; i < n; i++) {\n        let curr = {\n            value: nums[i],\n            left: i,\n            right: i,\n        };\n\n        while (stack.length > 0 && stack.at(-1).value > nums[i]) {\n            const top = stack.pop();\n            curr = {\n                value: Math.max(curr.value, top.value),\n                left: top.left,\n                right: curr.right,\n            };\n        }\n\n        stack.push(curr);\n    }\n\n    for (let i = 0; i < stack.length; i++) {\n        for (let j = stack[i].left; j <= stack[i].right; j++) {\n            ans[j] = stack[i].value;\n        }\n    }\n\n    return ans;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This algorithm finds the **maximum value within contiguous ranges** for each position in the array using a **stack-based approach**. It maintains a stack of objects, each tracking a value and its left-right boundaries. As it iterates through each number, if that number is smaller than the top of the stack, it can't expand further right, so it pops larger elements and merges their ranges together—expanding leftward to include what was popped. Once all elements are processed, the stack contains non-overlapping ranges where each holds the maximum value for its span. Finally, it fills the answer array by assigning each stacked value to all positions within its left-right boundaries, effectively creating an array where each position is mapped to the **maximum value that dominates its local region**.",
+    "status": "DONE",
+    "cpuUsage": 0,
+    "memoryUsage": 75,
+    "date": "2026-05-07T09:50:19.000Z"
+  }
+]

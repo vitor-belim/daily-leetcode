@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar minimumPairRemoval = function(nums) {\n    let sorted = false;\n    let operations = 0;\n\n    while (!sorted) {\n        sorted = true;\n\n        let lowestPair = null;\n        let lowestPairValue = Infinity;\n\n        for (let i = 0; i < nums.length - 1; i++) {\n            if (nums[i] > nums[i + 1]) {\n                sorted = false;\n            }\n\n            const sum = nums[i] + nums[i + 1];\n            if (sum < lowestPairValue) {\n                lowestPair = [i, i + 1];\n                lowestPairValue = sum;\n            }\n        }\n\n        if (!sorted && lowestPair) {\n            nums[lowestPair[0]] += nums[lowestPair[1]];\n            nums.splice(lowestPair[1], 1);\n            operations++;\n        }\n    }\n\n    return operations;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code repeatedly **combines adjacent pairs of numbers** until an array becomes sorted in ascending order, counting how many operations are needed. In each iteration, it scans the array to check if it's sorted and identifies the adjacent pair with the **smallest sum**. When it finds an unsorted array, it **merges** the pair with the lowest sum by adding them together and removing the second element, then increments a counter. This continues until no element is greater than its neighbor, at which point the function returns the total number of merge operations performed. Essentially, it's a sorting strategy that greedily combines the smallest adjacent pairs until the array reaches ascending order.",
+    "status": "DONE",
+    "cpuUsage": 81.25,
+    "memoryUsage": 43.75,
+    "date": "2026-01-22T09:22:04.000Z"
+  }
+]

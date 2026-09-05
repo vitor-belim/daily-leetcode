@@ -1,0 +1,90 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for a binary tree node.\n * function TreeNode(val, left, right) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.left = (left===undefined ? null : left)\n *     this.right = (right===undefined ? null : right)\n * }\n */\n/**\n * @param {TreeNode} root\n * @return {boolean}\n */\nvar isBalanced = function(root) {\n    let res = true;\n\n    const dfs = (node, depth) => {\n        if (!node) return depth;\n\n        if (!node.left && !node.right) return depth + 1;\n\n        const left = dfs(node.left, depth + 1);\n        const right = dfs(node.right, depth + 1);\n\n        if (Math.abs(right - left) > 1) {\n            res = false;\n        }\n\n        return Math.max(left, right);\n    };\n\n    dfs(root, 0);\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution recursively traverses the tree using depth-first search, tracking the depth of each path from the root. For each node, it calculates the depth of its left and right subtrees, and if the difference exceeds 1, it sets a `res` flag to `false` to indicate the tree is unbalanced; finally, it returns whether the tree is balanced by returning the `res` flag.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 84.44,
+    "date": "2025-07-03T10:40:30.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for a binary tree node.\n * function TreeNode(val, left, right) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.left = (left===undefined ? null : left)\n *     this.right = (right===undefined ? null : right)\n * }\n */\n/**\n * @param {TreeNode} root\n * @return {boolean}\n */\nvar isBalanced = function(root) {\n    const dfs = (node) => {\n        if (!node) return 0;\n        if (!node.left && !node.right) return 1;\n\n        const left = dfs(node.left);\n        const right = dfs(node.right);\n\n        if (left === -1 || right === -1) return -1;\n        if (Math.abs(right - left) > 1) return -1;\n\n        return Math.max(left, right) + 1;\n    };\n\n    return dfs(root) > -1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This approach uses a clever trick where the `dfs` function returns `-1` as a sentinel value to indicate an unbalanced subtree, and a positive number to represent the height. During traversal, if either subtree is unbalanced or the left and right heights differ by more than 1, the function immediately returns `-1` to propagate the unbalanced signal up the tree; finally, the result is `true` if the root's `dfs` call returns a value greater than `-1`.",
+    "status": "DONE",
+    "cpuUsage": 41.05,
+    "memoryUsage": 49.88,
+    "date": "2025-07-03T10:48:27.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for a binary tree node.\n * function TreeNode(val, left, right) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.left = (left===undefined ? null : left)\n *     this.right = (right===undefined ? null : right)\n * }\n */\n/**\n * @param {TreeNode} root\n * @return {boolean}\n */\nvar isBalanced = function(root) {\n    const dfs = (node) => {\n        if (!node) return 0;\n        if (!node.left && !node.right) return 1;\n\n        const left = dfs(node.left);\n        const right = dfs(node.right);\n\n        if (left === -1 || right === -1 || Math.abs(right - left) > 1) return -1;\n\n        return Math.max(left, right) + 1;\n    };\n\n    return dfs(root) !== -1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is a cleaner version of the previous approach that consolidates the balance check into a single `if` statement. The `dfs` function traverses the tree, calculating heights and returning `-1` if any unbalance is detected (either from child subtrees or from a height difference greater than 1 at the current node); the final result checks whether the root's `dfs` call did not return `-1`, indicating the entire tree is balanced.",
+    "status": "DONE",
+    "cpuUsage": 82.96,
+    "memoryUsage": 44.07,
+    "date": "2025-07-03T10:51:53.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for a binary tree node.\n * function TreeNode(val, left, right) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.left = (left===undefined ? null : left)\n *     this.right = (right===undefined ? null : right)\n * }\n */\n/**\n * @param {TreeNode} root\n * @return {boolean}\n */\nvar isBalanced = function(root) {\n    const dfs = (node) => {\n        if (!node) return 0;\n        if (!node.left && !node.right) return 1;\n\n        const left = dfs(node.left);\n        if (left === -1) return -1;\n\n        const right = dfs(node.right);\n        if (right === -1 || Math.abs(right - left) > 1) return -1;\n\n        return Math.max(left, right) + 1;\n    };\n\n    return dfs(root) !== -1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This variant optimizes the recursion by short-circuiting as soon as an unbalance is detected on the left subtree, avoiding unnecessary computation of the right subtree if the left is already unbalanced. It processes the left subtree first, and only if it's balanced (doesn't return `-1`) does it process the right subtree and check the height difference; this can provide better performance on certain tree structures.",
+    "status": "DONE",
+    "cpuUsage": 82.96,
+    "memoryUsage": 31.85,
+    "date": "2025-07-03T10:55:28.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for a binary tree node.\n * function TreeNode(val, left, right) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.left = (left===undefined ? null : left)\n *     this.right = (right===undefined ? null : right)\n * }\n */\n/**\n * @param {TreeNode} root\n * @return {boolean}\n */\nvar isBalanced = function(root) {\n    return dfs(root) !== -1;\n};\n\nconst dfs = (node) => {\n    if (!node) return 0;\n    if (!node.left && !node.right) return 1;\n\n    const left = dfs(node.left);\n    if (left === -1) return -1;\n\n    const right = dfs(node.right);\n    if (right === -1 || Math.abs(right - left) > 1) return -1;\n\n    return Math.max(left, right) + 1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This refactors the previous solution by extracting the `dfs` helper function as a separate `const` outside the main function, improving code organization and making the main `isBalanced` function more concise. The logic remains the same: `dfs` recursively checks the tree, returning `-1` to signal an unbalance or the height of a balanced subtree, and the main function simply returns whether the root's check didn't return `-1`.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 61.98,
+    "date": "2025-07-03T10:56:31.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for a binary tree node.\n * function TreeNode(val, left, right) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.left = (left===undefined ? null : left)\n *     this.right = (right===undefined ? null : right)\n * }\n */\n/**\n * @param {TreeNode} root\n * @return {boolean}\n */\nvar isBalanced = function(root) {\n    const dfs = (node) => {\n        if (!node) return 0;\n\n        return Math.max(dfs(node.left), dfs(node.right)) + 1;\n    };\n    const dfs2 = (node) => {\n        if (!node) return true;\n\n        return dfs2(node.left) &&\n            dfs2(node.right) &&\n            Math.abs(dfs(node.right) - dfs(node.left)) <= 1;\n    };\n\n    return dfs2(root);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses a two-function approach: `dfs` calculates the height of each subtree, while `dfs2` checks whether the tree is balanced by recursively verifying that both left and right subtrees are balanced and their heights differ by at most 1. However, this approach is less efficient because `dfs` recalculates heights multiple times during the traversal in `dfs2`, leading to redundant computations and a higher time complexity.",
+    "status": "DONE",
+    "cpuUsage": 82.96,
+    "memoryUsage": 97.65,
+    "date": "2026-02-08T10:34:54.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for a binary tree node.\n * function TreeNode(val, left, right) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.left = (left===undefined ? null : left)\n *     this.right = (right===undefined ? null : right)\n * }\n */\n/**\n * @param {TreeNode} root\n * @return {boolean}\n */\nvar isBalanced = function(root) {\n    const dfs = (node) => {\n        if (!node) return 0;\n\n        node.val = Math.max(dfs(node.left), dfs(node.right)) + 1;\n\n        return node.val;\n    };\n\n    dfs(root);\n\n    const dfs2 = (node) => {\n        if (!node) return true;\n\n        return dfs2(node.left) &&\n            dfs2(node.right) &&\n            Math.abs((node.right?.val || 0) - (node.left?.val || 0)) <= 1;\n    };\n\n    return dfs2(root);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution optimizes the two-function approach by caching the height of each node in its `val` property during the first `dfs` pass. The first `dfs` calculates and stores the height for every node, then `dfs2` performs the balance check by reading the cached heights instead of recalculating them, reducing redundant computations; however, this trades space and code clarity for a modest performance gain.",
+    "status": "DONE",
+    "cpuUsage": 41.05,
+    "memoryUsage": 12.28,
+    "date": "2026-02-08T10:40:58.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for a binary tree node.\n * function TreeNode(val, left, right) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.left = (left===undefined ? null : left)\n *     this.right = (right===undefined ? null : right)\n * }\n */\n/**\n * @param {TreeNode} root\n * @return {boolean}\n */\nvar isBalanced = function(root) {\n    const dfs = (node) => {\n        if (!node) return 0;\n\n        const l = dfs(node.left);\n        if (l === -1) return -1;\n\n        const r = dfs(node.right);\n        if (r === -1) return -1;\n\n        const diff = Math.abs(r - l);\n        if (diff > 1) return -1;\n\n        return Math.max(l, r) + 1;\n    };\n\n    return dfs(root) !== -1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses the same sentinel value approach but with more explicit variable names (`l` and `r` instead of inline expressions) and checks, making the logic slightly more readable. The `dfs` function short-circuits by checking if the left subtree is unbalanced before processing the right, then validates that the height difference doesn't exceed 1; overall, it achieves the same efficiency as the optimized versions but prioritizes code clarity.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 16.23,
+    "date": "2026-02-08T10:43:40.000Z"
+  }
+]

@@ -1,0 +1,35 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} grid\n * @param {number} x\n * @param {number} y\n * @param {number} k\n * @return {number[][]}\n */\nvar reverseSubmatrix = function(grid, x, y, k) {\n    const m = grid.length;\n    const n = grid[0].length;\n\n    const res = Array.from({ length: m }, () => new Array(n).fill(0));\n\n    for (let row = 0; row < m; row++) {\n        for (let col = 0; col < n; col++) {\n            if (row >= x && row < x + k && col >= y && col < y + k) {\n                const drow = k - 1 - row + 2 * x;\n                res[drow][col] = grid[row][col];\n            } else {\n                res[row][col] = grid[row][col];\n            }\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function **reverses a rectangular submatrix vertically** within a 2D grid. It creates a copy of the input `grid` where each cell in a `k × k` submatrix starting at coordinates `(x, y)` is flipped upside down — the top row becomes the bottom row, and so on. The formula `drow = k - 1 - row + 2 * x` calculates the new row position for each cell within the submatrix by mapping it to its vertically mirrored position, while all cells outside this submatrix are copied unchanged. The function returns the transformed grid with the specified submatrix reversed.",
+    "status": "DONE",
+    "cpuUsage": 4.44,
+    "memoryUsage": 88.89,
+    "date": "2026-03-21T10:20:47.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} grid\n * @param {number} x\n * @param {number} y\n * @param {number} k\n * @return {number[][]}\n */\nvar reverseSubmatrix = function(grid, x, y, k) {\n    const m = grid.length;\n    const n = grid[0].length;\n    const inv_m = 2 * x + k - 1;\n\n    const res = Array.from({ length: m }, () => new Array(n).fill(0));\n\n    for (let row = 0; row < m; row++) {\n        for (let col = 0; col < n; col++) {\n            if (row >= x && row < x + k && col >= y && col < y + k) {\n                res[inv_m - row][col] = grid[row][col];\n            } else {\n                res[row][col] = grid[row][col];\n            }\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function **reverses (flips) the rows of a k×k submatrix** within a larger grid. It takes a 2D `grid`, a starting position (`x`, `y`), and a size `k`, then creates a new grid where all elements in the k×k submatrix starting at row `x` and column `y` are flipped vertically—each row moves to its mirror position using the formula `inv_m - row`—while all other elements remain in their original positions.",
+    "status": "DONE",
+    "cpuUsage": 15.56,
+    "memoryUsage": 42.22,
+    "date": "2026-03-21T10:22:45.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} grid\n * @param {number} x\n * @param {number} y\n * @param {number} k\n * @return {number[][]}\n */\nvar reverseSubmatrix = function(grid, x, y, k) {\n    const rows = k / 2;\n\n    for (let row = 0; row < rows; row++) {\n        for (let col = 0; col < k; col++) {\n            const inv_row = k - 1 - row;\n\n            if (row !== inv_row) {\n                const temp = grid[x + row][y + col];\n                grid[x + row][y + col] = grid[x + inv_row][y + col];\n                grid[x + inv_row][y + col] = temp;\n            }\n        }\n    }\n\n    return grid;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function **reverses a k×k submatrix** within a grid by swapping elements symmetrically from opposite rows. Starting at coordinates `(x, y)`, it iterates through the top half of the submatrix (`k / 2` rows) and for each position, it swaps the value in the current row with its **mirror position in the opposite row** (calculated as `k - 1 - row`). The loop processes all `k` columns for each row pair, effectively flipping the submatrix vertically while keeping the grid structure intact. The swap operation uses a temporary variable to exchange values without data loss.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 95.56,
+    "date": "2026-03-21T10:32:59.000Z"
+  }
+]

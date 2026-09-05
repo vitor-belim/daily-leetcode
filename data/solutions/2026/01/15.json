@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @param {number} m\n * @param {number[]} hBars\n * @param {number[]} vBars\n * @return {number}\n */\nvar maximizeSquareHoleArea = function (n, m, hBars, vBars) {\n    hBars.sort((a, b) => a - b);\n    vBars.sort((a, b) => a - b);\n\n    let hmax = 1;\n    let vmax = 1;\n    let hcur = 1;\n    let vcur = 1;\n\n    for (let i = 1; i < hBars.length; i++) {\n        if (hBars[i] === hBars[i - 1] + 1) {\n            hcur++;\n        } else {\n            hcur = 1;\n        }\n\n        hmax = Math.max(hmax, hcur);\n    }\n\n    for (let i = 1; i < vBars.length; i++) {\n        if (vBars[i] === vBars[i - 1] + 1) {\n            vcur++;\n        } else {\n            vcur = 1;\n        }\n\n        vmax = Math.max(vmax, vcur);\n    }\n\n    const side = Math.min(hmax, vmax) + 1;\n\n    return side * side;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution finds the largest square hole in a grid by identifying the longest consecutive sequences of missing horizontal and vertical bars. It first **sorts both arrays**, then iterates through each to count consecutive integers (where each bar is exactly 1 position after the previous one), tracking the **maximum consecutive count** for both dimensions. The side length of the largest possible square is determined by taking the `Math.min()` of these two maxima and adding 1 (since a sequence of length `n` creates a hole of size `n+1`), and the function returns the **area** by squaring this side length.",
+    "status": "DONE",
+    "cpuUsage": 0,
+    "memoryUsage": 50,
+    "date": "2026-01-15T09:13:29.000Z"
+  }
+]

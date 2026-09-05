@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s1\n * @param {string} s2\n * @return {boolean}\n */\nvar canBeEqual = function(s1, s2) {\n    const setOdd1 = new Set();\n    const setEven1 = new Set();\n    const setOdd2 = new Set();\n    const setEven2 = new Set();\n    \n    for (let i = 0; i < 4; i++) {\n        if (i & 1) {\n            setOdd1.add(s1[i]);\n            setOdd2.add(s2[i]);\n        } else {\n            setEven1.add(s1[i]);\n            setEven2.add(s2[i]);\n        }\n    }\n\n    return setOdd1.size === setOdd2.size &&\n        [...setOdd1].every(char => setOdd2.has(char)) &&\n        setEven1.size === setEven2.size &&\n        [...setEven1].every(char => setEven2.has(char));\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function checks whether two **4-character strings** `s1` and `s2` can be equal by comparing their characters at **odd and even positions separately**. It creates four **Sets** to track unique characters: `setOdd1` and `setOdd2` store characters at indices 1 and 3 (odd positions) from each string, while `setEven1` and `setEven2` store characters at indices 0 and 2 (even positions). The loop populates these sets by iterating through indices 0–3, using the bitwise operation `i & 1` to determine if an index is odd or even. Finally, it returns `true` only if both the **odd-position character sets** and **even-position character sets** are identical—meaning they have the same size and contain exactly the same characters—confirming the strings match structurally at their corresponding positions.",
+    "status": "DONE",
+    "cpuUsage": 64,
+    "memoryUsage": 40,
+    "date": "2026-03-29T09:34:35.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s1\n * @param {string} s2\n * @return {boolean}\n */\nvar canBeEqual = function(s1, s2) {\n    return ((s1[0] === s2[0] && s1[2] === s2[2]) || (s1[0] === s2[2] && s1[2] === s2[0])) &&\n        ((s1[1] === s2[1] && s1[3] === s2[3]) || (s1[1] === s2[3] && s1[3] === s2[1]));\n\n    const setOdd1 = new Set();\n    const setEven1 = new Set();\n    const setOdd2 = new Set();\n    const setEven2 = new Set();\n    \n    for (let i = 0; i < 4; i++) {\n        if (i & 1) {\n            setOdd1.add(s1[i]);\n            setOdd2.add(s2[i]);\n        } else {\n            setEven1.add(s1[i]);\n            setEven2.add(s2[i]);\n        }\n    }\n\n    return setOdd1.size === setOdd2.size &&\n        [...setOdd1].every(char => setOdd2.has(char)) &&\n        setEven1.size === setEven2.size &&\n        [...setEven1].every(char => setEven2.has(char));\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function checks if two 4-character strings `s1` and `s2` can be considered **equal under specific swapping rules**. The logic verifies two conditions: for **even positions** (0 and 2), it returns true if either the characters match directly (`s1[0] === s2[0] && s1[2] === s2[2]`) OR they're swapped (`s1[0] === s2[2] && s1[2] === s2[0]`); similarly for **odd positions** (1 and 3), it allows either direct matches or swaps. The function returns `true` only if both conditions are satisfied, meaning the strings are equivalent under these position-swapping rules. Note: there is unreachable dead code after the `return` statement that attempts an alternative approach using Sets to collect characters at odd and even positions, which will never execute.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 85.33,
+    "date": "2026-03-29T09:38:13.000Z"
+  }
+]

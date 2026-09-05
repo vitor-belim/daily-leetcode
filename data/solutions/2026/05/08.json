@@ -1,0 +1,57 @@
+[
+  {
+    "author": "Vitor",
+    "code": "const generatePrimes = (limit) => {\n    const sieve = new Array(limit + 1).fill(true);\n    sieve[0] = sieve[1] = false;\n\n    for (let i = 2; i * i <= limit; i++) {\n        if (sieve[i]) {\n            for (let j = i * i; j <= limit; j += i) {\n                sieve[j] = false;\n            }\n        }\n    }\n\n    const primes = [];\n\n    for (let i = 2; i <= limit; i++) {\n        if (sieve[i]) primes.push(i);\n    }\n\n    return primes;\n}\n\nconst primesUpTo100k = generatePrimes(100000);\n\n/**\n * @param {number[]} nums\n * @return {number}\n */\nvar minJumps = function (nums) {\n    const n = nums.length;\n\n    const primeSet = new Set(primesUpTo100k);\n    const map = new Map();\n\n    for (let i = 0; i < n; i++) {\n        if (primeSet.has(nums[i]) && !map.has(nums[i])) {\n            map.set(nums[i], i);\n        }\n    }\n\n    let pos = n - 1;\n    let count = 0;\n\n    for (let i = n - 1; i > 0; i--) {\n        for (const [num, pos] of map) {\n            if (pos < i && nums[i] % num === 0) {\n                i = pos + 1;\n                break;\n            }\n        }\n\n        count++;\n    }\n\n    return count;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Solution 1 uses the **Sieve of Eratosthenes** to precompute all primes up to 100,000 and stores their first occurrence indices in a map. It then attempts to find minimum jumps by working backward from the end, checking if any number at position `i` has factors that are prime and appeared earlier; however, this backward approach and logic have correctness issues for finding the actual minimum jump path.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-05-08T09:26:26.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "const generatePrimes = (limit) => {\n    const sieve = new Array(limit + 1).fill(true);\n    sieve[0] = sieve[1] = false;\n\n    for (let i = 2; i * i <= limit; i++) {\n        if (sieve[i]) {\n            for (let j = i * i; j <= limit; j += i) {\n                sieve[j] = false;\n            }\n        }\n    }\n\n    const primes = [];\n\n    for (let i = 2; i <= limit; i++) {\n        if (sieve[i]) primes.push(i);\n    }\n\n    return primes;\n}\n\nconst primesUpTo100k = generatePrimes(100000);\nconst primeSet = new Set(primesUpTo100k);\n\n/**\n * @param {number[]} nums\n * @return {number}\n */\nvar minJumps = function (nums) {\n    const n = nums.length;\n    const seen = Array(n).fill(false);\n\n    let stack = [0];\n    let steps = 0;\n\n    while (stack.length > 0) {\n        let next = new Set();\n\n        while (stack.length > 0) {\n            const curr = stack.pop();\n\n            if (curr === n - 1) return steps;\n            if (seen[curr]) continue;\n\n            seen[curr] = true;\n\n            if (curr > 0) next.add(curr - 1);\n            next.add(curr + 1);\n\n            if (primeSet.has(nums[curr])) {\n                for (let j = 0; j < n; j++) {\n                    if (j !== curr && nums[j] % nums[curr] === 0) {\n                        next.add(j);\n                    }\n                }\n            }\n        }\n\n        stack = [...next];\n        steps++;\n    }\n\n    return n - 1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Solution 2 applies **BFS (breadth-first search)** with level-by-level exploration: from each position, it can move to adjacent indices (left/right) or, if the current value is prime, jump to all other positions where that prime divides the value evenly. It tracks visited positions to avoid redundant exploration and counts steps until reaching the final position, guaranteeing the minimum number of jumps.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-05-08T09:41:03.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "const generatePrimes = (limit) => {\n    const sieve = new Array(limit + 1).fill(true);\n    sieve[0] = sieve[1] = false;\n\n    for (let i = 2; i * i <= limit; i++) {\n        if (sieve[i]) {\n            for (let j = i * i; j <= limit; j += i) {\n                sieve[j] = false;\n            }\n        }\n    }\n\n    const primes = [];\n\n    for (let i = 2; i <= limit; i++) {\n        if (sieve[i]) primes.push(i);\n    }\n\n    return primes;\n}\n\nconst primesUpTo100k = generatePrimes(1000000);\nconst primeSet = new Set(primesUpTo100k);\n\n/**\n * @param {number[]} nums\n * @return {number}\n */\nvar minJumps = function (nums) {\n    const n = nums.length;\n    const seen = Array(n).fill(false);\n\n    let stack = [0];\n    let steps = 0;\n\n    while (stack.length > 0) {\n        let next = new Set();\n\n        while (stack.length > 0) {\n            const curr = stack.pop();\n\n            if (curr === n - 1) return steps;\n\n            seen[curr] = true;\n\n            if (curr > 0 && !seen[curr - 1]) next.add(curr - 1);\n            if (!seen[curr + 1]) next.add(curr + 1);\n\n            if (primeSet.has(nums[curr])) {\n                for (let j = 0; j < n; j++) {\n                    if (j !== curr && nums[j] % nums[curr] === 0 && !seen[j]) {\n                        next.add(j);\n                    }\n                }\n            }\n        }\n\n        stack = [...next];\n        steps++;\n        //console.log(steps, stack);\n    }\n\n    return n - 1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Solution 3 is nearly identical to Solution 2 but generates primes up to **1,000,000** instead of 100,000, ensuring no prime factors are missed for larger array values. It also adds explicit `!seen[j]` checks before adding divisible positions to the next level, making the visited-state handling more consistent and preventing potential duplicate additions to the queue.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-05-08T09:56:42.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "const generatePrimes = (limit) => {\n    const sieve = new Array(limit + 1).fill(true);\n    sieve[0] = sieve[1] = false;\n\n    for (let i = 2; i * i <= limit; i++) {\n        if (sieve[i]) {\n            for (let j = i * i; j <= limit; j += i) {\n                sieve[j] = false;\n            }\n        }\n    }\n\n    const primes = [];\n\n    for (let i = 2; i <= limit; i++) {\n        if (sieve[i]) primes.push(i);\n    }\n\n    return primes;\n}\n\nconst primesUpTo1M = generatePrimes(1_000_000);\n\n/**\n * @param {number[]} nums\n * @return {number}\n */\nvar minJumps = function (nums) {\n    const n = nums.length;\n    const seen = Array(n).fill(false);\n    const primeSet = new Set(primesUpTo1M);\n\n    let stack = [0];\n    let steps = 0;\n\n    while (stack.length > 0) {\n        let next = new Set();\n\n        while (stack.length > 0) {\n            const curr = stack.pop();\n\n            if (curr === n - 1) return steps;\n\n            seen[curr] = true;\n\n            if (curr > 0 && !seen[curr - 1]) next.add(curr - 1);\n            if (!seen[curr + 1]) next.add(curr + 1);\n\n            if (primeSet.has(nums[curr])) {\n                for (let j = 0; j < n; j++) {\n                    if (j !== curr && nums[j] % nums[curr] === 0 && !seen[j]) {\n                        next.add(j);\n                    }\n                }\n\n                primeSet.delete(nums[curr]);\n            }\n        }\n\n        stack = [...next];\n        steps++;\n        //console.log(steps, stack);\n    }\n\n    return n - 1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Solution 4 combines the BFS approach with primes up to **1,000,000** and adds a critical optimization: after exploring all positions divisible by a prime number, it **deletes that prime from the set** via `primeSet.delete(nums[curr])`. This prevents the algorithm from repeatedly checking the same prime across multiple iterations, significantly reducing redundant computation while maintaining correctness.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-05-08T10:07:21.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "const MX = 1_000_000;\nconst factors = Array.from({ length: MX + 1 }, () => []);\n\nfor (let i = 2; i <= MX; i++) {\n    if (factors[i].length === 0) {\n        for (let j = i; j <= MX; j += i) {\n            factors[j].push(i);\n        }\n    }\n}\n\nvar minJumps = function (nums) {\n    const n = nums.length;\n    const edges = new Map();\n\n    for (let i = 0; i < n; i++) {\n        for (const p of factors[nums[i]]) {\n            if (!edges.has(p)) edges.set(p, []);\n            edges.get(p).push(i);\n        }\n    }\n\n    const seen = new Array(n).fill(false);\n    seen[0] = true;\n    let q = [0];\n    let res = 0;\n\n    while (true) {\n        let q2 = [];\n\n        for (const i of q) {\n            if (i === n - 1) return res;\n\n            if (i > 0 && !seen[i - 1]) {\n                seen[i - 1] = true;\n                q2.push(i - 1);\n            }\n            if (i < n - 1 && !seen[i + 1]) {\n                seen[i + 1] = true;\n                q2.push(i + 1);\n            }\n\n            if (factors[nums[i]].length === 1) {\n                const p = nums[i];\n                const list = edges.get(p);\n\n                if (list && list.length > 0) {\n                    for (const j of list) {\n                        if (!seen[j]) {\n                            seen[j] = true;\n                            q2.push(j);\n                        }\n                    }\n\n                    edges.set(p, []);\n                }\n            }\n        }\n\n        q = q2;\n        res++;\n    }\n\n    return -1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Solution 5 takes a fundamentally different approach by **precomputing all prime factors** for every number up to 1,000,000 in a `factors` array. It then uses BFS where from each position you can jump to adjacent indices or to any position whose value shares a prime factor. It further optimizes by using an `edges` map to track which positions have each factor and clearing processed factors to ensure each connection is explored only once, making it highly efficient.",
+    "status": "DONE",
+    "cpuUsage": 22.22,
+    "memoryUsage": 11.11,
+    "date": "2026-05-08T10:14:11.000Z"
+  }
+]

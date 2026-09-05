@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} grid\n * @return {number}\n */\nvar minSwaps = function (grid) {\n    const n = grid.length;\n    const pos = new Array(n).fill(-1);\n    for (let i = 0; i < n; ++i) {\n        for (let j = n - 1; j >= 0; --j) {\n            if (grid[i][j] == 1) {\n                pos[i] = j;\n                break;\n            }\n        }\n    }\n    let ans = 0;\n    for (let i = 0; i < n; ++i) {\n        let k = -1;\n        for (let j = i; j < n; ++j) {\n            if (pos[j] <= i) {\n                ans += j - i;\n                k = j;\n                break;\n            }\n        }\n        if (~k) {\n            for (let j = k; j > i; --j) {\n                const temp = pos[j];\n                pos[j] = pos[j - 1];\n                pos[j - 1] = temp;\n            }\n        } else {\n            return -1;\n        }\n    }\n    return ans;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds the **minimum number of adjacent row swaps** needed to rearrange a binary grid so that each row's rightmost `1` is at or before column `i` for row `i`. It first creates a `pos` array storing the column index of the rightmost `1` in each row, then iterates through each row position, searching for a row (starting from the current position) whose rightmost `1` is already at or before the target column. When found, it counts the swaps needed (`j - i`) and performs adjacent swaps to move that row to its correct position. If no valid row is found for any position, the function returns `-1` (impossible to arrange).",
+    "status": "DONE",
+    "cpuUsage": 75,
+    "memoryUsage": 92.86,
+    "date": "2026-03-02T09:38:35.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} grid\n * @return {number}\n */\nvar minSwaps = function (grid) {\n    const n = grid.length;\n    const pos = new Array(n).fill(-1);\n\n    for (let i = 0; i < n; i++) {\n        for (let j = n - 1; j >= 0; j--) {\n            if (grid[i][j] === 1) {\n                pos[i] = j;\n                break;\n            }\n        }\n    }\n\n    let ans = 0;\n\n    for (let i = 0; i < n; i++) {\n        let k = -1;\n\n        for (let j = i; j < n; j++) {\n            if (pos[j] <= i) {\n                ans += j - i;\n                k = j;\n                break;\n            }\n        }\n\n        if (k === -1) {\n            return -1;\n        }\n\n        for (let j = k; j > i; j--) {\n            const temp = pos[j];\n            pos[j] = pos[j - 1];\n            pos[j - 1] = temp;\n        }\n    }\n\n    return ans;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function computes the **minimum number of adjacent row swaps** required to transform a binary grid into a valid arrangement where each row `i` has its rightmost `1` at position `i` or earlier. It starts by recording the column position of each row's rightmost `1` in a `pos` array, then iterates through each row index from left to right. For each position, it searches for an unvisited row with a rightmost `1` at or before the target column, increments the swap count by the distance needed, and rearranges the `pos` array using adjacent swaps. If no suitable row exists for any position, it returns `-1` (indicating an impossible configuration).",
+    "status": "DONE",
+    "cpuUsage": 75,
+    "memoryUsage": 100,
+    "date": "2026-03-02T09:42:00.000Z"
+  }
+]

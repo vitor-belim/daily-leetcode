@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number[]}\n */\nvar distance = function(nums) {\n    const n = nums.length;\n    const map = new Map();\n\n    for (let i = 0; i < n; i++) {\n        if (!map.has(nums[i])) {\n            map.set(nums[i], []);\n        }\n        map.get(nums[i]).push(i);\n    }\n\n    const res = Array(n);\n\n    for (let i = 0; i < n; i++) {\n        const arr = map.get(nums[i]);\n\n        let sum = 0;\n\n        for (const index of arr) {\n            if (index === i) continue;\n\n            sum += Math.abs(i - index);\n        }\n\n        res[i] = sum;\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution groups array indices by their values using a **Map**, then for each position, calculates the sum of absolute distances to all other indices containing the same value. It iterates through each index `i` and sums up `Math.abs(i - index)` for all other indices with matching values, resulting in a straightforward but potentially slow approach due to the nested loops.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-04-23T08:09:30.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number[]}\n */\nvar distance = function(nums) {\n    const n = nums.length;\n    const map = new Map();\n    const dp = new Array(n).fill(0);\n\n    for (let i = 0; i < n; i++) {\n        if (!map.has(nums[i])) {\n            map.set(nums[i], []);\n        }\n        map.get(nums[i]).push(i);\n    }\n\n    const res = Array(n).fill(0);\n\n    for (const group of map.values()) {\n        let total = 0;\n        for (const idx of group) {\n            total += idx;\n        }\n\n        const len = group.length;\n        let prefixTotal = 0;\n\n        for (let i = 0; i < len; i++) {\n            const index = group[i];\n            res[index] = total - 2 * prefixTotal + index * (2 * i - len);\n            prefixTotal += index;\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is an optimized version that uses a **prefix sum technique** to avoid redundant distance calculations. For each group of equal values, it computes a total sum of all indices, then uses the formula `total - 2 * prefixTotal + index * (2 * i - len)` to calculate each distance in O(1) time. The `prefixTotal` accumulates indices as we iterate through the group, allowing the algorithm to compute all results efficiently in linear time.",
+    "status": "DONE",
+    "cpuUsage": 83.33,
+    "memoryUsage": 73.33,
+    "date": "2026-04-23T08:27:44.000Z"
+  }
+]

@@ -1,0 +1,46 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string[]} nums\n * @return {string}\n */\nvar findDifferentBinaryString = function(nums) {\n    const n = nums[0].length;\n    const set = new Set(nums.map(x => parseInt(x, 2)));\n    let num = 0;\n\n    while (set.has(num)) {\n        num++;\n    }\n\n    return num.toString(2).padStart(n, '0');\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds a **binary string that doesn't exist** in the input array. It first converts all the binary strings in `nums` to decimal numbers and stores them in a **Set** for quick lookup, then iterates through integers starting from `0` until it finds one that's **not in the set**. Once found, it converts that integer back to a **binary string** and pads it with leading zeros to match the original length of the input strings (stored in `n`). This guarantees a valid binary string of the correct length that wasn't in the original array.",
+    "status": "DONE",
+    "cpuUsage": 29.47,
+    "memoryUsage": 77.89,
+    "date": "2025-02-20T08:19:50.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string[]} nums\n * @return {string}\n */\nvar findDifferentBinaryString = function(nums) {\n    const n = nums[0].length;\n    let res = \"\";\n\n    for (let i = 0; i < nums.length; i++) {\n        res += nums[i][i] === '0' ? '1' : '0';\n    }\n\n    return res.padStart(n, '0');\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code finds a **binary string that doesn't exist in the input array** using a clever technique called **Cantor's diagonalization**. It takes the length `n` of the first binary string, then loops through each string in the array and looks at the character at position `i` in the `i`-th string (the diagonal). For each diagonal character, it **flips the bit** — if it's `'0'`, it becomes `'1'`, and vice versa. The flipped bits are concatenated to build a result string, which is then **padded with leading zeros** to ensure it has the correct length `n`. This guarantees the resulting string will differ from every input string in at least one position (position `i` will differ from the `i`-th string), so it's definitely not in the original array.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 84.21,
+    "date": "2025-02-20T08:32:21.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string[]} nums\n * @return {string}\n */\nvar findDifferentBinaryString = function(nums) {\n    const n = nums[0].length;\n    const set = new Set(nums);\n    let limit = 2 << n;\n\n    for (let i = 0; i < limit; i++) {\n        const cur = i.toString(2).padStart(n, '0');\n        if (!set.has(cur)) {\n            return cur;\n        }\n    }\n\n    return \"\";\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds a **binary string that's not in the input array** by brute force checking. It first stores all input strings in a **Set** for fast lookup, then calculates the maximum number of possible binary strings (`2 << n` gives 2^(n+1) as an upper bound), and iterates through all numbers from 0 to that limit, converting each to a **zero-padded binary string** of the correct length using `toString(2)` and `padStart()`. For each generated binary string, it checks if it exists in the set—if it doesn't, that's the answer, so it returns immediately; if the loop exhausts without finding one, it returns an empty string (though by the **pigeonhole principle**, this shouldn't happen since there are only `n` input strings but 2^n possible strings of length `n`).",
+    "status": "DONE",
+    "cpuUsage": 29.47,
+    "memoryUsage": 98.95,
+    "date": "2026-03-08T09:08:40.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string[]} nums\n * @return {string}\n */\nvar findDifferentBinaryString = function(nums) {\n    const n = nums[0].length;\n    const set = new Set(nums.map(x => parseInt(x, 2)));\n    let res = 0;\n\n    while (set.has(res)) {\n        res++;\n    }\n\n    return res.toString(2).padStart(n, '0');\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code finds a **binary string that is not in the input array**. It works by first converting all binary strings to decimal numbers and storing them in a `Set` for quick lookup, then starting from `0` and incrementing a counter until it finds a decimal number that isn't in the set (using `while (set.has(res))`). Finally, it converts that decimal number back to a binary string using `toString(2)` and pads it with leading zeros to match the original string length, ensuring the result has the same format as the input strings.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 10.53,
+    "date": "2026-03-08T09:14:50.000Z"
+  }
+]

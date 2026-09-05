@@ -1,0 +1,35 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar minimumDeletions = function(s) {\n    let count = 0;\n    const stack = [];\n\n    for (let i = 0; i < s.length; i++) {\n        if (s[i] === 'a' && stack.length > 0 && stack[stack.length - 1] === 'b') {\n            stack.pop();\n            count++;\n            continue;\n        }\n        stack.push(s[i]);\n    }\n\n    return count;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "The function uses a **stack** to solve the problem. It iterates through the string, and whenever it encounters an `'a'` character with a `'b'` on top of the stack, it **removes** the `'b'` (by popping it) and increments the deletion counter. For all other characters, it pushes them onto the stack. This approach effectively removes all `'ba'` substrings and returns the total count of deletions made.",
+    "status": "DONE",
+    "cpuUsage": 9.09,
+    "memoryUsage": 100,
+    "date": "2024-07-30T07:49:21.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar minimumDeletions = function(s) {\n    let count = 0;\n    let bs = 0;\n\n    for (let i = 0; i < s.length; i++) {\n        if (s[i] === 'b') {\n            bs++;\n        } else if (bs > 0) {\n            count++;\n            bs--;\n        }\n    }\n\n    return count;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses a **counter-based approach** with a single pass through the string. It maintains a counter `bs` to track how many `'b'` characters have been seen so far. When it encounters an `'a'` character and there are `'b'` characters before it (`bs > 0`), it increments the deletion counter and decrements the `'b'` counter, effectively removing that `'a'`. This efficiently counts the minimum deletions needed by recognizing that each `'a'` preceded by any `'b'` must be deleted.",
+    "status": "DONE",
+    "cpuUsage": 9.09,
+    "memoryUsage": 100,
+    "date": "2024-07-30T12:18:23.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar minimumDeletions = function(s) {\n    let b = 0;\n    let res = 0;\n\n    for (const char of s) {\n        if (char === 'b') {\n            b++;\n        } else if (b > 0) {\n            b--;\n            res++;\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function also uses a **counter-based approach** similar to the previous solution, but with cleaner syntax using a `for...of` loop instead of indexed iteration. It counts the `'b'` characters encountered and for each `'a'` that has preceding `'b'` characters (checked via `b > 0`), it increments the result and decrements the counter, essentially matching each `'a'` with a preceding `'b'` to determine the minimum deletions needed.",
+    "status": "DONE",
+    "cpuUsage": 66.67,
+    "memoryUsage": 36.36,
+    "date": "2026-02-07T10:29:57.000Z"
+  }
+]

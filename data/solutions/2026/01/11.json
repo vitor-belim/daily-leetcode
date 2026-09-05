@@ -1,0 +1,90 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {character[][]} matrix\n * @return {number}\n */\nvar maximalRectangle = function (matrix) {\n    let count = 0;\n\n    const rightMatrix = [];\n    const downMatrix = [];\n\n    for (let row = 0; row < matrix.length; row++) {\n        for (let col = 0; col < matrix[row].length; col++) {\n            if (!rightMatrix[row])\n                rightMatrix[row] = [];\n            rightMatrix[row][col] = Number(matrix[row][col]);\n\n            if (!downMatrix[row])\n                downMatrix[row] = [];\n            downMatrix[row][col] = Number(matrix[row][col]);\n\n            if (col > 0 && rightMatrix[row][col] === 1 && rightMatrix[row][col - 1] !== 0) {\n                rightMatrix[row][col] += rightMatrix[row][col - 1];\n            }\n\n            if (row > 0 && downMatrix[row][col] === 1 && downMatrix[row - 1][col] !== 0) {\n                downMatrix[row][col] += downMatrix[row - 1][col];\n            }\n        }\n    }\n\n    console.log('rightMatrix', rightMatrix);\n    console.log('downMatrix', downMatrix);\n\n    let maxSeen = 0;\n\n    for (let row = 0; row < matrix.length; row++) {\n        for (let col = 0; col < matrix[row].length; col++) {\n            const longestByRow = rightMatrix[row][col];     // 5\n            const longestByCol = downMatrix[row][col];      // 2\n\n            let rows = 0;                                   // 2\n            let min = Infinity;                             // 3\n            let best = 0;\n            while (row >= rows && rightMatrix[row - rows][col] > 0) {\n                min = Math.min(min, rightMatrix[row - rows][col]);\n                best = Math.max(best, (rows + 1) * min);\n                rows++;\n            }\n\n            matrix[row][col] = Math.max(longestByRow, longestByCol, best);\n            maxSeen = Math.max(maxSeen, matrix[row][col]);\n        }\n    }\n\n    console.log('updated matrix', matrix);\n\n    return maxSeen;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses dynamic programming with two auxiliary matrices—`rightMatrix` tracking consecutive 1s extending right and `downMatrix` tracking consecutive 1s extending down for each cell. For each cell, it considers **horizontal**, **vertical**, and **multi-row rectangular expansions** by iterating upward from that cell, maintaining the minimum width across accumulated rows to compute the maximum area as `(rows + 1) * min`.",
+    "status": "DONE",
+    "cpuUsage": 5.24,
+    "memoryUsage": 53.71,
+    "date": "2024-04-13T12:39:21.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {character[][]} matrix\n * @return {number}\n */\nvar maximalRectangle = function (matrix) {\n    const rightMatrix = [];\n    const downMatrix = [];\n\n    for (let row = 0; row < matrix.length; row++) {\n        for (let col = 0; col < matrix[row].length; col++) {\n            if (!rightMatrix[row])\n                rightMatrix[row] = [];\n            rightMatrix[row][col] = Number(matrix[row][col]);\n\n            if (!downMatrix[row])\n                downMatrix[row] = [];\n            downMatrix[row][col] = Number(matrix[row][col]);\n\n            if (col > 0 && rightMatrix[row][col] === 1 && rightMatrix[row][col - 1] !== 0) {\n                rightMatrix[row][col] += rightMatrix[row][col - 1];\n            }\n\n            if (row > 0 && downMatrix[row][col] === 1 && downMatrix[row - 1][col] !== 0) {\n                downMatrix[row][col] += downMatrix[row - 1][col];\n            }\n        }\n    }\n\n    let maxSeen = 0;\n\n    for (let row = 0; row < matrix.length; row++) {\n        for (let col = 0; col < matrix[row].length; col++) {\n            const longestByRow = rightMatrix[row][col];\n            const longestByCol = downMatrix[row][col];\n\n            let rows = 0;\n            let min = Infinity;\n            let best = 0;\n            while (row >= rows && rightMatrix[row - rows][col] > 0) {\n                min = Math.min(min, rightMatrix[row - rows][col]);\n                best = Math.max(best, (rows + 1) * min);\n                rows++;\n            }\n\n            matrix[row][col] = Math.max(longestByRow, longestByCol, best);\n            maxSeen = Math.max(maxSeen, matrix[row][col]);\n        }\n    }\n\n    return maxSeen;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Identical to Solution 0, using two precomputed matrices (`rightMatrix` and `downMatrix`) to track consecutive 1s in rightward and downward directions. It then evaluates horizontal stretches, vertical stretches, and potential rectangles formed by expanding upward with a **sliding minimum width**, calculating the largest rectangle area at each cell position.",
+    "status": "DONE",
+    "cpuUsage": 5.24,
+    "memoryUsage": 100,
+    "date": "2024-04-13T12:58:19.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {character[][]} matrix\n * @return {number}\n */\nvar maximalRectangle = function (matrix) {\n    const rightMatrix = [];\n    const downMatrix = [];\n\n    let maxSeen = 0;\n\n    for (let row = 0; row < matrix.length; row++) {\n        for (let col = 0; col < matrix[row].length; col++) {\n            const curr = Number(matrix[row][col]);\n\n            if (!rightMatrix[row])\n                rightMatrix[row] = [];\n            rightMatrix[row][col] = curr;\n\n            if (!downMatrix[row])\n                downMatrix[row] = [];\n            downMatrix[row][col] = curr;\n\n            if (col > 0 && rightMatrix[row][col] === 1 && rightMatrix[row][col - 1] !== 0) {\n                rightMatrix[row][col] += rightMatrix[row][col - 1];\n            }\n\n            if (row > 0 && downMatrix[row][col] === 1 && downMatrix[row - 1][col] !== 0) {\n                downMatrix[row][col] += downMatrix[row - 1][col];\n            }\n\n            const longestByRow = rightMatrix[row][col];\n            const longestByCol = downMatrix[row][col];\n\n            let rows = 1;\n            let min = longestByRow;\n            let best = longestByRow;\n\n            while (row >= rows && rightMatrix[row - rows][col] > 0) {\n                if (rightMatrix[row - rows][col] < min) {\n                    min = rightMatrix[row - rows][col];\n                }\n\n                if ((rows + 1) * min > best) {\n                    best = (rows + 1) * min;\n                }\n\n                rows++;\n            }\n\n            matrix[row][col] = Math.max(longestByRow, longestByCol, best);\n\n            if (matrix[row][col] > maxSeen) {\n                maxSeen = matrix[row][col];\n            }\n        }\n    }\n\n    return maxSeen;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Implements the same two-matrix DP approach as Solutions 0 and 1 but optimizes the computation by initializing loop variables more efficiently (`rows = 1`, `min = longestByRow` upfront) and using conditional assignments instead of nested comparisons, reducing unnecessary arithmetic operations while preserving the **rectangular expansion exploration** logic.",
+    "status": "DONE",
+    "cpuUsage": 5.24,
+    "memoryUsage": 100,
+    "date": "2024-04-13T13:04:55.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {character[][]} matrix\n * @return {number}\n */\nvar maximalRectangle = function (matrix) {\n    const rightMatrix = Array(matrix.length);\n    const downMatrix = Array(matrix.length);\n\n    for (let i = 0; i < matrix.length; i++) {\n        rightMatrix[i] = new Array(matrix[i].length).fill(0);\n        downMatrix[i] = new Array(matrix[i].length).fill(0);\n    }\n\n    let maxSeen = 0;\n\n    for (let row = 0; row < matrix.length; row++) {\n        for (let col = 0; col < matrix[row].length; col++) {\n            const curr = Number(matrix[row][col]);\n\n            rightMatrix[row][col] = curr;\n            downMatrix[row][col] = curr;\n\n            if (col > 0 && curr === 1 && rightMatrix[row][col - 1] !== 0) {\n                rightMatrix[row][col] += rightMatrix[row][col - 1];\n            }\n\n            if (row > 0 && curr === 1 && downMatrix[row - 1][col] !== 0) {\n                downMatrix[row][col] += downMatrix[row - 1][col];\n            }\n\n            const longestByRow = rightMatrix[row][col];\n            const longestByCol = downMatrix[row][col];\n\n            let rows = 1;\n            let min = longestByRow;\n            let longestByArea = longestByRow;\n\n            while (row >= rows && rightMatrix[row - rows][col] > 0) {\n                if (rightMatrix[row - rows][col] < min) {\n                    min = rightMatrix[row - rows][col];\n                }\n\n                if ((rows + 1) * min > longestByArea) {\n                    longestByArea = (rows + 1) * min;\n                }\n\n                rows++;\n            }\n\n            const max = Math.max(longestByRow, longestByCol, longestByArea);\n\n            if (max > maxSeen) {\n                maxSeen = max;\n            }\n        }\n    }\n\n    return maxSeen;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Refines the two-matrix DP strategy by pre-allocating auxiliary arrays explicitly using `new Array()` and `.fill(0)` rather than dynamic object initialization, improving memory efficiency. It maintains the same **upward rectangular expansion** algorithm but with clearer variable names (`longestByArea` instead of `best`) for improved code readability.",
+    "status": "DONE",
+    "cpuUsage": 5.24,
+    "memoryUsage": 100,
+    "date": "2024-04-13T13:23:35.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {character[][]} matrix\n * @return {number}\n */\nvar maximalRectangle = function (matrix) {\n    if (matrix.length === 0) return 0;\n    const m = matrix.length;\n    const n = matrix[0].length;\n    let left = Array(n).fill(0);\n    let right = Array(n).fill(n);\n    let height = Array(n).fill(0);\n    let maxA = 0;\n    for (let i = 0; i < m; i++) {\n        let cur_left = 0, cur_right = n;\n        for (let j = 0; j < n; j++) { // compute height (can do this from either side)\n            if (matrix[i][j] == '1') height[j]++;\n            else height[j] = 0;\n        }\n        for (let j = 0; j < n; j++) { // compute left (from left to right)\n            if (matrix[i][j] == '1') left[j] = Math.max(left[j], cur_left);\n            else { left[j] = 0; cur_left = j + 1; }\n        }\n        // compute right (from right to left)\n        for (let j = n - 1; j >= 0; j--) {\n            if (matrix[i][j] == '1') right[j] = Math.min(right[j], cur_right);\n            else { right[j] = n; cur_right = j; }\n        }\n        // compute the area of rectangle (can do this from either side)\n        for (let j = 0; j < n; j++)\n            maxA = Math.max(maxA, (right[j] - left[j]) * height[j]);\n    }\n    return maxA;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Applies the **maximal rectangle in histogram** technique by treating each row as the base of a histogram. For every row, it computes cumulative heights of consecutive 1s, then tracks `left` and `right` boundaries for each column to determine how far each height can extend, calculating maximum area as `(right[j] - left[j]) * height[j]`.",
+    "status": "DONE",
+    "cpuUsage": 6.11,
+    "memoryUsage": 100,
+    "date": "2024-04-13T13:45:06.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string[][]} matrix\n * @return {number}\n */\nconst maximalRectangle = function (matrix) {\n    if (matrix.length === 0) {\n        return 0;\n    }\n\n    const rowLen = matrix.length;\n    const colLen = matrix[0].length;\n    let left = Array(colLen).fill(0);\n    let right = Array(colLen).fill(colLen);\n    let height = Array(colLen).fill(0);\n    let maxSeen = 0;\n\n    for (let row = 0; row < rowLen; row++) {\n        let curLeft = 0;\n        let curRight = colLen;\n\n        for (let col = 0; col < colLen; col++) {\n            if (matrix[row][col] === \"1\") {\n                // compute height (can do this from either side)\n                height[col]++;\n                // compute left (from left to right)\n                if (curLeft > left[col]) {\n                    left[col] = curLeft;\n                }\n            } else {\n                // compute height (can do this from either side)\n                height[col] = 0;\n                // compute left (from left to right)\n                left[col] = 0;\n                curLeft = col + 1;\n            }\n\n            // compute right (from right to left)\n            const revCol = colLen - 1 - col;\n            if (matrix[row][revCol] === \"1\") {\n                if (curRight < right[revCol]) {\n                    right[revCol] = curRight;\n                }\n            } else {\n                right[revCol] = colLen;\n                curRight = revCol;\n            }\n        }\n\n        // compute the area of rectangle (can do this from either side)\n        for (let col = 0; col < colLen; col++) {\n            const area = (right[col] - left[col]) * height[col];\n            if (area > maxSeen) {\n                maxSeen = area;\n            }\n        }\n    }\n\n    return maxSeen;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Optimizes the histogram-based approach with explicit variable naming and sequential **left-to-right, then right-to-left** passes to compute boundary arrays. It handles column updates incrementally and processes the right boundary by iterating backward through columns, reducing redundant logic while maintaining O(m·n) time complexity.",
+    "status": "DONE",
+    "cpuUsage": 6.55,
+    "memoryUsage": 100,
+    "date": "2024-04-13T16:03:38.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string[][]} matrix\n * @return {number}\n */\nfunction maximalRectangle(matrix) {\n    const colLen = matrix[0].length;\n    const heights = new Array(colLen).fill(0);\n    let maxArea = 0;\n\n    for (let row = 0; row < matrix.length; row++) {\n        for (let col = 0; col < colLen; col++) {\n            heights[col] = matrix[row][col] === \"1\" ? heights[col] + 1 : 0;\n        }\n\n        const cols = [];\n        let col = 0;\n        while (col < colLen || cols.length > 0) {\n            if (\n                col < colLen &&\n                (cols.length === 0 ||\n                    heights[col] >= heights[cols[cols.length - 1]])\n            ) {\n                cols.push(col);\n                col++;\n                continue;\n            }\n\n            const height = heights[cols.pop()];\n            let width = col - cols[cols.length - 1] - 1;\n            if (cols.length === 0) {\n                width = col;\n            }\n\n            maxArea = Math.max(maxArea, height * width);\n        }\n    }\n\n    return maxArea;\n}\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Leverages a **monotonic stack** combined with the histogram approach to achieve optimal performance. For each row's height histogram, it maintains a stack of column indices in increasing height order; when a decreasing height is encountered, it pops from the stack and calculates rectangle areas using the popped height and width determined by current and stack positions.",
+    "status": "DONE",
+    "cpuUsage": 6.11,
+    "memoryUsage": 100,
+    "date": "2024-04-13T16:30:22.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string[][]} matrix\n * @return {number}\n */\nfunction maximalRectangle(matrix) {\n    const m = matrix.length;\n    const n = matrix[0].length;\n    const heights = new Array(n).fill(0);\n    let maxArea = 0;\n\n    for (let row = 0; row < m; row++) {\n        for (let col = 0; col < n; col++) {\n            heights[col] = matrix[row][col] === \"1\" ? heights[col] + 1 : 0;\n        }\n\n        const cols = [];\n        let col = 0;\n        while (col < n || cols.length > 0) {\n            if (\n                col < n &&\n                (cols.length === 0 ||\n                    heights[col] >= heights[cols[cols.length - 1]])\n            ) {\n                cols.push(col);\n                col++;\n                continue;\n            }\n\n            const height = heights[cols.pop()];\n            let width = col - cols[cols.length - 1] - 1;\n            if (cols.length === 0) {\n                width = col;\n            }\n\n            maxArea = Math.max(maxArea, height * width);\n        }\n    }\n\n    return maxArea;\n}\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "Identical to Solution 6 with functionally equivalent monotonic stack logic but using more conventional variable naming (`m` and `n` for matrix dimensions). It efficiently processes each row's cumulative height histogram in a single pass by maintaining an increasing-height stack, popping and computing areas whenever the monotonic property is violated.",
+    "status": "DONE",
+    "cpuUsage": 91.7,
+    "memoryUsage": 90.83,
+    "date": "2026-01-11T10:17:59.000Z"
+  }
+]

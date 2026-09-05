@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} mat\n * @return {number}\n */\nvar numSpecial = function(mat) {\n    const m = mat.length;\n    const n = mat[0].length;\n    const rows = new Map();\n    const cols = new Map();\n    const found = [];\n\n    for (let row = 0; row < m; row++) {\n        for (let col = 0; col < n; col++) {\n            if (mat[row][col] === 1) {\n                rows.set(row, (rows.get(row) || 0) + 1);\n                cols.set(col, (cols.get(col) || 0) + 1);\n                found.push([row, col]);\n            }\n        }\n    }\n\n    let res = 0;\n\n    for (const [row, col] of found) {\n        if (rows.get(row) === 1 && cols.get(col) === 1) {\n            res++;\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds the count of **special positions** in a matrix where a special position is a `1` that is the only `1` in its row and the only `1` in its column. It first traverses the entire matrix to count how many `1`s appear in each row and column using two `Map` objects, and stores the positions of all `1`s in an array called `found`. Then it iterates through the found positions and checks if each one is the only `1` in its row (count = 1) and the only `1` in its column (count = 1), incrementing a result counter for each position that satisfies both conditions.",
+    "status": "DONE",
+    "cpuUsage": 65.75,
+    "memoryUsage": 5.48,
+    "date": "2026-03-04T08:49:47.000Z"
+  }
+]

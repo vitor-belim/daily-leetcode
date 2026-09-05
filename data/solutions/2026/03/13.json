@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} mountainHeight\n * @param {number[]} workerTimes\n * @return {number}\n */\nvar minNumberOfSeconds = function (mountainHeight, workerTimes) {\n    const EPS = 1e-7;\n    const maxWorkerTimes = Math.max(...workerTimes);\n    let l = 1;\n    let r = (maxWorkerTimes * mountainHeight * (mountainHeight + 1)) / 2;\n    let ans = 0;\n\n    while (l <= r) {\n        const mid = Math.floor((l + r) / 2);\n        let cnt = 0;\n        for (const t of workerTimes) {\n            const work = Math.floor(mid / t);\n            const k = Math.floor((-1.0 + Math.sqrt(1 + work * 8)) / 2 + EPS);\n            cnt += k;\n        }\n\n        if (cnt >= mountainHeight) {\n            ans = mid;\n            r = mid - 1;\n        } else {\n            l = mid + 1;\n        }\n    }\n\n    return ans;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code finds the **minimum time needed** to clear a mountain with multiple workers using **binary search on the answer**. It searches for a time value between `1` and a theoretical maximum, and for each candidate time `mid`, it calculates how much work each worker can accomplish: each worker gets `mid / t` time units (where `t` is their base time), and the formula `(-1.0 + Math.sqrt(1 + work * 8)) / 2` converts those time units into completed **levels** (solving the quadratic equation from the fact that level `k` takes `1*t + 2*t + ... + k*t` total time). If all workers combined can finish at least `mountainHeight` levels in time `mid`, the answer might be smaller, so the search narrows the upper bound; otherwise, more time is needed. The algorithm returns the smallest time where workers can collectively complete the mountain.",
+    "status": "DONE",
+    "cpuUsage": 81.82,
+    "memoryUsage": 63.64,
+    "date": "2026-03-13T09:07:31.000Z"
+  }
+]
