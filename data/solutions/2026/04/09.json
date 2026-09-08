@@ -11,7 +11,7 @@
     "date": "2026-04-09T08:58:01.000Z"
   },
   {
-    "author": "Vitor",
+    "author": "Leetcode",
     "code": "/**\n * @param {number[]} nums\n * @param {number[][]} queries\n * @return {number}\n */\nconst MOD = 1_000_000_007n;\n\nconst pow = (x, y) => {\n    let res = 1n;\n    for (; y > 0n; y >>= 1n) {\n        if (y & 1n) {\n            res = (res * x) % MOD;\n        }\n        x = (x * x) % MOD;\n    }\n    return res;\n};\n\nvar xorAfterQueries = function (nums, queries) {\n    const n = nums.length;\n    const T = Math.floor(Math.sqrt(n));\n    const groups = Array.from({ length: T }, () => []);\n\n    for (const [l, r, k, v] of queries) {\n        if (k < T) {\n            groups[k].push([l, r, BigInt(v)]);\n            continue;\n        }\n\n        for (let i = l; i <= r; i += k) {\n            nums[i] = Number((BigInt(nums[i]) * BigInt(v)) % MOD);\n        }\n    }\n\n    const dif = new BigInt64Array(n + T);\n\n    for (let k = 1; k < T; k++) {\n        if (groups[k].length === 0) {\n            continue;\n        }\n\n        dif.fill(1n);\n\n        for (let [l, r, v] of groups[k]) {\n            dif[l] = (dif[l] * BigInt(v)) % MOD;\n            const R = Math.floor((r - l) / k + 1) * k + l;\n            dif[R] = (dif[R] * pow(BigInt(v), MOD - 2n)) % MOD;\n        }\n\n        for (let i = k; i < n; i++) {\n            dif[i] = (dif[i] * dif[i - k]) % MOD;\n        }\n\n        for (let i = 0; i < n; i++) {\n            nums[i] = Number((BigInt(nums[i]) * dif[i]) % MOD);\n        }\n    }\n\n    return nums.reduce((acc, el) => acc ^ el, 0);\n};\n",
     "language": "javascript",
     "notes": "",

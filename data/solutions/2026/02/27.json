@@ -1,6 +1,6 @@
 [
   {
-    "author": "Vitor",
+    "author": "Leetcode",
     "code": "const { AvlTree } = require(\"@datastructures-js/binary-search-tree\");\n\nvar minOperations = function (s, k) {\n    const n = s.length;\n    let m = 0;\n\n    const dist = new Array(n + 1).fill(Infinity);\n    const nodeTrees = [new AvlTree(), new AvlTree()];\n    for (let i = 0; i <= n; i++) {\n        nodeTrees[i % 2].insert(i);\n        if (i < n && s[i] === \"0\") {\n            m++;\n        }\n    }\n\n    const queue = new Array(n + 1);\n    let head = 0,\n        tail = 0;\n    queue[tail++] = m;\n\n    dist[m] = 0;\n    nodeTrees[m % 2].remove(m);\n\n    while (head < tail) {\n        const currentM = queue[head++];\n        const c1 = Math.max(k - n + currentM, 0);\n        const c2 = Math.min(currentM, k);\n        const lnode = currentM + k - 2 * c2;\n        const rnode = currentM + k - 2 * c1;\n        const currentTree = nodeTrees[lnode % 2];\n        let node = currentTree.upperBound(lnode, true);\n\n        while (node !== null) {\n            const nodeValue = node.getValue();\n            if (nodeValue > rnode) {\n                break;\n            }\n            dist[nodeValue] = dist[currentM] + 1;\n            queue[tail++] = nodeValue;\n            const nextNode = currentTree.upperBound(nodeValue, false);\n            currentTree.remove(nodeValue);\n            node = nextNode;\n        }\n    }\n\n    return dist[0] === Infinity ? -1 : dist[0];\n};",
     "language": "javascript",
     "notes": "",

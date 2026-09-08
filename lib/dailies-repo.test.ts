@@ -152,7 +152,7 @@ describe("dailies-repo", () => {
       });
       // No solutions file at all for a past day reads as never attempted.
       expect(previous).toMatchObject({
-        solveStatus: SolveStatus.Unsolved,
+        solveStatus: SolveStatus.Failed,
         attempts: 0,
         hasEditorial: false,
       });
@@ -209,8 +209,8 @@ describe("dailies-repo", () => {
       expect(stats).toEqual({
         totalDays: 4,
         solved: 2,
+        functionallyCorrect: 0,
         failed: 1,
-        unsolved: 0,
         pending: 1,
         byDifficulty: {
           [Difficulty.Easy]: { total: 2, solved: 1 },

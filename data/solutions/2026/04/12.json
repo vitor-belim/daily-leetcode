@@ -11,7 +11,7 @@
     "date": "2026-04-12T08:00:20.000Z"
   },
   {
-    "author": "Vitor",
+    "author": "Leetcode",
     "code": "/**\n * @param {string} word\n * @return {number}\n */\nvar minimumDistance = function (word) {\n    const n = word.length;\n    const getDistance = (p, q) => {\n        const x1 = Math.floor(p / 6),\n            y1 = p % 6;\n        const x2 = Math.floor(q / 6),\n            y2 = q % 6;\n        return Math.abs(x1 - x2) + Math.abs(y1 - y2);\n    };\n\n    const dp = Array.from({ length: n }, () => Array.from({ length: 26 }, () => Math.floor(Number.MAX_SAFE_INTEGER / 2)));\n\n    for (let j = 0; j < 26; j++) {\n        dp[0][j] = 0;\n    }\n\n    for (let i = 1; i < n; i++) {\n        const cur = word.charCodeAt(i) - 65;\n        const prev = word.charCodeAt(i - 1) - 65;\n        const d = getDistance(prev, cur);\n\n        for (let j = 0; j < 26; j++) {\n            dp[i][j] = Math.min(dp[i][j], dp[i - 1][j] + d);\n\n            if (prev === j) {\n                for (let k = 0; k < 26; k++) {\n                    const d0 = getDistance(k, cur);\n                    dp[i][j] = Math.min(dp[i][j], dp[i - 1][k] + d0);\n                }\n            }\n        }\n    }\n\n    let ans = Math.floor(Number.MAX_SAFE_INTEGER / 2);\n\n    for (let j = 0; j < 26; j++) {\n        ans = Math.min(ans, dp[n - 1][j]);\n    }\n\n    return ans;\n};\n",
     "language": "javascript",
     "notes": "",

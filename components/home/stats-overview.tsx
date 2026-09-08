@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Difficulty, type ArchiveStats } from "@/lib/types";
+import { type ArchiveStats, Difficulty } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { CircleCheck, Flame } from "lucide-react";
 
@@ -57,7 +57,7 @@ export function StatsOverview({ stats }: StatsOverviewProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
             <CircleCheck className="size-4 text-emerald-600 dark:text-emerald-400" />
-            Solved
+            Progress
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -70,8 +70,11 @@ export function StatsOverview({ stats }: StatsOverviewProps) {
           </p>
           <Progress value={solvedPercent} className="h-1.5" />
           <p className="text-xs text-muted-foreground">
-            {solvedPercent}% of finished days, {stats.failed} failed,{" "}
-            {stats.unsolved} skipped
+            {solvedPercent}% solved
+            <br />
+            {stats.functionallyCorrect} functionally correct
+            <br />
+            {stats.failed} failed/not attempted
           </p>
         </CardContent>
       </Card>
@@ -92,8 +95,9 @@ export function StatsOverview({ stats }: StatsOverviewProps) {
             </span>
           </p>
           <p className="text-xs text-muted-foreground">
-            Consecutive days solved. Best run so far:{" "}
-            {days(stats.longestStreak)}.
+            Consecutive days without a failed or skipped one.
+            <br />
+            Best run so far: {days(stats.longestStreak)}.
           </p>
         </CardContent>
       </Card>

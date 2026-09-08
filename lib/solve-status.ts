@@ -1,11 +1,11 @@
 import { formatDateUTC, isPastDateUTC, shiftDateUTC, todayUTC } from "./dates";
 import {
-  Difficulty,
-  SolutionStatus,
-  SolveStatus,
   type ArchiveStats,
+  Difficulty,
   type DifficultyStats,
   type Solution,
+  SolutionStatus,
+  SolveStatus,
   type SolveSummary,
 } from "./types";
 
@@ -47,8 +47,8 @@ function maxPercentile(
  * Derives the author's progress on one day from its archived solutions.
  *
  * @param solutions The day's solutions, in any order.
- * @param date The challenge day as `YYYY-MM-DD`, used to tell an unsolved
- *   past day from one that is still in progress.
+ * @param date The challenge day as `YYYY-MM-DD`, used to tell a failed past
+ *   day from one that is still in progress.
  * @param today The reference "today" (defaults to the current UTC day).
  * @returns The solve status plus attempt count, languages, best accepted
  *   percentiles and whether an editorial solution is present.
@@ -69,7 +69,7 @@ export function summarizeSolutions(
   }
 
   return {
-    solveStatus: resolveStatus(own.length, accepted.length, date, today),
+    solveStatus: resolveStatus(own, date, today),
     attempts: own.length,
     languages: [...new Set(own.map((s) => s.language))],
     bestRuntime,
@@ -79,27 +79,45 @@ export function summarizeSolutions(
 }
 
 /**
- * Maps attempt and acceptance counts to a `SolveStatus`.
+ * Tells whether a submission ran out of time or memory, which means the
+ * approach itself worked and only its cost was too high.
  *
- * @param attempts Number of the author's own submissions.
- * @param accepted Number of those that were accepted.
+ * @param solution The solution to classify.
+ * @returns True for a time or memory limit exceeded submission.
+ */
+function exceededALimit(solution: Solution): boolean {
+  return (
+    solution.status === SolutionStatus.TimeLimitExceeded ||
+    solution.status === SolutionStatus.MemoryLimitExceeded ||
+    solution.status === SolutionStatus.FailedConstraints
+  );
+}
+
+/**
+ * Maps the author's own submissions for a day to a `SolveStatus`.
+ *
+ * @param own The author's own submissions for the day.
  * @param date The challenge day as `YYYY-MM-DD`.
  * @param today The reference "today".
- * @returns Solved when anything was accepted, Failed when only rejected
- *   attempts exist, otherwise Unsolved for a finished day and Pending for
- *   one still in progress.
+ * @returns Solved when anything was accepted, FunctionallyCorrect when the
+ *   best outcome was a time or memory limit exceeded, Pending for an
+ *   untouched day still in progress, otherwise Failed.
  */
 function resolveStatus(
-  attempts: number,
-  accepted: number,
+  own: Solution[],
   date: string,
   today: Date,
 ): SolveStatus {
-  if (accepted > 0) return SolveStatus.Solved;
-  if (attempts > 0) return SolveStatus.Failed;
-  return isPastDateUTC(date, today)
-    ? SolveStatus.Unsolved
-    : SolveStatus.Pending;
+  if (own.some((s) => s.status === SolutionStatus.Done)) {
+    return SolveStatus.Solved;
+  }
+  if (own.some(exceededALimit)) {
+    return SolveStatus.FunctionallyCorrect;
+  }
+  if (own.length === 0 && !isPastDateUTC(date, today)) {
+    return SolveStatus.Pending;
+  }
+  return SolveStatus.Failed;
 }
 
 /** The per-day inputs `computeArchiveStats` aggregates. */
@@ -110,22 +128,36 @@ export interface DayOutcome {
 }
 
 /**
- * Counts the longest run of consecutive solved calendar days. Days missing
- * from the archive break a run just like unsolved ones do.
+ * Tells whether a day keeps a streak alive. Only a failed or never attempted
+ * day breaks one, so a day that was merely too slow still counts.
  *
- * @param solvedDates The solved days as `YYYY-MM-DD`, in any order.
- * @returns The length of the longest run; zero when nothing was solved.
+ * @param status The day's solve status, or undefined when the day is missing
+ *   from the archive.
+ * @returns True for a solved or functionally correct day.
  */
-export function longestSolvedStreak(solvedDates: Iterable<string>): number {
-  const solved = new Set(solvedDates);
+export function continuesStreak(status: SolveStatus | undefined): boolean {
+  return (
+    status === SolveStatus.Solved || status === SolveStatus.FunctionallyCorrect
+  );
+}
+
+/**
+ * Counts the longest run of consecutive streak-keeping calendar days. Days
+ * missing from the archive break a run just like failed ones do.
+ *
+ * @param streakDates The streak-keeping days as `YYYY-MM-DD`, in any order.
+ * @returns The length of the longest run; zero when there are no such days.
+ */
+export function longestStreak(streakDates: Iterable<string>): number {
+  const kept = new Set(streakDates);
   let longest = 0;
 
-  for (const date of solved) {
-    if (solved.has(shiftDateUTC(date, -1))) continue;
+  for (const date of kept) {
+    if (kept.has(shiftDateUTC(date, -1))) continue;
 
     let length = 0;
     let cursor = date;
-    while (solved.has(cursor)) {
+    while (kept.has(cursor)) {
       length += 1;
       cursor = shiftDateUTC(cursor, 1);
     }
@@ -136,17 +168,17 @@ export function longestSolvedStreak(solvedDates: Iterable<string>): number {
 }
 
 /**
- * Counts the consecutive solved calendar days ending at today. A today that
- * is still pending is skipped rather than breaking the streak, so the count
- * doesn't drop to zero every morning before the day is solved.
+ * Counts the consecutive streak-keeping calendar days ending at today. A
+ * today that is still pending is skipped rather than breaking the streak, so
+ * the count doesn't drop to zero every morning before the day is solved.
  *
  * @param statusByDate Each archived day's solve status, keyed by
  *   `YYYY-MM-DD`.
  * @param today The reference "today" (defaults to the current UTC day).
  * @returns The current streak length; zero when the most recent finished
- *   day was not solved.
+ *   day was failed or never attempted.
  */
-export function currentSolvedStreak(
+export function currentStreak(
   statusByDate: ReadonlyMap<string, SolveStatus>,
   today: Date = todayUTC(),
 ): number {
@@ -156,7 +188,7 @@ export function currentSolvedStreak(
   }
 
   let streak = 0;
-  while (statusByDate.get(cursor) === SolveStatus.Solved) {
+  while (continuesStreak(statusByDate.get(cursor))) {
     streak += 1;
     cursor = shiftDateUTC(cursor, -1);
   }
@@ -193,8 +225,8 @@ export function computeArchiveStats(
   const statusByDate = new Map<string, SolveStatus>();
   const counts: Record<SolveStatus, number> = {
     [SolveStatus.Solved]: 0,
+    [SolveStatus.FunctionallyCorrect]: 0,
     [SolveStatus.Failed]: 0,
-    [SolveStatus.Unsolved]: 0,
     [SolveStatus.Pending]: 0,
   };
 
@@ -206,18 +238,18 @@ export function computeArchiveStats(
     if (solveStatus === SolveStatus.Solved) tier.solved += 1;
   }
 
-  const solvedDates = outcomes
-    .filter((o) => o.solveStatus === SolveStatus.Solved)
+  const streakDates = outcomes
+    .filter((o) => continuesStreak(o.solveStatus))
     .map((o) => o.date);
 
   return {
     totalDays: outcomes.length,
     solved: counts[SolveStatus.Solved],
+    functionallyCorrect: counts[SolveStatus.FunctionallyCorrect],
     failed: counts[SolveStatus.Failed],
-    unsolved: counts[SolveStatus.Unsolved],
     pending: counts[SolveStatus.Pending],
     byDifficulty,
-    currentStreak: currentSolvedStreak(statusByDate, today),
-    longestStreak: longestSolvedStreak(solvedDates),
+    currentStreak: currentStreak(statusByDate, today),
+    longestStreak: longestStreak(streakDates),
   };
 }

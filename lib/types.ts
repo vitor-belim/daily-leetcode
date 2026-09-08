@@ -59,10 +59,16 @@ export interface Solution {
 export enum SolveStatus {
   /** At least one of the author's own submissions was accepted. */
   Solved = "SOLVED",
-  /** The author submitted at least once, but nothing was accepted. */
+  /**
+   * Nothing was accepted, but at least one submission exceeded the time limit
+   * rather than erroring out: the approach worked, it was just too slow.
+   */
+  FunctionallyCorrect = "FUNCTIONALLY_CORRECT",
+  /**
+   * The day is over with no accepted or time-limited submission: the author
+   * either gave up on an error or never attempted it.
+   */
   Failed = "FAILED",
-  /** The day is over and the author never submitted. */
-  Unsolved = "UNSOLVED",
   /** The day is still in progress and the author has not submitted yet. */
   Pending = "PENDING",
 }
@@ -100,8 +106,9 @@ export interface DifficultyStats {
 export interface ArchiveStats {
   totalDays: number;
   solved: number;
+  functionallyCorrect: number;
+  /** Days failed on an error or never attempted. */
   failed: number;
-  unsolved: number;
   pending: number;
   byDifficulty: Record<Difficulty, DifficultyStats>;
   /** Consecutive solved calendar days ending today (or yesterday while today is pending). */

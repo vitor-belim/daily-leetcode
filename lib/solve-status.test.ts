@@ -1,9 +1,9 @@
 import { describe, it, expect } from "vitest";
 import {
   computeArchiveStats,
-  currentSolvedStreak,
+  currentStreak,
   isOwnSolution,
-  longestSolvedStreak,
+  longestStreak,
   summarizeSolutions,
 } from "./solve-status";
 import {
@@ -79,36 +79,80 @@ describe("summarizeSolutions", () => {
       TODAY,
     );
 
-    expect(summary.solveStatus).toBe(SolveStatus.Failed);
+    // The author's own best outcome is a TLE, so the day is functionally
+    // correct even though the editorial one was accepted.
+    expect(summary.solveStatus).toBe(SolveStatus.FunctionallyCorrect);
     expect(summary.attempts).toBe(1);
     expect(summary.bestRuntime).toBeNull();
     expect(summary.hasEditorial).toBe(true);
   });
 
-  it("distinguishes a finished unsolved day from one still in progress", () => {
+  // A time limit exceeded means the approach worked but was too slow, which
+  // never counts as a failure.
+  it("is functionally correct when a rejected day includes a TLE", () => {
+    const summary = summarizeSolutions(
+      [
+        solution({ status: SolutionStatus.Failed }),
+        solution({ status: SolutionStatus.TimeLimitExceeded }),
+      ],
+      "2026-07-20",
+      TODAY,
+    );
+    expect(summary.solveStatus).toBe(SolveStatus.FunctionallyCorrect);
+  });
+
+  // A memory limit exceeded is the same kind of "worked but cost too much"
+  // outcome as a time limit exceeded.
+  it("is functionally correct when a rejected day includes an MLE", () => {
+    const summary = summarizeSolutions(
+      [
+        solution({ status: SolutionStatus.Failed }),
+        solution({ status: SolutionStatus.MemoryLimitExceeded }),
+      ],
+      "2026-07-20",
+      TODAY,
+    );
+    expect(summary.solveStatus).toBe(SolveStatus.FunctionallyCorrect);
+  });
+
+  it("fails a day whose attempts only errored out", () => {
+    const summary = summarizeSolutions(
+      [
+        solution({ status: SolutionStatus.Failed }),
+        solution({ status: SolutionStatus.FailedConstraints }),
+      ],
+      "2026-07-20",
+      TODAY,
+    );
+    expect(summary.solveStatus).toBe(SolveStatus.Failed);
+  });
+
+  // A never-attempted past day counts as failed too; only a day still in
+  // progress is held back as pending.
+  it("distinguishes a finished untouched day from one still in progress", () => {
     expect(summarizeSolutions([], "2026-07-20", TODAY).solveStatus).toBe(
-      SolveStatus.Unsolved,
+      SolveStatus.Failed,
     );
     expect(summarizeSolutions([], "2026-07-21", TODAY).solveStatus).toBe(
       SolveStatus.Pending,
     );
   });
 
-  it("counts an editorial-only day as unsolved", () => {
+  it("counts an editorial-only day as failed", () => {
     const summary = summarizeSolutions(
       [solution({ author: "Leetcode", status: SolutionStatus.Done })],
       "2026-07-20",
       TODAY,
     );
-    expect(summary.solveStatus).toBe(SolveStatus.Unsolved);
+    expect(summary.solveStatus).toBe(SolveStatus.Failed);
     expect(summary.hasEditorial).toBe(true);
   });
 });
 
-describe("longestSolvedStreak", () => {
+describe("longestStreak", () => {
   it("finds the longest run of consecutive calendar days", () => {
     expect(
-      longestSolvedStreak([
+      longestStreak([
         "2026-07-01",
         "2026-07-02",
         "2026-07-04",
@@ -120,15 +164,15 @@ describe("longestSolvedStreak", () => {
   });
 
   it("spans month boundaries", () => {
-    expect(longestSolvedStreak(["2026-06-30", "2026-07-01"])).toBe(2);
+    expect(longestStreak(["2026-06-30", "2026-07-01"])).toBe(2);
   });
 
   it("is zero for no solved days", () => {
-    expect(longestSolvedStreak([])).toBe(0);
+    expect(longestStreak([])).toBe(0);
   });
 });
 
-describe("currentSolvedStreak", () => {
+describe("currentStreak", () => {
   it("counts back from today while days are solved", () => {
     const statuses = new Map([
       ["2026-07-18", SolveStatus.Failed],
@@ -136,7 +180,7 @@ describe("currentSolvedStreak", () => {
       ["2026-07-20", SolveStatus.Solved],
       ["2026-07-21", SolveStatus.Solved],
     ]);
-    expect(currentSolvedStreak(statuses, TODAY)).toBe(3);
+    expect(currentStreak(statuses, TODAY)).toBe(3);
   });
 
   it("skips a pending today instead of breaking the streak", () => {
@@ -144,7 +188,7 @@ describe("currentSolvedStreak", () => {
       ["2026-07-20", SolveStatus.Solved],
       ["2026-07-21", SolveStatus.Pending],
     ]);
-    expect(currentSolvedStreak(statuses, TODAY)).toBe(1);
+    expect(currentStreak(statuses, TODAY)).toBe(1);
   });
 
   it("is zero when yesterday was failed and today is pending", () => {
@@ -153,12 +197,23 @@ describe("currentSolvedStreak", () => {
       ["2026-07-20", SolveStatus.Failed],
       ["2026-07-21", SolveStatus.Pending],
     ]);
-    expect(currentSolvedStreak(statuses, TODAY)).toBe(0);
+    expect(currentStreak(statuses, TODAY)).toBe(0);
   });
 
   it("is zero when today is missing from the archive", () => {
     const statuses = new Map([["2026-07-20", SolveStatus.Solved]]);
-    expect(currentSolvedStreak(statuses, TODAY)).toBe(0);
+    expect(currentStreak(statuses, TODAY)).toBe(0);
+  });
+
+  // Only a failed or never attempted day breaks a streak; a day that was
+  // merely too slow keeps it running.
+  it("counts through a functionally correct day", () => {
+    const statuses = new Map([
+      ["2026-07-19", SolveStatus.Solved],
+      ["2026-07-20", SolveStatus.FunctionallyCorrect],
+      ["2026-07-21", SolveStatus.Solved],
+    ]);
+    expect(currentStreak(statuses, TODAY)).toBe(3);
   });
 });
 
@@ -169,7 +224,7 @@ describe("computeArchiveStats", () => {
         {
           date: "2026-07-17",
           difficulty: Difficulty.Easy,
-          solveStatus: SolveStatus.Unsolved,
+          solveStatus: SolveStatus.FunctionallyCorrect,
         },
         {
           date: "2026-07-18",
@@ -198,8 +253,8 @@ describe("computeArchiveStats", () => {
     expect(stats).toEqual({
       totalDays: 5,
       solved: 2,
+      functionallyCorrect: 1,
       failed: 1,
-      unsolved: 1,
       pending: 1,
       byDifficulty: {
         [Difficulty.Easy]: { total: 2, solved: 0 },
@@ -207,7 +262,8 @@ describe("computeArchiveStats", () => {
         [Difficulty.Hard]: { total: 1, solved: 1 },
       },
       currentStreak: 1,
-      longestStreak: 1,
+      // 07-17 was functionally correct and 07-18 solved: a two-day run.
+      longestStreak: 2,
     });
   });
 });

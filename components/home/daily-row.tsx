@@ -27,12 +27,16 @@ function describeProgress(daily: DailySummary): string {
         daily.attempts === 1 ? "Solved first try" : `Solved in ${attempts}`,
       );
       break;
-    case SolveStatus.Failed:
-      parts.push(`${attempts}, none accepted`);
+    case SolveStatus.FunctionallyCorrect:
+      parts.push("Functionally correct", `${attempts}, limits exceeded`);
       break;
-    case SolveStatus.Unsolved:
-      parts.push("Not attempted");
-      if (daily.hasEditorial) parts.push("editorial available");
+    case SolveStatus.Failed:
+      if (daily.attempts === 0) {
+        parts.push("Not attempted");
+        if (daily.hasEditorial) parts.push("editorial available");
+      } else {
+        parts.push(`${attempts}, none accepted`);
+      }
       break;
     case SolveStatus.Pending:
       parts.push("Waiting for a submission");

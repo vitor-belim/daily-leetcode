@@ -105,7 +105,7 @@ function newestMonthBefore(
  * @param problem The archived problem.
  * @param date The day as `YYYY-MM-DD`.
  * @param roots The archive roots.
- * @param today The reference "today" for pending-vs-unsolved.
+ * @param today The reference "today" for pending-vs-failed.
  * @returns The day's summary.
  */
 async function summarizeDay(
@@ -129,7 +129,7 @@ async function summarizeDay(
  *
  * @param date The day as `YYYY-MM-DD`.
  * @param roots The archive roots.
- * @param today The reference "today" for pending-vs-unsolved.
+ * @param today The reference "today" for pending-vs-failed.
  * @returns The summary, or null when the problem file is unreadable.
  */
 async function loadDay(

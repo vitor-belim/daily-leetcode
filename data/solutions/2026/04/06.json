@@ -33,7 +33,7 @@
     "date": "2024-09-04T07:51:08.000Z"
   },
   {
-    "author": "Vitor",
+    "author": "Leetcode",
     "code": "var robotSim = function(commands, obstacles) {\n    // Store obstacles in a set for O(1) lookup\n    let obs = new Set();\n    for (let obstacle of obstacles) {\n        obs.add(obstacle[0] + \",\" + obstacle[1]);\n    }\n\n    // Direction vectors for [N, E, S, W]\n    const directionVectors = [\n        [0, 1],   // North -> +Y direction\n        [1, 0],   // East -> +X direction\n        [0, -1],  // South -> -Y direction\n        [-1, 0]   // West -> -X direction\n    ];\n\n    // Map for changing directions\n    const dirChangeMap = [\n        [3, 1], // N -> Left: W (index 3), Right: E (index 1)\n        [0, 2], // E -> Left: N (index 0), Right: S (index 2)\n        [1, 3], // S -> Left: E (index 1), Right: W (index 3)\n        [2, 0]  // W -> Left: S (index 2), Right: N (index 0)\n    ];\n\n    let currDirection = 0; // Start facing North\n    let x = 0, y = 0;\n    let maxDist = 0;\n\n    for (let command of commands) {\n        if (command > 0) {\n            let dx = directionVectors[currDirection][0];\n            let dy = directionVectors[currDirection][1];\n            for (let i = 0; i < command; i++) {\n                let nextX = x + dx;\n                let nextY = y + dy;\n                if (obs.has(nextX + \",\" + nextY)) {\n                    break;\n                }\n                x = nextX;\n                y = nextY;\n            }\n            maxDist = Math.max(maxDist, x * x + y * y);\n        } else {\n            currDirection = dirChangeMap[currDirection][command === -1 ? 1 : 0];\n        }\n    }\n\n    return maxDist;\n};",
     "language": "javascript",
     "notes": "",
