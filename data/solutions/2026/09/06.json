@@ -1,0 +1,46 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @param {string} t\n * @return {number}\n */\nvar numDistinct = function(s, t) {\n    let res = 0;\n\n    const dfs = (i, j) => {\n        if (i >= s.length || j >= t.length) {\n            if (j >= t.length) {\n                res++;\n            }\n            return;\n        }\n\n        if (s[i] === t[j]) {\n            dfs(i + 1, j + 1);\n        }\n        dfs(i + 1, j);\n    };\n    dfs(0, 0);\n\n    return res;\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This code uses a recursive depth-first search to count distinct subsequences. It explores all positions in string `s` by either matching the current character with string `t` (if they're equal) or skipping it. The base case returns when we've either exhausted `s` or completed matching all of `t`, incrementing a counter for each successful match. Without memoization, it recalculates the same subproblems many times, leading to exponential time complexity and the **TLE** status.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-03-20T18:58:53.000Z"
+  },
+  {
+    "author": "Vitor + Leetcode",
+    "code": "/**\n * @param {string} s\n * @param {string} t\n * @return {number}\n */\nvar numDistinct = function(s, t) {\n    const dp = Array.from({ length: s.length }, () => Array(t.length).fill(-1));\n\n    const dfs = (i, j) => {\n        if (j === t.length) return 1;\n        if (i === s.length) return 0;\n        if (dp[i][j] !== -1) return dp[i][j];\n\n        let take = 0;\n        let skip = 0;\n\n        if (s[i] === t[j]) {\n            take = dfs(i + 1, j + 1);\n        }\n        skip = dfs(i + 1, j);\n\n        dp[i][j] = take + skip;\n        return dp[i][j];\n    };\n\n    return dfs(0, 0);\n};",
+    "language": "javascript",
+    "notes": "I believe this was loosely inspired on another solution.",
+    "aiExplanation": "This improves the brute force approach by adding memoization with a 2D array. The DFS explores the same states (position in `s`, position in `t`) but now stores results in `dp[i][j]` to avoid redundant calculations. When characters match, it counts both taking the character (moving both pointers) and skipping it (moving only in `s`). The recursive base cases return 1 when `t` is fully matched and 0 when `s` is exhausted without matching `t`.",
+    "status": "DONE",
+    "cpuUsage": 23.31,
+    "memoryUsage": 39.11,
+    "date": "2026-03-20T19:10:30.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @param {string} t\n * @return {number}\n */\nvar numDistinct = function(s, t) {\n    const memo = new Map();\n\n    const dfs = (cur, lookup) => {\n        const key = cur + ':' + lookup;\n        if (memo.has(key)) return memo.get(key);\n\n        if (lookup === t.length) {\n            memo.set(key, 1);\n            return 1;\n        }\n        if (cur === s.length) {\n            memo.set(key, 0);\n            return 0;\n        }\n\n        const res = dfs(cur + 1, lookup) +\n            (s[cur] === t[lookup] ? dfs(cur + 1, lookup + 1) : 0);\n\n        memo.set(key, res);\n        return res;\n    };\n    return dfs(0, 0);\n};",
+    "language": "javascript",
+    "notes": "Was expecting a TLE, somehow it passed.",
+    "aiExplanation": "This replaces the 2D array with a `Map` for memoization, using a string key (`cur:lookup`) to cache results. The logic remains the same—it counts subsequences by deciding whether to skip the current character in `s` or (if it matches) include it. This approach performs well because it only stores actually-visited states rather than allocating space for the entire grid upfront.",
+    "status": "DONE",
+    "cpuUsage": 6.55,
+    "memoryUsage": 5.58,
+    "date": "2026-09-06T08:59:15.000Z"
+  },
+  {
+    "author": "Leetcode",
+    "code": "/**\n * @param {string} s\n * @param {string} t\n * @return {number}\n */\nvar numDistinct = function(s, t) {\n    const dp = Array(t.length + 1).fill(0);\n    dp[0] = 1;\n\n    for (const char of s) {\n        for (let j = t.length - 1; j >= 0; j--) {\n            if (char === t[j]) {\n                dp[j + 1] += dp[j];\n            }\n        }\n    }\n\n    return dp[t.length];\n};",
+    "language": "javascript",
+    "notes": "Crazy 1-dimension dp solution, seems like magic to me.",
+    "aiExplanation": "This is the most optimized solution, using a 1D array instead of recursion. `dp[j]` represents the count of ways to match the first `j` characters of `t`. For each character in `s`, it iterates backwards through `t` to update the counts—if characters match, it adds the previous count (`dp[j]`) to the next position (`dp[j+1]`). This **O(n·m)** time and **O(m)** space solution is elegant and fast.",
+    "status": "DONE",
+    "cpuUsage": 57.23,
+    "memoryUsage": 72.06,
+    "date": "2026-09-06T09:05:34.000Z"
+  }
+]

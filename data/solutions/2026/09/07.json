@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Leetcode",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar distinctSubseqII = function (s) {\n    let MOD = 1_000_000_007;\n    let n = s.length;\n    const dp = new Array(n + 1);\n    dp[0] = 1;\n    const last = Array(26).fill(-1);\n\n    for (let i = 0; i < n; ++i) {\n        const pos = s.charCodeAt(i) - 97;\n\n        dp[i + 1] = (dp[i] * 2) % MOD;\n\n        if (last[pos] >= 0) {\n            dp[i + 1] -= dp[last[pos]];\n        }\n\n        dp[i + 1] %= MOD;\n        last[pos] = i;\n    }\n\n    return (dp[n] - 1 + MOD) % MOD;\n};\n",
+    "language": "javascript",
+    "notes": "Knowing yesterday's solution was already magic, I didn't even attempt to do this one.",
+    "aiExplanation": "This algorithm counts the number of **distinct subsequences** in a string using dynamic programming. It maintains `dp[i]` to represent the count of distinct subsequences up to position `i`, starting with 1 (the empty subsequence). For each character, it **doubles** `dp[i]` since every existing subsequence can either include or exclude this character—but then it **subtracts** the count from when this character last appeared (`dp[last[pos]]`) to eliminate duplicate subsequences. By tracking the last position of each letter in the `last` array, the algorithm avoids counting the same subsequence twice. Finally, it returns the result minus 1 to exclude the empty subsequence.",
+    "status": "DONE",
+    "cpuUsage": 58.33,
+    "memoryUsage": 75,
+    "date": "2026-09-07T07:30:24.000Z"
+  }
+]

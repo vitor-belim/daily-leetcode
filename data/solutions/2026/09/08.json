@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @return {number}\n */\nvar countCommas = function(n) {\n    return Math.max(0, n - 999);\n};\n",
+    "language": "javascript",
+    "notes": "Seemed like it might include some crazy math tricks, but the restriction of max n = 100_000 is too low.",
+    "aiExplanation": "This function counts how many commas appear in the decimal representation of a number `n`. The formula `Math.max(0, n - 999)` works because commas appear every 3 digits after the first 3 digits (thousands position onwards). For numbers 0–999, there are no commas, so the result is 0. For numbers 1000 and above, each additional digit beyond 999 represents a group of digits that would need a comma, so the count equals `n - 999` (ensuring it doesn't go below 0 for edge cases).",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 74.19,
+    "date": "2026-09-08T08:13:42.000Z"
+  }
+]
