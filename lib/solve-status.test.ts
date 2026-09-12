@@ -213,11 +213,26 @@ describe("summarizeSolutions", () => {
     expect(summary.solveStatus).toBe(SolveStatus.FunctionallyCorrect);
   });
 
-  it("fails a day whose attempts only errored out", () => {
+  // A failed-constraints submission hit a runtime limit LeetCode doesn't
+  // report as TLE/MLE (e.g. "RangeError: Invalid string length", heap out of
+  // memory), so it's another "worked but cost too much" outcome.
+  it("is functionally correct when a rejected day includes a failed-constraints run", () => {
     const summary = summarizeSolutions(
       [
         solution({ status: SolutionStatus.Failed }),
         solution({ status: SolutionStatus.FailedConstraints }),
+      ],
+      "2026-07-20",
+      TODAY,
+    );
+    expect(summary.solveStatus).toBe(SolveStatus.FunctionallyCorrect);
+  });
+
+  it("fails a day whose attempts only errored out", () => {
+    const summary = summarizeSolutions(
+      [
+        solution({ status: SolutionStatus.Failed }),
+        solution({ status: SolutionStatus.Failed }),
       ],
       "2026-07-20",
       TODAY,

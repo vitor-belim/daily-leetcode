@@ -60,13 +60,14 @@ export enum SolveStatus {
   /** At least one of the author's own submissions was accepted. */
   Solved = "SOLVED",
   /**
-   * Nothing was accepted, but at least one submission exceeded the time limit
-   * rather than erroring out: the approach worked, it was just too slow.
+   * Nothing was accepted, but at least one submission exceeded a time, memory
+   * or other runtime limit rather than erroring out: the approach worked, it
+   * just cost too much.
    */
   FunctionallyCorrect = "FUNCTIONALLY_CORRECT",
   /**
-   * The day is over with no accepted or time-limited submission: the author
-   * either gave up on an error or never attempted it.
+   * The day is over with no accepted or limit-exceeding submission: the
+   * author either gave up on an error or never attempted it.
    */
   Failed = "FAILED",
   /** The day is still in progress and the author has not submitted yet. */

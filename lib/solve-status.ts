@@ -103,10 +103,14 @@ export function summarizeSolutions(
 
 /**
  * Tells whether a submission ran out of time or memory, which means the
- * approach itself worked and only its cost was too high.
+ * approach itself worked and only its cost was too high. Failed-constraints
+ * runs count too: they hit a runtime limit LeetCode doesn't report as a time
+ * or memory limit exceeded, such as a heap out of memory or an oversized
+ * string.
  *
  * @param solution The solution to classify.
- * @returns True for a time or memory limit exceeded submission.
+ * @returns True for a time limit exceeded, memory limit exceeded or failed
+ *   constraints submission.
  */
 function exceededALimit(solution: Solution): boolean {
   return (
@@ -123,8 +127,8 @@ function exceededALimit(solution: Solution): boolean {
  * @param date The challenge day as `YYYY-MM-DD`.
  * @param today The reference "today".
  * @returns Solved when anything was accepted, FunctionallyCorrect when the
- *   best outcome was a time or memory limit exceeded, Pending for an
- *   untouched day still in progress, otherwise Failed.
+ *   best outcome exceeded a time, memory or other runtime limit, Pending for
+ *   an untouched day still in progress, otherwise Failed.
  */
 function resolveStatus(
   own: Solution[],
