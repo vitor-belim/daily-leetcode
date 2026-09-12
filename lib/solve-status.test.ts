@@ -57,12 +57,110 @@ describe("summarizeSolutions", () => {
     expect(summary).toEqual({
       solveStatus: SolveStatus.Solved,
       attempts: 3,
+      // The TLE came first, so the pass took two tries; the later accepted
+      // python run doesn't add to that.
+      attemptsToSolve: 2,
       languages: ["javascript", "python"],
       // Best percentiles are taken independently across accepted submissions.
       bestRuntime: 85,
       bestMemory: 90,
       hasEditorial: false,
     });
+  });
+
+  // Submissions made after the first pass (other approaches, chasing better
+  // percentiles) don't count towards the tries it took, and the file order
+  // is irrelevant: only submission time decides which pass came first.
+  it("counts attempts up to the earliest accepted submission", () => {
+    const summary = summarizeSolutions(
+      [
+        solution({
+          status: SolutionStatus.Done,
+          date: "2026-07-20T09:30:00.000Z",
+        }),
+        solution({
+          status: SolutionStatus.Failed,
+          date: "2026-07-20T09:10:00.000Z",
+        }),
+        solution({
+          status: SolutionStatus.Failed,
+          date: "2026-07-20T09:40:00.000Z",
+        }),
+        solution({
+          status: SolutionStatus.Done,
+          date: "2026-07-20T09:20:00.000Z",
+        }),
+      ],
+      "2026-07-20",
+      TODAY,
+    );
+
+    expect(summary.attempts).toBe(4);
+    expect(summary.attemptsToSolve).toBe(2);
+  });
+
+  // Submissions for the same problem from before it became the daily, or
+  // after its UTC day ended, don't count towards the challenge day's tries.
+  it("counts only submissions made on the challenge's UTC day", () => {
+    const summary = summarizeSolutions(
+      [
+        solution({
+          status: SolutionStatus.Done,
+          date: "2024-09-13T14:37:19.000Z",
+        }),
+        solution({
+          status: SolutionStatus.Failed,
+          date: "2026-07-20T00:05:00.000Z",
+        }),
+        solution({
+          status: SolutionStatus.Done,
+          date: "2026-07-20T23:55:00.000Z",
+        }),
+        solution({
+          status: SolutionStatus.Done,
+          date: "2026-07-21T00:05:00.000Z",
+        }),
+      ],
+      "2026-07-20",
+      TODAY,
+    );
+
+    expect(summary.attempts).toBe(4);
+    expect(summary.attemptsToSolve).toBe(2);
+  });
+
+  // The day still reads as solved thanks to the older pass, but it has no
+  // challenge-day count to report.
+  it("has no attempts-to-solve when the only pass came on another day", () => {
+    const summary = summarizeSolutions(
+      [
+        solution({
+          status: SolutionStatus.Done,
+          date: "2024-07-27T07:23:57.000Z",
+        }),
+        solution({
+          status: SolutionStatus.Failed,
+          date: "2026-07-20T08:00:00.000Z",
+        }),
+      ],
+      "2026-07-20",
+      TODAY,
+    );
+
+    expect(summary.solveStatus).toBe(SolveStatus.Solved);
+    expect(summary.attemptsToSolve).toBeNull();
+  });
+
+  it("has no attempts-to-solve when nothing was accepted", () => {
+    const summary = summarizeSolutions(
+      [
+        solution({ status: SolutionStatus.Failed }),
+        solution({ status: SolutionStatus.TimeLimitExceeded }),
+      ],
+      "2026-07-20",
+      TODAY,
+    );
+    expect(summary.attemptsToSolve).toBeNull();
   });
 
   it("ignores editorial solutions when deciding the status", () => {

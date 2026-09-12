@@ -78,6 +78,12 @@ export interface SolveSummary {
   solveStatus: SolveStatus;
   /** Number of the author's own submissions. */
   attempts: number;
+  /**
+   * The author's own submissions made on the challenge's UTC day, up to and
+   * including their first accepted one, in submission order; null when
+   * nothing was accepted that day.
+   */
+  attemptsToSolve: number | null;
   /** Distinct languages across the author's own submissions. */
   languages: string[];
   /** Best runtime percentile among the author's accepted submissions. */

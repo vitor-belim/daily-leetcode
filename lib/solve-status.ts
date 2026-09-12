@@ -44,13 +44,35 @@ function maxPercentile(
 }
 
 /**
+ * Counts how many submissions it took to first get accepted on the challenge
+ * day itself. Submissions for the same problem from before it became the
+ * daily, or after its UTC day ended, are left out, and so are re-submissions
+ * made after the pass (to try other approaches or chase better percentiles).
+ *
+ * @param own The author's own submissions for the day, in any order.
+ * @param date The challenge day as `YYYY-MM-DD`.
+ * @returns The 1-based position of the earliest accepted submission among
+ *   that UTC day's submissions ordered by submission time; null when nothing
+ *   was accepted that day.
+ */
+function countAttemptsToSolve(own: Solution[], date: string): number | null {
+  const chronological = own
+    .filter((s) => formatDateUTC(new Date(s.date)) === date)
+    .sort((a, b) => Date.parse(a.date) - Date.parse(b.date));
+  const firstAccepted = chronological.findIndex(
+    (s) => s.status === SolutionStatus.Done,
+  );
+  return firstAccepted === -1 ? null : firstAccepted + 1;
+}
+
+/**
  * Derives the author's progress on one day from its archived solutions.
  *
  * @param solutions The day's solutions, in any order.
  * @param date The challenge day as `YYYY-MM-DD`, used to tell a failed past
  *   day from one that is still in progress.
  * @param today The reference "today" (defaults to the current UTC day).
- * @returns The solve status plus attempt count, languages, best accepted
+ * @returns The solve status plus attempt counts, languages, best accepted
  *   percentiles and whether an editorial solution is present.
  */
 export function summarizeSolutions(
@@ -71,6 +93,7 @@ export function summarizeSolutions(
   return {
     solveStatus: resolveStatus(own, date, today),
     attempts: own.length,
+    attemptsToSolve: countAttemptsToSolve(own, date),
     languages: [...new Set(own.map((s) => s.language))],
     bestRuntime,
     bestMemory,

@@ -14,18 +14,37 @@ interface DailyRowProps {
 }
 
 /**
+ * The language nearly every solution is written in. It goes without saying,
+ * so only other languages are listed.
+ */
+const DEFAULT_LANGUAGE = "javascript";
+
+/**
+ * Formats an attempt count with the matching singular or plural noun.
+ */
+function pluralizeAttempts(count: number): string {
+  return `${count} ${count === 1 ? "attempt" : "attempts"}`;
+}
+
+/**
  * Turns a summary into the one-line detail shown under the title, e.g.
- * "Solved in 3 attempts · javascript · beats 83% runtime".
+ * "Solved after 3 attempts · beats 83% runtime". A solved day counts only
+ * the challenge day's attempts up to its first pass, and shows no count when
+ * the pass came on another day.
  */
 function describeProgress(daily: DailySummary): string {
-  const attempts = `${daily.attempts} ${daily.attempts === 1 ? "attempt" : "attempts"}`;
+  const attempts = pluralizeAttempts(daily.attempts);
   const parts: string[] = [];
 
   switch (daily.solveStatus) {
     case SolveStatus.Solved:
-      parts.push(
-        daily.attempts === 1 ? "Solved first try" : `Solved in ${attempts}`,
-      );
+      if (daily.attemptsToSolve === null) {
+        parts.push("Solved");
+      } else if (daily.attemptsToSolve === 1) {
+        parts.push("Solved first try");
+      } else {
+        parts.push(`Solved after ${pluralizeAttempts(daily.attemptsToSolve)}`);
+      }
       break;
     case SolveStatus.FunctionallyCorrect:
       parts.push("Functionally correct", `${attempts}, limits exceeded`);
@@ -43,7 +62,10 @@ function describeProgress(daily: DailySummary): string {
       break;
   }
 
-  if (daily.languages.length > 0) parts.push(daily.languages.join(", "));
+  const otherLanguages = daily.languages.filter(
+    (language) => language !== DEFAULT_LANGUAGE,
+  );
+  if (otherLanguages.length > 0) parts.push(otherLanguages.join(", "));
   if (daily.bestRuntime !== null) {
     parts.push(`beats ${Math.round(daily.bestRuntime)}% runtime`);
   }

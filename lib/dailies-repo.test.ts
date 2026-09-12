@@ -147,6 +147,7 @@ describe("dailies-repo", () => {
         difficulty: Difficulty.Hard,
         solveStatus: SolveStatus.Solved,
         attempts: 2,
+        attemptsToSolve: 2,
         bestRuntime: 80,
         hasEditorial: true,
       });
