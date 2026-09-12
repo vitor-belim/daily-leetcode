@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Leetcode",
+    "code": "/**\n * @param {number} n\n * @return {number}\n */\nvar countCommas = function(n) {\n    let temp = 1_000;\n    let res = 0;\n\n    while (temp <= n) {\n        res += n - temp + 1;\n        temp *= 1_000;\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "I knew there was some math wizardry present, didn't bother attempting to solve.",
+    "aiExplanation": "This function counts how many **commas** appear when a number is formatted with thousand separators (e.g., `1000` → `\"1,000\"`, `1000000` → `\"1,000,000\"`). It iterates through each tier of thousands starting at `1000`, checking which tiers the input number `n` reaches. For each tier, it calculates how many numbers fall within that range using `n - temp + 1`, which counts all numbers from that thousand boundary up to `n`. By multiplying `temp` by `1000` after each iteration, the function moves to the next tier (millions, billions, etc.), accumulating the total comma count in `res` and returning it.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 10.19,
+    "date": "2026-09-09T08:55:49.000Z"
+  }
+]

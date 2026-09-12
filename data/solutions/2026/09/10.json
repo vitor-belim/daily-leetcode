@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for a binary tree node.\n * function TreeNode(val, left, right) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.left = (left===undefined ? null : left)\n *     this.right = (right===undefined ? null : right)\n * }\n */\n/**\n * @param {TreeNode} root\n * @return {number}\n */\nvar averageOfSubtree = function(root) {\n    const dfs = (node) => {\n        if (!node) return { sum: 0, count: 0, res: 0 };\n\n        const left = dfs(node.left);\n        const right = dfs(node.right);\n\n        const sum = node.val + left.sum + right.sum;\n        const count = 1 + left.count + right.count;\n        let res = left.res + right.res;\n\n        if (Math.floor(sum / count) === node.val) {\n            res++;\n        }\n\n        return { sum, count, res };\n    };\n\n    return dfs(root).res;\n};\n",
+    "language": "javascript",
+    "notes": "Intuition-based.",
+    "aiExplanation": "This solution uses **depth-first search (DFS)** with a helper function that returns an object containing three pieces of information: the `sum` of all node values in the subtree, the `count` of nodes in the subtree, and `res` which accumulates the count of valid subtrees. For each node, it recursively processes the left and right subtrees, then calculates the **total sum** and **total count** for the current subtree. If the **floored average** (`Math.floor(sum / count)`) equals the node's value, it increments the result counter `res`. By returning an object that carries the result through the recursion, this approach combines the accumulation of values with the counting of valid nodes in a single data structure.",
+    "status": "DONE",
+    "cpuUsage": 68.73,
+    "memoryUsage": 70.52,
+    "date": "2026-09-10T09:32:44.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * Definition for a binary tree node.\n * function TreeNode(val, left, right) {\n *     this.val = (val===undefined ? 0 : val)\n *     this.left = (left===undefined ? null : left)\n *     this.right = (right===undefined ? null : right)\n * }\n */\n/**\n * @param {TreeNode} root\n * @return {number}\n */\nvar averageOfSubtree = function(root) {\n    let res = 0;\n\n    const dfs = (node) => {\n        if (!node) return { sum: 0, count: 0 };\n\n        const left = dfs(node.left);\n        const right = dfs(node.right);\n\n        const sum = node.val + left.sum + right.sum;\n        const count = 1 + left.count + right.count;\n\n        if (Math.floor(sum / count) === node.val) {\n            res++;\n        }\n\n        return { sum, count };\n    };\n    dfs(root);\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Code/performance improvements.",
+    "aiExplanation": "This solution also uses **depth-first search** but takes a different approach to tracking results: instead of returning the result count within the recursive object, it uses a **closure variable** `res` declared in the outer scope to accumulate the count of valid subtrees. The DFS helper function returns only the `sum` and `count` for each subtree, and when a subtree's average (calculated as `Math.floor(sum / count)`) matches the node's value, it directly increments the outer `res` variable. This approach separates concerns by keeping the structural information (`sum` and `count`) distinct from the result counter, which is maintained externally through closure.",
+    "status": "DONE",
+    "cpuUsage": 99.2,
+    "memoryUsage": 60.16,
+    "date": "2026-09-10T09:34:51.000Z"
+  }
+]

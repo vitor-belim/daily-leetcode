@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} digits\n * @return {number}\n */\nvar totalNumbers = function(digits) {\n    const n = digits.length;\n    let res = new Set();\n\n    for (let i = 0; i < n; i++) {\n        if (digits[i] === 0) continue;\n\n        for (let j = 0; j < n; j++) {\n            if (j === i) continue;\n\n            for (let k = 0; k < n; k++) {\n                if (k === i || k === j) continue;\n                if (digits[k] & 1) continue;\n\n                res.add(digits[i] + ':' + digits[j] + ':' + digits[k]);\n            }\n        }\n    }\n\n    return res.size;\n};\n",
+    "language": "javascript",
+    "notes": "The brute-force way.",
+    "aiExplanation": "This function counts the number of **unique 3-digit numbers** that can be formed from an array of digits with specific constraints. It uses three nested loops to select three different positions from the array: the **first digit** (position `i`) cannot be `0`, the **second digit** (position `j`) can be any digit at a different position, and the **third digit** (position `k`) must be at a different position than the first two AND must be **even** (checked by `digits[k] & 1`, which returns 0 for even numbers). Each valid combination is stored in a `Set` using a string key format (`digits[i] + ':' + digits[j] + ':' + digits[k]`), which automatically prevents duplicates; the function then returns the `size` of this set, representing the count of distinct valid numbers.",
+    "status": "DONE",
+    "cpuUsage": 45.45,
+    "memoryUsage": 43.18,
+    "date": "2026-09-11T08:58:28.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} digits\n * @return {number}\n */\nvar totalNumbers = function(digits) {\n    const freq = Array(10).fill(0);\n\n    for (const digit of digits) {\n        freq[digit]++;\n    }\n\n    let res = 0;\n\n    for (let i = 1; i <= 9; i++) {\n        if (freq[i] === 0) continue;\n        freq[i]--;\n\n        for (let j = 0; j <= 9; j++) {\n            if (freq[j] === 0) continue;\n            freq[j]--;\n\n            for (let k = 0; k <= 8; k += 2) {\n                if (freq[k] === 0) continue;\n\n                res++;\n            }\n\n            freq[j]++;\n        }\n\n        freq[i]++;\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "The proper way.",
+    "aiExplanation": "This function counts how many valid **3-digit even numbers** can be formed using the given digits. It first creates a **frequency array** to track how many times each digit (0-9) appears in the input. Then it uses three nested loops to systematically try all possible combinations: the **first digit** is chosen from 1-9 (to avoid leading zeros), the **second digit** from 0-9, and the **third digit** only from even numbers (0, 2, 4, 6, 8) to ensure the resulting number is even. For each valid combination where all required digits are available, it temporarily decrements the frequency counts to simulate \"using\" those digits, counts it as a valid number, and then restores the counts so other combinations can still use those digits. The function returns the total count of all such valid 3-digit even numbers that can be formed.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 97.73,
+    "date": "2026-09-11T09:04:33.000Z"
+  }
+]

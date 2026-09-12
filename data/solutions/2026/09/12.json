@@ -1,0 +1,35 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} intervals\n * @return {number[]}\n */\nvar maximumWeight = function(intervals) {\n    intervals = intervals\n        .map((x, i) => [...x, i])\n        .sort((a, b) => a[0] === b[0] ? a[1] - b[1] : a[0] - b[0]);\n\n    let res = [];\n    let score = 0;\n\n    const dfs = (pos, arr, sc) => {\n        if (pos === intervals.length || arr.length === 4) {\n            if (sc > score) {\n                score = sc;\n                res = [...arr];\n            }\n            return;\n        }\n\n        if (arr.length === 0 || intervals[arr[arr.length - 1]][1] < intervals[pos][0]) {\n            arr.push(pos);\n            dfs(pos + 1, arr, sc + intervals[pos][2]);\n            arr.pop();\n        }\n\n        dfs(pos + 1, arr, sc);\n    };\n    dfs(0, [], 0);\n\n    return res\n        .map(x => intervals[x][3])\n        .sort((a, b) => a - b);\n};\n",
+    "language": "javascript",
+    "notes": "Forgot to check for lexicographical sorting.",
+    "aiExplanation": "This solution uses **backtracking** to find the 4 non-overlapping intervals with the maximum total weight by exploring all valid combinations. It adds the original index to each interval and sorts them by start time, then recursively tries including or excluding each interval while ensuring selected intervals don't overlap (previous interval's end < current interval's start). It tracks the combination with the highest total weight score and returns the original indices of the selected intervals sorted in ascending order.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-09-12T08:10:20.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} intervals\n * @return {number[]}\n */\nvar maximumWeight = function(intervals) {\n    intervals = intervals\n        .map((x, i) => [...x, i])\n        .sort((a, b) => a[0] === b[0] ? a[1] - b[1] : a[0] - b[0]);\n\n    let res = [];\n    let score = 0;\n\n    const dfs = (pos, arr, sc) => {\n        if (pos === intervals.length || arr.length === 4) {\n            if (sc < score) return;\n\n            const newArr = arr\n                .map(x => intervals[x][3])\n                .sort((a, b) => a - b);\n\n            if (sc > score) {\n                score = sc;\n                res = newArr;\n            } else if (newArr.join(',') < res.join(',')) {\n                res = newArr;\n            }\n            return;\n        }\n\n        if (arr.length === 0 || intervals[arr[arr.length - 1]][1] < intervals[pos][0]) {\n            arr.push(pos);\n            dfs(pos + 1, arr, sc + intervals[pos][2]);\n            arr.pop();\n        }\n\n        dfs(pos + 1, arr, sc);\n    };\n    dfs(0, [], 0);\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Achieved TLE as expected, 509 / 581 testcases passed.",
+    "aiExplanation": "This solution is similar to the first but adds **lexicographical tie-breaking**: when two combinations have equal weight, it selects the one with the lexicographically smaller sorted indices by comparing them as comma-joined strings. It still uses backtracking to explore all valid combinations of up to 4 non-overlapping intervals, computing the sorted indices at each base case and comparing them both by score and by lexicographical order to find the optimal result.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-09-12T08:21:09.000Z"
+  },
+  {
+    "author": "Vitor + ChatGPT",
+    "code": "/**\n * @param {number[][]} intervals\n * @return {number[]}\n */\nvar maximumWeight = function(intervals) {\n    intervals = intervals\n        .map((x, i) => [...x, i])\n        .sort((a, b) => a[0] === b[0] ? a[1] - b[1] : a[0] - b[0]);\n\n    const n = intervals.length;\n    const memo = new Map();\n\n    // First interval whose start > current interval's end\n    const getNext = (pos) => {\n        let left = pos + 1;\n        let right = n;\n\n        while (left < right) {\n            const mid = Math.floor((left + right) / 2);\n\n            if (intervals[mid][0] > intervals[pos][1]) {\n                right = mid;\n            } else {\n                left = mid + 1;\n            }\n        }\n\n        return left;\n    };\n\n    const lexSmaller = (a, b) => {\n        const len = Math.min(a.length, b.length);\n\n        for (let i = 0; i < len; i++) {\n            if (a[i] !== b[i]) {\n                return a[i] < b[i];\n            }\n        }\n\n        return a.length < b.length;\n    };\n\n    // Returns:\n    // {\n    //   score: maximum weight,\n    //   indices: original interval indices\n    // }\n    const dfs = (pos, remaining) => {\n        if (pos === n || remaining === 0) {\n            return {\n                score: 0,\n                indices: []\n            };\n        }\n\n        const key = `${pos},${remaining}`;\n\n        if (memo.has(key)) {\n            return memo.get(key);\n        }\n\n        // Skip\n        const skipped = dfs(pos + 1, remaining);\n\n        // Take\n        const next = getNext(pos);\n        const takenRest = dfs(next, remaining - 1);\n\n        const taken = {\n            score: intervals[pos][2] + takenRest.score,\n            indices: [\n                intervals[pos][3],\n                ...takenRest.indices\n            ].sort((a, b) => a - b)\n        };\n\n        let result;\n\n        if (taken.score > skipped.score) {\n            result = taken;\n        } else if (taken.score < skipped.score) {\n            result = skipped;\n        } else {\n            result = lexSmaller(taken.indices, skipped.indices)\n                ? taken\n                : skipped;\n        }\n\n        memo.set(key, result);\n        return result;\n    };\n\n    return dfs(0, 4).indices;\n};\n",
+    "language": "javascript",
+    "notes": "Requested memoization to be added to the previous one.",
+    "aiExplanation": "This solution uses **dynamic programming with memoization** for improved efficiency, avoiding redundant subproblem calculations. It includes a **binary search** (`getNext()`) to quickly find the next non-overlapping interval instead of checking linearly, and a **lexicographical comparison** helper (`lexSmaller()`) to break ties. The recursive `dfs()` function returns an object with both the maximum weight and corresponding sorted original indices, storing results in a memo map keyed by position and remaining slots needed.",
+    "status": "DONE",
+    "cpuUsage": 40,
+    "memoryUsage": 80,
+    "date": "2026-09-12T08:30:06.000Z"
+  }
+]
