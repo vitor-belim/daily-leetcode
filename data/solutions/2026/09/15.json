@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @param {number} k\n * @return {number}\n */\nvar maxPalindromes = function(s, k) {\n    let res = 0;\n\n    for (let i = 0; i < s.length; i++) {\n        let subStart = '';\n        let subEnd = '';\n\n        for (let j = i; j < s.length - Math.floor((s.length - i - 1) / 2); j++) {\n            const created1 = subStart + subEnd;\n            const sliced1 = s.slice(i, i + created1.length);\n\n            if (created1.length >= k && created1 === sliced1) {\n                res++;\n                i += created1.length - 1;\n                break;\n            }\n\n            const created2 = subStart + s[j] + subEnd;\n            const sliced2 = s.slice(i, i + created2.length);\n\n            if (created2.length >= k && created2 === sliced2) {\n                res++;\n                i += created2.length - 1;\n                break;\n            }\n\n            subStart += s[j];\n            subEnd = s[j] + subEnd;\n        }\n    }\n\n    return res;\n};",
+    "language": "javascript",
+    "notes": "There's a bug somewhere, but I didn't find it. Was expecting TLE.",
+    "aiExplanation": "This solution finds the maximum number of non-overlapping palindromic substrings of at least length **k** using a greedy approach. It iterates through each position in the string and builds potential palindromes by expanding outward with two pointers (`subStart` and `subEnd`) from the center. At each expansion, it checks if either an even-length palindrome (`subStart + subEnd`) or an odd-length palindrome (`subStart + s[j] + subEnd`) matches the actual substring in **s**; when a valid palindrome of sufficient length is found, it increments the counter and jumps the main pointer past that palindrome to avoid overlaps.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-09-15T07:39:24.000Z"
+  },
+  {
+    "author": "Leetcode",
+    "code": "/** By Leetcode */\nvar maxPalindromes = function (s, k) {\n    const n = s.length;\n    let res = 0;\n    let start = 0;\n\n    const check = (left, right) => {\n        while (left < right && s[left] === s[right]) {\n            left++;\n            right--;\n        }\n        return left >= right;\n    };\n\n    for (let right = k - 1; right < n; right++) {\n        let left = right - k + 1;\n        if (left >= start && check(left, right)) {\n            res++;\n            start = right + 1;\n            continue;\n        }\n\n        left = right - k;\n        if (left >= start && check(left, right)) {\n            res++;\n            start = right + 1;\n        }\n    }\n\n    return res;\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution efficiently counts the maximum number of non-overlapping palindromes in string **s** where each palindrome has length **k** or **k+1**. The `check` function validates palindromes by comparing characters from both ends moving inward. The algorithm uses a greedy approach: for each ending position **right**, it first checks if the previous **k** characters form a palindrome, and if not, checks if the previous **k+1** characters do; when a palindrome is found, it increments the count and updates **start** to the position after the palindrome to ensure no overlapping selections.",
+    "status": "DONE",
+    "cpuUsage": 83.33,
+    "memoryUsage": 58.33,
+    "date": "2026-09-15T07:44:55.000Z"
+  }
+]

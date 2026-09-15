@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} rec1\n * @param {number[]} rec2\n * @return {boolean}\n */\nvar isRectangleOverlap = function(rec1, rec2) {\n    const innerSquareBottomX = Math.max(rec1[0], rec2[0]);\n    const innerSquareBottomY = Math.max(rec1[1], rec2[1]);\n    const innerSquareTopX = Math.min(rec1[2], rec2[2]);\n    const innerSquareTopY = Math.min(rec1[3], rec2[3]);\n\n    return innerSquareTopX - innerSquareBottomX > 0 &&\n        innerSquareTopY - innerSquareBottomY > 0;\n};\n",
+    "language": "javascript",
+    "notes": "Intersection between two rectangles.",
+    "aiExplanation": "This function determines whether two **rectangles overlap** by finding the intersection area between them. Each rectangle is represented as an array `[x1, y1, x2, y2]` where `(x1, y1)` is the bottom-left corner and `(x2, y2)` is the top-right corner. The code calculates the **potential overlap region** by taking the **maximum** of the left/bottom coordinates from both rectangles (this gives the innermost bottom-left corner) and the **minimum** of the right/top coordinates (this gives the innermost top-right corner). The rectangles overlap only if this intersection region has **positive width** and **positive height** — meaning the top-right corner of the intersection is actually above and to the right of the bottom-left corner, which would be impossible if there was no real overlap.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 11.11,
+    "date": "2026-09-14T07:39:53.000Z"
+  }
+]

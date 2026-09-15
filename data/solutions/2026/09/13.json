@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} img1\n * @param {number[][]} img2\n * @return {number}\n */\nvar largestOverlap = function(img1, img2) {\n    const n = img1.length;\n    const set1 = new Set();\n    const set2 = new Set();\n\n    for (let i = 0; i < n; i++) {\n        for (let j = 0; j < n; j++) {\n            if (img1[i][j] === 1) set1.add([i, j]);\n            if (img2[i][j] === 1) set2.add([i, j]);\n        }\n    }\n\n    const map = new Map();\n    let max = 0;\n\n    for (const point1 of set1) {\n        for (const point2 of set2) {\n            const dx = point1[0] - point2[0];\n            const dy = point1[1] - point2[1];\n\n            const key = dx + ':' + dy;\n            const count = (map.get(key) || 0) + 1;\n            map.set(key, count);\n\n            max = Math.max(max, count);\n        }\n    }\n\n    return max;\n};\n",
+    "language": "javascript",
+    "notes": "Inspired by an existing solution idea, manually developed.",
+    "aiExplanation": "This function finds the **largest overlap** between two binary images by converting each image into a set of coordinates where 1s appear, then examining all possible **offsets** (translations) between them. For each pair of coordinates—one from each image—it calculates the **displacement vector** and tracks how many coordinate pairs produce the same displacement using a `Map`. This count represents how many 1s from one image would overlap with 1s in the other if shifted by that offset. The function returns the **maximum overlap count** found by trying all possible translations.",
+    "status": "DONE",
+    "cpuUsage": 41.13,
+    "memoryUsage": 44.9,
+    "date": "2026-09-13T09:09:50.000Z"
+  }
+]
