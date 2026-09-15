@@ -1,6 +1,13 @@
 import { describe, it, expect } from "vitest";
 import { SolutionStatus, type Solution } from "./types";
-import { statusFromDisplay, score, buildSolution, dedupeSolutions } from "./solutions";
+import {
+  statusFromDisplay,
+  score,
+  buildSolution,
+  dedupeSolutions,
+  isEditorialCode,
+} from "./solutions";
+import { EDITORIAL_AUTHOR } from "./solve-status";
 import type { SubmissionListItem, SubmissionDetails } from "./leetcode-api";
 
 describe("statusFromDisplay", () => {
@@ -69,6 +76,46 @@ describe("buildSolution", () => {
     expect(solution.notes).toBe("");
     expect(solution.aiExplanation).toBe("");
     expect(solution.date).toBe(new Date(1753430400 * 1000).toISOString());
+  });
+
+  it("attributes code carrying a 'By Leetcode' comment to the editorial author", () => {
+    const sub: SubmissionListItem = {
+      id: "124",
+      statusDisplay: "Accepted",
+      lang: "javascript",
+      runtime: "50 ms",
+      memory: "40 MB",
+      timestamp: "1753430400",
+      url: "/submissions/124",
+    };
+    const details: SubmissionDetails = {
+      runtimePercentile: 83.33,
+      memoryPercentile: 58.33,
+      code: "/** By Leetcode */\nvar x = 1;",
+      timestamp: "1753430400",
+      statusDisplay: "Accepted",
+      lang: { name: "javascript", verboseName: "JavaScript" },
+    };
+
+    expect(buildSolution(sub, details).author).toBe(EDITORIAL_AUTHOR);
+  });
+});
+
+describe("isEditorialCode", () => {
+  it("detects the marker in any common comment syntax, case-insensitively", () => {
+    expect(isEditorialCode("/** By Leetcode */\nvar x = 1;")).toBe(true);
+    expect(isEditorialCode("/* by leetcode */")).toBe(true);
+    expect(isEditorialCode("// By LeetCode\nint x = 1;")).toBe(true);
+    expect(isEditorialCode("# By Leetcode\nx = 1")).toBe(true);
+    expect(isEditorialCode("-- By Leetcode\nSELECT 1;")).toBe(true);
+  });
+
+  it("ignores code without the marker or with it outside a comment", () => {
+    expect(isEditorialCode("var x = 1;")).toBe(false);
+    // Mentioning LeetCode in a comment is not the attribution marker.
+    expect(isEditorialCode("// see Leetcode hint")).toBe(false);
+    // A string literal is not a comment.
+    expect(isEditorialCode('const s = "By Leetcode";')).toBe(false);
   });
 });
 

@@ -14,6 +14,8 @@ Set these in `.env` at the project root:
 
 Both LeetCode variables expire every few weeks; `npm run refresh-auth` refills them from Chrome.
 
+A submission whose code contains a `By Leetcode` comment (e.g. `/** By Leetcode */`, `// By Leetcode`, `# By Leetcode`) is a pasted editorial solution: it is archived with `author: "Leetcode"` regardless of `LEETCODE_USERNAME`, so it never counts toward your own solve status or stats.
+
 ## Commands
 
 All fetch commands default to today (LeetCode's UTC day) if no date is given. Problem and solution fetching are deliberately separate: the two halves of a day fill in at different times (the problem exists from midnight, your solutions only once you've solved it), so fetching one must never force a re-fetch of the other.

@@ -1,5 +1,23 @@
 import { SolutionStatus, type Solution } from "./types";
 import type { SubmissionListItem, SubmissionDetails } from "./leetcode-api";
+import { EDITORIAL_AUTHOR } from "./solve-status";
+
+/**
+ * Matches a "By Leetcode" marker written as a comment in any common syntax
+ * (C-style line or block/JSDoc comments, `#` or `--`), case-insensitively.
+ */
+const EDITORIAL_MARKER = /(?:\/\/|\/\*+|#|--)\s*By\s+Leetcode\b/i;
+
+/**
+ * Tells whether submitted code carries the "By Leetcode" comment marking it
+ * as a copy of LeetCode's editorial solution rather than the author's own.
+ *
+ * @param code The submitted source code.
+ * @returns True when a "By Leetcode" comment appears anywhere in the code.
+ */
+export function isEditorialCode(code: string): boolean {
+  return EDITORIAL_MARKER.test(code);
+}
 
 /**
  * Maps LeetCode's human-readable submission status to the archive's
@@ -40,15 +58,18 @@ export function score(solution: Solution): number {
  * @param sub The submission list entry (source of the timestamp).
  * @param details The submission details (source of code, language, status
  *   and percentiles, rounded to two decimals).
- * @returns The solution, with empty notes/aiExplanation and the author from
- *   `LEETCODE_USERNAME` (falling back to "Vitor").
+ * @returns The solution, with empty notes/aiExplanation. The author is
+ *   `EDITORIAL_AUTHOR` when the code carries a "By Leetcode" comment, and
+ *   otherwise comes from `LEETCODE_USERNAME` (falling back to "Vitor").
  */
 export function buildSolution(
   sub: SubmissionListItem,
   details: SubmissionDetails,
 ): Solution {
   return {
-    author: process.env["LEETCODE_USERNAME"] || "Vitor",
+    author: isEditorialCode(details.code)
+      ? EDITORIAL_AUTHOR
+      : process.env["LEETCODE_USERNAME"] || "Vitor",
     code: details.code,
     language: details.lang.name,
     notes: "",
