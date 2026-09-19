@@ -1,4 +1,5 @@
 import { SPLIT_RESTORE_SCRIPT } from "@/lib/split-storage";
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -40,6 +41,7 @@ export default function RootLayout({
       >
         <script dangerouslySetInnerHTML={{ __html: SPLIT_RESTORE_SCRIPT }} />
         {children}
+        <Analytics />
       </body>
     </html>
   );
