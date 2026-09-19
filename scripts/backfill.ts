@@ -24,20 +24,11 @@ function fetchSolution(date: string) {
   });
 }
 
-const EXPLAIN_MODEL = "haiku";
-
 function explainDate(date: string) {
   console.log(`\n=== explain: ${date} ===`);
   execFileSync(
     "claude",
-    [
-      "-p",
-      `/explain ${date}`,
-      "--permission-mode",
-      "acceptEdits",
-      "--model",
-      EXPLAIN_MODEL,
-    ],
+    ["-p", `/explain ${date}`, "--permission-mode", "acceptEdits"],
     { stdio: "inherit", timeout: EXPLAIN_TIMEOUT_MS },
   );
 }

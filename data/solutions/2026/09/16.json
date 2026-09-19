@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Leetcode",
+    "code": "/** By Leetcode */\nvar numberOfSets = function (n, k) {\n    const MOD = 1_000_000_007;\n    const dp = Array(n).fill(1);\n    const prefixSums = Array(n + 1).fill(0);\n\n    for (let j = 0; j < n; j++) {\n        prefixSums[j + 1] = (prefixSums[j] + dp[j]) % MOD;\n    }\n\n    for (let i = 1; i <= k; i++) {\n        dp[0] = 0;\n\n        for (let j = 1; j < n; j++) {\n            dp[j] = (dp[j - 1] + prefixSums[j]) % MOD;\n        }\n\n        for (let j = 0; j < n; j++) {\n            prefixSums[j + 1] = (prefixSums[j] + dp[j]) % MOD;\n        }\n    }\n\n    return dp[n - 1];\n};",
+    "language": "javascript",
+    "notes": "Dynamic programming + combinatorics, deadly combination.",
+    "aiExplanation": "This code uses **dynamic programming** to count the number of valid combinations, performing `k` iterations of calculations while using modulo arithmetic (`1_000_000_007`) to keep large numbers manageable. The algorithm maintains a `dp` array (initially all 1s) that gets updated in each iteration, and a `prefixSums` array that stores cumulative totals to optimize the computation—instead of recalculating sums from scratch, each new `dp[j]` value is computed by adding the previous position's value (`dp[j-1]`) to the cumulative sum up to that position (`prefixSums[j]`). After completing all `k` iterations, it returns `dp[n-1]`, which represents the final count of valid combinations given the constraints imposed by the `n` positions and `k` iterations.",
+    "status": "DONE",
+    "cpuUsage": 33.03,
+    "memoryUsage": 82.51,
+    "date": "2026-09-16T08:34:35.000Z"
+  }
+]

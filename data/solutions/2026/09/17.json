@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} arr\n * @param {number} target\n * @return {number}\n */\nvar minSumOfLengths = function(arr, target) {\n    const n = arr.length;\n    let res = [];\n\n    for (let i = 0; i < n; i++) {\n        let sum = 0;\n        let count = 0;\n\n        for (let j = i; j < n; j++) {\n            sum += arr[j];\n            count++;\n\n            if (sum >= target) break;\n        }\n\n        if (sum === target) {\n            res.push(count);\n        }\n    }\n\n    if (res.length < 2) return -1;\n\n    res.sort((a, b) => a - b);\n\n    return res[0] + res[1];\n};\n",
+    "language": "javascript",
+    "notes": "Attempted a prefix sum without actually doing one, failed miserably.",
+    "aiExplanation": "The function finds all **contiguous subarrays** in the input array that sum to exactly the `target` value, storing their **lengths** in a result array. It uses a **nested loop approach** where the outer loop picks each starting position and the inner loop extends rightward, accumulating a sum until it reaches or exceeds the target—when the sum equals the target exactly, the subarray length is recorded. Finally, if at least **two valid subarrays** exist, the function **sorts their lengths** and returns the sum of the **two shortest** ones; otherwise, it returns `-1` if fewer than two subarrays match the target sum.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-09-17T07:01:11.000Z"
+  },
+  {
+    "author": "Leetcode",
+    "code": "/** By Leetcode */\nvar minSumOfLengths = function (arr, target) {\n    const n = arr.length;\n    const dp = Array(n + 1).fill(n);\n    let res = n + 1;\n    let sum = 0;\n    let left = 0;\n\n    for (let right = 0; right < n; right++) {\n        sum += arr[right];\n\n        while (sum > target) {\n            sum -= arr[left];\n            left++;\n        }\n\n        dp[right + 1] = dp[right];\n\n        if (sum === target) {\n            const length = right - left + 1;\n            res = Math.min(res, length + dp[left]);\n            dp[right + 1] = Math.min(dp[right], length);\n        }\n    }\n\n    return res === n + 1 ? -1 : res;\n};\n",
+    "language": "javascript",
+    "notes": "Sliding window + shenanigans.",
+    "aiExplanation": "This code finds the **minimum sum of lengths** of two **non-overlapping subarrays** that each sum to a target value. It uses a **sliding window** with two pointers (`left` and `right`) to find subarrays that equal the target, while a **`dp` array tracks the shortest subarray found so far** up to each position. For each window that sums to the target, it calculates the length and adds it to `dp[left]` (the best minimum length before this window) to find the combined minimum; `dp[right + 1]` then stores the best minimum length discovered up to that point for future windows to use. The algorithm returns this minimum sum of two lengths, or **`-1` if no valid pair exists**.",
+    "status": "DONE",
+    "cpuUsage": 57.53,
+    "memoryUsage": 91.97,
+    "date": "2026-09-17T07:04:44.000Z"
+  }
+]

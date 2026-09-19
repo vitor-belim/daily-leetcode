@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Leetcode",
+    "code": "class Seg {\n    constructor(left = -1, right = -1) {\n        this.left = left;\n        this.right = right;\n    }\n}\n\n/** By Leetcode */\nvar maxNumOfSubstrings = function (s) {\n    const seg = Array.from({ length: 26 }, () => new Seg());\n\n    // Preprocess the left and right endpoints.\n    for (let i = 0; i < s.length; i++) {\n        const charIdx = s.charCodeAt(i) - \"a\".charCodeAt(0);\n\n        if (seg[charIdx].left === -1) {\n            seg[charIdx].left = seg[charIdx].right = i;\n        } else {\n            seg[charIdx].right = i;\n        }\n    }\n\n    for (let i = 0; i < 26; i++) {\n        if (seg[i].left !== -1) {\n            let j = seg[i].left;\n\n            while (j <= seg[i].right) {\n                const charIdx = s.charCodeAt(j) - \"a\".charCodeAt(0);\n\n                if (\n                    seg[i].left <= seg[charIdx].left &&\n                    seg[charIdx].right <= seg[i].right\n                ) {\n                } else {\n                    seg[i].left = Math.min(seg[i].left, seg[charIdx].left);\n                    seg[i].right = Math.max(seg[i].right, seg[charIdx].right);\n                    j = seg[i].left;\n                }\n\n                j++;\n            }\n        }\n    }\n\n    // Greedily select intervals.\n    seg.sort((a, b) => {\n        if (a.right === b.right) {\n            return b.left - a.left;\n        }\n        return a.right - b.right;\n    });\n\n    const ans = [];\n    let end = -1;\n\n    for (const segment of seg) {\n        const { left, right } = segment;\n\n        if (left === -1) {\n            continue;\n        }\n\n        if (end === -1 || left > end) {\n            end = right;\n            ans.push(s.slice(left, right + 1));\n        }\n    }\n\n    return ans;\n};",
+    "language": "javascript",
+    "notes": "I tried, went as far as retrieving the possible combinations. Picking the right ones was missing, so I didn't submit.",
+    "aiExplanation": "The code finds the maximum number of non-overlapping substrings where each substring must contain all occurrences of at least one character. It works by: first identifying the **leftmost and rightmost positions** of each letter (a-z) in the string, then **expanding each segment** to ensure it encompasses all occurrences of every letter within its current bounds, and finally **sorting segments by ending position** and greedily selecting non-overlapping ones using an interval selection algorithm, keeping only substrings whose starting position is after the previously selected substring's end.",
+    "status": "DONE",
+    "cpuUsage": 36.84,
+    "memoryUsage": 73.68,
+    "date": "2026-09-18T16:37:41.000Z"
+  }
+]

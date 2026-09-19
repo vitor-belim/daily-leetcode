@@ -49,7 +49,7 @@ Finds every day that is missing a problem (including interior gaps) or is missin
 
 1. Runs `fetch-problem` for that date, if the problem file is missing.
 2. Runs `fetch-solution` for that date, if the solutions file is missing.
-3. Runs `claude -p "/explain <date>" --model haiku` if a solutions file is present and has solutions still needing an explanation — skipped otherwise, since `/explain` would just no-op. Pinned to Haiku since explaining already-written code is cheap work that doesn't need a larger model.
+3. Runs `claude -p "/explain <date>"` if a solutions file is present and has solutions still needing an explanation — skipped otherwise, since `/explain` would just no-op. Use the cheapest model when backfilling many dates.
 4. Re-checks the solutions file to confirm every solution got a non-empty `aiExplanation`.
 
 A day recorded as unsolved (an empty `[]` solutions file) counts as complete and is not revisited.
