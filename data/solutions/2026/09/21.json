@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Leetcode",
+    "code": "/** By Leetcode */\nvar resultArray = function (nums, k) {\n    const n = nums.length;\n    const result = new Array(k).fill(0);\n    let dp = new Array(k).fill(0); // Initial state: no elements have been processed, so no non-empty subarray exists.\n\n    for (let i = 0; i < n; i++) {\n        const ndp = new Array(k).fill(0); // Current-layer state (rolling array).\n\n        ndp[nums[i] % k]++;\n\n        for (let r = 0; r < k; r++) {\n            ndp[(r * nums[i]) % k] += dp[r];\n        }\n\n        dp = ndp; // Update the state.\n\n        // Accumulate the answer.\n        for (let r = 0; r < k; r++) {\n            result[r] += dp[r];\n        }\n    }\n\n    return result;\n};\n",
+    "language": "javascript",
+    "notes": "Prefix/suffix-sum plus dp, too much for a Monday.",
+    "aiExplanation": "This function counts, for every remainder `r` from `0` to `k-1`, how many **contiguous subarrays** of `nums` have a product whose remainder modulo `k` equals `r`. It uses a **rolling dynamic-programming array** called `dp`, where `dp[r]` holds the number of subarrays *ending at the current position* whose product leaves remainder `r`. For each new element `nums[i]`, a fresh array `ndp` is built: first the single-element subarray `[nums[i]]` is counted by incrementing `ndp[nums[i] % k]`, and then every subarray that ended at the previous position with remainder `r` is extended by one element, so its new remainder becomes `(r * nums[i]) % k` and its count `dp[r]` is added there. Since only remainders matter (a product mod `k` depends only on the previous remainder mod `k`), the array never needs to store real products. After each step `dp` is replaced by `ndp`, and the counts are **accumulated into `result`**, so by the end `result[r]` totals all subarrays across every ending position with remainder `r`. This runs in `O(n * k)` time and `O(k)` extra space.",
+    "status": "DONE",
+    "cpuUsage": 21.56,
+    "memoryUsage": 31.04,
+    "date": "2026-09-21T08:12:52.000Z"
+  }
+]

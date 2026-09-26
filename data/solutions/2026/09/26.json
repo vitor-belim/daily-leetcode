@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @param {string[][]} knowledge\n * @return {string}\n */\nvar evaluate = function(s, knowledge) {\n    const map = new Map(knowledge);\n\n    let reading = false;\n    let temp = '';\n    let res = '';\n\n    for (const char of s) {\n        if (char === '(') {\n            reading = true;\n            temp = '';\n        } else if (char === ')') {\n            reading = false;\n            res += map.get(temp) ?? '?';\n        } else if (reading) {\n            temp += char;\n        } else {\n            res += char;\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Per-char handling.",
+    "aiExplanation": "This function replaces every bracketed key in a string with its value from a lookup table. It first turns the `knowledge` array of `[key, value]` pairs into a `Map` for fast lookups, then scans the string `s` one character at a time. When it sees an opening `(`, it flips a **reading** flag on and resets a `temp` buffer that will collect the key's characters. When it sees a closing `)`, it flips the flag off and appends the value found for `temp` in the map, or a `?` if the key is unknown (that's what `map.get(temp) ?? '?'` does). Any other character is either added to `temp` while reading a key, or appended directly to the result `res` when outside brackets. The built-up `res` string is returned at the end.",
+    "status": "DONE",
+    "cpuUsage": 66.67,
+    "memoryUsage": 96.67,
+    "date": "2026-09-26T08:32:02.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @param {string[][]} knowledge\n * @return {string}\n */\nvar evaluate = function(s, knowledge) {\n    const map = new Map(knowledge);\n\n    return s.split(/\\(|\\)/)\n        .map((x, i) => i & 1 ? map.get(x) ?? '?' : x)\n        .join('');\n};\n",
+    "language": "javascript",
+    "notes": "Per-needle handling.",
+    "aiExplanation": "This is a compact version of the same idea: swap every `(key)` in the string for its value from `knowledge`. It builds a `Map` from the `[key, value]` pairs, then splits `s` on every `(` or `)` using the regex `/\\(|\\)/`. Because the brackets always come in matched pairs, the resulting pieces **alternate** between plain text and bracketed keys, so every odd-indexed piece is a key. The `map` callback uses `i & 1` (a bitwise check for odd indices) to spot those key pieces and replace them with `map.get(x) ?? '?'`, which returns the stored value or a `?` if the key isn't known, while even-indexed pieces are kept as-is. Finally `join('')` glues the pieces back into a single string.",
+    "status": "DONE",
+    "cpuUsage": 10,
+    "memoryUsage": 43.33,
+    "date": "2026-09-26T08:33:10.000Z"
+  }
+]

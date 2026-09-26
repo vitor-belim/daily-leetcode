@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar reverseDegree = function(s) {\n    let res = 0;\n\n    for (let i = 0; i < s.length; i++) {\n        res += (123 - s.charCodeAt(i)) * (i + 1);\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function computes the **\"reverse degree\"** of a lowercase string by giving every letter a reversed alphabet value and weighting it by its position. It loops over each character `s[i]` and takes its ASCII code with `s.charCodeAt(i)`; since `'a'` is `97` and `'z'` is `122`, subtracting the code from `123` maps `'a'` to `26`, `'b'` to `25`, and so on down to `'z'` mapping to `1`, effectively reversing the alphabet. That reversed value is then multiplied by the **1-based position** of the character, `(i + 1)`, so letters later in the string contribute more. Each product is added to the running total `res`, which is returned at the end as the final degree. The whole thing runs in a single pass, so it is **O(n)** time and **O(1)** extra space.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 75.4,
+    "date": "2026-09-20T08:10:39.000Z"
+  }
+]

@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} x\n * @return {number}\n */\nvar minOperations = function(nums, x) {\n    const n = nums.length;\n\n    let total = 0;\n    for (const num of nums) {\n        total += num;\n    }\n\n    const target = total - x;\n    let left = 0;\n    let sum = 0;\n    let res = -1;\n\n    for (let right = 0; right < n; right++) {\n        sum += nums[right];\n\n        while (sum > target) {\n            sum -= nums[left];\n            left++;\n        }\n\n        if (sum === target) {\n            res = Math.max(res, right - left + 1);\n        }\n    }\n\n    return res === -1 ? -1 : n - res;\n};\n",
+    "language": "javascript",
+    "notes": "This one was fun.",
+    "aiExplanation": "This solution reframes the problem: instead of removing elements from the ends to reach a sum of exactly `x`, it looks for the **longest contiguous subarray in the middle** whose sum equals `total - x`, since whatever is left over after removing the ends must add up to that value. It first computes `total` by summing every number, then sets `target = total - x`. A **sliding window** then scans the array with a `right` pointer expanding the window and a `left` pointer shrinking it whenever the running `sum` exceeds `target` (this works because all numbers are positive, so a bigger window always means a bigger sum). Each time the window sum equals `target`, the code records the window length in `res` if it is the largest seen so far. Finally, if no valid window was found it returns `-1`; otherwise the answer is `n - res`, the number of elements outside the longest valid window, which is exactly the minimum number of operations needed.",
+    "status": "DONE",
+    "cpuUsage": 16.32,
+    "memoryUsage": 59.38,
+    "date": "2026-09-23T08:17:51.000Z"
+  }
+]

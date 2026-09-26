@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar smallestIndex = function(nums) {\n    for (let i = 0; i < nums.length; i++) {\n        let num = nums[i];\n        let sum = 0;\n\n        while (num > 0) {\n            sum += num % 10;\n            num = Math.floor(num / 10);\n        }\n\n        if (sum === i) {\n            return i;\n        }\n    }\n\n    return -1;\n};\n",
+    "language": "javascript",
+    "notes": "Trivial.",
+    "aiExplanation": "This function looks for the **smallest index** `i` in the array whose element has a **digit sum equal to that index**. It walks through `nums` from left to right, and for each element it computes the sum of its digits by repeatedly taking the last digit with `num % 10`, adding it to `sum`, and then dropping that digit with `Math.floor(num / 10)` until nothing is left. As soon as it finds a position where `sum === i`, it immediately returns that index, which guarantees the answer is the smallest matching one because earlier indices were checked first. If the loop finishes without any match, it returns `-1`.",
+    "status": "DONE",
+    "cpuUsage": 64.23,
+    "memoryUsage": 97.3,
+    "date": "2026-09-24T08:06:40.000Z"
+  }
+]
