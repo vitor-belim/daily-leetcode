@@ -1,0 +1,35 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {string}\n */\nvar reverseParentheses = function(s) {\n    let res = \"\";\n    let rev = 0;\n    let temp = [\"\"];\n\n    for (let i = 0; i < s.length; i++) {\n        if (s[i] === '(') {\n            rev++;\n            temp[rev] = \"\";\n        } else if (s[i] === ')') {\n            rev--;\n            temp[rev] = rev % 2 === 0 ?\n                (temp[rev] + temp[rev + 1]) :\n                (temp[rev + 1] + temp[rev]);\n        } else {\n            temp[rev] = rev % 2 === 0 ?\n                (temp[rev] + s[i]) :\n                (s[i] + temp[rev]);\n        }\n    }\n\n    return temp[0];\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution reverses the text inside every pair of parentheses by keeping a **buffer per nesting level** in the `temp` array, where `rev` tracks how deeply nested the current character is. When an opening `(` appears, the code moves one level deeper and starts a fresh empty buffer for it; when a closing `)` appears, it moves back up a level and merges the finished inner buffer into the outer one. The clever part is that instead of actually reversing strings, it decides **which side to attach to** based on the parity of the level: at even depths characters are appended to the end (`temp[rev] + s[i]`), while at odd depths they are prepended to the front (`s[i] + temp[rev]`), which naturally builds the string backwards. The same parity rule is applied when merging a completed inner buffer back into its parent, so nested reversals cancel out correctly, and after the loop `temp[0]` holds the fully processed string. Note the `res` variable is declared but never used.",
+    "status": "DONE",
+    "cpuUsage": 10.87,
+    "memoryUsage": 100,
+    "date": "2024-07-11T07:57:57.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {string}\n */\nvar reverseParentheses = function(s) {\n    let res = [\"\"];\n    let lvl = 0;\n\n    const flipOddLvl = (a, b) => {\n        return lvl % 2 === 1 ? (b + a) : (a + b);\n    };\n\n    for (let i = 0; i < s.length; i++) {\n        if (s[i] === '(') {\n            lvl++;\n            res[lvl] = \"\";\n        } else if (s[i] === ')') {\n            lvl--;\n            res[lvl] = flipOddLvl(res[lvl], res[lvl + 1]);\n        } else {\n            res[lvl] = flipOddLvl(res[lvl], s[i]);\n        }\n    }\n\n    return res[0];\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is a cleaner version of the same level-based idea: the `res` array holds one string buffer for each nesting depth, and `lvl` tracks the current depth as the loop walks through the input. The small helper `flipOddLvl(a, b)` encapsulates the core trick: at **odd** depths it joins the pieces in reversed order (`b + a`), and at **even** depths it joins them normally (`a + b`), so text inside an odd number of parentheses ends up backwards while text inside an even number ends up forwards again. An opening `(` increments `lvl` and starts a new empty buffer, a regular character is joined onto the current level's buffer through the helper, and a closing `)` decrements `lvl` and folds the just-finished inner buffer into its parent, again through the helper. Because every join respects the parity rule, no explicit string reversal is ever needed, and `res[0]` contains the final answer once the loop finishes.",
+    "status": "DONE",
+    "cpuUsage": 10.87,
+    "memoryUsage": 100,
+    "date": "2024-07-11T08:18:08.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {string}\n */\nvar reverseParentheses = function(s) {\n    const stack = [''];\n    let rev = false;\n\n    const appendStr = (str) => {\n        if (!rev) {\n            stack[stack.length - 1] += str;\n        } else {\n            stack[stack.length - 1] = str + stack[stack.length - 1];\n        }\n    };\n\n    for (const char of s) {\n        if (char === '(') {\n            stack.push('');\n            rev = !rev;\n        } else if (char === ')') {\n            rev = !rev;\n            appendStr(stack.pop());\n        } else {\n            appendStr(char);\n        }\n    }\n\n    return stack[0];\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses an explicit **stack** of string buffers plus a single boolean `rev` that flips every time a parenthesis is crossed, so `rev` is `true` exactly when the current text sits inside an odd number of parentheses. The helper `appendStr` writes to the top of the stack in one of two ways: when `rev` is `false` it appends to the end (`stack[top] += str`), and when `rev` is `true` it prepends to the front (`str + stack[top]`), which builds the segment backwards without ever calling a reverse function. On `(` the code pushes a fresh empty buffer and toggles `rev`; on `)` it toggles `rev` back first and then pops the finished inner segment and merges it into the new top using the same helper, so the parent's own orientation decides how the child is attached; any other character is simply passed to `appendStr`. When the loop ends, only the base buffer remains and `stack[0]` is the fully transformed string.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 95.65,
+    "date": "2026-09-27T08:37:15.000Z"
+  }
+]
