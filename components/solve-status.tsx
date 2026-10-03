@@ -59,6 +59,14 @@ interface SolveStatusIconProps {
   className?: string;
 }
 
+/**
+ * Renders a day's solve status as a standalone colored icon, named by the
+ * status label for assistive technology.
+ *
+ * @param status The day's solve status.
+ * @param className Extra classes applied to the icon.
+ * @returns The icon element.
+ */
 export function SolveStatusIcon({ status, className }: SolveStatusIconProps) {
   const { label, icon: Icon, iconClassName } = SOLVE_STATUS_STYLES[status];
 

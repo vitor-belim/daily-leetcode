@@ -1,13 +1,17 @@
+"use client";
+
 import { DifficultyBadge } from "@/components/difficulty-badge";
 import {
   SOLVE_STATUS_STYLES,
   SolveStatusIcon,
 } from "@/components/solve-status";
 import { formatWeekdayShort } from "@/lib/date-display";
+import { blogPath } from "@/lib/routes";
 import { SolveStatus, type DailySummary } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 
 interface DailyRowProps {
   daily: DailySummary;
@@ -73,12 +77,29 @@ function describeProgress(daily: DailySummary): string {
   return parts.join(" · ");
 }
 
+/**
+ * One archived day in the home list, linking to its blog page. A month holds
+ * up to 31 rows and every blog page is prerendered, so viewport prefetching
+ * would download each visible row's full page; the row prefetches only once
+ * the reader shows intent by hovering, focusing or touching it.
+ *
+ * @param daily The day's summary: its date, title, difficulty and progress.
+ * @returns The row, a link to the day's blog page.
+ */
 export function DailyRow({ daily }: DailyRowProps) {
-  const [year, month, day] = daily.date.split("-");
+  const [hasIntent, setHasIntent] = useState(false);
+
+  function showIntent(): void {
+    setHasIntent(true);
+  }
 
   return (
     <Link
-      href={`/blog/${year}/${month}/${day}`}
+      href={blogPath(daily.date)}
+      prefetch={hasIntent ? null : false}
+      onMouseEnter={showIntent}
+      onFocus={showIntent}
+      onTouchStart={showIntent}
       className={cn(
         "group flex items-center gap-3 px-4 py-3 transition-colors focus-visible:outline-none sm:gap-4",
         SOLVE_STATUS_STYLES[daily.solveStatus].rowClassName,
@@ -86,7 +107,7 @@ export function DailyRow({ daily }: DailyRowProps) {
     >
       <div className="flex w-10 shrink-0 flex-col items-center leading-none">
         <span className="font-heading text-xl font-semibold tabular-nums">
-          {day}
+          {daily.date.slice(8)}
         </span>
         <span className="mt-0.5 text-[0.6875rem] font-medium uppercase tracking-wide text-muted-foreground">
           {formatWeekdayShort(daily.date)}

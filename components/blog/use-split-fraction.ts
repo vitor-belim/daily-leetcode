@@ -6,7 +6,7 @@ import {
   readLeftFraction,
   writeLeftFraction,
 } from "@/lib/split-storage";
-import { useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 
 interface SplitFraction {
   leftFraction: number;
@@ -84,7 +84,11 @@ function commitLeftFraction(fraction: number): void {
  * Subscribes to the split shared by every panel pair on the page. The split
  * lives outside React because the document owns it first: an inline script
  * applies the persisted value before hydration, and this store adopts it rather
- * than re-imposing a default.
+ * than re-imposing a default. On mount the store's value is written back to
+ * the document, because a client render of the root (after a root-level
+ * hydration error, say) rebuilds `<html>` without the property the script set
+ * and does not run the script again; without the rewrite the panels would fall
+ * back to the even split while the separator still reports the stored one.
  *
  * @returns The current split and the two ways to move it.
  */
@@ -94,6 +98,10 @@ export function useSplitFraction(): SplitFraction {
     getSnapshot,
     getServerSnapshot,
   );
+
+  useEffect(() => {
+    applyLeftFraction(getSnapshot());
+  }, []);
 
   return { leftFraction, setLeftFraction, commitLeftFraction };
 }

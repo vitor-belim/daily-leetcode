@@ -1,7 +1,11 @@
+import "server-only";
 import fs from "node:fs/promises";
+import { cache } from "react";
+import { parseProblem } from "./archive-schema";
 import type { Problem } from "./types";
 import { problemFilePath, PROBLEMS_ROOT } from "./paths";
 import { isValidCalendarDate, shiftDateUTC } from "./dates";
+import { isMissingFileError } from "./fs-errors";
 
 /** The archived days directly before and after a date, when they exist. */
 export interface AdjacentDates {
@@ -10,37 +14,50 @@ export interface AdjacentDates {
 }
 
 /**
- * Reads and parses one problem file, logging failures instead of throwing.
+ * Reads, parses and validates one problem file without validating the date,
+ * for callers that already hold a date from the archive scan.
  *
  * @param date The day as `YYYY-MM-DD`.
  * @param root The problems root (defaults to `data/problems`).
- * @returns The parsed problem, or null when reading/parsing fails.
+ * @returns The validated problem, or null when the file does not exist.
+ * @throws When the file exists but cannot be read (`EACCES`, `EISDIR`, ...),
+ *   fails to parse (`SyntaxError`) or holds the wrong shape (`TypeError`,
+ *   see {@link parseProblem}), so a corrupted archive reaches an error
+ *   boundary or fails the build instead of passing for a missing day.
  */
 export async function readProblemFile(
   date: string,
   root: string = PROBLEMS_ROOT,
 ): Promise<Problem | null> {
+  const filePath = problemFilePath(date, root);
   try {
-    const content = await fs.readFile(problemFilePath(date, root), "utf8");
-    return JSON.parse(content);
+    const content = await fs.readFile(filePath, "utf8");
+    const value: unknown = JSON.parse(content);
+    return parseProblem(value, filePath);
   } catch (error) {
-    console.error(`Error reading problem for ${date}:`, error);
-    return null;
+    if (isMissingFileError(error)) return null;
+    throw error;
   }
 }
 
 /**
  * Reads one day's archived problem, validating the date first so URL
- * segments can be passed straight in.
+ * segments can be passed straight in. Wrapped in React's `cache()`, so it is
+ * memoized per server request: the blog page and its `generateMetadata` share
+ * a single read per set of arguments. The Open Graph image is its own Route
+ * Handler request and reads once on its own. Outside a React server render
+ * it simply calls through.
  *
  * @param year The four-digit year.
  * @param month The two-digit month.
  * @param day The two-digit day.
  * @param root The problems root (defaults to `data/problems`).
- * @returns The problem, or null when the date is invalid, the file is
- *   missing, or it fails to parse.
+ * @returns The problem, or null when the date is invalid or the file is
+ *   missing.
+ * @throws When the file exists but cannot be read, fails to parse or holds
+ *   the wrong shape.
  */
-export async function getProblem(
+export const getProblem = cache(async function getProblem(
   year: string,
   month: string,
   day: string,
@@ -51,27 +68,25 @@ export async function getProblem(
     return null;
   }
 
-  try {
-    const content = await fs.readFile(problemFilePath(date, root), "utf8");
-    return JSON.parse(content);
-  } catch {
-    return null;
-  }
-}
+  return readProblemFile(date, root);
+});
 
 /**
  * Checks whether a problem file exists for a date.
  *
  * @param date The day as `YYYY-MM-DD`.
  * @param root The problems root directory.
- * @returns True when the file exists on disk.
+ * @returns True when the file exists on disk, false when it is missing.
+ * @throws When the existence check fails for any reason other than the file
+ *   being missing.
  */
 async function problemExists(date: string, root: string): Promise<boolean> {
   try {
     await fs.access(problemFilePath(date, root));
     return true;
-  } catch {
-    return false;
+  } catch (error) {
+    if (isMissingFileError(error)) return false;
+    throw error;
   }
 }
 
@@ -83,6 +98,8 @@ async function problemExists(date: string, root: string): Promise<boolean> {
  * @param root The problems root (defaults to `data/problems`).
  * @returns Each neighbor's `YYYY-MM-DD` when its problem file exists, null
  *   otherwise.
+ * @throws When either existence check fails for a reason other than the
+ *   file being missing.
  */
 export async function getAdjacentDates(
   date: string,

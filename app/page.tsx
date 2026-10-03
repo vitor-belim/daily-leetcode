@@ -1,11 +1,19 @@
 import { DailyList } from "@/components/daily-list";
 import { StatsOverview } from "@/components/home/stats-overview";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { getArchiveStats, getDailySummariesByMonth } from "@/lib/dailies-repo";
 import { formatMonthUTC, todayUTC } from "@/lib/dates";
+import { cn } from "@/lib/utils";
 import { ExternalLink } from "lucide-react";
+import type { Metadata } from "next";
 
 const INITIAL_MONTHS = 7;
+
+export const metadata: Metadata = {
+  alternates: {
+    canonical: "/",
+  },
+};
 
 export default async function HomePage() {
   const [{ dailies, hasMore, nextCursor, total }, stats] = await Promise.all([
@@ -30,22 +38,18 @@ export default async function HomePage() {
               ones that never got started.
             </p>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            className="shrink-0"
-            nativeButton={false}
-            render={
-              <a
-                href="https://github.com/vitor-belim/daily-leetcode"
-                target="_blank"
-                rel="noopener noreferrer"
-              />
-            }
+          <a
+            href="https://github.com/vitor-belim/daily-leetcode"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={cn(
+              buttonVariants({ variant: "outline", size: "sm" }),
+              "shrink-0",
+            )}
           >
             Source on GitHub
             <ExternalLink data-icon="inline-end" />
-          </Button>
+          </a>
         </header>
 
         <StatsOverview stats={stats} />
@@ -58,6 +62,7 @@ export default async function HomePage() {
             <p className="text-sm text-muted-foreground">Newest first</p>
           </div>
           <DailyList
+            key={`${nextCursor}:${total}`}
             initialDailies={dailies}
             initialHasMore={hasMore}
             initialCursor={nextCursor}

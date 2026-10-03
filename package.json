@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run",
     "fetch-daily": "f(){ npm run fetch-problem -- \"$@\" && npm run fetch-solution -- \"$@\"; }; f",
     "fetch-problem": "tsx scripts/fetch-problem.ts",
@@ -17,7 +17,6 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",
-    "@radix-ui/react-progress": "^1.1.8",
     "@tailwindcss/typography": "^0.5.19",
     "@vercel/analytics": "^2.0.1",
     "class-variance-authority": "^0.7.1",
@@ -28,6 +27,7 @@
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "sanitize-html": "^2.17.6",
+    "server-only": "^0.0.1",
     "shadcn": "^4.8.3",
     "shiki": "^4.1.0",
     "tailwind-merge": "^3.6.0",
@@ -36,7 +36,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/markdown-it": "^14.1.2",
-    "@types/node": "^20",
+    "@types/node": "^24",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/sanitize-html": "^2.16.1",
@@ -48,5 +48,8 @@
     "tsx": "^4.22.3",
     "typescript": "^5",
     "vitest": "^4.1.10"
+  },
+  "engines": {
+    "node": "24.x"
   }
 }

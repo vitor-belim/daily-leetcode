@@ -1,6 +1,11 @@
+import {
+  AdjacentDayLink,
+  AdjacentDirection,
+} from "@/components/blog/adjacent-day-link";
 import { SplitPanels } from "@/components/blog/split-panels";
 import { CodeBlock } from "@/components/code/code-block";
 import { DifficultyBadge } from "@/components/difficulty-badge";
+import { LocalDateTime } from "@/components/local-date-time";
 import {
   Accordion,
   AccordionContent,
@@ -8,42 +13,101 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { formatDate, formatLongDate, timeAgo } from "@/lib/date-display";
+import { type ArchivedDayParams, listArchivedDayParams } from "@/lib/archive";
+import { formatLongDate, timeAgo } from "@/lib/date-display";
 import { isPastDateUTC } from "@/lib/dates";
+import { describeProblem } from "@/lib/excerpt";
 import { markdownToHtml } from "@/lib/markdown";
 import { getAdjacentDates, getProblem } from "@/lib/problems-repo";
+import { blogPath } from "@/lib/routes";
+import { SITE_LOCALE, SITE_NAME } from "@/lib/site";
 import { getSolutions } from "@/lib/solutions-repo";
 import { summarizeSolutions } from "@/lib/solve-status";
 import { SolutionStatus, SolveStatus } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Cpu,
-  ExternalLink,
-  HardDrive,
-  House,
-} from "lucide-react";
+import { Cpu, ExternalLink, HardDrive, House } from "lucide-react";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-export default async function ProblemPage({
+export const dynamicParams = false;
+
+export const revalidate = 3600;
+
+/**
+ * Prerenders one page per archived day at build time. The archive only
+ * changes through a commit, and every commit redeploys, so the build always
+ * sees every day there is; any other date 404s instead of rendering on demand.
+ * Each page is still regenerated in the background at most hourly
+ * (`revalidate`), because parts of it depend on the clock rather than the
+ * archive: the relative submission times, today's "waiting for a submission"
+ * copy and the pending-versus-failed summary would otherwise stay frozen at
+ * the last deploy.
+ *
+ * @returns The `year`/`month`/`day` segments of every archived day.
+ */
+export function generateStaticParams(): ArchivedDayParams[] {
+  return listArchivedDayParams();
+}
+
+/**
+ * Gives each day's page its own title, description, canonical URL and Open
+ * Graph article tags. The Open Graph image comes from the colocated
+ * `opengraph-image` file, so it is not set here.
+ *
+ * @param props The page props, holding the route segments.
+ * @returns The day's metadata.
+ */
+export async function generateMetadata({
   params,
-}: {
-  params: Promise<{ year: string; month: string; day: string }>;
-}) {
+}: PageProps<"/blog/[year]/[month]/[day]">): Promise<Metadata> {
   const { year, month, day } = await params;
-  const date = `${year}-${month}-${day}`;
   const problem = await getProblem(year, month, day);
-  const archivedSolutions = await getSolutions(year, month, day);
 
   if (!problem) notFound();
 
-  const { prev, next } = await getAdjacentDates(date);
+  const path = blogPath(`${year}-${month}-${day}`);
+  const description = describeProblem(problem);
+
+  return {
+    title: problem.title,
+    description,
+    alternates: { canonical: path },
+    openGraph: {
+      type: "article",
+      title: problem.title,
+      description,
+      url: path,
+      siteName: SITE_NAME,
+      locale: SITE_LOCALE,
+      publishedTime: problem.date,
+    },
+  };
+}
+
+/**
+ * Renders one archived day: the problem statement beside its submitted
+ * solutions, with navigation to the neighboring days.
+ *
+ * @param props The page props, holding the route segments.
+ * @returns The day's page.
+ */
+export default async function ProblemPage({
+  params,
+}: PageProps<"/blog/[year]/[month]/[day]">) {
+  const { year, month, day } = await params;
+  const date = `${year}-${month}-${day}`;
+  const [problem, archivedSolutions, { prev, next }] = await Promise.all([
+    getProblem(year, month, day),
+    getSolutions(year, month, day),
+    getAdjacentDates(date),
+  ]);
+
+  if (!problem) notFound();
+
   const solutions = archivedSolutions ?? [];
   const awaitingSubmission =
     summarizeSolutions(archivedSolutions, date).solveStatus ===
@@ -93,6 +157,7 @@ export default async function ProblemPage({
         <div className="flex items-center">
           <Link
             href="/"
+            aria-label="All challenges"
             className="p-2 hover:bg-accent rounded-full transition-colors"
           >
             <House className="w-5 h-5" />
@@ -104,37 +169,14 @@ export default async function ProblemPage({
             {problem.title}
           </h1>
           <div className="flex items-center gap-1 mt-1">
-            <Button
-              variant="ghost"
-              size="icon-xs"
-              className="rounded-full"
-              disabled={!prev}
-              nativeButton={!prev}
-              render={
-                prev ? (
-                  <Link href={`/blog/${prev.split("-").join("/")}`} />
-                ) : undefined
-              }
-            >
-              <ChevronLeft className="w-3 h-3" strokeWidth={1.5} />
-            </Button>
+            <AdjacentDayLink
+              direction={AdjacentDirection.Previous}
+              date={prev}
+            />
             <p className="text-[11px] sm:text-sm text-muted-foreground text-center whitespace-nowrap min-w-[14ch] sm:min-w-[22ch]">
               {formatLongDate(problem.date)}
             </p>
-            <Button
-              variant="ghost"
-              size="icon-xs"
-              className="rounded-full"
-              disabled={!next}
-              nativeButton={!next}
-              render={
-                next ? (
-                  <Link href={`/blog/${next.split("-").join("/")}`} />
-                ) : undefined
-              }
-            >
-              <ChevronRight className="w-3 h-3" strokeWidth={1.5} />
-            </Button>
+            <AdjacentDayLink direction={AdjacentDirection.Next} date={next} />
           </div>
         </div>
 
@@ -146,7 +188,7 @@ export default async function ProblemPage({
             rel="noopener noreferrer"
             className="text-xs flex items-center gap-1 text-muted-foreground hover:text-primary transition-colors"
           >
-            <span className="hidden sm:inline">LeetCode</span>
+            <span className="sr-only sm:not-sr-only">LeetCode</span>
             <ExternalLink className="w-3 h-3" />
           </a>
         </div>
@@ -286,7 +328,7 @@ export default async function ProblemPage({
                                   </Badge>
                                   {s.date && (
                                     <span className="ml-2 text-xs text-muted-foreground">
-                                      ({formatDate(s.date)})
+                                      (<LocalDateTime value={s.date} />)
                                     </span>
                                   )}
                                 </span>
@@ -327,6 +369,7 @@ export default async function ProblemPage({
                                     </div>
                                     <Progress
                                       value={s.cpuUsage}
+                                      aria-label="CPU performance percentile"
                                       className="h-1.5"
                                     />
                                   </div>
@@ -344,6 +387,7 @@ export default async function ProblemPage({
                                     </div>
                                     <Progress
                                       value={s.memoryUsage}
+                                      aria-label="Memory performance percentile"
                                       className="h-1.5"
                                     />
                                   </div>

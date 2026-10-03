@@ -93,18 +93,19 @@ export interface SolveSummary {
   languages: string[];
   /** Best runtime percentile among the author's accepted submissions. */
   bestRuntime: number | null;
-  /** Best memory percentile among the author's accepted submissions. */
-  bestMemory: number | null;
   /** Whether an editorial (non-author) solution is archived for the day. */
   hasEditorial: boolean;
 }
 
-/** One archived day as listed on the home page: the problem plus progress. */
+/**
+ * One archived day as listed on the home page: the problem plus progress.
+ * It crosses the server/client boundary as a prop and as route handler JSON,
+ * so it carries only the fields the list renders.
+ */
 export interface DailySummary extends SolveSummary {
   date: string;
   title: string;
   difficulty: Difficulty;
-  link: string;
 }
 
 /** Solved-vs-total counts for one difficulty tier. */
@@ -127,4 +128,13 @@ export interface ArchiveStats {
   currentStreak: number;
   /** The longest run of consecutive solved calendar days on record. */
   longestStreak: number;
+}
+
+/** A page of daily summaries plus the state needed to fetch the next. */
+export interface LatestDailies {
+  dailies: DailySummary[];
+  total: number;
+  hasMore: boolean;
+  /** The oldest month covered, to pass back as `before`; null at the end. */
+  nextCursor: string | null;
 }

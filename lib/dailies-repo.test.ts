@@ -174,14 +174,43 @@ describe("dailies-repo", () => {
       });
     });
 
-    it("pages month by month and drops days with unreadable problems", async () => {
+    // Summaries cross the server/client boundary (home page prop and the
+    // dailies route JSON), so they must not carry fields the list never
+    // renders, like the problem link or the memory percentile.
+    it("leaves fields the home list never renders out of each summary", async () => {
+      const roots = makeRoots();
+      writeProblem(roots.problems, "2026-07-20");
+      writeJson(roots.solutions, "2026-07-20", [
+        solution("Vitor", SolutionStatus.Done, 80),
+      ]);
+
+      const result = await getDailySummariesByMonth(1, null, roots, TODAY);
+      expect(result.dailies).toEqual([
+        {
+          date: "2026-07-20",
+          title: "Problem 2026-07-20",
+          difficulty: Difficulty.Easy,
+          solveStatus: SolveStatus.Solved,
+          attempts: 1,
+          attemptsToSolve: 1,
+          languages: ["javascript"],
+          bestRuntime: 80,
+          hasEditorial: false,
+        },
+      ]);
+    });
+
+    it("pages month by month", async () => {
       const roots = makeRoots();
       writeProblem(roots.problems, "2026-06-19");
-      writeJson(roots.problems, "2026-07-20", "{not json");
+      writeProblem(roots.problems, "2026-07-20");
       writeProblem(roots.problems, "2026-07-21");
 
       const first = await getDailySummariesByMonth(1, null, roots, TODAY);
-      expect(first.dailies.map((d) => d.date)).toEqual(["2026-07-21"]);
+      expect(first.dailies.map((d) => d.date)).toEqual([
+        "2026-07-21",
+        "2026-07-20",
+      ]);
       expect(first.hasMore).toBe(true);
       expect(first.nextCursor).toBe("2026-07");
 
@@ -193,6 +222,29 @@ describe("dailies-repo", () => {
       );
       expect(second.dailies.map((d) => d.date)).toEqual(["2026-06-19"]);
       expect(second.hasMore).toBe(false);
+    });
+
+    // The list is prerendered at build time, so a corrupted problem or
+    // solutions file must fail the build loudly instead of silently dropping
+    // the day or reporting it as not attempted.
+    it("throws on a malformed problem file", async () => {
+      const roots = makeRoots();
+      writeProblem(roots.problems, "2026-07-19");
+      writeJson(roots.problems, "2026-07-20", "{not json");
+
+      await expect(
+        getDailySummariesByMonth(1, null, roots, TODAY),
+      ).rejects.toThrow(SyntaxError);
+    });
+
+    it("throws on a malformed solutions file", async () => {
+      const roots = makeRoots();
+      writeProblem(roots.problems, "2026-07-20");
+      writeJson(roots.solutions, "2026-07-20", "{not json");
+
+      await expect(
+        getDailySummariesByMonth(1, null, roots, TODAY),
+      ).rejects.toThrow(SyntaxError);
     });
 
     it("marks today as pending until something is submitted", async () => {
@@ -263,6 +315,26 @@ describe("dailies-repo", () => {
         currentStreak: 2,
         longestStreak: 2,
       });
+    });
+
+    // Stats are prerendered too: a corrupted solutions file would otherwise
+    // count the day as failed and break the streak without any signal.
+    it("throws on a malformed solutions file", async () => {
+      const roots = makeRoots();
+      writeProblem(roots.problems, "2026-07-20");
+      writeJson(roots.solutions, "2026-07-20", "{not json");
+
+      await expect(getArchiveStats(roots, TODAY)).rejects.toThrow(SyntaxError);
+    });
+
+    // Well-formed JSON of the wrong shape is just as corrupt: an object
+    // instead of the solutions array must not count as "not attempted".
+    it("throws on a solutions file holding the wrong shape", async () => {
+      const roots = makeRoots();
+      writeProblem(roots.problems, "2026-07-20");
+      writeJson(roots.solutions, "2026-07-20", {});
+
+      await expect(getArchiveStats(roots, TODAY)).rejects.toThrow(TypeError);
     });
 
     it("returns zeroed stats for an empty archive", async () => {

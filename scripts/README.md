@@ -41,7 +41,9 @@ Never overwrites an existing solutions file. If you haven't solved the day yet:
 
 Note that because an existing file is never overwritten, solving a past daily after its empty file was written needs that file deleted before the solutions can be fetched.
 
-The site reads that distinction too: a day with no solutions file, whatever its date, is shown as *waiting for a submission* and doesn't count towards the solved percentage. The current streak skips the run of such days leading back from today, but one sitting behind an already-archived day (e.g. left behind by a failed `backfill` fetch) still ends the streak until its solutions are fetched. A past day with an empty `[]` file is shown as *not attempted*.
+The site reads that distinction too: a day with no solutions file, whatever its date, is shown as *waiting for a submission* and doesn't count towards the solved percentage. The current streak skips the run of such days leading back from today, but one sitting behind an already-archived day (e.g. left behind by a failed `backfill` fetch) still ends the streak until its solutions are fetched. A past day with an empty `[]` file is shown as _not attempted_.
+
+The site is prerendered from `data/` at build time, so whatever a fetch writes shows up once its commit has been deployed.
 
 Resolves the question slug from `data/problems/YYYY/MM/DD.json` when that file exists, costing no extra API call; only a date with no problem file on disk falls back to the daily-challenge lookup.
 
@@ -83,19 +85,20 @@ Every profile is searched, `Default` first, and the first one holding both cooki
 These scripts are thin CLI orchestrators; shared logic lives in `lib/` alongside the Next.js app's modules:
 
 - `lib/types.ts` — `Problem`/`Solution` types.
+- `lib/archive-schema.ts` — `parseProblem`/`parseSolutions`, which validate a parsed `data/` file before a script trusts it (built on `lib/json-fields.ts`).
 - `lib/paths.ts` — `data/problems|solutions/YYYY/MM/DD.json` path convention, `solutionFileExists`, `writeJsonFile`.
 - `lib/dates.ts` — UTC-only date primitives (deliberately UTC, not local time, to match LeetCode's daily rollover).
 - `lib/archive.ts` — `collectFilledDates` / `getMissingDates` for missing-day detection.
 - `lib/leetcode-api.ts` — GraphQL queries and the authenticated fetch client (CLI-only).
 - `lib/chrome-cookies.ts` — reads and decrypts LeetCode cookies out of Chrome's macOS cookie store (CLI-only).
 - `lib/env-file.ts` — rewrites `NAME=value` lines in `.env` without disturbing the rest of the file.
-- `lib/problems.ts` — maps a LeetCode daily challenge to the app's `Problem` shape, normalizes its link and recovers the question slug from one (CLI-only).
+- `lib/problems.ts` — maps a LeetCode daily challenge to the app's `Problem` shape, sanitizes its description (moving inline image sizes into `width`/`height` attributes, so images keep their aspect ratio), normalizes its link and recovers the question slug from one (CLI-only).
 - `lib/solutions.ts` — maps a LeetCode submission to the app's `Solution` shape and dedupes by code (CLI-only).
 
-Note: don't add the `server-only` package to any of these — it breaks resolution under plain `tsx`/Vitest, which these scripts and their tests rely on.
+Note: don't add the `server-only` package to any of these — it throws when imported outside a React Server Components build, so these scripts would fail under plain `tsx`. The app-only data modules (`problems-repo.ts`, `solutions-repo.ts`, `dailies-repo.ts`, `markdown.ts`) do import it; their Vitest tests still run because `vitest.config.ts` aliases `server-only` to its no-op entry, an alias `tsx` doesn't have.
 
 ## Tests
 
-`npm run test` runs the Vitest suite in `lib/*.test.ts`, covering nearly all of `lib/`. Untested: `lib/leetcode-api.ts` (needs network mocking) and `lib/actions.ts` (a one-line delegating wrapper).
+`npm run test` runs the Vitest suite in `lib/*.test.ts`, covering nearly all of `lib/`. Untested: `lib/leetcode-api.ts` (needs network mocking).
 
 `lib/chrome-cookies.test.ts` covers the decryption path only — it encrypts fixtures exactly as Chrome does and asserts they round-trip, including the Chrome 118+ domain-hash prefix and a full trailing padding block. The Keychain lookup and the profile scan are not tested, since both depend on the local machine's Chrome install.

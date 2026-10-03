@@ -1,3 +1,4 @@
+import { parseProblem } from "@/lib/archive-schema";
 import { formatDateUTC, isPastDateUTC, todayUTC } from "@/lib/dates";
 import {
   fetchAllSubmissions,
@@ -14,7 +15,7 @@ import {
 } from "@/lib/paths";
 import { titleSlugFromLink } from "@/lib/problems";
 import { buildSolution, dedupeSolutions } from "@/lib/solutions";
-import type { Problem, Solution } from "@/lib/types";
+import type { Solution } from "@/lib/types";
 import fs from "fs";
 
 interface Target {
@@ -23,11 +24,10 @@ interface Target {
 }
 
 function slugFromProblemFile(date: string): string | null {
+  const filePath = problemFilePath(date);
   try {
-    const problem: Problem = JSON.parse(
-      fs.readFileSync(problemFilePath(date), "utf8"),
-    );
-    return titleSlugFromLink(problem.link);
+    const value: unknown = JSON.parse(fs.readFileSync(filePath, "utf8"));
+    return titleSlugFromLink(parseProblem(value, filePath).link);
   } catch {
     return null;
   }

@@ -2,7 +2,12 @@ import { describe, it, expect, afterEach } from "vitest";
 import fs from "fs";
 import path from "path";
 import os from "os";
-import { collectFilledDates, getMissingDates } from "./archive";
+import {
+  collectFilledDates,
+  getMissingDates,
+  listArchivedDayParams,
+  listMonthCursors,
+} from "./archive";
 
 describe("collectFilledDates", () => {
   const tmpDirs: string[] = [];
@@ -98,5 +103,61 @@ describe("getMissingDates with an explicit start", () => {
       "2026-01-01",
       "2026-01-02",
     ]);
+  });
+});
+
+describe("archive route helpers", () => {
+  const tmpDirs: string[] = [];
+
+  afterEach(() => {
+    for (const dir of tmpDirs.splice(0)) {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  function makeArchive(dates: string[]): string {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "archive-routes-test-"));
+    tmpDirs.push(root);
+    for (const date of dates) {
+      const [year = "", month = "", day = ""] = date.split("-");
+      fs.mkdirSync(path.join(root, year, month), { recursive: true });
+      fs.writeFileSync(path.join(root, year, month, `${day}.json`), "{}");
+    }
+    return root;
+  }
+
+  it("splits every archived day into blog route segments", () => {
+    const root = makeArchive(["2026-07-20", "2026-08-01"]);
+
+    expect(listArchivedDayParams(root)).toEqual([
+      { year: "2026", month: "07", day: "20" },
+      { year: "2026", month: "08", day: "01" },
+    ]);
+  });
+
+  it("returns no route segments for a missing archive", () => {
+    expect(
+      listArchivedDayParams(path.join(os.tmpdir(), "does-not-exist")),
+    ).toEqual([]);
+  });
+
+  it("lists every calendar month from the oldest archived one through today, gaps included", () => {
+    // 2026-12 and 2027-01 hold no data but are still valid cursors, and the
+    // range crosses a year boundary.
+    const root = makeArchive(["2026-11-30", "2027-02-01"]);
+
+    expect(listMonthCursors(root, new Date(Date.UTC(2027, 2, 15)))).toEqual([
+      "2026-11",
+      "2026-12",
+      "2027-01",
+      "2027-02",
+      "2027-03",
+    ]);
+  });
+
+  it("returns no month cursors for an empty archive", () => {
+    expect(
+      listMonthCursors(makeArchive([]), new Date(Date.UTC(2026, 0, 1))),
+    ).toEqual([]);
   });
 });

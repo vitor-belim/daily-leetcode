@@ -18,17 +18,17 @@ interface DifficultyTone {
 const DIFFICULTY_TONES: Record<Difficulty, DifficultyTone> = {
   [Difficulty.Easy]: {
     label: "Easy",
-    indicatorClassName: "[&>[data-slot=progress-indicator]]:bg-emerald-500",
+    indicatorClassName: "[&_[data-slot=progress-indicator]]:bg-emerald-500",
     textClassName: "text-emerald-700 dark:text-emerald-400",
   },
   [Difficulty.Medium]: {
     label: "Medium",
-    indicatorClassName: "[&>[data-slot=progress-indicator]]:bg-amber-500",
+    indicatorClassName: "[&_[data-slot=progress-indicator]]:bg-amber-500",
     textClassName: "text-amber-700 dark:text-amber-400",
   },
   [Difficulty.Hard]: {
     label: "Hard",
-    indicatorClassName: "[&>[data-slot=progress-indicator]]:bg-rose-500",
+    indicatorClassName: "[&_[data-slot=progress-indicator]]:bg-rose-500",
     textClassName: "text-rose-700 dark:text-rose-400",
   },
 };
@@ -47,6 +47,13 @@ function days(count: number): string {
   return `${count} ${count === 1 ? "day" : "days"}`;
 }
 
+/**
+ * The home page's archive-wide stats: the share of finished days solved,
+ * solved counts per difficulty, and the current and longest streaks.
+ *
+ * @param stats The aggregated archive stats.
+ * @returns The grid of stat cards.
+ */
 export function StatsOverview({ stats }: StatsOverviewProps) {
   const finished = stats.totalDays - stats.pending;
   const solvedPercent = percent(stats.solved, finished);
@@ -68,7 +75,11 @@ export function StatsOverview({ stats }: StatsOverviewProps) {
               / {finished}
             </span>
           </p>
-          <Progress value={solvedPercent} className="h-1.5" />
+          <Progress
+            value={solvedPercent}
+            aria-label="Share of finished days solved"
+            className="h-1.5"
+          />
           <p className="text-xs text-muted-foreground">
             {solvedPercent}% solved
             <br />
@@ -124,6 +135,7 @@ export function StatsOverview({ stats }: StatsOverviewProps) {
                 </div>
                 <Progress
                   value={percent(solved, total)}
+                  aria-label={`${tone.label} problems solved`}
                   className={cn("h-1.5", tone.indicatorClassName)}
                 />
               </div>

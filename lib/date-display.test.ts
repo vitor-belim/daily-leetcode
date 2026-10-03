@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import {
   formatDate,
+  formatDateTimeUTC,
   formatLongDate,
   formatMonthYear,
   formatWeekdayShort,
@@ -41,6 +42,44 @@ describe("formatDate", () => {
 
   it("pads single-digit hours and minutes", () => {
     expect(formatDate(new Date(2026, 0, 5, 1, 2))).toBe("2026-01-05 01:02");
+  });
+});
+
+describe("formatDateTimeUTC", () => {
+  it("formats an ISO string in UTC with a zone label", () => {
+    // The archived 2026-10-01 submission time, rendered on the server
+    expect(formatDateTimeUTC("2026-10-01T07:11:25.000Z")).toBe(
+      "2026-10-01 07:11 UTC",
+    );
+  });
+
+  it("formats a Date object in UTC", () => {
+    expect(formatDateTimeUTC(new Date(Date.UTC(2026, 6, 25, 9, 5)))).toBe(
+      "2026-07-25 09:05 UTC",
+    );
+  });
+
+  it("keeps the UTC calendar day for times just before midnight", () => {
+    // Whatever zone the test runs in, the UTC day must not shift
+    expect(formatDateTimeUTC("2026-09-30T23:59:59.000Z")).toBe(
+      "2026-09-30 23:59 UTC",
+    );
+  });
+
+  it("pads single-digit months, days, hours and minutes", () => {
+    expect(formatDateTimeUTC("2026-01-05T01:02:00.000Z")).toBe(
+      "2026-01-05 01:02 UTC",
+    );
+  });
+
+  it("matches formatDate's fields when the instant is read in UTC", () => {
+    // formatDate reads the runtime zone; shifting by the zone offset makes
+    // its local fields equal the UTC ones, so the two share one layout
+    const instant = new Date("2026-10-01T07:11:25.000Z");
+    const asLocal = new Date(
+      instant.getTime() + instant.getTimezoneOffset() * 60_000,
+    );
+    expect(formatDateTimeUTC(instant)).toBe(`${formatDate(asLocal)} UTC`);
   });
 });
 

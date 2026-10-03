@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import type { Difficulty } from "@/lib/types";
+import { Difficulty } from "@/lib/types";
 import type { ComponentProps } from "react";
 
 interface DifficultyStyle {
@@ -12,19 +12,25 @@ interface DifficultyBadgeProps {
 }
 
 const DIFFICULTY_STYLES: Record<Difficulty, DifficultyStyle> = {
-  Easy: {
+  [Difficulty.Easy]: {
     variant: "secondary",
     className:
       "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400",
   },
-  Medium: {
+  [Difficulty.Medium]: {
     variant: "default",
     className:
       "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
   },
-  Hard: { variant: "destructive", className: "" },
+  [Difficulty.Hard]: { variant: "destructive", className: "" },
 };
 
+/**
+ * Renders a problem's difficulty as a color-coded badge.
+ *
+ * @param difficulty The problem's difficulty tier.
+ * @returns The badge element.
+ */
 export function DifficultyBadge({ difficulty }: DifficultyBadgeProps) {
   const { variant, className } = DIFFICULTY_STYLES[difficulty];
 

@@ -1,7 +1,7 @@
 import { collectFilledDates, getMissingDates } from "@/lib/archive";
+import { parseSolutions } from "@/lib/archive-schema";
 import { isValidCalendarDate, todayUTC } from "@/lib/dates";
 import { solutionFileExists, solutionFilePath } from "@/lib/paths";
-import type { Solution } from "@/lib/types";
 import { execFileSync } from "child_process";
 import fs from "fs";
 
@@ -36,11 +36,12 @@ function explainDate(date: string) {
 function isExplainComplete(date: string): boolean {
   if (!solutionFileExists(date)) return false;
 
+  const filePath = solutionFilePath(date);
   try {
-    const solutions: Solution[] = JSON.parse(
-      fs.readFileSync(solutionFilePath(date), "utf8"),
+    const value: unknown = JSON.parse(fs.readFileSync(filePath, "utf8"));
+    return parseSolutions(value, filePath).every(
+      (s) => (s.aiExplanation || "").trim().length > 0,
     );
-    return solutions.every((s) => (s.aiExplanation || "").trim().length > 0);
   } catch {
     return false;
   }

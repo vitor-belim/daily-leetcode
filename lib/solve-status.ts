@@ -73,10 +73,10 @@ function countAttemptsToSolve(own: Solution[], date: string): number | null {
  * @param date The challenge day as `YYYY-MM-DD`, used to tell a failed past
  *   day from one that is still in progress.
  * @param today The reference "today" (defaults to the current UTC day).
- * @returns The solve status plus attempt counts, languages, best accepted
- *   percentiles and whether an editorial solution is present. A day with no
- *   solutions file is Pending whatever its date, since its submissions have
- *   not been fetched yet.
+ * @returns The solve status plus attempt counts, languages, the best
+ *   accepted runtime percentile and whether an editorial solution is
+ *   present. A day with no solutions file is Pending whatever its date, since
+ *   its submissions have not been fetched yet.
  */
 export function summarizeSolutions(
   solutions: Solution[] | null,
@@ -87,12 +87,10 @@ export function summarizeSolutions(
   const own = archived.filter(isOwnSolution);
   const accepted = own.filter((s) => s.status === SolutionStatus.Done);
 
-  let bestRuntime: number | null = null;
-  let bestMemory: number | null = null;
-  for (const solution of accepted) {
-    bestRuntime = maxPercentile(bestRuntime, solution.cpuUsage);
-    bestMemory = maxPercentile(bestMemory, solution.memoryUsage);
-  }
+  const bestRuntime = accepted.reduce<number | null>(
+    (best, solution) => maxPercentile(best, solution.cpuUsage),
+    null,
+  );
 
   return {
     solveStatus:
@@ -103,7 +101,6 @@ export function summarizeSolutions(
     attemptsToSolve: countAttemptsToSolve(own, date),
     languages: [...new Set(own.map((s) => s.language))],
     bestRuntime,
-    bestMemory,
     hasEditorial: own.length < archived.length,
   };
 }

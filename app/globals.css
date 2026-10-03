@@ -6,14 +6,20 @@
 
 @custom-variant dark (&:is(.dark *));
 
-@theme {
-  /*noinspection CssUnresolvedCustomProperty*/
-  --font-sans: var(--font-geist-sans);
-  /*noinspection CssUnresolvedCustomProperty*/
-  --font-mono: var(--font-geist-mono);
-  /*noinspection CssUnresolvedCustomProperty*/
-  --font-heading: var(--font-geist-sans);
+@theme inline {
+  --font-sans: var(--font-geist-sans, ui-sans-serif, system-ui, sans-serif);
+  --font-mono: var(
+    --font-geist-mono,
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Consolas,
+    monospace
+  );
+  --font-heading: var(--font-geist-sans, ui-sans-serif, system-ui, sans-serif);
+}
 
+@theme {
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-sm: calc(var(--radius) * 0.6);

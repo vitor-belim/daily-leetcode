@@ -61,9 +61,9 @@ describe("summarizeSolutions", () => {
       // python run doesn't add to that.
       attemptsToSolve: 2,
       languages: ["javascript", "python"],
-      // Best percentiles are taken independently across accepted submissions.
+      // The best runtime percentile is taken across accepted submissions
+      // only; memory percentiles aren't summarized at all.
       bestRuntime: 85,
-      bestMemory: 90,
       hasEditorial: false,
     });
   });
@@ -262,7 +262,6 @@ describe("summarizeSolutions", () => {
         attemptsToSolve: null,
         languages: [],
         bestRuntime: null,
-        bestMemory: null,
         hasEditorial: false,
       });
     }

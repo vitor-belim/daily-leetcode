@@ -1,10 +1,17 @@
+import "server-only";
 import { collectFilledDates } from "./archive";
 import { formatMonthUTC, monthOf, shiftMonth, todayUTC } from "./dates";
 import { PROBLEMS_ROOT, SOLUTIONS_ROOT } from "./paths";
 import { readProblemFile } from "./problems-repo";
 import { computeArchiveStats, summarizeSolutions } from "./solve-status";
 import { readSolutionsFile } from "./solutions-repo";
-import type { ArchiveStats, DailySummary, Problem } from "./types";
+import type {
+  ArchiveStats,
+  DailySummary,
+  LatestDailies,
+  Problem,
+  Solution,
+} from "./types";
 
 /** The two archive roots a summary is assembled from. */
 export interface ArchiveRoots {
@@ -29,15 +36,6 @@ export interface MonthPage {
    * Cursor for the next page: the oldest month covered by this page, to be
    * passed back as `before`. Null when nothing older remains.
    */
-  nextCursor: string | null;
-}
-
-/** A page of daily summaries plus the state needed to fetch the next. */
-export interface LatestDailies {
-  dailies: DailySummary[];
-  total: number;
-  hasMore: boolean;
-  /** The oldest month covered, to pass back as `before`; null at the end. */
   nextCursor: string | null;
 }
 
@@ -103,42 +101,48 @@ function newestMonthBefore(
  * Combines one day's problem with the progress derived from its solutions.
  *
  * @param problem The archived problem.
+ * @param solutions The day's archived solutions, or null when its solutions
+ *   file does not exist yet.
  * @param date The day as `YYYY-MM-DD`.
- * @param roots The archive roots.
  * @param today The reference "today" for pending-vs-failed.
- * @returns The day's summary.
+ * @returns The day's summary, holding only the fields the home list renders.
  */
-async function summarizeDay(
+function summarizeDay(
   problem: Problem,
+  solutions: Solution[] | null,
   date: string,
-  roots: ArchiveRoots,
   today: Date,
-): Promise<DailySummary> {
-  const solutions = await readSolutionsFile(date, roots.solutions);
+): DailySummary {
   return {
     date,
     title: problem.title,
     difficulty: problem.difficulty,
-    link: problem.link,
     ...summarizeSolutions(solutions, date, today),
   };
 }
 
 /**
- * Reads one day's problem and, when it parses, summarizes it.
+ * Reads one day's problem and solutions in parallel and summarizes them.
  *
  * @param date The day as `YYYY-MM-DD`.
  * @param roots The archive roots.
  * @param today The reference "today" for pending-vs-failed.
- * @returns The summary, or null when the problem file is unreadable.
+ * @returns The summary, or null when the problem file has disappeared since
+ *   the archive scan.
+ * @throws When the day's problem or solutions file exists but cannot be
+ *   read, fails to parse or holds the wrong shape, even if the other file is
+ *   missing.
  */
 async function loadDay(
   date: string,
   roots: ArchiveRoots,
   today: Date,
 ): Promise<DailySummary | null> {
-  const problem = await readProblemFile(date, roots.problems);
-  return problem ? summarizeDay(problem, date, roots, today) : null;
+  const [problem, solutions] = await Promise.all([
+    readProblemFile(date, roots.problems),
+    readSolutionsFile(date, roots.solutions),
+  ]);
+  return problem ? summarizeDay(problem, solutions, date, today) : null;
 }
 
 /**
@@ -151,8 +155,13 @@ async function loadDay(
  * @param roots The archive roots (default to `data/problems` and
  *   `data/solutions`).
  * @param today The reference "today" (defaults to the current UTC day).
- * @returns The summaries (days with unreadable problem files are dropped),
- *   the total day count, whether older days remain, and the next cursor.
+ * @returns The summaries (days whose problem file disappeared since the scan
+ *   are dropped), the total day count, whether older days remain, and the
+ *   next cursor.
+ * @throws When a covered day's problem or solutions file exists but cannot
+ *   be read, fails to parse or holds the wrong shape, so a corrupted archive
+ *   fails the prerender instead of silently dropping or misreporting the
+ *   day.
  */
 export async function getDailySummariesByMonth(
   months: number,
@@ -181,8 +190,11 @@ export async function getDailySummariesByMonth(
  * @param roots The archive roots (default to `data/problems` and
  *   `data/solutions`).
  * @param today The reference "today" (defaults to the current UTC day).
- * @returns Archive-wide totals, per-difficulty counts and streaks; days with
- *   unreadable problem files are skipped.
+ * @returns Archive-wide totals, per-difficulty counts and streaks; days
+ *   whose problem file disappeared since the scan are skipped.
+ * @throws When any day's problem or solutions file exists but cannot be
+ *   read, fails to parse or holds the wrong shape, so a corrupted archive
+ *   fails the prerender instead of skewing the stats.
  */
 export async function getArchiveStats(
   roots: ArchiveRoots = DEFAULT_ROOTS,

@@ -1,21 +1,86 @@
+/** The calendar and clock fields of one instant, as read in some time zone. */
+interface DateTimeFields {
+  year: number;
+  month: number;
+  day: number;
+  hours: number;
+  minutes: number;
+}
+
 /**
- * Formats a timestamp as `YYYY-MM-DD HH:mm` in the viewer's local time.
- * Local-time display formatting lives here, deliberately separate from the
- * UTC-only archive logic in `dates.ts`; the UTC-vs-local split was a past
- * bug source and the two must not be merged.
+ * Left-pads a calendar or clock field to two digits.
+ *
+ * @param value The field value.
+ * @returns The value as a string of at least two characters.
+ */
+function padTwoDigits(value: number): string {
+  return String(value).padStart(2, "0");
+}
+
+/**
+ * Joins calendar and clock fields into a zero-padded `YYYY-MM-DD HH:mm`
+ * string.
+ *
+ * @param fields The fields to join, with a 1-based month.
+ * @returns The `YYYY-MM-DD HH:mm` string; `NaN` fields from an unparseable
+ *   timestamp come through as `NaN` rather than throwing.
+ */
+function joinDateTimeFields({
+  year,
+  month,
+  day,
+  hours,
+  minutes,
+}: DateTimeFields): string {
+  return `${year}-${padTwoDigits(month)}-${padTwoDigits(day)} ${padTwoDigits(hours)}:${padTwoDigits(minutes)}`;
+}
+
+/**
+ * Formats a timestamp as `YYYY-MM-DD HH:mm` in the local time zone of the
+ * JavaScript runtime that calls it. That is the viewer's zone only when it
+ * runs in the browser: on the server or at build time it is the host's zone
+ * (UTC on Vercel), so server-rendered markup must not show it unlabelled.
+ * The `LocalDateTime` client component renders {@link formatDateTimeUTC} on
+ * the server and swaps in this after hydration. Local-time display
+ * formatting lives here, deliberately separate from the UTC-only archive
+ * logic in `dates.ts`; the UTC-vs-local split was a past bug source and the
+ * two must not be merged.
  *
  * @param date The timestamp to format, as a Date or a date string.
- * @returns The local-time `YYYY-MM-DD HH:mm` string.
+ * @returns The `YYYY-MM-DD HH:mm` string in the runtime's local time zone.
  */
-export function formatDate(date: string | Date) {
+export function formatDate(date: string | Date): string {
   const d = new Date(date);
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  const hours = String(d.getHours()).padStart(2, "0");
-  const minutes = String(d.getMinutes()).padStart(2, "0");
 
-  return `${year}-${month}-${day} ${hours}:${minutes}`;
+  return joinDateTimeFields({
+    year: d.getFullYear(),
+    month: d.getMonth() + 1,
+    day: d.getDate(),
+    hours: d.getHours(),
+    minutes: d.getMinutes(),
+  });
+}
+
+/**
+ * Formats a timestamp as `YYYY-MM-DD HH:mm UTC`, the same in every runtime
+ * and time zone. This is the server-rendered and hydration-time text of the
+ * `LocalDateTime` client component, labelled so a reader whose script never
+ * runs can still tell which zone it is in.
+ *
+ * @param date The timestamp to format, as a Date or a date string.
+ * @returns The `YYYY-MM-DD HH:mm UTC` string.
+ */
+export function formatDateTimeUTC(date: string | Date): string {
+  const d = new Date(date);
+  const fields = joinDateTimeFields({
+    year: d.getUTCFullYear(),
+    month: d.getUTCMonth() + 1,
+    day: d.getUTCDate(),
+    hours: d.getUTCHours(),
+    minutes: d.getUTCMinutes(),
+  });
+
+  return `${fields} UTC`;
 }
 
 const MONTH_NAMES = [

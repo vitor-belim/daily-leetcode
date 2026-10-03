@@ -9,12 +9,18 @@ import {
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { getLatestDailies } from "@/lib/actions";
+import {
+  appendDailiesPage,
+  fetchDailiesPage,
+  restoreDailyListState,
+  type DailyListSnapshot,
+  type DailyListState,
+} from "@/lib/dailies-client";
 import { formatMonthYear } from "@/lib/date-display";
 import { monthOf } from "@/lib/dates";
 import type { DailySummary } from "@/lib/types";
 import { Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface DailyListProps {
   initialDailies: DailySummary[];
@@ -31,6 +37,32 @@ interface MonthGroup {
   key: string;
   label: string;
   dailies: DailySummary[];
+}
+
+/** Where the latest "Load previous month" request stands. */
+enum LoadStatus {
+  Idle = "idle",
+  Loading = "loading",
+  Failed = "failed",
+}
+
+/**
+ * The list's state as of its last render, kept at module level so that it
+ * outlives the component: navigating to a day and back remounts the list,
+ * which then resumes with the months already loaded and expanded instead of
+ * starting over. It is only ever written from an effect, so server renders
+ * never touch it, and a full page load starts it empty, matching the server
+ * HTML on hydration.
+ */
+let lastSnapshot: DailyListSnapshot | null = null;
+
+/**
+ * Records the list's latest state for the next mount to resume from.
+ *
+ * @param snapshot The state plus the seed it grew from.
+ */
+function rememberSnapshot(snapshot: DailyListSnapshot): void {
+  lastSnapshot = snapshot;
 }
 
 /**
@@ -57,11 +89,19 @@ function groupByMonth(dailies: DailySummary[]): MonthGroup[] {
   return groups;
 }
 
-/** The distinct months present in a list of days, in list order. */
-function monthKeys(dailies: DailySummary[]): string[] {
-  return [...new Set(dailies.map((d) => monthOf(d.date)))];
-}
-
+/**
+ * The home page's archive list: the server-rendered months grouped into
+ * accordions, plus a "Load previous month" button that fetches older months
+ * from the statically generated month pages. Loaded months and expanded
+ * accordions survive navigating to a day and back.
+ *
+ * @param initialDailies The server-rendered days, newest first.
+ * @param initialHasMore Whether any day is older than `initialDailies`.
+ * @param initialCursor The cursor for the first older month, or null.
+ * @param currentMonth Today's `YYYY-MM` month, expanded on first render.
+ * @param total The archive-wide day count.
+ * @returns The grouped list with its load button.
+ */
 export function DailyList({
   initialDailies,
   initialHasMore,
@@ -69,30 +109,45 @@ export function DailyList({
   currentMonth,
   total,
 }: DailyListProps) {
-  const [dailies, setDailies] = useState<DailySummary[]>(initialDailies);
-  const [hasMore, setHasMore] = useState(initialHasMore);
-  const [cursor, setCursor] = useState(initialCursor);
-  const [isLoading, setIsLoading] = useState(false);
-  const [openMonths, setOpenMonths] = useState<string[]>([currentMonth]);
+  const [state, setState] = useState<DailyListState>(() =>
+    restoreDailyListState(
+      lastSnapshot,
+      { cursor: initialCursor, hasMore: initialHasMore, total },
+      currentMonth,
+    ),
+  );
+  const [loadStatus, setLoadStatus] = useState<LoadStatus>(LoadStatus.Idle);
 
-  async function loadMore() {
-    setIsLoading(true);
+  useEffect(() => {
+    rememberSnapshot({
+      seed: { cursor: initialCursor, hasMore: initialHasMore, total },
+      state,
+    });
+  }, [initialCursor, initialHasMore, total, state]);
+
+  const dailies = [...initialDailies, ...state.olderDailies];
+  const isLoading = loadStatus === LoadStatus.Loading;
+  const idleLabel =
+    loadStatus === LoadStatus.Failed ? "Try again" : "Load previous month";
+
+  async function loadMore(): Promise<void> {
+    const cursor = state.cursor;
+    if (cursor === null) return;
+
+    setLoadStatus(LoadStatus.Loading);
     try {
-      const result = await getLatestDailies(1, cursor);
-      setDailies((prev) => [...prev, ...result.dailies]);
-      setOpenMonths((prev) => [
-        ...new Set([...prev, ...monthKeys(result.dailies)]),
-      ]);
-      setHasMore(result.hasMore);
-      setCursor(result.nextCursor);
+      const page = await fetchDailiesPage(cursor);
+      setState((current) =>
+        current.cursor === cursor ? appendDailiesPage(current, page) : current,
+      );
+      setLoadStatus(LoadStatus.Idle);
     } catch (error) {
       console.error("Failed to load more dailies:", error);
-    } finally {
-      setIsLoading(false);
+      setLoadStatus(LoadStatus.Failed);
     }
   }
 
-  if (dailies.length === 0) {
+  if (dailies.length === 0 && !state.hasMore) {
     return (
       <Card className="items-center border-dashed p-12 text-center shadow-none ring-0 border">
         <p className="text-muted-foreground italic">
@@ -106,8 +161,13 @@ export function DailyList({
     <div className="space-y-6">
       <Accordion
         multiple
-        value={openMonths}
-        onValueChange={(value) => setOpenMonths(value.map(String))}
+        value={state.openMonths}
+        onValueChange={(value) =>
+          setState((current) => ({
+            ...current,
+            openMonths: value.map(String),
+          }))
+        }
         className="gap-6"
       >
         {groupByMonth(dailies).map((group) => (
@@ -139,15 +199,22 @@ export function DailyList({
       </Accordion>
 
       <div className="flex flex-col items-center gap-2">
-        <p className="text-xs text-muted-foreground">
+        <p aria-live="polite" className="text-xs text-muted-foreground">
           Showing {dailies.length} of {total} challenges
         </p>
-        {hasMore && (
+        {loadStatus === LoadStatus.Failed && (
+          <p role="alert" className="text-center text-xs text-destructive">
+            Couldn&apos;t load the previous month. Check your connection and try
+            again.
+          </p>
+        )}
+        {state.hasMore && (
           <Button
             onClick={loadMore}
             disabled={isLoading}
+            focusableWhenDisabled
             variant="outline"
-            className="w-full sm:w-auto sm:min-w-48"
+            className="w-full aria-disabled:opacity-50 sm:w-auto sm:min-w-48"
           >
             {isLoading ? (
               <>
@@ -155,7 +222,7 @@ export function DailyList({
                 Loading…
               </>
             ) : (
-              "Load previous month"
+              idleLabel
             )}
           </Button>
         )}

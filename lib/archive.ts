@@ -2,8 +2,11 @@ import fs from "fs";
 import path from "path";
 import {
   formatDateUTC,
+  formatMonthUTC,
   isValidCalendarDate,
+  monthOf,
   parseDateUTC,
+  shiftMonth,
   todayUTC,
 } from "./dates";
 import { PROBLEMS_ROOT } from "./paths";
@@ -46,6 +49,60 @@ export function collectFilledDates(root: string = PROBLEMS_ROOT): string[] {
   }
 
   return dates.sort();
+}
+
+/** The `[year]/[month]/[day]` segments of one archived day's blog route. */
+export interface ArchivedDayParams {
+  year: string;
+  month: string;
+  day: string;
+}
+
+/**
+ * Lists every archived day as blog route segments, for the blog page's
+ * `generateStaticParams`.
+ *
+ * @param root The archive root to scan (defaults to `data/problems`).
+ * @returns One entry per filled day, ascending; empty when the root doesn't
+ *   exist.
+ */
+export function listArchivedDayParams(
+  root: string = PROBLEMS_ROOT,
+): ArchivedDayParams[] {
+  return collectFilledDates(root).flatMap((date) => {
+    const [year, month, day] = date.split("-");
+    return year && month && day ? [{ year, month, day }] : [];
+  });
+}
+
+/**
+ * Lists every calendar month from the oldest archived month through today's
+ * month, inclusive. That covers every `before` cursor the home list can ask
+ * for: the first page's cursor is a calendar month that may hold no data,
+ * and later cursors are archived months, all within this range.
+ *
+ * @param root The archive root to scan (defaults to `data/problems`).
+ * @param today The range end (defaults to the current UTC day).
+ * @returns The months as ascending `YYYY-MM` strings; empty when nothing is
+ *   archived.
+ */
+export function listMonthCursors(
+  root: string = PROBLEMS_ROOT,
+  today: Date = todayUTC(),
+): string[] {
+  const oldest = collectFilledDates(root)[0];
+  if (oldest === undefined) return [];
+
+  const last = formatMonthUTC(today);
+  const months: string[] = [];
+  for (
+    let month = monthOf(oldest);
+    month <= last;
+    month = shiftMonth(month, 1)
+  ) {
+    months.push(month);
+  }
+  return months;
 }
 
 /**
