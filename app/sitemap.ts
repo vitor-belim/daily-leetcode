@@ -16,12 +16,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const newest = dates.at(-1);
   if (newest !== undefined) home.lastModified = newest;
 
-  const challenges = dates.map(
-    (date): SitemapEntry => ({
-      url: new URL(blogPath(date), SITE_URL).href,
-      lastModified: date,
-    }),
-  );
+  const challenges = dates.map((date): SitemapEntry => ({
+    url: new URL(blogPath(date), SITE_URL).href,
+    lastModified: date,
+  }));
 
   return [home, ...challenges];
 }
