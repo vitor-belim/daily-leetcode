@@ -95,7 +95,7 @@ These scripts are thin CLI orchestrators; shared logic lives in `lib/` alongside
 - `lib/problems.ts` — maps a LeetCode daily challenge to the app's `Problem` shape, sanitizes its description (moving inline image sizes into `width`/`height` attributes, so images keep their aspect ratio), normalizes its link and recovers the question slug from one (CLI-only).
 - `lib/solutions.ts` — maps a LeetCode submission to the app's `Solution` shape and dedupes by code (CLI-only).
 
-Note: don't add the `server-only` package to any of these — it throws when imported outside a React Server Components build, so these scripts would fail under plain `tsx`. The app-only data modules (`problems-repo.ts`, `solutions-repo.ts`, `dailies-repo.ts`, `markdown.ts`) do import it; their Vitest tests still run because `vitest.config.ts` aliases `server-only` to its no-op entry, an alias `tsx` doesn't have.
+Note: don't add the `server-only` package to any of these — it throws when imported outside a React Server Components build, so these scripts would fail under plain `tsx`. The app-only data modules (`problems-repo.ts`, `solutions-repo.ts`, `dailies-repo.ts`, `markdown.ts`) do import it; their Vitest tests still run because `vitest.config.mts` aliases `server-only` to its no-op entry, an alias `tsx` doesn't have.
 
 ## Tests
 

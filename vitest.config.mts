@@ -4,9 +4,9 @@ import path from "path";
 export default defineConfig({
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "."),
+      "@": path.resolve(import.meta.dirname, "."),
       "server-only": path.resolve(
-        __dirname,
+        import.meta.dirname,
         "node_modules/server-only/empty.js",
       ),
     },
