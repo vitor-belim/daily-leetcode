@@ -115,6 +115,26 @@ export function applyTheme(theme: Theme): void {
 }
 
 /**
+ * Watches the document for theme changes, whatever caused them: the toggle,
+ * another tab and the system appearance all end up flipping the dark class on
+ * `<html>`, so observing that class catches every one of them.
+ *
+ * @param listener Called after each change to `<html>`'s class list.
+ * @returns A function that stops watching.
+ */
+export function subscribeToAppliedTheme(listener: () => void): () => void {
+  const observer = new MutationObserver(listener);
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["class"],
+  });
+
+  return () => {
+    observer.disconnect();
+  };
+}
+
+/**
  * Applies the theme a reader gets on a fresh load: an explicit choice wins,
  * then the stored one, then the operating system's appearance. Called on
  * mount to re-assert what the restore script set, since React strips

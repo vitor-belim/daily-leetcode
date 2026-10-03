@@ -8,6 +8,7 @@ import {
   readAppliedTheme,
   readStoredTheme,
   resolveTheme,
+  subscribeToAppliedTheme,
   SYSTEM_DARK_QUERY,
   systemPrefersDark,
   Theme,
@@ -313,6 +314,58 @@ describe("THEME_RESTORE_SCRIPT", () => {
       expect(scripted.style.colorScheme).toBe(bundled.style.colorScheme);
     },
   );
+});
+
+describe("subscribeToAppliedTheme", () => {
+  /**
+   * A MutationObserver stand-in that records what it was asked to watch and
+   * lets the test fire its callback.
+   */
+  class FakeMutationObserver {
+    static instances: FakeMutationObserver[] = [];
+    readonly callback: () => void;
+    target: unknown = null;
+    options: MutationObserverInit | null = null;
+    disconnected = false;
+
+    constructor(callback: () => void) {
+      this.callback = callback;
+      FakeMutationObserver.instances.push(this);
+    }
+
+    observe(target: unknown, options: MutationObserverInit): void {
+      this.target = target;
+      this.options = options;
+    }
+
+    disconnect(): void {
+      this.disconnected = true;
+    }
+  }
+
+  it("watches only the class attribute of <html> and stops when unsubscribed", () => {
+    FakeMutationObserver.instances = [];
+    const root = fakeRoot();
+    vi.stubGlobal("MutationObserver", FakeMutationObserver);
+    vi.stubGlobal("document", { documentElement: root });
+    const listener = vi.fn();
+
+    const unsubscribe = subscribeToAppliedTheme(listener);
+    const [observer] = FakeMutationObserver.instances;
+
+    expect(observer?.target).toBe(root);
+    expect(observer?.options).toEqual({
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    // A class change on <html> (e.g. the toggle applying dark) reaches the listener.
+    observer?.callback();
+    expect(listener).toHaveBeenCalledTimes(1);
+
+    unsubscribe();
+    expect(observer?.disconnected).toBe(true);
+  });
 });
 
 describe("applyResolvedTheme", () => {
