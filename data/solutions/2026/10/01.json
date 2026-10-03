@@ -1,0 +1,145 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {boolean}\n */\nvar isValid = function(s) {\n    const stack = [];\n\n    for (let i = 0; i < s.length; i++) {\n        if (['{', '[', '('].includes(s[i]))\n            stack.push(s[i]);\n        else if (\n            (s[i] === '}' && stack[stack.length - 1] !== '{') ||\n            (s[i] === ']' && stack[stack.length - 1] !== '[') ||\n            (s[i] === ')' && stack[stack.length - 1] !== '(')\n        )\n            return false;\n        else\n            stack.pop();\n    }\n\n    return stack.length === 0;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function checks whether a string of brackets is **balanced** using a **stack**. It walks through each character: if it is an opening bracket (`{`, `[` or `(`, detected with an `includes` check on a small array), it is pushed onto the stack. Otherwise the character must be a closing bracket, so the code compares it against the most recent item on the stack (`stack[stack.length - 1]`); if the pair does not match (for example `}` when the top is not `{`), the string is invalid and the function returns `false`. If they do match, the opener is popped off. When the stack is empty, the top is `undefined`, so any closing bracket automatically fails the check. After the loop, the string is valid only if the stack is empty (`stack.length === 0`), meaning every opener found its closer.",
+    "status": "DONE",
+    "cpuUsage": 5,
+    "memoryUsage": 100,
+    "date": "2024-05-03T17:27:23.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {boolean}\n */\nvar isValid = function(s) {\n    const stack = [];\n\n    for (let i = 0; i < s.length; i++) {\n        if (s[i] === '{' || s[i] === '[' || s[i] === '(')\n            stack.push(s[i]);\n        else if (\n            (s[i] === '}' && stack[stack.length - 1] !== '{') ||\n            (s[i] === ']' && stack[stack.length - 1] !== '[') ||\n            (s[i] === ')' && stack[stack.length - 1] !== '(')\n        )\n            return false;\n        else\n            stack.pop();\n    }\n\n    return stack.length === 0;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is the same **stack-based** approach to the valid-parentheses problem, but the opener check uses three direct `===` comparisons instead of an array `includes` call, which avoids allocating a new array on every iteration. For each character, an opening bracket is pushed onto `stack`; a closing bracket is compared with the top of the stack (`stack[stack.length - 1]`) and if the two do not form a matching pair the function immediately returns `false`. Otherwise the matching opener is popped. Because an empty stack has an `undefined` top, a stray closing bracket also fails. The final result is `stack.length === 0`, which is `true` only when every bracket was properly closed.",
+    "status": "DONE",
+    "cpuUsage": 5,
+    "memoryUsage": 100,
+    "date": "2024-05-03T17:29:30.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {boolean}\n */\nvar isValid = function(s) {\n    const stack = [];\n    let stackPointer = -1;\n\n    for (let i = 0; i < s.length; i++) {\n        if (s[i] === '{' || s[i] === '[' || s[i] === '(') {\n            stack.push(s[i]);\n            stackPointer++;\n        } else if (\n            (s[i] === '}' && stack[stack.length - 1] !== '{') ||\n            (s[i] === ']' && stack[stack.length - 1] !== '[') ||\n            (s[i] === ')' && stack[stack.length - 1] !== '(')\n        )\n            return false;\n        else\n            stackPointer--;\n    }\n\n    return stackPointer === -1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This attempt tries to speed up the stack approach by tracking the top with a manual index, `stackPointer`, starting at `-1`. Opening brackets are pushed onto `stack` and `stackPointer` is incremented; for closing brackets the code compares against `stack[stack.length - 1]` and returns `false` on a mismatch, otherwise it only decrements `stackPointer` without actually removing anything from the array. That is the **bug**: because `stack.pop()` is never called, `stack.length` keeps growing and `stack[stack.length - 1]` always refers to the most recently pushed opener rather than the logical top, so a string like `()[]` is wrongly rejected. The final `stackPointer === -1` check is correct in spirit, but the mismatch between the real array and the pointer makes the solution fail.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2024-05-03T17:32:23.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {boolean}\n */\nvar isValid = function(s) {\n    const stack = [];\n    let stackPointer = -1;\n\n    for (let i = 0; i < s.length; i++) {\n        if (s[i] === '{' || s[i] === '[' || s[i] === '(') {\n            stackPointer++;\n            stack[stackPointer] = s[i];\n        } else if (\n            (s[i] === '}' && stack[stackPointer] !== '{') ||\n            (s[i] === ']' && stack[stackPointer] !== '[') ||\n            (s[i] === ')' && stack[stackPointer] !== '(')\n        ) {\n            console.log('failed condition', s[i], stackPointer, stack);\n            return false;\n        } else\n            stackPointer--;\n    }\n\n    return stackPointer === -1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This version fixes the earlier pointer bug by making `stackPointer` the **single source of truth** for the top of the stack. Opening brackets increment `stackPointer` and are written directly into that slot (`stack[stackPointer] = s[i]`), and closing brackets are compared against `stack[stackPointer]` rather than `stack.length - 1`. On a mismatch the function logs some debugging info with `console.log` and returns `false`; on a match it simply decrements `stackPointer`, effectively discarding the top without calling `pop()`. Since stale values above the pointer are overwritten on the next push, they never interfere. The string is valid when `stackPointer` ends back at `-1`, meaning every opener was consumed by a matching closer.",
+    "status": "DONE",
+    "cpuUsage": 5,
+    "memoryUsage": 100,
+    "date": "2024-05-03T17:37:10.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {boolean}\n */\nvar isValid = function(s) {\n    const stack = [];\n    let stackPointer = -1;\n\n    for (let i = 0; i < s.length; i++) {\n        if (s[i] === '{' || s[i] === '[' || s[i] === '(') {\n            stackPointer++;\n            stack[stackPointer] = s[i];\n        } else if (\n            (s[i] === '}' && stack[stackPointer] !== '{') ||\n            (s[i] === ']' && stack[stackPointer] !== '[') ||\n            (s[i] === ')' && stack[stackPointer] !== '(')\n        ) {\n            return false;\n        } else\n            stackPointer--;\n    }\n\n    return stackPointer === -1;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is the cleaned-up version of the **manual stack pointer** solution with the debug `console.log` removed. It keeps an array `stack` and an index `stackPointer` that starts at `-1`. Each opening bracket increments the pointer and is stored at `stack[stackPointer]`; each closing bracket is checked against `stack[stackPointer]`, and if the pair does not match the function returns `false`. On a match, the pointer is decremented, which logically pops the top without touching the array itself (any leftover value will be overwritten by the next push). At the end, the input is valid only if `stackPointer === -1`, meaning the stack is logically empty and every bracket was properly closed.",
+    "status": "DONE",
+    "cpuUsage": 5,
+    "memoryUsage": 100,
+    "date": "2024-05-03T17:38:01.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {boolean}\n */\nvar isValid = function(s) {\n    const open = [];\n    const map = {\n        '(': ')',\n        '{': '}',\n        '[': ']',\n    };\n\n    for (let i = 0; i < s.length; i++) {\n        if (s[i] === '(' || s[i] === '{' || s[i] === '[') {\n            open.push(s[i]);\n            continue;\n        }\n\n        if (open.length > 0 && map[open[open.length - 1]] === s[i]) {\n            open.pop();\n            continue;\n        }\n\n        return false;\n    }\n\n    return open.length === 0;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses a **lookup map** from each opening bracket to its closing partner (`'(' → ')'`, and so on) together with an `open` array acting as a stack. For each character, an opener is pushed onto `open` and the loop `continue`s. For anything else, the code checks that the stack is non-empty and that the expected closer for the top opener (`map[open[open.length - 1]]`) equals the current character; if so, the opener is popped and the loop continues. If neither branch matched, the character is an unexpected closer and the function returns `false`. Once the loop ends, the string is valid only when `open.length === 0`, meaning no brackets were left unclosed.",
+    "status": "DONE",
+    "cpuUsage": 5,
+    "memoryUsage": 100,
+    "date": "2024-09-09T09:16:35.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {boolean}\n */\nvar isValid = function(s) {\n    const open = [];\n    const map = {\n        '(': ')',\n        '{': '}',\n        '[': ']',\n    };\n\n    for (let i = 0; i < s.length; i++) {\n        if (s[i] === '(' || s[i] === '{' || s[i] === '[') {\n            open.push(s[i]);\n            continue;\n        }\n\n        if (open.length === 0 || map[open[open.length - 1]] !== s[i]) {\n            return false;\n        }\n\n        open.pop();\n    }\n\n    return open.length === 0;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is a slight restructuring of the previous **map + stack** solution with the failure condition written explicitly. Openers are pushed onto `open` as before. For closing brackets, the code returns `false` right away if the stack is empty (`open.length === 0`) or if the expected closer for the top opener (`map[open[open.length - 1]]`) is not the current character; otherwise the top is popped. Expressing the early exit as a single guard clause removes the extra `continue` and makes the happy path (`open.pop()`) the final statement in the loop. The result is `open.length === 0`, which is `true` only if every opening bracket was matched by its closer.",
+    "status": "DONE",
+    "cpuUsage": 5,
+    "memoryUsage": 100,
+    "date": "2024-09-09T09:21:13.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {boolean}\n */\nvar isValid = function(s) {\n    const map = {\n        ')' : '(',\n        ']' : '[',\n        '}' : '{',\n    };\n    const stack = [];\n\n    for (const char of s) {\n        if (!map[char]) {\n            stack.push(char);\n        } else {\n            if (stack[stack.length - 1] !== map[char]) {\n                return false;\n            }\n\n            stack.pop();\n        }\n    }\n\n    return stack.length === 0;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This version flips the lookup around: `map` goes from each **closing** bracket to its matching **opening** bracket. Iterating with `for...of`, the code uses `!map[char]` to detect openers (they have no entry in the map) and pushes them onto `stack`. For closers, it compares the top of the stack (`stack[stack.length - 1]`) with the opener the map says should be there; a mismatch, including the case where the stack is empty and the top is `undefined`, returns `false`. Otherwise the opener is popped. After the loop the input is valid only if `stack.length === 0`, meaning every bracket pair was closed in the correct order.",
+    "status": "DONE",
+    "cpuUsage": 5,
+    "memoryUsage": 100,
+    "date": "2024-09-29T08:36:37.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {boolean}\n */\nvar isValid = function(s) {\n    const stack = [];\n\n    for (const char of s) {\n        if (char === '(' || char === '{' || char === '[') {\n            stack.push(char);\n        } else if ((char === ')' && stack[stack.length - 1] !== '(') ||\n            (char === '}' && stack[stack.length - 1] !== '{') ||\n            (char === ']' && stack[stack.length - 1] !== '[')) {\n            return false;\n        } else {\n            stack.pop();\n        }\n    }\n\n    return stack.length === 0;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is the classic **stack** solution written with a `for...of` loop so each `char` is read directly instead of indexing with `s[i]`. Opening brackets are pushed onto `stack`. For closing brackets, three combined conditions check whether the current character and the top of the stack fail to form a matching pair, in which case the function returns `false` immediately; otherwise the matching opener is popped. Because an empty stack yields `undefined` as its top, a closer with nothing to match also fails. The function finally returns `stack.length === 0`, which is `true` only when all brackets were balanced and properly nested.",
+    "status": "DONE",
+    "cpuUsage": 21.2,
+    "memoryUsage": 83.61,
+    "date": "2025-06-15T11:10:44.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {boolean}\n */\nvar isValid = function(s) {\n    const map = {\n        '(': ')',\n        '{': '}',\n        '[': ']',\n    };\n\n    const stack = [];\n\n    for (const char of s) {\n        if (char === '(' || char === '{' || char === '[') {\n            stack.push(map[char]);\n        } else if (stack.length > 0 && char === stack[stack.length - 1]) {\n            stack.pop();\n        } else {\n            return false;\n        }\n    }\n\n    return stack.length === 0;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution simplifies matching by pushing the **expected closing bracket** instead of the opener. Using `map` (opener to closer), each opening bracket pushes its partner, for example `(` pushes `)` onto `stack`. When a closing bracket is encountered, the code only has to check that the stack is non-empty and that `char` equals the top of the stack; if so, it pops, otherwise it returns `false`. This removes the need for a second lookup when closing. The string is valid when the loop finishes with `stack.length === 0`, meaning every expected closer was actually seen.",
+    "status": "DONE",
+    "cpuUsage": 83.91,
+    "memoryUsage": 20.86,
+    "date": "2025-06-15T11:13:23.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {boolean}\n */\nvar isValid = function(s) {\n    const map = {\n        '(': ')',\n        '{': '}',\n        '[': ']',\n    };\n\n    const stack = [];\n\n    for (const char of s) {\n        if (char in map) {\n            stack.push(map[char]);\n        } else if (stack.length > 0 && char === stack[stack.length - 1]) {\n            stack.pop();\n        } else {\n            return false;\n        }\n    }\n\n    return stack.length === 0;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is the same **push-the-expected-closer** approach, but the opener test is replaced with `char in map`, which checks whether the character is a key in the lookup object. If so, the matching closing bracket is pushed onto `stack`. Otherwise the character is treated as a closer and must equal the top of a non-empty stack, in which case it is popped; any other situation returns `false`. The use of `in` keeps the opener check in sync with the map, so adding another bracket type would only require editing `map`. The function returns `stack.length === 0`, which is `true` only when all brackets were properly matched.",
+    "status": "DONE",
+    "cpuUsage": 34.23,
+    "memoryUsage": 40.48,
+    "date": "2025-06-15T11:13:57.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {boolean}\n */\nvar isValid = function(s) {\n    const map = {\n        '(': ')',\n        '{': '}',\n        '[': ']',\n    };\n\n    const stack = [];\n\n    for (const char of s) {\n        if (char in map) {\n            stack.push(map[char]);\n        } else if (char !== stack.pop()) {\n            return false;\n        }\n    }\n\n    return stack.length === 0;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is the most compact variant of the **expected-closer stack** idea. For each `char`, if it is an opening bracket (`char in map`) its matching closer is pushed onto `stack`. Otherwise the code calls `stack.pop()` and compares the result directly with `char`; a mismatch returns `false`. This single comparison also covers the empty-stack case, because `pop()` on an empty array returns `undefined`, which never equals a bracket character. After the loop the function returns `stack.length === 0`, so leftover unclosed openers make the result `false`. The pop-and-compare trick is what keeps the body down to a few lines.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 67.5,
+    "date": "2025-06-15T11:15:21.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {boolean}\n */\nvar isValid = function(s) {\n    const map = new Map([\n        ['(', ')'],\n        ['{', '}'],\n        ['[', ']'],\n    ]);\n    const stack = [];\n\n    for (const char of s) {\n        if (map.has(char)) {\n            stack.push(char);\n        } else if (stack.length > 0 && map.get(stack[stack.length - 1]) === char) {\n            stack.pop();\n        } else {\n            return false;\n        }\n    }\n\n    return stack.length === 0;\n};\n",
+    "language": "javascript",
+    "notes": "Straightforward, although better performance could have been achieved - not attempted due to low number of test cases.",
+    "aiExplanation": "This solution uses a built-in `Map` instead of a plain object to associate each opening bracket with its closing partner. It iterates with `for...of` and, when `map.has(char)` is true, pushes the opening bracket onto `stack`. For any other character, it checks that the stack is non-empty and that the closer registered for the top opener (`map.get(stack[stack.length - 1])`) equals `char`; if so, the opener is popped, otherwise the function returns `false`. Using `Map` with `has` and `get` makes the intent explicit and avoids prototype lookups that a plain object would have. The result is `stack.length === 0`, which is `true` only if every bracket was closed in the correct order.",
+    "status": "DONE",
+    "cpuUsage": 21.2,
+    "memoryUsage": 12.2,
+    "date": "2026-10-01T07:11:25.000Z"
+  }
+]

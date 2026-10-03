@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Leetcode",
+    "code": "/** By Leetcode */\nvar maxDepthAfterSplit = function (seq) {\n    let dep = 0;\n    return seq.split(\"\").map((value, index) => {\n        if (value === \"(\") {\n            ++dep;\n            return dep % 2;\n        } else {\n            let ans = dep % 2;\n            --dep;\n            return ans;\n        }\n    });\n};",
+    "language": "javascript",
+    "notes": "This exercise is a mess. After 10 minutes looking confounded at the description, I remembered I do this for fun and moved on with my life.",
+    "aiExplanation": "This function splits a valid parentheses string into two groups (labeled `0` and `1`) so that each group is as shallow as possible, and it does this by assigning each character to a group based on its **nesting depth**. It walks through the string with a running counter `dep` that tracks how deeply nested we currently are: when it sees an opening `\"(\"`, it first **increments** `dep` and then returns `dep % 2`, so brackets at odd depth go to group `1` and brackets at even depth go to group `0`; when it sees a closing `\")\"`, it computes `dep % 2` **before** decrementing, which guarantees the closing bracket lands in the same group as its matching opening bracket. By alternating groups level by level, the deepest nesting is cut roughly in half, and the `.map` call returns an array with one group label per character.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 8.46,
+    "date": "2026-09-30T07:29:59.000Z"
+  }
+]

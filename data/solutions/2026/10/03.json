@@ -1,0 +1,79 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar longestValidParentheses = function(s) {\n    const stack = [];\n    let left = -1;\n    let res = 0;\n\n    for (let right = 0; right < s.length; right++) {\n        if (s[right] === ')') {\n            if (stack.length === 0) {\n                left = right;\n            } else {\n                stack.pop();\n\n                const lastInvalidPos = stack.length === 0 ? left : stack[stack.length - 1];\n\n                res = Math.max(res, right - lastInvalidPos);\n            }\n        } else {\n            stack.push(right);\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds the length of the **longest well-formed run of parentheses** in the string `s` by scanning it once with a `stack` of indices. Every time it sees an opening `(`, it **pushes that index** onto the stack as an unmatched opener. When it sees a closing `)`, there are two cases: if the stack is empty there is nothing to match, so this `)` is a hard break and its index is remembered in `left` as the most recent **invalid position**; otherwise it **pops** the matching opener and measures the valid stretch that just closed. That stretch runs from the previous unmatched boundary (the new top of the stack, or `left` if the stack emptied) up to the current index `right`, so `right - lastInvalidPos` is its length, and `res` keeps the **maximum** seen. The answer is `res`, computed in **O(n)** time with **O(n)** extra space.",
+    "status": "DONE",
+    "cpuUsage": 89.85,
+    "memoryUsage": 88.8,
+    "date": "2025-06-23T10:02:18.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar longestValidParentheses = function(s) {\n    const stack = [];\n    let left = -1;\n    let res = 0;\n\n    for (let right = 0; right < s.length; right++) {\n        if (s[right] === '(') {\n            stack.push(right);\n            continue;\n        }\n\n        if (stack.length === 0) {\n            left = right;\n            continue;\n        }\n\n        stack.pop();\n\n        const lastInvalidPos = stack.length === 0 ? left : stack[stack.length - 1];\n        const dist = right - lastInvalidPos;\n\n        if (dist > res) {\n            res = dist;\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This version solves **Longest Valid Parentheses** with the same stack-of-indices idea, but uses early `continue` statements to keep the loop flat. For each character at index `right`: an opening `(` is simply **pushed** and the loop moves on; a closing `)` with an **empty stack** cannot be matched, so `left` is set to this index to mark where the next valid run must start, and the loop moves on; otherwise the `)` matches the top opener, which is **popped**. After the pop, the start of the valid stretch is the new top of the stack, or `left` if the stack is now empty, and `dist = right - lastInvalidPos` is the length of the valid substring ending here. The code replaces `res` only when `dist` is strictly larger, and finally returns `res`. It runs in **linear time** with a stack that holds at most one entry per character.",
+    "status": "DONE",
+    "cpuUsage": 89.85,
+    "memoryUsage": 90.7,
+    "date": "2025-06-23T10:04:35.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar longestValidParentheses = function(s) {\n    const stack = [-1];\n    let res = 0;\n\n    for (let right = 0; right < s.length; right++) {\n        if (s[right] === '(') {\n            stack.push(right);\n        } else if (stack.length === 1) {\n            stack[0] = right;\n        } else {\n            stack.pop();\n\n            const dist = right - stack[stack.length - 1];\n            if (dist > res) {\n                res = dist;\n            }\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution folds the separate `left` variable into the stack itself by **seeding the stack with `-1`**, a sentinel that always sits at the bottom and represents the last index where a valid run was broken. Walking through `s`, each `(` is **pushed** as a pending opener. For a `)`, if the stack holds only the sentinel (`stack.length === 1`) there is no opener to match, so the sentinel is **overwritten** with the current index to mark a new break point. Otherwise the top opener is **popped**, and whatever is now on top (either another unmatched opener or the sentinel) is the boundary just before the valid stretch, so `right - stack[stack.length - 1]` is its length and `res` is bumped if this is longer. Because the stack is never empty, no special-case check is needed when measuring. The result is the longest valid span, found in **O(n)** time.",
+    "status": "DONE",
+    "cpuUsage": 63.42,
+    "memoryUsage": 88.8,
+    "date": "2025-06-23T10:12:31.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar longestValidParentheses = function(s) {\n    const stack = [-1];\n    let res = 0;\n\n    for (let right = 0; right < s.length; right++) {\n        if (s[right] === '(') {\n            stack.push(right);\n        } else if (stack.length === 1) {\n            stack[0] = right;\n        } else {\n            stack.pop();\n\n            res = Math.max(res, right - stack[stack.length - 1]);\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is a compact take on **Longest Valid Parentheses** that starts the `stack` with a `-1` **sentinel**, standing in for the position just before the string (and later for the most recent unmatched `)`). As it scans, every `(` has its index **pushed**. When a `)` arrives and the stack contains only the sentinel, there is nothing to pair with, so the sentinel is **replaced** by the current index, resetting where future valid runs are measured from. When there is an opener available, it is **popped**, and the distance from the current index to the new top of the stack, `right - stack[stack.length - 1]`, is exactly the length of the valid substring ending at `right`; `Math.max` keeps the largest such length in `res`. Keeping a boundary index at the bottom of the stack at all times means every measurement is a single subtraction, and the whole pass takes **linear time**.",
+    "status": "DONE",
+    "cpuUsage": 89.85,
+    "memoryUsage": 83.3,
+    "date": "2025-06-23T10:12:55.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar longestValidParentheses = function(s) {\n    const stack = [-1];\n    let res = 0;\n\n    for (let right = 0; right < s.length; right++) {\n        if (s[right] === '(') {\n            stack.push(right);\n        } else {\n            stack.pop();\n\n            if (stack.length === 0) {\n                stack.push(right);\n            } else {\n                res = Math.max(res, right - stack[stack.length - 1]);\n            }\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This variant uses the classic **pop-first** form of the sentinel stack approach. The `stack` begins with `-1` as a base boundary, and each `(` **pushes** its index. On every `)` the code **pops unconditionally**: if that pop removed a real opener, the stack is still non-empty and its new top is the boundary before the current valid run, so `right - stack[stack.length - 1]` gives the run length and `res` is updated with `Math.max`. If instead the pop removed the boundary itself (meaning this `)` had no opener to match), the stack becomes empty, and the current index is **pushed back as the new boundary** so later runs are measured from just after this unmatched `)`. This keeps the invariant that the bottom of the stack is always the index right before the current candidate substring, and the function returns the longest valid length after one **O(n)** pass.",
+    "status": "DONE",
+    "cpuUsage": 78.44,
+    "memoryUsage": 88.8,
+    "date": "2025-06-23T10:13:22.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar longestValidParentheses = function (s) {\n    const stack = [];\n    let left = -1;\n    let res = 0;\n\n    for (let right = 0; right < s.length; right++) {\n        if (s[right] === '(') {\n            stack.push(right);\n            continue;\n        }\n\n        if (stack.length === 0) {\n            left = right;\n        } else {\n            stack.pop();\n\n            const lastInvalidPos = stack.length === 0 ? left : stack[stack.length - 1];\n            const dist = right - lastInvalidPos;\n\n            if (dist > res) {\n                res = dist;\n            }\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function scans `s` once and tracks the **longest balanced parentheses substring** using a `stack` of opener indices plus a `left` marker for the last position where matching broke down. Each `(` is **pushed** and the loop immediately continues. For a `)`, if the stack is empty there is no opener to pair with, so `left` is moved to this index, which effectively discards everything before it. Otherwise the most recent opener is **popped**, and the valid stretch that just closed extends back to whichever boundary is nearest: the new top of the stack if there are still unmatched openers, or `left` if there are none. The length of that stretch is `right - lastInvalidPos`, and `res` is raised whenever a longer one appears. After the loop, `res` holds the answer; the algorithm is **O(n)** in time and uses at most **O(n)** stack space.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 89.85,
+    "date": "2025-06-23T10:19:14.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar longestValidParentheses = function(s) {\n    const stack = [];\n    let min = -1;\n    let res = 0;\n\n    for (let right = 0; right < s.length; right++) {\n        if (s[right] === '(') {\n            stack.push(right);\n            continue;\n        }\n        if (stack.length === 0) {\n            min = right;\n            continue;\n        }\n\n        stack.pop();\n\n        const left = stack.length > 0 ? stack[stack.length - 1] : min;\n        res = Math.max(res, right - left);\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Perfect solution first try, mostly because exhaustive test cases list was available in the comments.",
+    "aiExplanation": "This solution finds the length of the **longest valid parentheses substring** in a single left-to-right pass. It keeps a `stack` of indices for unmatched `(` characters and a variable `min`, initially `-1`, that records the index of the most recent `)` that could not be matched, which acts as a wall that no valid run can cross. For each index `right`: an opening bracket is **pushed** and skipped; a closing bracket with an empty stack becomes the new wall by setting `min = right`; otherwise the closing bracket **pops** its partner. The valid run ending at `right` then starts just after the nearest boundary on its left, which is the new stack top if any openers remain, or `min` if the stack is empty, so `right - left` is its length and `Math.max` folds it into `res`. The function returns `res`, achieving **O(n)** time with **O(n)** auxiliary space in the worst case.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 57.72,
+    "date": "2026-10-03T09:09:12.000Z"
+  }
+]

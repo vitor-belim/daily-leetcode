@@ -1,0 +1,79 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @return {string[]}\n */\nvar generateParenthesis = function(n) {\n    const res = [];\n\n    const backtrack = (open, rem, str) => {\n        if (open === 0 && rem === 0) {\n            res.push(str);\n        }\n\n        if (rem > 0) {\n            backtrack(open + 1, rem - 1, str + \"(\");\n        }\n        if (open > 0) {\n            backtrack(open - 1, rem, str + \")\");\n        }\n    };\n\n    backtrack(0, n, \"\");\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function builds every valid combination of `n` pairs of parentheses using **backtracking**. The inner `backtrack` helper tracks two counters: `open`, the number of `\"(\"` characters that are currently unclosed, and `rem`, how many `\"(\"` characters still remain to be placed. At each step it can either add a `\"(\"` (only if `rem > 0`, decrementing `rem` and incrementing `open`) or add a `\")\"` (only if `open > 0`, so it never closes something that was never opened). When both counters reach zero, the string `str` has used all `n` pairs in a balanced way, so it is pushed into `res`. Starting from an empty string with `open = 0` and `rem = n`, the recursion explores every legal path and `res` ends up with all well-formed strings.",
+    "status": "DONE",
+    "cpuUsage": 77.43,
+    "memoryUsage": 100,
+    "date": "2024-11-25T07:50:40.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @return {string[]}\n */\nvar generateParenthesis = function(n) {\n    const res = [];\n\n    const dfs = (cur, open, target) => {\n        if (target === 0 && open === 0) {\n            res.push(cur);\n            return;\n        }\n\n        if (target > 0) {\n            dfs(cur + '(', open + 1, target - 1);\n        }\n        if (open > 0) {\n            dfs(cur + ')', open - 1, target);\n        }\n    };\n\n    dfs(\"\", 0, n);\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution generates all well-formed parentheses strings of `n` pairs using a **depth-first search**. The `dfs` function carries the string built so far (`cur`), the count of unclosed `\"(\"` characters (`open`), and how many `\"(\"` characters are still available to add (`target`). It only appends `\"(\"` while `target > 0`, and only appends `\")\"` while `open > 0`, which guarantees the string never becomes invalid. Once `target` and `open` are both zero, every opening bracket has been placed and closed, so `cur` is complete and gets added to `res`, and the branch returns. Starting from `dfs(\"\", 0, n)`, the recursion tries every valid choice and collects all the balanced results.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 28.99,
+    "date": "2025-05-25T19:14:01.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @return {string[]}\n */\nvar generateParenthesis = function(n) {\n    const res = [];\n\n    const dfs = (target, open, cur) => {\n        if (target === 0 && open === 0) {\n            res.push(cur);\n            return;\n        }\n\n        if (target > 0) {\n            dfs(target - 1, open + 1, cur + \"(\");\n        }\n        if (open > 0) {\n            dfs(target, open - 1, cur + \")\");\n        }\n    };\n\n    dfs(n, 0, \"\");\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is a **recursive DFS** that enumerates every balanced string with `n` pairs of parentheses. The helper `dfs(target, open, cur)` keeps `target` as the number of `\"(\"` characters left to place, `open` as the number of currently unmatched `\"(\"` characters, and `cur` as the partial string. On each call it branches: if `target > 0` it appends a `\"(\"` (using one from `target` and raising `open`), and if `open > 0` it appends a `\")\"` (lowering `open`). Because a closing bracket is only allowed when something is open, every string explored stays valid, and when both counters hit zero the finished `cur` is pushed into `res`. Calling `dfs(n, 0, \"\")` kicks off the search and `res` is returned with all the combinations.",
+    "status": "DONE",
+    "cpuUsage": 77.43,
+    "memoryUsage": 90.2,
+    "date": "2025-06-20T10:23:09.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @return {string[]}\n */\nvar generateParenthesis = function(n) {\n    const res = [];\n\n    const dfs = (target, open, cur) => {\n        if (!target && !open) {\n            res.push(cur);\n            return;\n        }\n\n        if (target > 0) {\n            dfs(target - 1, open + 1, cur + \"(\");\n        }\n        if (open > 0) {\n            dfs(target, open - 1, cur + \")\");\n        }\n    };\n\n    dfs(n, 0, \"\");\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function uses **depth-first search** to produce every valid arrangement of `n` parentheses pairs. The `dfs` helper takes `target` (how many `\"(\"` remain to be added), `open` (how many `\"(\"` are waiting for a matching `\")\"`), and `cur` (the string built so far). The base case `if (!target && !open)` is a shorthand way of checking that both counters are `0`, meaning all brackets are placed and balanced, so `cur` is saved into `res`. Otherwise it recurses by adding a `\"(\"` whenever `target > 0`, and by adding a `\")\"` whenever `open > 0`, which prevents ever closing more brackets than were opened. The search starts at `dfs(n, 0, \"\")` and `res` collects all the results.",
+    "status": "DONE",
+    "cpuUsage": 32.09,
+    "memoryUsage": 85.58,
+    "date": "2025-06-20T10:27:57.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @return {string[]}\n */\nvar generateParenthesis = function(n) {\n    let res = new Set();\n\n    const dfs = (cur, open, total) => {\n        if (open > 0) dfs(cur + ')', open - 1, total);\n        if (total < n) dfs(cur + '(', open + 1, total + 1);\n        if (open === 0 && total === n) res.add(cur);\n    };\n    dfs('', 0, 0);\n\n    return [...res];\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This version explores every valid parentheses string with a **DFS** that tracks `open` (unmatched `\"(\"` count) and `total` (how many `\"(\"` have been used so far, capped at `n`). On each call it first tries to append a `\")\"` if there is something open, then tries to append a `\"(\"` if fewer than `n` have been placed, and finally, when `open === 0` and `total === n`, the string `cur` is complete and balanced so it is added to `res`. A `Set` is used for `res`, which deduplicates results, although the constraints already make every generated string unique, so it is simply converted back to an array with `[...res]` before returning. Starting from `dfs(\"\", 0, 0)`, the recursion reaches every balanced combination.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 11.66,
+    "date": "2026-10-02T07:24:01.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @return {string[]}\n */\nvar generateParenthesis = function(n) {\n    let res = new Set();\n\n    const dfs = (cur, open, toOpen) => {\n        if (open > 0) dfs(cur + ')', open - 1, toOpen);\n        if (toOpen > 0) dfs(cur + '(', open + 1, toOpen - 1);\n        if (open + toOpen === 0) res.add(cur);\n    };\n    dfs('', 0, n);\n\n    return [...res];\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution uses a **recursive DFS** where the state is the current string `cur`, the number of unclosed `\"(\"` characters (`open`), and the number of `\"(\"` characters still left to place (`toOpen`). At each step it appends a `\")\"` when `open > 0`, and appends a `\"(\"` when `toOpen > 0`, so the string can never close a bracket that was not opened. The check `open + toOpen === 0` means nothing is left to open and nothing is left to close, which is exactly when `cur` is a finished, balanced string, so it is added to the `res` set. The search begins with `dfs(\"\", 0, n)` and the set is spread into an array with `[...res]` for the final answer.",
+    "status": "DONE",
+    "cpuUsage": 77.43,
+    "memoryUsage": 58.8,
+    "date": "2026-10-02T07:26:44.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @return {string[]}\n */\nvar generateParenthesis = function(n) {\n    let res = [];\n\n    const dfs = (cur, open, toOpen) => {\n        if (open > 0) dfs(cur + ')', open - 1, toOpen);\n        if (toOpen > 0) dfs(cur + '(', open + 1, toOpen - 1);\n        if (open + toOpen === 0) res.push(cur);\n    };\n    dfs('', 0, n);\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function generates all balanced parentheses strings of length `2n` through **depth-first search**. The `dfs` helper carries `cur` (the string so far), `open` (how many `\"(\"` are currently unmatched), and `toOpen` (how many `\"(\"` still need to be placed). It recurses by adding a `\")\"` whenever `open > 0` and by adding a `\"(\"` whenever `toOpen > 0`, which guarantees every intermediate string stays valid. When `open + toOpen === 0`, there are no brackets left to open or close, so `cur` is complete and is pushed into the `res` array. Since the rules prevent duplicates, a plain array is enough here, and `res` is returned after `dfs(\"\", 0, n)` has explored every path.",
+    "status": "DONE",
+    "cpuUsage": 77.43,
+    "memoryUsage": 77.57,
+    "date": "2026-10-02T07:28:02.000Z"
+  }
+]

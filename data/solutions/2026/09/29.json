@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {character[][]} grid\n * @return {boolean}\n */\nvar hasValidPath = function(grid) {\n    const m = grid.length;\n    const n = grid[0].length;\n    const memo = new Map();\n\n    const explore = (row, col, count) => {\n        if (row < 0 || row >= m || col < 0 || col >= n) return false;\n\n        const key = row + ':' + col + ':' + count;\n        if (memo.has(key)) return memo.get(key);\n\n        if (grid[row][col] === '(') {\n            count++;\n        } else {\n            if (count === 0) {\n                memo.set(key, false);\n                return false;\n            }\n            count--;\n        }\n\n        if (row === m - 1 && col === n - 1 && count === 0) return true;\n\n        const res = explore(row, col + 1, count) ||\n            explore(row + 1, col, count);\n\n        memo.set(key, res);\n        return res;\n    };\n\n    return explore(0, 0, 0);\n};\n",
+    "language": "javascript",
+    "notes": "DFS approach, only works because movement is restricted to down and right.",
+    "aiExplanation": "This solution checks whether you can walk from the **top-left** to the **bottom-right** corner of a grid of `'('` and `')'` characters (moving only **right** or **down**) so that the parentheses you pass through form a valid, balanced sequence. The recursive `explore` function carries a `count` of currently open parentheses: stepping on `'('` increments it, stepping on `')'` decrements it, and if `count` would ever drop below zero the path is immediately invalid and returns `false`. Reaching the final cell with `count === 0` means every opening bracket was closed, so it returns `true`; otherwise the function tries moving right and then down, returning `true` if either branch succeeds. Because many different paths can arrive at the same cell with the same `count`, the result for each `row:col:count` combination is cached in a `Map` (**memoization**) so that repeated states are answered instantly instead of being re-explored, keeping the search efficient even on larger grids.",
+    "status": "DONE",
+    "cpuUsage": 5.04,
+    "memoryUsage": 5.92,
+    "date": "2026-09-29T07:39:23.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {character[][]} grid\n * @return {boolean}\n */\nvar hasValidPath = function(grid) {\n    const m = grid.length;\n    const n = grid[0].length;\n    const memo = new Map();\n\n    if (grid[m - 1][n - 1] === '(') return false;\n\n    const explore = (row, col, count) => {\n        if (row < 0 || row >= m || col < 0 || col >= n) return false;\n\n        const key = row + ':' + col + ':' + count;\n        if (memo.has(key)) return memo.get(key);\n\n        if (grid[row][col] === '(') {\n            count++;\n        } else {\n            if (count === 0) {\n                memo.set(key, false);\n                return false;\n            }\n            count--;\n        }\n\n        if (row === m - 1 && col === n - 1 && count === 0) return true;\n\n        const res = explore(row, col + 1, count) ||\n            explore(row + 1, col, count);\n\n        memo.set(key, res);\n        return res;\n    };\n\n    return explore(0, 0, 0);\n};\n",
+    "language": "javascript",
+    "notes": "Attempt at improving performance. Real performance gain is realizing there must be a minimum number of steps in between current location and ending according to the current open count.",
+    "aiExplanation": "This solution determines whether there is a path from the **top-left** to the **bottom-right** cell of a grid filled with `'('` and `')'`, moving only **right** or **down**, such that the characters along the path form a balanced parentheses string. It starts with a quick **early exit**: if the destination cell is `'('`, no path can possibly end balanced, so it returns `false` right away without any searching. Otherwise the recursive `explore` function walks the grid while tracking `count`, the number of unmatched opening brackets so far: an `'('` increases it, a `')'` decreases it, and if a `')'` appears when `count` is already zero the path is invalid. Arriving at the last cell with `count === 0` means the sequence is balanced and the function returns `true`; if not, it recursively tries the cell to the right and the cell below. To avoid re-exploring the same situation many times, every `row:col:count` state is stored in a `Map` as **memoization**, so once a state is known to lead (or not lead) to a valid path, that answer is reused instantly.",
+    "status": "DONE",
+    "cpuUsage": 5.04,
+    "memoryUsage": 6.89,
+    "date": "2026-09-29T07:41:34.000Z"
+  }
+]

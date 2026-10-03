@@ -1,0 +1,57 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar maxDepth = function(s) {\n    let count = 0;\n    let max = 0;\n\n    for (let i = 0; i < s.length; i++) {\n        if (s[i] === '(') {\n            count++;\n        }\n        if (s[i] === ')') {\n            count--;\n        }\n        max = Math.max(max, count);\n    }\n\n    return max;\n};\n",
+    "language": "javascript",
+    "notes": "Simple counting of open parenthesis.",
+    "aiExplanation": "This function finds the **maximum nesting depth** of parentheses in a string by keeping two counters: `count`, which tracks how many parentheses are currently open, and `max`, which remembers the deepest level seen so far. It loops over every character with a classic index-based `for` loop, incrementing `count` on each `'('` and decrementing it on each `')'`, while ignoring any other character. After every character it calls `Math.max(max, count)` to update the record, so `max` ends up holding the highest value `count` ever reached. Because the input is a valid parentheses string, `count` never goes negative, and the final `max` is the answer.",
+    "status": "DONE",
+    "cpuUsage": 1.18,
+    "memoryUsage": 100,
+    "date": "2024-04-04T08:54:23.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar maxDepth = function(s) {\n    let count = 0;\n    let max = 0;\n\n    for (let i = 0; i < s.length; i++) {\n        if (s[i] === '(') {\n            count++;\n        }\n        if (s[i] === ')') {\n            count--;\n        }\n        if (count > max) {\n            max = count;\n        }\n    }\n\n    return max;\n};\n",
+    "language": "javascript",
+    "notes": "Attempt at better performance.",
+    "aiExplanation": "This solution measures the **deepest level of nested parentheses** in the string `s`. It walks through each character by index, adding one to `count` when it sees an opening `'('` and subtracting one when it sees a closing `')'`, so `count` always reflects how many parentheses are open at that moment. Instead of using `Math.max`, it uses a plain `if (count > max)` check to bump `max` whenever the current depth exceeds the best seen so far. Since the parentheses are guaranteed to be balanced, the depth never dips below zero, and when the loop ends `max` holds the maximum nesting depth, which the function returns.",
+    "status": "DONE",
+    "cpuUsage": 1.18,
+    "memoryUsage": 100,
+    "date": "2024-04-04T08:54:47.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar maxDepth = function (s) {\n    let count = 0;\n    let max = 0;\n\n    for (let i = 0; i < s.length; i++) {\n        if (s[i] === '(') {\n            count++;\n            if (count > max) {\n                max = count;\n            }\n        } else if (s[i] === ')') {\n            count--;\n        }\n    }\n\n    return max;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This version computes the **maximum depth of nested parentheses** while doing slightly less work per character. It keeps a running `count` of currently open parentheses and a `max` that stores the deepest level reached. When it encounters `'('`, it increments `count` and immediately checks whether this new depth beats `max`, updating it if so; when it encounters `')'`, it simply decrements `count`. The `else if` means a character is tested at most twice, and the `max` comparison only happens on opening brackets, which is the only time the depth can actually grow. Any other characters (digits, operators) are skipped entirely, and the function returns `max` once the whole string has been scanned.",
+    "status": "DONE",
+    "cpuUsage": 1.18,
+    "memoryUsage": 100,
+    "date": "2024-04-04T08:56:21.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar maxDepth = function(s) {\n    let paren = 0;\n    let max = 0;\n\n    for (const char of s) {\n        if (char === '(') {\n            paren++;\n            max = Math.max(max, paren);\n        } else if (char === ')') {\n            paren--;\n        }\n    }\n\n    return max;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function returns the **deepest nesting level of parentheses** in the string `s`. It uses a `for...of` loop to visit each character directly, which reads more cleanly than indexing. A counter named `paren` goes up by one on every `'('` and down by one on every `')'`, so it always equals the number of parentheses currently open. Right after incrementing on an opening bracket, `max = Math.max(max, paren)` records the new depth if it is the largest seen so far; closing brackets only decrement and never need the check, since depth can only increase when something opens. Characters that are not parentheses fall through both branches and are ignored, and the final `max` is returned as the answer.",
+    "status": "DONE",
+    "cpuUsage": 40.94,
+    "memoryUsage": 43.31,
+    "date": "2026-09-28T07:06:42.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar maxDepth = function(s) {\n    let paren = 0;\n    let max = 0;\n\n    for (const char of s) {\n        if (char === '(') {\n            paren++;\n        } else if (char === ')') {\n            max = Math.max(max, paren);\n            paren--;\n        }\n    }\n\n    return max;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution finds the **maximum nesting depth** of a valid parentheses string with a small twist on where the maximum is recorded. Using a `for...of` loop, it increments `paren` on each `'('` to track how many brackets are currently open, but it only updates `max` when it meets a `')'`, calling `Math.max(max, paren)` **before** decrementing. This works because every opening bracket in a valid string is eventually closed, and at the moment its matching `')'` appears, `paren` still holds the full depth that bracket reached, so no peak is ever missed. Non-parenthesis characters are ignored, and after the loop `max` contains the deepest level, which is returned.",
+    "status": "DONE",
+    "cpuUsage": 40.94,
+    "memoryUsage": 34.65,
+    "date": "2026-09-28T07:09:04.000Z"
+  }
+]
