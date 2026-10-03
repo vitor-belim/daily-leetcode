@@ -6,10 +6,7 @@ import { SITE_NAME } from "@/lib/site";
 import Link from "next/link";
 import { useEffect } from "react";
 
-export default function ErrorPage({
-  error,
-  unstable_retry,
-}: ErrorBoundaryProps) {
+export default function ErrorPage({ error, retry }: ErrorBoundaryProps) {
   useEffect(() => {
     console.error(error);
   }, [error]);
@@ -33,7 +30,7 @@ export default function ErrorPage({
           </p>
         )}
         <div className="flex flex-wrap justify-center gap-2">
-          <Button onClick={() => unstable_retry()}>Try again</Button>
+          <Button onClick={() => retry()}>Try again</Button>
           <Link href="/" className={buttonVariants({ variant: "outline" })}>
             Back to the challenge log
           </Link>

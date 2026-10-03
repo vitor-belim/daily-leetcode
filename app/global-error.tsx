@@ -7,10 +7,7 @@ import Link from "next/link";
 import { useEffect } from "react";
 import "./globals.css";
 
-export default function GlobalError({
-  error,
-  unstable_retry,
-}: ErrorBoundaryProps) {
+export default function GlobalError({ error, retry }: ErrorBoundaryProps) {
   useEffect(() => {
     console.error(error);
   }, [error]);
@@ -37,7 +34,7 @@ export default function GlobalError({
               </p>
             )}
             <div className="flex flex-wrap justify-center gap-2">
-              <Button onClick={() => unstable_retry()}>Try again</Button>
+              <Button onClick={() => retry()}>Try again</Button>
               <Link href="/" className={buttonVariants({ variant: "outline" })}>
                 Back to the challenge log
               </Link>
