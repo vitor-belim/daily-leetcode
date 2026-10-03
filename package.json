@@ -13,7 +13,8 @@
     "fetch-problem": "tsx scripts/fetch-problem.ts",
     "fetch-solution": "tsx scripts/fetch-solution.ts",
     "backfill": "tsx scripts/backfill.ts",
-    "refresh-auth": "tsx scripts/refresh-auth.ts"
+    "refresh-auth": "tsx scripts/refresh-auth.ts",
+    "generate-icons": "tsx scripts/generate-icons.tsx"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",

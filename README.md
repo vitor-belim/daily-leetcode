@@ -93,6 +93,7 @@ The whole site is prerendered at build time. The archive only changes through a 
 | `npm run fetch-problem` | Fetches a day's LeetCode daily challenge into `data/problems/`. |
 | `npm run fetch-solution` | Fetches your submissions for a day's challenge into `data/solutions/` — all submissions ever made to that problem, not just that day's. |
 | `npm run backfill` | Finds days in `data/` missing a problem or solutions and backfills them via `fetch-problem`/`fetch-solution` + the `/explain` command. |
+| `npm run generate-icons` | Re-renders `app/icon.svg` and `app/favicon.ico` from the "DL" monogram component. |
 
 See [`scripts/README.md`](scripts/README.md) for details on all CLI scripts and required env vars.
 
@@ -114,7 +115,7 @@ All three take the same optional date argument, and default to today if none is 
 ## 📂 Project Structure
 
 - `app/`: Next.js App Router pages, layouts, and global styles, plus the route handler, metadata files and error pages described under [Rendering](#rendering).
-  - `icon.svg` and `favicon.ico` are pre-rendered copies of the monogram in `components/og/monogram.tsx`, which `apple-icon.tsx` and the Open Graph cards render live. Regenerate both if the monogram changes.
+  - `icon.svg` and `favicon.ico` are pre-rendered copies of the monogram in `components/og/monogram.tsx`, which `apple-icon.tsx` and the Open Graph cards render live. Regenerate both with `npm run generate-icons` whenever the monogram or its palette changes.
 - `components/`: Reusable UI components (Shadcn UI + custom).
   - `ui/`: Base components from Shadcn.
   - `og/`: the Open Graph card, the "DL" monogram and their hex palette (the image renderer can't read the CSS `oklch()` tokens).
@@ -135,7 +136,7 @@ All three take the same optional date argument, and default to today if none is 
   - `utils.ts` (`cn`, pinned by `components.json`), `date-display.ts` (local-time display formatting), `markdown.ts` (server-only; markdown/LaTeX-ish → HTML), `excerpt.ts` (plain-text excerpts of problem statements for meta descriptions), `shiki-languages.ts` (maps LeetCode language names to Shiki grammars, falling back to plain text).
 
   See [`scripts/README.md`](scripts/README.md) for the CLI-facing modules.
-- `scripts/`: CLI entrypoints (`fetch-problem.ts`, `fetch-solution.ts`, `backfill.ts`); their logic lives in `lib/` alongside the app's own modules.
+- `scripts/`: CLI entrypoints (`fetch-problem.ts`, `fetch-solution.ts`, `backfill.ts`, `generate-icons.tsx`); their logic lives in `lib/` alongside the app's own modules.
 
 ## 🧪 Tests
 

@@ -1,6 +1,6 @@
 # scripts/
 
-CLI utilities for maintaining the `data/` archive, run via `tsx` (no build step).
+CLI utilities for maintaining the `data/` archive and the site's pre-rendered icons, run via `tsx` (no build step).
 
 ## Environment variables
 
@@ -80,6 +80,15 @@ macOS specifics, all of them reasons this script is not portable as-is:
 
 Every profile is searched, `Default` first, and the first one holding both cookies wins — so it works when you are signed into LeetCode in a secondary Chrome profile.
 
+### `npm run generate-icons`
+
+Re-renders the two icon files Next.js serves as-is, from the same `Monogram` component (`components/og/monogram.tsx`) that `app/apple-icon.tsx` and the Open Graph cards render at build time:
+
+- `app/icon.svg` — the monogram's markup, rendered with `react-dom/server`.
+- `app/favicon.ico` — 16, 32 and 48px PNG frames rendered with `next/og` (the same renderer as the Open Graph cards), packed into an ICO container by `lib/ico.ts`.
+
+Run it after changing the monogram or `OG_PALETTE`, then commit both files. It needs no network or `.env`, and the output is deterministic, so a clean re-run leaves no diff. A new Next.js version can still change the favicon's bytes without changing a pixel, since `next/og` may compress PNGs differently.
+
 ## Shared modules (`lib/`)
 
 These scripts are thin CLI orchestrators; shared logic lives in `lib/` alongside the Next.js app's modules:
@@ -94,6 +103,7 @@ These scripts are thin CLI orchestrators; shared logic lives in `lib/` alongside
 - `lib/env-file.ts` — rewrites `NAME=value` lines in `.env` without disturbing the rest of the file.
 - `lib/problems.ts` — maps a LeetCode daily challenge to the app's `Problem` shape, sanitizes its description (moving inline image sizes into `width`/`height` attributes, so images keep their aspect ratio), normalizes its link and recovers the question slug from one (CLI-only).
 - `lib/solutions.ts` — maps a LeetCode submission to the app's `Solution` shape and dedupes by code (CLI-only).
+- `lib/ico.ts` — `packIco`, which wraps PNG frames in the ICO container `generate-icons` writes to `app/favicon.ico`.
 
 Note: don't add the `server-only` package to any of these — it throws when imported outside a React Server Components build, so these scripts would fail under plain `tsx`. The app-only data modules (`problems-repo.ts`, `solutions-repo.ts`, `dailies-repo.ts`, `markdown.ts`) do import it; their Vitest tests still run because `vitest.config.mts` aliases `server-only` to its no-op entry, an alias `tsx` doesn't have.
 

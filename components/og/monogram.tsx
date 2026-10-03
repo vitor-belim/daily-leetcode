@@ -16,8 +16,9 @@ interface MonogramProps {
 /**
  * The site's "DL" monogram: Daily LeetCode's initials drawn as strokes on a
  * primary-colored tile, so it renders identically without any font. The
- * same drawing backs `app/icon.svg`, `app/favicon.ico`, the Apple touch icon
- * and the header of every Open Graph card.
+ * same drawing backs `app/icon.svg` and `app/favicon.ico` (pre-rendered by
+ * `npm run generate-icons`), the Apple touch icon and the header of every
+ * Open Graph card.
  *
  * @param size Rendered width and height in pixels.
  * @param cornerRadius Tile corner radius in the 32-unit grid.
