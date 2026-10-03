@@ -1,5 +1,6 @@
 "use client";
 
+import { handleAccordionKeyNavigation } from "@/components/accordion-key-navigation";
 import { DailyRow } from "@/components/home/daily-row";
 import {
   Accordion,
@@ -168,6 +169,7 @@ export function DailyList({
             openMonths: value.map(String),
           }))
         }
+        onKeyDown={handleAccordionKeyNavigation}
         className="gap-6"
       >
         {groupByMonth(dailies).map((group) => (
