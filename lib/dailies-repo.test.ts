@@ -151,11 +151,26 @@ describe("dailies-repo", () => {
         bestRuntime: 80,
         hasEditorial: true,
       });
-      // No solutions file at all for a past day reads as never attempted.
+      // No solutions file at all for a past day means its submissions were
+      // never fetched, so it is still waiting for a submission.
       expect(previous).toMatchObject({
-        solveStatus: SolveStatus.Failed,
+        solveStatus: SolveStatus.Pending,
         attempts: 0,
         hasEditorial: false,
+      });
+    });
+
+    // An empty file is what fetch-solution writes once a day ends with no
+    // submissions, so unlike a missing file it records a day not attempted.
+    it("reads an empty solutions file for a past day as not attempted", async () => {
+      const roots = makeRoots();
+      writeProblem(roots.problems, "2026-07-19");
+      writeJson(roots.solutions, "2026-07-19", []);
+
+      const result = await getDailySummariesByMonth(1, null, roots, TODAY);
+      expect(result.dailies[0]).toMatchObject({
+        solveStatus: SolveStatus.Failed,
+        attempts: 0,
       });
     });
 
@@ -218,6 +233,33 @@ describe("dailies-repo", () => {
           [Difficulty.Medium]: { total: 1, solved: 0 },
           [Difficulty.Hard]: { total: 1, solved: 1 },
         },
+        currentStreak: 2,
+        longestStreak: 2,
+      });
+    });
+
+    // Days whose solutions haven't been fetched yet are pending rather than
+    // failed: they stay out of the solved percentage and don't break the
+    // streak built before them.
+    it("counts days without a solutions file as pending", async () => {
+      const roots = makeRoots();
+      writeProblem(roots.problems, "2026-07-18");
+      writeProblem(roots.problems, "2026-07-19");
+      writeProblem(roots.problems, "2026-07-20");
+      writeProblem(roots.problems, "2026-07-21");
+      writeJson(roots.solutions, "2026-07-18", [
+        solution("Vitor", SolutionStatus.Done),
+      ]);
+      writeJson(roots.solutions, "2026-07-19", [
+        solution("Vitor", SolutionStatus.Done),
+      ]);
+
+      const stats = await getArchiveStats(roots, TODAY);
+      expect(stats).toMatchObject({
+        totalDays: 4,
+        solved: 2,
+        failed: 0,
+        pending: 2,
         currentStreak: 2,
         longestStreak: 2,
       });

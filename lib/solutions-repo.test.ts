@@ -37,11 +37,19 @@ describe("getSolutions", () => {
     ]);
 
     const solutions = await getSolutions("2026", "07", "20", root);
-    expect(solutions.map((s) => s.code)).toEqual(["b", "c", "a"]);
+    expect(solutions?.map((s) => s.code)).toEqual(["b", "c", "a"]);
   });
 
-  it("returns an empty array for a missing file", async () => {
+  // No file means the day's solutions were never fetched, which callers
+  // must be able to tell apart from an empty file recording no submissions.
+  it("returns null for a missing file", async () => {
     const root = makeFixture();
+    expect(await getSolutions("2026", "07", "20", root)).toBeNull();
+  });
+
+  it("returns an empty array for an empty file", async () => {
+    const root = makeFixture();
+    writeSolutions(root, "2026-07-20", []);
     expect(await getSolutions("2026", "07", "20", root)).toEqual([]);
   });
 
@@ -51,13 +59,21 @@ describe("getSolutions", () => {
     expect(await getSolutions("2026", "07", "20", root)).toEqual([]);
   });
 
-  it("returns an empty array for an invalid calendar date", async () => {
+  // A read failure other than a missing file (here EISDIR, from a directory
+  // sitting at the file path) must not be mistaken for "not fetched yet".
+  it("returns an empty array when the file path is a directory", async () => {
     const root = makeFixture();
-    expect(await getSolutions("2026", "02", "30", root)).toEqual([]);
+    fs.mkdirSync(path.join(root, "2026", "07", "20.json"), { recursive: true });
+    expect(await getSolutions("2026", "07", "20", root)).toEqual([]);
   });
 
-  it("returns an empty array for malformed date segments", async () => {
+  it("returns null for an invalid calendar date", async () => {
     const root = makeFixture();
-    expect(await getSolutions("2026", "not-a-month", "20", root)).toEqual([]);
+    expect(await getSolutions("2026", "02", "30", root)).toBeNull();
+  });
+
+  it("returns null for malformed date segments", async () => {
+    const root = makeFixture();
+    expect(await getSolutions("2026", "not-a-month", "20", root)).toBeNull();
   });
 });

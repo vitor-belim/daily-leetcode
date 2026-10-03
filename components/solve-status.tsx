@@ -44,7 +44,7 @@ export const SOLVE_STATUS_STYLES: Record<SolveStatus, SolveStatusStyle> = {
       "bg-rose-50/70 hover:bg-rose-100/80 focus-visible:bg-rose-100/80 dark:bg-rose-950/30 dark:hover:bg-rose-950/50 dark:focus-visible:bg-rose-950/50",
   },
   [SolveStatus.Pending]: {
-    label: "In progress",
+    label: "Waiting for a submission",
     icon: Clock,
     badgeClassName:
       "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",

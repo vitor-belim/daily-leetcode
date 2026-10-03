@@ -66,11 +66,15 @@ export enum SolveStatus {
    */
   FunctionallyCorrect = "FUNCTIONALLY_CORRECT",
   /**
-   * The day is over with no accepted or limit-exceeding submission: the
-   * author either gave up on an error or never attempted it.
+   * The day is over and its archived solutions hold no accepted or
+   * limit-exceeding submission: the author either gave up on an error or
+   * never attempted it.
    */
   Failed = "FAILED",
-  /** The day is still in progress and the author has not submitted yet. */
+  /**
+   * Waiting for a submission: the day has no solutions file yet, whatever its
+   * date, or it is still in progress and the author has not submitted yet.
+   */
   Pending = "PENDING",
 }
 
@@ -116,9 +120,10 @@ export interface ArchiveStats {
   functionallyCorrect: number;
   /** Days failed on an error or never attempted. */
   failed: number;
+  /** Days waiting for a submission, left out of the solved percentage. */
   pending: number;
   byDifficulty: Record<Difficulty, DifficultyStats>;
-  /** Consecutive solved calendar days ending today (or yesterday while today is pending). */
+  /** Consecutive solved calendar days ending at the most recent day that is not pending. */
   currentStreak: number;
   /** The longest run of consecutive solved calendar days on record. */
   longestStreak: number;

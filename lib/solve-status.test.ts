@@ -240,8 +240,9 @@ describe("summarizeSolutions", () => {
     expect(summary.solveStatus).toBe(SolveStatus.Failed);
   });
 
-  // A never-attempted past day counts as failed too; only a day still in
-  // progress is held back as pending.
+  // An empty solutions file records that nothing was submitted, so a past
+  // day with one counts as failed; only a day still in progress is held back
+  // as pending.
   it("distinguishes a finished untouched day from one still in progress", () => {
     expect(summarizeSolutions([], "2026-07-20", TODAY).solveStatus).toBe(
       SolveStatus.Failed,
@@ -249,6 +250,22 @@ describe("summarizeSolutions", () => {
     expect(summarizeSolutions([], "2026-07-21", TODAY).solveStatus).toBe(
       SolveStatus.Pending,
     );
+  });
+
+  // A missing solutions file means the day's submissions were never fetched,
+  // so even a long-finished day is waiting for a submission, not failed.
+  it("is pending when the day has no solutions file, whatever its date", () => {
+    for (const date of ["2026-07-01", "2026-07-20", "2026-07-21"]) {
+      expect(summarizeSolutions(null, date, TODAY)).toEqual({
+        solveStatus: SolveStatus.Pending,
+        attempts: 0,
+        attemptsToSolve: null,
+        languages: [],
+        bestRuntime: null,
+        bestMemory: null,
+        hasEditorial: false,
+      });
+    }
   });
 
   it("counts an editorial-only day as failed", () => {
@@ -304,6 +321,31 @@ describe("currentStreak", () => {
     expect(currentStreak(statuses, TODAY)).toBe(1);
   });
 
+  // Recent days whose solutions haven't been fetched yet are pending just
+  // like today, so the whole leading run of them is skipped.
+  it("skips every pending day leading back from today", () => {
+    const statuses = new Map([
+      ["2026-07-17", SolveStatus.Failed],
+      ["2026-07-18", SolveStatus.Solved],
+      ["2026-07-19", SolveStatus.FunctionallyCorrect],
+      ["2026-07-20", SolveStatus.Pending],
+      ["2026-07-21", SolveStatus.Pending],
+    ]);
+    expect(currentStreak(statuses, TODAY)).toBe(2);
+  });
+
+  // Only the run at the head is skipped: a pending day behind a finished
+  // one is not a streak-keeping day, so the count stops there.
+  it("stops at a pending day behind the most recent finished one", () => {
+    const statuses = new Map([
+      ["2026-07-18", SolveStatus.Solved],
+      ["2026-07-19", SolveStatus.Pending],
+      ["2026-07-20", SolveStatus.Solved],
+      ["2026-07-21", SolveStatus.Solved],
+    ]);
+    expect(currentStreak(statuses, TODAY)).toBe(2);
+  });
+
   it("is zero when yesterday was failed and today is pending", () => {
     const statuses = new Map([
       ["2026-07-19", SolveStatus.Solved],
@@ -318,8 +360,8 @@ describe("currentStreak", () => {
     expect(currentStreak(statuses, TODAY)).toBe(0);
   });
 
-  // Only a failed or never attempted day breaks a streak; a day that was
-  // merely too slow keeps it running.
+  // A day that was merely too slow keeps a streak running; only failed,
+  // missing or non-leading pending days break it.
   it("counts through a functionally correct day", () => {
     const statuses = new Map([
       ["2026-07-19", SolveStatus.Solved],

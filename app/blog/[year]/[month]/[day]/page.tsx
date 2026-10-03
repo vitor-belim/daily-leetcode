@@ -13,10 +13,12 @@ import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatDate, formatLongDate, timeAgo } from "@/lib/date-display";
+import { isPastDateUTC } from "@/lib/dates";
 import { markdownToHtml } from "@/lib/markdown";
 import { getAdjacentDates, getProblem } from "@/lib/problems-repo";
 import { getSolutions } from "@/lib/solutions-repo";
-import { SolutionStatus } from "@/lib/types";
+import { summarizeSolutions } from "@/lib/solve-status";
+import { SolutionStatus, SolveStatus } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import {
   ChevronLeft,
@@ -35,12 +37,25 @@ export default async function ProblemPage({
   params: Promise<{ year: string; month: string; day: string }>;
 }) {
   const { year, month, day } = await params;
+  const date = `${year}-${month}-${day}`;
   const problem = await getProblem(year, month, day);
-  const solutions = await getSolutions(year, month, day);
+  const archivedSolutions = await getSolutions(year, month, day);
 
   if (!problem) notFound();
 
-  const { prev, next } = await getAdjacentDates(`${year}-${month}-${day}`);
+  const { prev, next } = await getAdjacentDates(date);
+  const solutions = archivedSolutions ?? [];
+  const awaitingSubmission =
+    summarizeSolutions(archivedSolutions, date).solveStatus ===
+    SolveStatus.Pending;
+  const emptyStateTitle = awaitingSubmission
+    ? "Waiting for a submission"
+    : "Not attempted";
+  const emptyStateDetail = !awaitingSubmission
+    ? "No submission was made for this challenge."
+    : isPastDateUTC(date)
+      ? "Submissions for this challenge haven't been archived yet."
+      : "Vítor is probably working on it right now!";
 
   const authorMap = new Map<string, number>();
 
@@ -347,10 +362,10 @@ export default async function ProblemPage({
                 <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-muted/5">
                   <div className="max-w-xs space-y-2">
                     <p className="font-semibold text-muted-foreground">
-                      No solutions yet
+                      {emptyStateTitle}
                     </p>
                     <p className="text-xs text-muted-foreground/60">
-                      Vítor is probably working on it right now!
+                      {emptyStateDetail}
                     </p>
                   </div>
                 </div>

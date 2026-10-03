@@ -68,19 +68,23 @@ function countAttemptsToSolve(own: Solution[], date: string): number | null {
 /**
  * Derives the author's progress on one day from its archived solutions.
  *
- * @param solutions The day's solutions, in any order.
+ * @param solutions The day's solutions, in any order; null when the day has
+ *   no solutions file yet.
  * @param date The challenge day as `YYYY-MM-DD`, used to tell a failed past
  *   day from one that is still in progress.
  * @param today The reference "today" (defaults to the current UTC day).
  * @returns The solve status plus attempt counts, languages, best accepted
- *   percentiles and whether an editorial solution is present.
+ *   percentiles and whether an editorial solution is present. A day with no
+ *   solutions file is Pending whatever its date, since its submissions have
+ *   not been fetched yet.
  */
 export function summarizeSolutions(
-  solutions: Solution[],
+  solutions: Solution[] | null,
   date: string,
   today: Date = todayUTC(),
 ): SolveSummary {
-  const own = solutions.filter(isOwnSolution);
+  const archived = solutions ?? [];
+  const own = archived.filter(isOwnSolution);
   const accepted = own.filter((s) => s.status === SolutionStatus.Done);
 
   let bestRuntime: number | null = null;
@@ -91,13 +95,16 @@ export function summarizeSolutions(
   }
 
   return {
-    solveStatus: resolveStatus(own, date, today),
+    solveStatus:
+      solutions === null
+        ? SolveStatus.Pending
+        : resolveStatus(own, date, today),
     attempts: own.length,
     attemptsToSolve: countAttemptsToSolve(own, date),
     languages: [...new Set(own.map((s) => s.language))],
     bestRuntime,
     bestMemory,
-    hasEditorial: own.length < solutions.length,
+    hasEditorial: own.length < archived.length,
   };
 }
 
@@ -121,7 +128,8 @@ function exceededALimit(solution: Solution): boolean {
 }
 
 /**
- * Maps the author's own submissions for a day to a `SolveStatus`.
+ * Maps the author's own submissions for a day that has a solutions file to a
+ * `SolveStatus`.
  *
  * @param own The author's own submissions for the day.
  * @param date The challenge day as `YYYY-MM-DD`.
@@ -155,8 +163,11 @@ export interface DayOutcome {
 }
 
 /**
- * Tells whether a day keeps a streak alive. Only a failed or never attempted
- * day breaks one, so a day that was merely too slow still counts.
+ * Tells whether a day keeps a streak alive. Only a solved or functionally
+ * correct day does, so a day that was merely too slow still counts, while a
+ * failed day, a day missing from the archive or a day still waiting for a
+ * submission breaks one. `currentStreak` separately skips the run of pending
+ * days leading back from today.
  *
  * @param status The day's solve status, or undefined when the day is missing
  *   from the archive.
@@ -195,14 +206,16 @@ export function longestStreak(streakDates: Iterable<string>): number {
 }
 
 /**
- * Counts the consecutive streak-keeping calendar days ending at today. A
- * today that is still pending is skipped rather than breaking the streak, so
- * the count doesn't drop to zero every morning before the day is solved.
+ * Counts the consecutive streak-keeping calendar days ending at today. The
+ * run of pending days leading back from today (today itself, plus any recent
+ * days whose solutions have not been fetched yet) is skipped rather than
+ * breaking the streak, so the count doesn't drop to zero every morning before
+ * the day is solved, nor while solutions wait to be archived.
  *
  * @param statusByDate Each archived day's solve status, keyed by
  *   `YYYY-MM-DD`.
  * @param today The reference "today" (defaults to the current UTC day).
- * @returns The current streak length; zero when the most recent finished
+ * @returns The current streak length; zero when the most recent non-pending
  *   day was failed or never attempted.
  */
 export function currentStreak(
@@ -210,7 +223,7 @@ export function currentStreak(
   today: Date = todayUTC(),
 ): number {
   let cursor = formatDateUTC(today);
-  if (statusByDate.get(cursor) === SolveStatus.Pending) {
+  while (statusByDate.get(cursor) === SolveStatus.Pending) {
     cursor = shiftDateUTC(cursor, -1);
   }
 

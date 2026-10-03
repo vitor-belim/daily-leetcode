@@ -41,6 +41,8 @@ Never overwrites an existing solutions file. If you haven't solved the day yet:
 
 Note that because an existing file is never overwritten, solving a past daily after its empty file was written needs that file deleted before the solutions can be fetched.
 
+The site reads that distinction too: a day with no solutions file, whatever its date, is shown as *waiting for a submission* and doesn't count towards the solved percentage. The current streak skips the run of such days leading back from today, but one sitting behind an already-archived day (e.g. left behind by a failed `backfill` fetch) still ends the streak until its solutions are fetched. A past day with an empty `[]` file is shown as *not attempted*.
+
 Resolves the question slug from `data/problems/YYYY/MM/DD.json` when that file exists, costing no extra API call; only a date with no problem file on disk falls back to the daily-challenge lookup.
 
 ### `npm run backfill -- [--from YYYY-MM-DD]`
