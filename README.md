@@ -8,7 +8,7 @@ A web application that tracks and displays daily LeetCode challenges and the sol
 
 > **Disclaimer**: Most of this application's code was generated or assisted by AI.
 
-## Follow my progress here: [https://daily-leetcode-gamma.vercel.app/](https://daily-leetcode-gamma.vercel.app/)
+## Follow my progress here: [https://vitorbelim.com/](https://vitorbelim.com/)
 
 ## 🚀 Overview
 
