@@ -2,9 +2,12 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   applyLeftFraction,
   clampLeftFraction,
+  clampLeftFractionToBounds,
   DEFAULT_LEFT_FRACTION,
+  leftFractionBounds,
   MAX_LEFT_FRACTION,
   MIN_LEFT_FRACTION,
+  MIN_PANEL_WIDTH,
   parseLeftFraction,
   readLeftFraction,
   SPLIT_LEFT_VARIABLE,
@@ -74,6 +77,61 @@ describe("clampLeftFraction", () => {
     "falls back to the default split for %s",
     (input) => {
       expect(clampLeftFraction(input)).toBe(DEFAULT_LEFT_FRACTION);
+    },
+  );
+});
+
+describe("leftFractionBounds", () => {
+  it("keeps the fixed 20-80% range when it already leaves room for both panels", () => {
+    // 20% of 2500px is 500px, above the 400px minimum.
+    expect(leftFractionBounds(2500)).toEqual({
+      min: MIN_LEFT_FRACTION,
+      max: MAX_LEFT_FRACTION,
+    });
+  });
+
+  it("raises the minimum and lowers the maximum so no panel drops below its pixel floor", () => {
+    const bounds = leftFractionBounds(1000);
+
+    expect(bounds.min).toBeCloseTo(0.4);
+    expect(bounds.max).toBeCloseTo(0.6);
+    expect(bounds.min * 1000).toBeCloseTo(MIN_PANEL_WIDTH);
+    expect((1 - bounds.max) * 1000).toBeCloseTo(MIN_PANEL_WIDTH);
+  });
+
+  it("allows only the even split when both floors exactly fill the row", () => {
+    expect(leftFractionBounds(MIN_PANEL_WIDTH * 2)).toEqual({
+      min: DEFAULT_LEFT_FRACTION,
+      max: DEFAULT_LEFT_FRACTION,
+    });
+  });
+
+  it.each([400, 0, -10])(
+    "collapses to the even split when %dpx cannot fit both floors",
+    (width) => {
+      expect(leftFractionBounds(width)).toEqual({
+        min: DEFAULT_LEFT_FRACTION,
+        max: DEFAULT_LEFT_FRACTION,
+      });
+    },
+  );
+});
+
+describe("clampLeftFractionToBounds", () => {
+  const bounds = { min: 0.3, max: 0.7 };
+
+  it.each([
+    [0.5, 0.5],
+    [0.1, 0.3],
+    [0.95, 0.7],
+  ])("clamps %d to %d", (input, expected) => {
+    expect(clampLeftFractionToBounds(input, bounds)).toBe(expected);
+  });
+
+  it.each([Number.NaN, Number.POSITIVE_INFINITY])(
+    "falls back to the middle of the range for %d",
+    (input) => {
+      expect(clampLeftFractionToBounds(input, bounds)).toBe(0.5);
     },
   );
 });

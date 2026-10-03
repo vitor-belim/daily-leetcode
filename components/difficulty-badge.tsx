@@ -22,7 +22,11 @@ const DIFFICULTY_STYLES: Record<Difficulty, DifficultyStyle> = {
     className:
       "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
   },
-  [Difficulty.Hard]: { variant: "destructive", className: "" },
+  [Difficulty.Hard]: {
+    variant: "destructive",
+    className:
+      "bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400",
+  },
 };
 
 /**

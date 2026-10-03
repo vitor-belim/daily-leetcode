@@ -5,6 +5,59 @@ export const MIN_LEFT_FRACTION = 0.2;
 export const MAX_LEFT_FRACTION = 0.8;
 
 /**
+ * Narrowest a desktop panel may get, in CSS pixels. The panels mirror it with
+ * a literal `lg:min-w-100` class, which Tailwind needs to see verbatim.
+ */
+export const MIN_PANEL_WIDTH = 400;
+
+/** The range a split may take for a given container width. */
+export interface LeftFractionBounds {
+  min: number;
+  max: number;
+}
+
+/**
+ * Tightens the fixed split range for the space the panels actually share, so
+ * that neither panel ends up narrower than MIN_PANEL_WIDTH: on a 1000px row the
+ * 20% minimum would leave a 200px panel, so the minimum rises to 40% there.
+ *
+ * @param panelsWidth The width both panels share, excluding the separator, in
+ *   CSS pixels.
+ * @returns The allowed range of the left panel's share. When the row is too
+ *   narrow to give both panels their minimum (or has no width at all), both
+ *   bounds collapse to the even split.
+ */
+export function leftFractionBounds(panelsWidth: number): LeftFractionBounds {
+  const minimumShare =
+    panelsWidth > 0 ? MIN_PANEL_WIDTH / panelsWidth : Number.POSITIVE_INFINITY;
+  const min = Math.max(MIN_LEFT_FRACTION, minimumShare);
+  const max = Math.min(MAX_LEFT_FRACTION, 1 - minimumShare);
+
+  return min <= max
+    ? { min, max }
+    : { min: DEFAULT_LEFT_FRACTION, max: DEFAULT_LEFT_FRACTION };
+}
+
+/**
+ * Restricts a split to a range from {@link leftFractionBounds}.
+ *
+ * @param fraction Desired share of the container taken by the left panel.
+ * @param bounds The allowed range for the current container width.
+ * @returns The fraction clamped to the range, or the range's midpoint when the
+ *   input is not a finite number.
+ */
+export function clampLeftFractionToBounds(
+  fraction: number,
+  bounds: LeftFractionBounds,
+): number {
+  if (!Number.isFinite(fraction)) {
+    return (bounds.min + bounds.max) / 2;
+  }
+
+  return Math.min(bounds.max, Math.max(bounds.min, fraction));
+}
+
+/**
  * Restricts a split to the range that keeps both panels usable. Every value
  * entering or leaving storage passes through here, so a split persisted by an
  * older range or edited by hand can never starve a panel.

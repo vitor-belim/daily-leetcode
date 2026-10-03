@@ -1,6 +1,7 @@
 "use client";
 
 import type { ErrorBoundaryProps } from "@/components/error-boundary-props";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { SITE_NAME } from "@/lib/site";
 import Link from "next/link";
@@ -41,6 +42,7 @@ export default function GlobalError({ error, retry }: ErrorBoundaryProps) {
             </div>
           </div>
         </main>
+        <ThemeToggle />
       </body>
     </html>
   );

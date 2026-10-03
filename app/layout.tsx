@@ -1,3 +1,4 @@
+import { ThemeToggle } from "@/components/theme-toggle";
 import {
   SITE_AUTHOR,
   SITE_DESCRIPTION,
@@ -7,6 +8,7 @@ import {
   SITE_URL,
 } from "@/lib/site";
 import { SPLIT_RESTORE_SCRIPT } from "@/lib/split-storage";
+import { THEME_RESTORE_SCRIPT } from "@/lib/theme";
 import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -61,8 +63,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
     >
       <body className="antialiased">
+        <script dangerouslySetInnerHTML={{ __html: THEME_RESTORE_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: SPLIT_RESTORE_SCRIPT }} />
         {children}
+        <ThemeToggle />
         <Analytics />
       </body>
     </html>

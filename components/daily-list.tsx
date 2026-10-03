@@ -181,7 +181,7 @@ export function DailyList({
             <AccordionTrigger className="rounded-none border-0 bg-muted/60 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground hover:bg-muted hover:no-underline focus-visible:ring-inset data-panel-open:border-b">
               <span className="flex items-baseline gap-2">
                 {group.label}
-                <span className="font-normal normal-case tracking-normal text-muted-foreground/70">
+                <span className="font-normal normal-case tracking-normal text-muted-foreground">
                   {group.dailies.length}{" "}
                   {group.dailies.length === 1 ? "day" : "days"}
                 </span>

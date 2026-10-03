@@ -1,8 +1,10 @@
 "use client";
 
 import {
-  clampLeftFraction,
+  clampLeftFractionToBounds,
   DEFAULT_LEFT_FRACTION,
+  leftFractionBounds,
+  type LeftFractionBounds,
   MAX_LEFT_FRACTION,
   MIN_LEFT_FRACTION,
 } from "@/lib/split-storage";
@@ -21,12 +23,47 @@ interface SplitResizeHandleProps {
   onFractionCommit: (fraction: number) => void;
 }
 
+/** Where the two panels sit on screen while a drag is in progress. */
+interface DragGeometry {
+  /** Left edge of the left panel, in viewport pixels. */
+  start: number;
+  /** Width both panels share, excluding the separator. */
+  panelsWidth: number;
+  /** Half the separator's width, the offset from its center to its edge. */
+  halfHandle: number;
+}
+
 const KEYBOARD_STEP = 0.02;
+
+const FALLBACK_BOUNDS: LeftFractionBounds = {
+  min: MIN_LEFT_FRACTION,
+  max: MAX_LEFT_FRACTION,
+};
+
+/**
+ * Measures the split range for the row a separator sits in.
+ *
+ * @param handle The separator element.
+ * @returns The range that keeps both panels at least MIN_PANEL_WIDTH wide, or
+ *   the fixed range when the separator has no parent row.
+ */
+function measureBounds(handle: HTMLElement): LeftFractionBounds {
+  const row = handle.parentElement;
+
+  if (!row) {
+    return FALLBACK_BOUNDS;
+  }
+
+  return leftFractionBounds(
+    row.getBoundingClientRect().width - handle.getBoundingClientRect().width,
+  );
+}
 
 /**
  * Desktop-only separator that resizes the surrounding panels while dragged.
  * Arrow keys nudge the split, Home and End jump to its limits, double click and
- * Enter restore the even split. Intermediate drag positions are reported
+ * Enter restore the even split. The limits track the row's width, so neither
+ * panel can be dragged or nudged below MIN_PANEL_WIDTH. Intermediate drag positions are reported
  * through onFractionChange and only the resting position through
  * onFractionCommit, so a drag does not write to storage on every pointer move.
  *
@@ -40,8 +77,28 @@ export function SplitResizeHandle({
   onFractionChange,
   onFractionCommit,
 }: SplitResizeHandleProps) {
-  const containerRect = useRef<DOMRect | null>(null);
+  const handleRef = useRef<HTMLDivElement>(null);
+  const dragGeometry = useRef<DragGeometry | null>(null);
   const [dragging, setDragging] = useState(false);
+  const [bounds, setBounds] = useState<LeftFractionBounds>(FALLBACK_BOUNDS);
+
+  useEffect(() => {
+    const handle = handleRef.current;
+    const row = handle?.parentElement;
+
+    if (!handle || !row) {
+      return undefined;
+    }
+
+    const observer = new ResizeObserver(() => {
+      setBounds(measureBounds(handle));
+    });
+    observer.observe(row);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   useEffect(() => {
     if (!dragging) {
@@ -62,35 +119,48 @@ export function SplitResizeHandle({
   }, [dragging]);
 
   function startDrag(event: PointerEvent<HTMLDivElement>) {
-    const container = event.currentTarget.parentElement;
+    const handle = event.currentTarget;
+    const row = handle.parentElement;
 
-    if (!container) {
+    if (!row) {
       return;
     }
 
-    containerRect.current = container.getBoundingClientRect();
-    event.currentTarget.setPointerCapture(event.pointerId);
+    const rowRect = row.getBoundingClientRect();
+    const handleWidth = handle.getBoundingClientRect().width;
+
+    dragGeometry.current = {
+      start: rowRect.left,
+      panelsWidth: rowRect.width - handleWidth,
+      halfHandle: handleWidth / 2,
+    };
+    setBounds(measureBounds(handle));
+    handle.setPointerCapture(event.pointerId);
     setDragging(true);
   }
 
   function moveDrag(event: PointerEvent<HTMLDivElement>) {
-    const rect = containerRect.current;
+    const geometry = dragGeometry.current;
 
-    if (!rect || rect.width === 0) {
+    if (!geometry || geometry.panelsWidth <= 0) {
       return;
     }
 
     onFractionChange(
-      clampLeftFraction((event.clientX - rect.left) / rect.width),
+      clampLeftFractionToBounds(
+        (event.clientX - geometry.start - geometry.halfHandle) /
+          geometry.panelsWidth,
+        bounds,
+      ),
     );
   }
 
   function endDrag(event: PointerEvent<HTMLDivElement>) {
-    if (!containerRect.current) {
+    if (!dragGeometry.current) {
       return;
     }
 
-    containerRect.current = null;
+    dragGeometry.current = null;
 
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
@@ -103,16 +173,20 @@ export function SplitResizeHandle({
   function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     if (event.key === "ArrowLeft") {
       event.preventDefault();
-      onFractionCommit(clampLeftFraction(leftFraction - KEYBOARD_STEP));
+      onFractionCommit(
+        clampLeftFractionToBounds(leftFraction - KEYBOARD_STEP, bounds),
+      );
     } else if (event.key === "ArrowRight") {
       event.preventDefault();
-      onFractionCommit(clampLeftFraction(leftFraction + KEYBOARD_STEP));
+      onFractionCommit(
+        clampLeftFractionToBounds(leftFraction + KEYBOARD_STEP, bounds),
+      );
     } else if (event.key === "Home") {
       event.preventDefault();
-      onFractionCommit(MIN_LEFT_FRACTION);
+      onFractionCommit(bounds.min);
     } else if (event.key === "End") {
       event.preventDefault();
-      onFractionCommit(MAX_LEFT_FRACTION);
+      onFractionCommit(bounds.max);
     } else if (event.key === "Enter") {
       event.preventDefault();
       onFractionCommit(DEFAULT_LEFT_FRACTION);
@@ -121,12 +195,15 @@ export function SplitResizeHandle({
 
   return (
     <div
+      ref={handleRef}
       role="separator"
       aria-orientation="vertical"
       aria-label="Resize panels"
-      aria-valuenow={Math.round(leftFraction * 100)}
-      aria-valuemin={Math.round(MIN_LEFT_FRACTION * 100)}
-      aria-valuemax={Math.round(MAX_LEFT_FRACTION * 100)}
+      aria-valuenow={Math.round(
+        clampLeftFractionToBounds(leftFraction, bounds) * 100,
+      )}
+      aria-valuemin={Math.round(bounds.min * 100)}
+      aria-valuemax={Math.round(bounds.max * 100)}
       tabIndex={0}
       onPointerDown={startDrag}
       onPointerMove={moveDrag}

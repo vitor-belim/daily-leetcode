@@ -18,8 +18,9 @@ interface SplitPanelsProps {
 /**
  * Renders the two problem panels side by side on desktop and stacked on mobile.
  * Desktop widths come from the persisted split and are moved by the separator
- * between the panels; mobile heights come from the per-panel
- * maximize/minimize/collapse controls.
+ * between the panels; mobile heights come from the leading panel's
+ * maximize/minimize/collapse controls, which also cover every state of the
+ * trailing panel, so it carries none of its own.
  *
  * @param left Configuration of the leading panel.
  * @param right Configuration of the trailing panel.
@@ -42,9 +43,11 @@ export function SplitPanels({ left, right }: SplitPanelsProps) {
               ? PanelState.Collapsed
               : PanelState.Half
         }
-        onMaximize={() => setMaximized(PanelKey.Left)}
-        onMinimize={() => setMaximized(null)}
-        onCollapse={() => setMaximized(PanelKey.Right)}
+        controls={{
+          onMaximize: () => setMaximized(PanelKey.Left),
+          onMinimize: () => setMaximized(null),
+          onCollapse: () => setMaximized(PanelKey.Right),
+        }}
       />
       <SplitResizeHandle
         leftFraction={leftFraction}
@@ -61,9 +64,6 @@ export function SplitPanels({ left, right }: SplitPanelsProps) {
               ? PanelState.Collapsed
               : PanelState.Half
         }
-        onMaximize={() => setMaximized(PanelKey.Right)}
-        onMinimize={() => setMaximized(null)}
-        onCollapse={() => setMaximized(PanelKey.Left)}
       />
     </>
   );

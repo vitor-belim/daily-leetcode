@@ -6,6 +6,7 @@ import { SplitPanels } from "@/components/blog/split-panels";
 import { CodeBlock } from "@/components/code/code-block";
 import { DifficultyBadge } from "@/components/difficulty-badge";
 import { LocalDateTime } from "@/components/local-date-time";
+import { SolutionStatusBadge } from "@/components/solution-status-badge";
 import {
   Accordion,
   AccordionContent,
@@ -17,7 +18,7 @@ import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { type ArchivedDayParams, listArchivedDayParams } from "@/lib/archive";
-import { formatLongDate, timeAgo } from "@/lib/date-display";
+import { formatLongDate, formatShortDate, timeAgo } from "@/lib/date-display";
 import { isPastDateUTC } from "@/lib/dates";
 import { describeProblem } from "@/lib/excerpt";
 import { markdownToHtml } from "@/lib/markdown";
@@ -153,7 +154,7 @@ export default async function ProblemPage({
 
   return (
     <div className="flex flex-col h-screen max-h-screen overflow-hidden">
-      <header className="border-b px-3 py-3 sm:px-6 sm:py-4 grid grid-cols-3 items-center gap-2 shrink-0">
+      <header className="border-b px-3 py-1.5 sm:px-4 sm:py-2 grid grid-cols-[1fr_auto_1fr] items-center gap-2 shrink-0">
         <div className="flex items-center">
           <Link
             href="/"
@@ -164,24 +165,18 @@ export default async function ProblemPage({
           </Link>
         </div>
 
-        <div className="flex flex-col items-center min-w-0">
-          <h1 className="text-sm sm:text-xl font-bold leading-tight sm:leading-none text-center line-clamp-2 sm:line-clamp-1">
-            {problem.title}
-          </h1>
-          <div className="flex items-center gap-1 mt-1">
-            <AdjacentDayLink
-              direction={AdjacentDirection.Previous}
-              date={prev}
-            />
-            <p className="text-[11px] sm:text-sm text-muted-foreground text-center whitespace-nowrap min-w-[14ch] sm:min-w-[22ch]">
+        <div className="flex items-center justify-center gap-1">
+          <AdjacentDayLink direction={AdjacentDirection.Previous} date={prev} />
+          <p className="text-sm text-muted-foreground text-center whitespace-nowrap min-w-[12ch] sm:min-w-[22ch]">
+            <span className="sm:hidden">{formatShortDate(problem.date)}</span>
+            <span className="hidden sm:inline">
               {formatLongDate(problem.date)}
-            </p>
-            <AdjacentDayLink direction={AdjacentDirection.Next} date={next} />
-          </div>
+            </span>
+          </p>
+          <AdjacentDayLink direction={AdjacentDirection.Next} date={next} />
         </div>
 
-        <div className="flex items-center justify-end gap-2 sm:gap-3">
-          <DifficultyBadge difficulty={problem.difficulty} />
+        <div className="flex items-center justify-end">
           <a
             href={problem.link}
             target="_blank"
@@ -189,7 +184,7 @@ export default async function ProblemPage({
             className="text-xs flex items-center gap-1 text-muted-foreground hover:text-primary transition-colors"
           >
             <span className="sr-only sm:not-sr-only">LeetCode</span>
-            <ExternalLink className="w-3 h-3" />
+            <ExternalLink className="size-4 sm:size-3" />
           </a>
         </div>
       </header>
@@ -202,6 +197,12 @@ export default async function ProblemPage({
             content: (
               <ScrollArea className="min-h-0 flex-1">
                 <div className="p-6">
+                  <div className="mb-6 flex flex-col items-start gap-2">
+                    <h1 className="text-xl sm:text-2xl font-bold leading-tight tracking-tight text-balance">
+                      {problem.title}
+                    </h1>
+                    <DifficultyBadge difficulty={problem.difficulty} />
+                  </div>
                   <div
                     className="prose dark:prose-invert max-w-none prose-sm sm:prose-base prose-pre:bg-muted prose-pre:text-foreground"
                     dangerouslySetInnerHTML={{ __html: problem.description }}
@@ -242,7 +243,7 @@ export default async function ProblemPage({
                           <span>
                             {s.author} {s.label}
                           </span>
-                          <span className="text-[0.6875rem] text-muted-foreground">
+                          <span className="text-[0.6875rem] font-normal">
                             {timeAgo(s.date)}
                           </span>
                         </TabsTrigger>
@@ -258,7 +259,7 @@ export default async function ProblemPage({
                         className="h-full m-0 p-0 overflow-hidden outline-none"
                       >
                         <ScrollArea className="h-full">
-                          <div className="p-6 space-y-6">
+                          <div className="p-6 pb-16 space-y-6">
                             {(s.notes || s.aiExplanation) && (
                               <Accordion
                                 className="border rounded-lg px-4"
@@ -333,25 +334,7 @@ export default async function ProblemPage({
                                   )}
                                 </span>
                                 {s.status && (
-                                  <Badge
-                                    className={cn(
-                                      "font-bold",
-                                      s.status === SolutionStatus.Done &&
-                                        "bg-green-500 hover:bg-green-600",
-                                      (s.status ===
-                                        SolutionStatus.TimeLimitExceeded ||
-                                        s.status ===
-                                          SolutionStatus.MemoryLimitExceeded) &&
-                                        "bg-yellow-500 hover:bg-yellow-600 text-black",
-                                      s.status === SolutionStatus.Failed &&
-                                        "bg-red-500 hover:bg-red-600",
-                                      s.status ===
-                                        SolutionStatus.FailedConstraints &&
-                                        "bg-orange-500 hover:bg-orange-600",
-                                    )}
-                                  >
-                                    {s.status.replace(/_/g, " ")}
-                                  </Badge>
+                                  <SolutionStatusBadge status={s.status} />
                                 )}
                               </div>
 

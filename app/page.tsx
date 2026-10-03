@@ -23,7 +23,7 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen bg-muted/40">
-      <div className="mx-auto max-w-5xl space-y-10 px-4 py-10 sm:px-8 sm:py-14">
+      <div className="mx-auto max-w-5xl space-y-10 px-4 pt-10 pb-16 sm:px-8 sm:pt-14 sm:pb-20">
         <header className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div className="space-y-3">
             <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">

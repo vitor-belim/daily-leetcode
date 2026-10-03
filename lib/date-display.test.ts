@@ -4,9 +4,21 @@ import {
   formatDateTimeUTC,
   formatLongDate,
   formatMonthYear,
+  formatShortDate,
   formatWeekdayShort,
   timeAgo,
 } from "./date-display";
+
+describe("formatShortDate", () => {
+  it.each([
+    ["2026-09-30", "Sep 30th, 2026"],
+    ["2026-05-01", "May 1st, 2026"],
+    ["2026-01-22", "Jan 22nd, 2026"],
+    ["2026-12-13", "Dec 13th, 2026"],
+  ])("formats %s as %s", (input, expected) => {
+    expect(formatShortDate(input)).toBe(expected);
+  });
+});
 
 describe("formatLongDate", () => {
   it("formats a date with the correct ordinal suffix", () => {

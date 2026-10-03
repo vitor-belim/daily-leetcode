@@ -125,6 +125,21 @@ export function formatLongDate(date: string) {
   return `${monthName} ${day}${ordinalSuffix(day)}, ${year}`;
 }
 
+/**
+ * Formats a `YYYY-MM-DD` day as a compact English date with a three-letter
+ * month, e.g. "Sep 30th, 2026", for places too narrow for the long form.
+ *
+ * @param date The `YYYY-MM-DD` day to format.
+ * @returns The "Mon Dth, YYYY" string; malformed input produces garbage
+ *   output rather than throwing.
+ */
+export function formatShortDate(date: string) {
+  const [year = NaN, month = NaN, day = NaN] = date.split("-").map(Number);
+  const monthName = MONTH_NAMES[month - 1]?.slice(0, 3);
+
+  return `${monthName} ${day}${ordinalSuffix(day)}, ${year}`;
+}
+
 enum RelativeTimeUnitName {
   Year = "year",
   Month = "month",
