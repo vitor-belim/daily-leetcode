@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar minInsertions = function(s) {\n    let open = 0;\n    let closed = 0;\n    let missing = 0;\n\n    for (let i = 0; i < s.length; i++) {\n        if (s[i] === '(') {\n            open++;\n            continue;\n        }\n\n        if (open > 0) {\n            open--;\n        } else {\n            closed++;\n        }\n\n        if (s[i + 1] === ')') {\n            i++;\n        } else {\n            missing++;\n        }\n    }\n\n    return open * 2 + closed + missing;\n};\n",
+    "language": "javascript",
+    "notes": "Excellent exercise, hard but possible without crazy shenanigans.",
+    "aiExplanation": "This function solves the problem where every `(` must be closed by a **pair** of `))`, and it counts the minimum number of characters to insert to make the string valid. It walks through the string once, keeping three counters: `open` tracks `(` characters still waiting to be closed, `closed` counts `)` pairs that appear with **no** matching `(` before them (each needs one `(` inserted), and `missing` counts places where a single `)` appears without a second `)` right after it (each needs one `)` inserted). When it sees a `(`, it just increments `open` and moves on. When it sees a `)`, it first tries to match it with a pending `(` by decrementing `open`; if none is available, it bumps `closed` instead. Then it checks whether the **next** character is also `)`: if so, it skips ahead one index because the pair is complete, otherwise it increments `missing`. Finally, it returns `open * 2 + closed + missing`, since every unclosed `(` needs two `)` added, every unmatched `)` pair needs one `(` added, and every lone `)` needs one more `)` added.",
+    "status": "DONE",
+    "cpuUsage": 93.75,
+    "memoryUsage": 56.25,
+    "date": "2026-10-09T07:40:54.000Z"
+  }
+]

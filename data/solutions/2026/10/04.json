@@ -1,0 +1,68 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {boolean}\n */\nvar checkValidString = function(s) {\n    let any = 0;\n    let count = 0;\n\n    for (let i = 0; i < s.length; i++) {\n        if (s[i] === '*') {\n            any++;\n        } else if (s[i] === '(') {\n            count++;\n        } else if (s[i] === ')') {\n            if (count > 0) {\n                count--;\n            } else if (any > 0) {\n                any--;\n            } else {\n                return false;\n            }\n        }\n    }\n\n    if (count > any) {\n        return false;\n    }\n\n    any = 0;\n    let j = s.length - 1;\n    while (count > 0 && j >= 0) {\n        if (s[j] === '*') {\n            any++;\n        } else if (s[j] === '(') {\n            if (any > 0) {\n                any--;\n                count--;\n            } else {\n                return false;\n            }\n        }\n        j--;\n    }\n\n    return count === 0;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is a first attempt at **Valid Parenthesis String**, where `*` can act as `(`, `)`, or nothing. The forward loop walks the string keeping two counters: `count` for unmatched `(` and `any` for unused `*`. Each `)` first cancels an open paren, falls back to consuming a star, and if neither is available the string is immediately invalid. After that pass, if more opens remain than stars there is no way to close them all, so it returns `false`. The second loop then walks **backwards** trying to pair each leftover `(` with a star to its right, decrementing `count` as it goes. The flaw is that this backward pass ignores `)` characters entirely, so it cannot tell when a `(` is already closed by a real `)` further right and may wrongly demand a star for it, which is why this version fails on inputs like `(*()`.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2024-04-07T09:27:27.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {boolean}\n */\nvar checkValidString = function(s) {\n    let any = 0;\n    let count = 0;\n\n    for (let i = 0; i < s.length; i++) {\n        if (s[i] === '*') {\n            any++;\n        } else if (s[i] === '(') {\n            count++;\n        } else if (s[i] === ')') {\n            if (count > 0) {\n                count--;\n            } else if (any > 0) {\n                any--;\n            } else {\n                return false;\n            }\n        }\n    }\n\n    console.log('first for', count);\n\n    if (count > any) {\n        return false;\n    }\n\n    any = 0;\n    let j = s.length - 1;\n    let cCount = 0;\n    while (count > 0 && j >= 0) {\n        if (s[j] === '*') {\n            any++;\n        } else if (s[j] === ')') {\n            cCount++;\n        } else if (s[j] === '(') {\n            if (cCount > 0) {\n                cCount--;\n            } else if (any > 0) {\n                any--;\n                count--;\n            } else {\n                return false;\n            }\n        }\n        j--;\n    }\n\n    return count === 0;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This version fixes the earlier bug by tracking closing parens in the backward pass. The forward loop is unchanged: `count` tracks unmatched `(`, `any` tracks unused `*`, and every `)` consumes an open paren first, then a star, otherwise the string is invalid. If the leftover `count` exceeds the stars seen, it returns `false` early. The backward loop now also keeps `cCount`, the number of `)` seen from the right, so when it meets a `(` it first lets a real closing paren absorb it, and only otherwise spends a star while also reducing the global `count`. If it hits a `(` with neither available, the string is invalid. A stray `console.log('first for', count)` debugging line is still present but harmless. The string is valid when `count` reaches `0`.",
+    "status": "DONE",
+    "cpuUsage": 5.49,
+    "memoryUsage": 100,
+    "date": "2024-04-07T09:32:17.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {boolean}\n */\nvar checkValidString = function(s) {\n    let any = 0;\n    let count = 0;\n\n    for (let i = 0; i < s.length; i++) {\n        if (s[i] === '*') {\n            any++;\n        } else if (s[i] === '(') {\n            count++;\n        } else if (s[i] === ')') {\n            if (count > 0) {\n                count--;\n            } else if (any > 0) {\n                any--;\n            } else {\n                return false;\n            }\n        }\n    }\n\n    if (count > any) {\n        return false;\n    }\n\n    any = 0;\n    let j = s.length - 1;\n    let cCount = 0;\n    while (count > 0 && j >= 0) {\n        if (s[j] === '*') {\n            any++;\n        } else if (s[j] === ')') {\n            cCount++;\n        } else if (s[j] === '(') {\n            if (cCount > 0) {\n                cCount--;\n            } else if (any > 0) {\n                any--;\n                count--;\n            } else {\n                return false;\n            }\n        }\n        j--;\n    }\n\n    return count === 0;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is the same two-pass solution with the debug `console.log` removed. The **forward pass** scans left to right counting unmatched `(` in `count` and unused `*` in `any`; each `)` prefers to close a real `(`, otherwise consumes a star, otherwise the string is invalid. If the surviving opens outnumber the stars, there is no way to balance them and the function returns `false`. The **backward pass** scans right to left while `count > 0`, counting stars in `any` and closing parens in `cCount`; each `(` is matched by a `)` to its right if one exists, otherwise it spends a star and decrements `count`, and if neither is available it returns `false`. The result is `count === 0`, meaning every leftover `(` found something to its right to close it.",
+    "status": "DONE",
+    "cpuUsage": 5.49,
+    "memoryUsage": 100,
+    "date": "2024-04-07T09:33:48.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {boolean}\n */\nvar checkValidString = function(s) {\n    let any = 0;\n    let open = 0;\n\n    for (let i = 0; i < s.length; i++) {\n        if (s[i] === '*') {\n            any++;\n        } else if (s[i] === '(') {\n            open++;\n        } else if (s[i] === ')') {\n            if (open > 0) {\n                open--;\n            } else if (any > 0) {\n                any--;\n                if (open > 0) {\n                    open--;\n                }\n            } else {\n                return false;\n            }\n        }\n    }\n\n    if (open > any) {\n        return false;\n    }\n\n    any = 0;\n    let j = s.length - 1;\n    let closed = 0;\n    while (open > 0 && j >= 0) {\n        if (s[j] === '*') {\n            any++;\n        } else if (s[j] === ')') {\n            closed++;\n        } else if (s[j] === '(') {\n            if (closed > 0) {\n                closed--;\n            } else if (any > 0) {\n                any--;\n                open--;\n            } else {\n                return false;\n            }\n        }\n        j--;\n    }\n\n    return open === 0;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This revision renames the counters to clearer names, `open` and `closed`, but keeps the same two-pass strategy. Scanning **left to right**, `open` counts unmatched `(` and `any` counts unused `*`; a `)` closes a real paren first, otherwise consumes a star, otherwise the string is invalid (the nested `if (open > 0)` inside the star branch can never trigger, since that branch is only reached when `open` is already `0`). If `open > any` after this pass, it returns `false`. Scanning **right to left**, `closed` counts `)` seen so far and `any` counts stars; each `(` is absorbed by a `)` on its right if available, otherwise it uses a star and decrements `open`, and if nothing can absorb it the result is `false`. The string is valid when `open` ends at `0`.",
+    "status": "DONE",
+    "cpuUsage": 5.49,
+    "memoryUsage": 100,
+    "date": "2024-04-07T09:51:17.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {boolean}\n */\nvar checkValidString = function(s) {\n    let open = 0;\n    let stars = 0;\n\n    for (const char of s) {\n        if (char === '(') {\n            open++;\n        } else if (char === ')' && open > 0) {\n            open--;\n        } else if (char === ')' && stars > 0) {\n            stars--;\n        } else if (char === '*') {\n            stars++;\n        } else {\n            return false;\n        }\n    }\n\n    return open <= stars;\n};\n",
+    "language": "javascript",
+    "notes": "Forgot to account for ordering.",
+    "aiExplanation": "This is a simplified single-pass attempt. It walks the string once with two counters: `open` for unmatched `(` and `stars` for unused `*`. A `(` increments `open`, a `)` prefers to cancel an `open` and otherwise consumes a star, and a `*` is simply banked. Any other outcome returns `false`. At the end it returns `open <= stars`, assuming every leftover `(` can be closed by some star. The problem is that this ignores **position**: a star can only close a `(` if it appears *after* it. For input like `**((`, the two stars come before the two opens, yet the check `2 <= 2` passes and the function wrongly returns `true`, which is why this version failed.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-10-04T09:10:11.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {boolean}\n */\nvar checkValidString = function(s) {\n    let open = 0;\n    let stars = 0;\n\n    for (let i = 0; i < s.length; i++) {\n        const char = s[i];\n\n        if (char === '(') {\n            open++;\n        } else if (char === ')' && open > 0) {\n            open--;\n        } else if (char === ')' && stars > 0) {\n            stars--;\n        } else if (char === '*') {\n            stars++;\n        } else {\n            return false;\n        }\n    }\n\n    if (open > stars) return false;\n\n    open = 0;\n    stars = 0;\n\n    for (let i = s.length - 1; i >= 0; i--) {\n        const char = s[i];\n\n        if (char === ')') {\n            open++;\n        } else if (char === '(' && open > 0) {\n            open--;\n        } else if (char === '(' && stars > 0) {\n            stars--;\n        } else if (char === '*') {\n            stars++;\n        } else {\n            return false;\n        }\n    }\n\n    return open <= stars;\n};\n",
+    "language": "javascript",
+    "notes": "Double pass solution to guarantee valid ordering.",
+    "aiExplanation": "This is the accepted solution, using a symmetric **two-pass** approach. The first loop scans left to right with `open` counting unmatched `(` and `stars` counting unused `*`; each `)` cancels an open paren if possible, otherwise consumes a star, otherwise the string is invalid, and at the end `open > stars` means too many opens survive, so it returns `false`. The second loop does the exact mirror image from right to left, treating `)` as the thing to open and `(` as the thing to close, with the same star fallback. Since the forward pass proves every `)` has something before it to match, and the backward pass proves every `(` has something after it to match, both passing (`open <= stars` in each direction) guarantees the string can be made valid.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 36.38,
+    "date": "2026-10-04T09:33:56.000Z"
+  }
+]

@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {string}\n */\nvar removeOuterParentheses = function(s) {\n    let level = 0;\n    let res = '';\n\n    for (const char of s) {\n        if (char === ')') level--;\n        if (level > 0) res += char;\n        if (char === '(') level++;\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Ignore level 0 parenthesis.",
+    "aiExplanation": "This function strips the **outermost pair of parentheses** from every top-level group in a valid parentheses string. It walks through the string one character at a time while tracking a `level` counter that represents how deeply nested the current position is. The order of the three checks is the clever part: when it sees a `)` it **decrements** `level` *before* deciding whether to keep the character, and when it sees a `(` it **increments** `level` *after* that decision. This means an opening parenthesis is only appended to `res` if we were already inside a group (`level > 0`) before it appeared, and a closing parenthesis is only kept if a group is still open after it closes. The outermost `(` of each group arrives at `level === 0` and the outermost `)` brings `level` back to `0`, so both are skipped, while every inner parenthesis is kept. For example, `\"(()())\"` becomes `\"()()\"`, and `\"()()\"` becomes `\"\"`. The solution runs in **O(n)** time with a single pass and uses only the output string as extra space.",
+    "status": "DONE",
+    "cpuUsage": 86.42,
+    "memoryUsage": 34.57,
+    "date": "2026-10-08T06:58:06.000Z"
+  }
+]

@@ -1,0 +1,46 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar minAddToMakeValid = function(s) {\n    let open = 0;\n    let closed = 0;\n\n    for (let char of s) {\n        if (char === '(') {\n            open++;\n        } else if (open > 0) {\n            open--;\n        } else {\n            closed++;\n        }\n    }\n\n    return Math.abs(closed - open);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function walks through the string `s` one character at a time, keeping two counters: `open` tracks how many `(` are still waiting for a matching `)`, and `closed` counts every `)` that showed up with nothing to match it. When it sees a `(` it bumps `open`; when it sees a `)` it either **cancels out** a pending `(` by decrementing `open`, or, if there are none pending, records a stray `)` by incrementing `closed`. At the end both leftover counters represent brackets that each need one insertion to fix, so the answer should be their **sum**. This version instead returns `Math.abs(closed - open)`, which wrongly lets unmatched `(` and unmatched `)` cancel each other even though they are in the wrong order (for example `)(` needs 2 insertions but this returns 0), which is why it fails.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2024-10-09T06:21:01.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar minAddToMakeValid = function(s) {\n    let open = 0;\n    let closed = 0;\n\n    for (let char of s) {\n        if (char === '(') {\n            open++;\n        } else if (open > 0) {\n            open--;\n        } else {\n            closed++;\n        }\n    }\n\n    return open + closed;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function figures out the **minimum number of parentheses to insert** to make the string `s` valid by scanning it once with two counters. `open` counts `(` characters that have not yet been closed, and `closed` counts `)` characters that arrived when there was no open bracket to pair with. For each `(` it increments `open`; for each `)` it either **matches** a pending `(` by decrementing `open`, or, if `open` is already zero, marks the `)` as unmatched by incrementing `closed`. Once the loop finishes, every leftover `open` needs a `)` added and every `closed` needs a `(` added, so returning `open + closed` gives the exact number of insertions required. It runs in **O(n)** time with constant extra space.",
+    "status": "DONE",
+    "cpuUsage": 2.51,
+    "memoryUsage": 100,
+    "date": "2024-10-09T06:22:34.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar minAddToMakeValid = function(s) {\n    let open = 0;\n    let closed = 0;\n\n    for (const char of s) {\n        if (char === '(') {\n            open++;\n        } else {\n            if (open > 0) {\n                open--;\n            } else {\n                closed++;\n            }\n        }\n    }\n\n    return open + closed;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This solution counts how many parentheses must be added to make `s` balanced using a single pass and two counters. Every `(` increases `open`, the number of brackets currently waiting to be closed. Every `)` goes into a nested check: if `open` is greater than zero, a pending `(` is **consumed** by decrementing `open`; otherwise the `)` has nothing to pair with, so `closed` is incremented to record an **unmatched closing bracket**. When the loop ends, `open` is how many `)` are missing and `closed` is how many `(` are missing, and their sum `open + closed` is the minimum number of insertions. The logic is identical to the flat `else if` version, just written with an explicit inner `if/else` block.",
+    "status": "DONE",
+    "cpuUsage": 57.74,
+    "memoryUsage": 55.18,
+    "date": "2026-10-06T07:30:46.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar minAddToMakeValid = function(s) {\n    let open = 0;\n    let closed = 0;\n\n    for (const char of s) {\n        if (char === '(') {\n            open++;\n        } else if (open > 0) {\n            open--;\n        } else {\n            closed++;\n        }\n    }\n\n    return open + closed;\n};\n",
+    "language": "javascript",
+    "notes": "The basis for many exercises to follow during the week.",
+    "aiExplanation": "This function returns the **fewest insertions** needed to turn `s` into a valid parentheses string. It loops over each character with `for...of`, keeping `open` as a running count of `(` brackets that still need a partner and `closed` as the count of `)` brackets that appeared with no partner available. A `(` simply increments `open`; a `)` first tries to **pair with** a pending `(` by decrementing `open`, and only if none is pending does it increment `closed`. Because each leftover `open` requires one `)` and each `closed` requires one `(`, the final answer is `open + closed`. The approach is **O(n)** time and **O(1)** space, and using `const` for the loop variable signals that `char` is never reassigned inside the body.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 88.92,
+    "date": "2026-10-06T07:32:02.000Z"
+  }
+]

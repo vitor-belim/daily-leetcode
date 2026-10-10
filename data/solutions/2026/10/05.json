@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar scoreOfParentheses = function(s) {\n    const map = new Map([[0, 0]]);\n    let depth = 0;\n\n    for (let i = 0; i < s.length; i++) {\n        if (s[i] === '(') {\n            depth++;\n\n            map.set(depth, 0);\n        } else {\n            depth--;\n\n            const added = s[i - 1] === '(' ? 1 : 2 * map.get(depth + 1);\n            map.set(depth, map.get(depth) + added);\n        }\n    }\n\n    return map.get(0);\n};\n",
+    "language": "javascript",
+    "notes": "The map keeps the score per level, although a stack could have been used.",
+    "aiExplanation": "This function computes the **score of a balanced parentheses string**, where `()` is worth **1**, two side-by-side groups `AB` add up (`A + B`), and a group wrapped in another pair `(A)` is worth **double** (`2 * A`). It walks the string once while tracking the current nesting `depth` and keeps a `Map` from each depth to the running score accumulated at that level, starting with depth `0` at score `0`. Every time it sees an opening `(` it goes one level deeper and resets that level's score to `0`, since a fresh group is starting. When it sees a closing `)` it steps back up one level and decides what that just-closed group is worth: if the previous character was `(`, the group was an empty `()` and contributes **1**; otherwise it contained nested content, so it contributes **twice** the score that was collected at the deeper level (`map.get(depth + 1)`). That value is then **added** to the score of the level it just returned to, which naturally handles sibling groups being summed. Once the loop finishes, everything has bubbled up to depth `0`, so `map.get(0)` is the final answer, all in **O(n)** time.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 68.6,
+    "date": "2026-10-05T08:30:55.000Z"
+  }
+]

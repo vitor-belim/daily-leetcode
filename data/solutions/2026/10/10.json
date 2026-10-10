@@ -1,0 +1,35 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums1\n * @param {number[]} nums2\n * @param {number} k1\n * @param {number} k2\n * @return {number}\n */\nvar minSumSquareDiff = function (nums1, nums2, k1, k2) {\n    const n = nums1.length;\n    const diffs = Array(n);\n\n    for (let i = 0; i < n; i++) {\n        diffs[i] = Math.abs(nums2[i] - nums1[i]);\n    }\n\n    const k = k1 + k2;\n\n    if (k > diffs.reduce((acc, el) => acc + el, 0)) {\n        return 0;\n    }\n\n    let left = 0;\n    let right = Math.max(...diffs);\n\n    while (left < right) {\n        const mid = Math.floor((left + right) / 2);\n        const needed = diffs.reduce((acc, el) => acc + Math.max(0, el - mid), 0);\n\n        if (needed <= k) {\n            right = mid;\n        } else {\n            left = mid + 1;\n        }\n    }\n\n    const averagedDiffs = diffs.map(num => Math.min(num, left));\n    let remaining = k - diffs.reduce((acc, el, i) => acc + el - averagedDiffs[i], 0);\n\n    for (let i = averagedDiffs.length - 1; i >= 0 && remaining > 0; i--) {\n        if (averagedDiffs[i] === left) {\n            averagedDiffs[i]--;\n            remaining--;\n        }\n    }\n\n    return averagedDiffs.reduce((acc, el) => acc + el * el, 0);\n};\n",
+    "language": "javascript",
+    "notes": "Inquired AI on how to evenly distribute a given amount over an array, without context of the current exercise.",
+    "aiExplanation": "This solution minimizes the sum of squared differences between two arrays when you are allowed a total of `k = k1 + k2` unit adjustments. It first builds a `diffs` array holding the **absolute difference** at each index, and if `k` is large enough to erase every difference it returns `0` right away. Otherwise it **binary searches** for the smallest cap `left` such that trimming every difference down to `left` costs at most `k` operations, since the cheapest way to reduce a sum of squares is to always shrink the largest values first. Every difference is then capped at `left` via `averagedDiffs`, and whatever budget is still `remaining` is spent walking backwards through the array and lowering elements that sit exactly at the cap by one more unit. Finally it returns the **sum of the squares** of the adjusted differences.",
+    "status": "DONE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-10-10T09:14:59.000Z"
+  },
+  {
+    "author": "Vitor + ChatGPT",
+    "code": "/**\n * @param {number[]} nums1\n * @param {number[]} nums2\n * @param {number} k1\n * @param {number} k2\n * @return {number}\n */\nvar minSumSquareDiff = function (nums1, nums2, k1, k2) {\n    const n = nums1.length;\n    const diffs = Array(n);\n\n    for (let i = 0; i < n; i++) {\n        diffs[i] = Math.abs(nums2[i] - nums1[i]);\n    }\n\n    const k = k1 + k2;\n\n    if (k > diffs.reduce((acc, el) => acc + el, 0)) {\n        return 0;\n    }\n\n    let left = 0;\n    let right = Math.max(...diffs);\n\n    while (left < right) {\n        const mid = Math.floor((left + right) / 2);\n        const needed = diffs.reduce((acc, el) => acc + Math.max(0, el - mid), 0);\n\n        if (needed <= k) {\n            right = mid;\n        } else {\n            left = mid + 1;\n        }\n    }\n\n    let result = 0;\n    let used = 0;\n\n    for (const diff of diffs) {\n        const reduced = Math.min(diff, left);\n\n        used += diff - reduced;\n        result += reduced * reduced;\n    }\n\n    const remaining = k - used;\n\n    return result - remaining * (2 * left - 1);\n};\n",
+    "language": "javascript",
+    "notes": "Optimization improvement looking at the full code.",
+    "aiExplanation": "This version uses the same idea as before: compute the **absolute differences** between `nums1` and `nums2`, pool the two budgets into `k`, return `0` if the budget covers every difference, and then **binary search** for the lowest cap `left` such that trimming all differences down to `left` fits within `k` operations. The difference is in the final step, which is done with arithmetic instead of a second pass. A single loop caps each difference at `left`, accumulating how many operations were `used` and the running `result` of squared values. Any leftover budget (`remaining`) will each lower one capped value from `left` to `left - 1`, and because `left² - (left - 1)²` equals `2 * left - 1`, the answer is simply `result - remaining * (2 * left - 1)`, avoiding any extra array allocation or iteration.",
+    "status": "DONE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-10-10T09:43:15.000Z"
+  },
+  {
+    "author": "ChatGPT",
+    "code": "/**\n * @param {number[]} nums1\n * @param {number[]} nums2\n * @param {number} k1\n * @param {number} k2\n * @return {number}\n */\nvar minSumSquareDiff = function (nums1, nums2, k1, k2) {\n    const n = nums1.length;\n    let max = 0;\n    let total = 0;\n    let k = k1 + k2;\n\n    for (let i = 0; i < n; i++) {\n        const diff = Math.abs(nums1[i] - nums2[i]);\n        max = Math.max(max, diff);\n        total += diff;\n    }\n\n    if (k >= total) return 0;\n\n    const freq = new Int32Array(max + 1);\n\n    for (let i = 0; i < n; i++) {\n        freq[Math.abs(nums1[i] - nums2[i])]++;\n    }\n\n    for (let d = max; d > 0 && k > 0; d--) {\n        const reductions = Math.min(k, freq[d]);\n\n        freq[d] -= reductions;\n        freq[d - 1] += reductions;\n        k -= reductions;\n    }\n\n    let result = 0;\n\n    for (let d = 1; d <= max; d++) {\n        result += d * d * freq[d];\n    }\n\n    return result;\n};\n",
+    "language": "javascript",
+    "notes": "Best approach: difference frequency counting approach.",
+    "aiExplanation": "This solution replaces binary search with a **counting (bucket) approach**. It first scans both arrays once to find the largest absolute difference (`max`), the `total` of all differences, and the combined budget `k`, returning `0` immediately if `k` can wipe out every difference. It then fills a `freq` array (an `Int32Array` for speed) where `freq[d]` counts how many indices have a difference of exactly `d`. Starting from the **largest** difference and working downward, it moves as many values as the budget allows from bucket `d` into bucket `d - 1`, since reducing the biggest differences yields the largest drop in the squared sum; this continues until either the budget `k` is exhausted or the buckets run out. Finally it sums `d * d * freq[d]` across all buckets to produce the **minimum sum of squared differences**, all in linear time relative to the array length plus the maximum difference.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 80,
+    "date": "2026-10-10T09:44:05.000Z"
+  }
+]
