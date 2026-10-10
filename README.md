@@ -90,7 +90,7 @@ The whole site is prerendered at build time. The archive only changes through a 
 | `npm run typecheck` | Generates the Next.js route types (`next typegen`), then runs the TypeScript compiler in `--noEmit` mode. |
 | `npm run test` | Runs the Vitest suite (covers nearly all of `lib/` — see [`scripts/README.md`](scripts/README.md)). |
 | `npm run fetch-daily` | Fetches both halves of a day: `fetch-problem` followed by `fetch-solution`. |
-| `npm run fetch-problem` | Fetches a day's LeetCode daily challenge into `data/problems/`. |
+| `npm run fetch-problem` | Fetches a day's LeetCode daily challenge into `data/problems/`, or with `--missing` every day the archive lacks through today. |
 | `npm run fetch-solution` | Fetches your submissions for a day's challenge into `data/solutions/` — all submissions ever made to that problem, not just that day's. |
 | `npm run backfill` | Finds days in `data/` missing a problem or solutions and backfills them via `fetch-problem`/`fetch-solution` + the `/explain` command. |
 | `npm run generate-icons` | Re-renders `app/icon.svg` and `app/favicon.ico` from the "DL" monogram component. |

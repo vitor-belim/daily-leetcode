@@ -6,6 +6,7 @@ import {
   collectFilledDates,
   getMissingDates,
   listArchivedDayParams,
+  listMissingDates,
   listMonthCursors,
 } from "./archive";
 
@@ -159,5 +160,70 @@ describe("archive route helpers", () => {
     expect(
       listMonthCursors(makeArchive([]), new Date(Date.UTC(2026, 0, 1))),
     ).toEqual([]);
+  });
+});
+
+describe("listMissingDates", () => {
+  const tmpDirs: string[] = [];
+
+  afterEach(() => {
+    for (const dir of tmpDirs.splice(0)) {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  function makeArchive(dates: string[]): string {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "archive-missing-test-"));
+    tmpDirs.push(root);
+    for (const date of dates) {
+      const [year = "", month = "", day = ""] = date.split("-");
+      fs.mkdirSync(path.join(root, year, month), { recursive: true });
+      fs.writeFileSync(path.join(root, year, month, `${day}.json`), "{}");
+    }
+    return root;
+  }
+
+  it("returns nothing when the archive is complete through today", () => {
+    const root = makeArchive(["2026-10-08", "2026-10-09", "2026-10-10"]);
+
+    expect(listMissingDates(root, new Date(Date.UTC(2026, 9, 10)))).toEqual(
+      [],
+    );
+  });
+
+  it("catches up on every day skipped since the last run, today included", () => {
+    // The scheduled run last succeeded on 10-07; the machine was off for the
+    // next two runs, so 10-08, 10-09 and today all need fetching.
+    const root = makeArchive(["2026-10-06", "2026-10-07"]);
+
+    expect(listMissingDates(root, new Date(Date.UTC(2026, 9, 10)))).toEqual([
+      "2026-10-08",
+      "2026-10-09",
+      "2026-10-10",
+    ]);
+  });
+
+  it("includes interior gaps, across a month boundary", () => {
+    const root = makeArchive(["2026-09-29", "2026-10-02"]);
+
+    expect(listMissingDates(root, new Date(Date.UTC(2026, 9, 2)))).toEqual([
+      "2026-09-30",
+      "2026-10-01",
+    ]);
+  });
+
+  it("seeds today alone on an empty archive", () => {
+    expect(
+      listMissingDates(makeArchive([]), new Date(Date.UTC(2026, 9, 10))),
+    ).toEqual(["2026-10-10"]);
+  });
+
+  it("seeds today alone when the archive root doesn't exist", () => {
+    expect(
+      listMissingDates(
+        path.join(os.tmpdir(), "does-not-exist"),
+        new Date(Date.UTC(2026, 9, 10)),
+      ),
+    ).toEqual(["2026-10-10"]);
   });
 });

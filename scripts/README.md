@@ -24,9 +24,19 @@ All fetch commands default to today (LeetCode's UTC day) if no date is given. Pr
 
 Convenience wrapper that runs `fetch-problem` and then `fetch-solution` for the same date, stopping if the first fails. Defined in `package.json` rather than as its own script file — it's a shell function purely so the date argument reaches *both* commands; a plain `npm run fetch-problem && npm run fetch-solution` chain would pass it to the second one only.
 
-### `npm run fetch-problem -- [YYYY-MM-DD]`
+### `npm run fetch-problem -- [YYYY-MM-DD | --missing]`
 
 Fetches one day's LeetCode daily challenge — title, difficulty, description, link — and writes `data/problems/YYYY/MM/DD.json`, overwriting any existing file.
+
+With `--missing` it instead fetches every day the archive lacks, from its oldest day through today, interior gaps included, and leaves the days already archived untouched. Authentication is checked once up front; a day that fails is reported while the rest are still fetched, and the command exits non-zero if any day failed. An empty archive fetches today alone. `--missing` can't be combined with a date.
+
+### `scripts/local-daily-run.sh [YYYY-MM-DD]`
+
+The scheduled entry point, run every morning by a launchd agent on the author's Mac. It pulls, runs `fetch-problem`, then commits and pushes whatever changed under `data/problems`. If the fetch failed it still commits the days that did succeed, then raises a macOS notification (via `terminal-notifier`, when installed) and exits non-zero.
+
+Without arguments it runs `fetch-problem --missing`, so a skipped day is caught up by the next run that succeeds, alongside today. Days get skipped when the Mac is powered off at the scheduled time (launchd makes up a run missed during sleep on wake, but not one missed while shut down) or when the auth cookies have expired. Pass a date to fetch only that day instead.
+
+It only fetches problems: solutions and their explanations are left to `backfill`, since they depend on the day having been solved.
 
 ### `npm run fetch-solution -- [YYYY-MM-DD]`
 
@@ -97,7 +107,7 @@ These scripts are thin CLI orchestrators; shared logic lives in `lib/` alongside
 - `lib/archive-schema.ts` — `parseProblem`/`parseSolutions`, which validate a parsed `data/` file before a script trusts it (built on `lib/json-fields.ts`).
 - `lib/paths.ts` — `data/problems|solutions/YYYY/MM/DD.json` path convention, `solutionFileExists`, `writeJsonFile`.
 - `lib/dates.ts` — UTC-only date primitives (deliberately UTC, not local time, to match LeetCode's daily rollover).
-- `lib/archive.ts` — `collectFilledDates` / `getMissingDates` for missing-day detection.
+- `lib/archive.ts` — `collectFilledDates` / `getMissingDates` / `listMissingDates` for missing-day detection.
 - `lib/leetcode-api.ts` — GraphQL queries and the authenticated fetch client (CLI-only).
 - `lib/chrome-cookies.ts` — reads and decrypts LeetCode cookies out of Chrome's macOS cookie store (CLI-only).
 - `lib/env-file.ts` — rewrites `NAME=value` lines in `.env` without disturbing the rest of the file.

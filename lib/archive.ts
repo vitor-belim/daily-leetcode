@@ -140,3 +140,26 @@ export function getMissingDates(
 
   return missingDates;
 }
+
+/**
+ * Lists every day an archive is missing, from its oldest day through today,
+ * interior gaps included. This is what a scheduled run that was skipped for a
+ * few days (machine off, expired auth) needs to catch up on. An empty archive
+ * scans today alone, so a first run still seeds the current day.
+ *
+ * @param root The archive root to scan (defaults to `data/problems`).
+ * @param today The scan end (defaults to the current UTC day).
+ * @returns The missing days as ascending `YYYY-MM-DD` strings; empty when the
+ *   archive is complete through today.
+ */
+export function listMissingDates(
+  root: string = PROBLEMS_ROOT,
+  today: Date = todayUTC(),
+): string[] {
+  const filledDates = collectFilledDates(root);
+  return getMissingDates(
+    filledDates,
+    today,
+    filledDates[0] ?? formatDateUTC(today),
+  );
+}

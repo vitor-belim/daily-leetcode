@@ -21,6 +21,10 @@ nvm use default
 
 git pull --ff-only
 
+if [ "$#" -eq 0 ]; then
+  set -- --missing
+fi
+
 set +e
 npm run fetch-problem -- "$@"
 FETCH_STATUS=$?
