@@ -257,7 +257,7 @@ describe("dailies-repo", () => {
   });
 
   describe("getArchiveStats", () => {
-    it("aggregates every archived day", async () => {
+    it("aggregates every archived day in the window", async () => {
       const roots = makeRoots();
       writeProblem(roots.problems, "2026-07-18", Difficulty.Medium);
       writeProblem(roots.problems, "2026-07-19", Difficulty.Easy);
@@ -273,7 +273,7 @@ describe("dailies-repo", () => {
         solution("Vitor", SolutionStatus.Done),
       ]);
 
-      const stats = await getArchiveStats(roots, TODAY);
+      const stats = await getArchiveStats(6, roots, TODAY);
       expect(stats).toEqual({
         totalDays: 4,
         solved: 2,
@@ -306,7 +306,7 @@ describe("dailies-repo", () => {
         solution("Vitor", SolutionStatus.Done),
       ]);
 
-      const stats = await getArchiveStats(roots, TODAY);
+      const stats = await getArchiveStats(6, roots, TODAY);
       expect(stats).toMatchObject({
         totalDays: 4,
         solved: 2,
@@ -324,7 +324,9 @@ describe("dailies-repo", () => {
       writeProblem(roots.problems, "2026-07-20");
       writeJson(roots.solutions, "2026-07-20", "{not json");
 
-      await expect(getArchiveStats(roots, TODAY)).rejects.toThrow(SyntaxError);
+      await expect(getArchiveStats(6, roots, TODAY)).rejects.toThrow(
+        SyntaxError,
+      );
     });
 
     // Well-formed JSON of the wrong shape is just as corrupt: an object
@@ -334,12 +336,38 @@ describe("dailies-repo", () => {
       writeProblem(roots.problems, "2026-07-20");
       writeJson(roots.solutions, "2026-07-20", {});
 
-      await expect(getArchiveStats(roots, TODAY)).rejects.toThrow(TypeError);
+      await expect(getArchiveStats(6, roots, TODAY)).rejects.toThrow(TypeError);
+    });
+
+    // A six-month window on 2026-07-21 starts after 2026-01-21, so that day
+    // and older ones drop out of every figure, cutting the streak that runs
+    // across the boundary (it would be 4 days over the whole archive).
+    it("only counts days inside the window", async () => {
+      const roots = makeRoots();
+      for (const date of [
+        "2026-01-20",
+        "2026-01-21",
+        "2026-01-22",
+        "2026-01-23",
+      ]) {
+        writeProblem(roots.problems, date, Difficulty.Hard);
+        writeJson(roots.solutions, date, [
+          solution("Vitor", SolutionStatus.Done),
+        ]);
+      }
+
+      const stats = await getArchiveStats(6, roots, TODAY);
+      expect(stats).toMatchObject({
+        totalDays: 2,
+        solved: 2,
+        byDifficulty: { [Difficulty.Hard]: { total: 2, solved: 2 } },
+        longestStreak: 2,
+      });
     });
 
     it("returns zeroed stats for an empty archive", async () => {
       const roots = makeRoots();
-      const stats = await getArchiveStats(roots, TODAY);
+      const stats = await getArchiveStats(6, roots, TODAY);
       expect(stats.totalDays).toBe(0);
       expect(stats.currentStreak).toBe(0);
       expect(stats.longestStreak).toBe(0);

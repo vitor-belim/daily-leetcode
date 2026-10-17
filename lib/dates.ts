@@ -111,3 +111,20 @@ export function shiftMonth(month: string, months: number): string {
   const [y = NaN, m = NaN] = month.split("-").map(Number);
   return formatMonthUTC(new Date(Date.UTC(y, m - 1 + months, 1)));
 }
+
+/**
+ * Shifts a `YYYY-MM-DD` day by a number of calendar months in UTC, clamping
+ * to the target month's last day when it is shorter, so `2026-08-31` minus
+ * six months is `2026-02-28` rather than rolling over into March.
+ *
+ * @param date The `YYYY-MM-DD` starting day.
+ * @param months The offset in months; negative values shift into the past.
+ * @returns The shifted day as a `YYYY-MM-DD` string.
+ */
+export function shiftDateByMonthsUTC(date: string, months: number): string {
+  const [y = NaN, m = NaN, d = NaN] = date.split("-").map(Number);
+  const lastDay = new Date(Date.UTC(y, m + months, 0)).getUTCDate();
+  return formatDateUTC(
+    new Date(Date.UTC(y, m - 1 + months, Math.min(d, lastDay))),
+  );
+}

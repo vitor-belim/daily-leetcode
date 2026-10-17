@@ -3,11 +3,11 @@ import { StatsOverview } from "@/components/home/stats-overview";
 import { buttonVariants } from "@/components/ui/button";
 import { getArchiveStats, getDailySummariesByMonth } from "@/lib/dailies-repo";
 import { formatMonthUTC, todayUTC } from "@/lib/dates";
-import { cn } from "@/lib/utils";
 import { ExternalLink } from "lucide-react";
 import type { Metadata } from "next";
 
-const INITIAL_MONTHS = 7;
+const INITIAL_MONTHS = 6;
+const STATS_MONTHS = 6;
 
 export const metadata: Metadata = {
   alternates: {
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 export default async function HomePage() {
   const [{ dailies, hasMore, nextCursor, total }, stats] = await Promise.all([
     getDailySummariesByMonth(INITIAL_MONTHS, null),
-    getArchiveStats(),
+    getArchiveStats(STATS_MONTHS),
   ]);
 
   return (
@@ -38,21 +38,39 @@ export default async function HomePage() {
               ones that never got started.
             </p>
           </div>
-          <a
-            href="https://github.com/vitor-belim/daily-leetcode"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={cn(
-              buttonVariants({ variant: "outline", size: "sm" }),
-              "shrink-0",
-            )}
-          >
-            Source on GitHub
-            <ExternalLink data-icon="inline-end" />
-          </a>
+          <div className="flex shrink-0 flex-wrap gap-2 sm:flex-col">
+            <a
+              href="https://leetcode.com/u/vitorbelim/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={buttonVariants({ variant: "outline", size: "sm" })}
+            >
+              Vitor on LeetCode
+              <ExternalLink data-icon="inline-end" />
+            </a>
+            <a
+              href="https://github.com/vitor-belim"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={buttonVariants({ variant: "outline", size: "sm" })}
+            >
+              Vitor on GitHub
+              <ExternalLink data-icon="inline-end" />
+            </a>
+          </div>
         </header>
 
-        <StatsOverview stats={stats} />
+        <section className="space-y-4">
+          <div className="flex items-baseline justify-between">
+            <h2 className="font-heading text-xl font-semibold tracking-tight">
+              Stats
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              Last {STATS_MONTHS} months
+            </p>
+          </div>
+          <StatsOverview stats={stats} />
+        </section>
 
         <section className="space-y-4">
           <div className="flex items-baseline justify-between">

@@ -9,6 +9,7 @@ import {
   formatMonthUTC,
   monthOf,
   shiftMonth,
+  shiftDateByMonthsUTC,
 } from "./dates";
 
 describe("formatDateUTC / parseDateUTC", () => {
@@ -129,5 +130,25 @@ describe("formatMonthUTC / monthOf / shiftMonth", () => {
     expect(shiftMonth("2026-09", -1)).toBe("2026-08");
     expect(shiftMonth("2026-01", -2)).toBe("2025-11");
     expect(shiftMonth("2026-12", 1)).toBe("2027-01");
+  });
+});
+
+describe("shiftDateByMonthsUTC", () => {
+  it("keeps the day of month when the target month has it", () => {
+    expect(shiftDateByMonthsUTC("2026-10-17", -6)).toBe("2026-04-17");
+    expect(shiftDateByMonthsUTC("2026-04-17", 6)).toBe("2026-10-17");
+  });
+
+  it("crosses year boundaries in both directions", () => {
+    expect(shiftDateByMonthsUTC("2026-03-15", -6)).toBe("2025-09-15");
+    expect(shiftDateByMonthsUTC("2026-09-15", 6)).toBe("2027-03-15");
+  });
+
+  // Plain Date arithmetic would roll 2026-02-31 over into March; the helper
+  // clamps to the shorter month's last day instead.
+  it("clamps to the last day of a shorter target month", () => {
+    expect(shiftDateByMonthsUTC("2026-08-31", -6)).toBe("2026-02-28");
+    expect(shiftDateByMonthsUTC("2028-08-31", -6)).toBe("2028-02-29");
+    expect(shiftDateByMonthsUTC("2026-05-31", -1)).toBe("2026-04-30");
   });
 });

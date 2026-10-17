@@ -1,6 +1,13 @@
 import "server-only";
 import { collectFilledDates } from "./archive";
-import { formatMonthUTC, monthOf, shiftMonth, todayUTC } from "./dates";
+import {
+  formatDateUTC,
+  formatMonthUTC,
+  monthOf,
+  shiftDateByMonthsUTC,
+  shiftMonth,
+  todayUTC,
+} from "./dates";
 import { PROBLEMS_ROOT, SOLUTIONS_ROOT } from "./paths";
 import { readProblemFile } from "./problems-repo";
 import { computeArchiveStats, summarizeSolutions } from "./solve-status";
@@ -185,22 +192,30 @@ export async function getDailySummariesByMonth(
 }
 
 /**
- * Aggregates progress over every archived day.
+ * Aggregates progress over the archived days of a rolling window ending
+ * today: the days after the same date `months` months ago, so a six-month
+ * window on 2026-10-17 covers 2026-04-18 through 2026-10-17. Older days are
+ * ignored entirely, so streaks are cut at the window's start too.
  *
+ * @param months How many months back the window reaches.
  * @param roots The archive roots (default to `data/problems` and
  *   `data/solutions`).
  * @param today The reference "today" (defaults to the current UTC day).
- * @returns Archive-wide totals, per-difficulty counts and streaks; days
+ * @returns The window's totals, per-difficulty counts and streaks; days
  *   whose problem file disappeared since the scan are skipped.
- * @throws When any day's problem or solutions file exists but cannot be
- *   read, fails to parse or holds the wrong shape, so a corrupted archive
- *   fails the prerender instead of skewing the stats.
+ * @throws When any covered day's problem or solutions file exists but
+ *   cannot be read, fails to parse or holds the wrong shape, so a corrupted
+ *   archive fails the prerender instead of skewing the stats.
  */
 export async function getArchiveStats(
+  months: number,
   roots: ArchiveRoots = DEFAULT_ROOTS,
   today: Date = todayUTC(),
 ): Promise<ArchiveStats> {
-  const dates = collectFilledDates(roots.problems);
+  const windowStart = shiftDateByMonthsUTC(formatDateUTC(today), -months);
+  const dates = collectFilledDates(roots.problems).filter(
+    (date) => date > windowStart,
+  );
   const loaded = await Promise.all(
     dates.map((date) => loadDay(date, roots, today)),
   );

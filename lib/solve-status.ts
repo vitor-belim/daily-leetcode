@@ -247,10 +247,10 @@ function emptyDifficultyStats(): Record<Difficulty, DifficultyStats> {
 }
 
 /**
- * Aggregates per-day outcomes into archive-wide totals, per-difficulty
- * counts and streaks.
+ * Aggregates per-day outcomes into totals, per-difficulty counts and
+ * streaks.
  *
- * @param outcomes One entry per archived day.
+ * @param outcomes One entry per archived day to include.
  * @param today The reference "today" (defaults to the current UTC day).
  * @returns The archive statistics.
  */

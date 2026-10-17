@@ -114,7 +114,7 @@ export interface DifficultyStats {
   solved: number;
 }
 
-/** Aggregate progress across the whole archive. */
+/** Aggregate progress across a window of archived days. */
 export interface ArchiveStats {
   totalDays: number;
   solved: number;
@@ -126,7 +126,7 @@ export interface ArchiveStats {
   byDifficulty: Record<Difficulty, DifficultyStats>;
   /** Consecutive solved calendar days ending at the most recent day that is not pending. */
   currentStreak: number;
-  /** The longest run of consecutive solved calendar days on record. */
+  /** The longest run of consecutive solved calendar days within the window. */
   longestStreak: number;
 }
 

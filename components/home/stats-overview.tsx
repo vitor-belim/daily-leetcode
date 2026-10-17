@@ -48,10 +48,11 @@ function days(count: number): string {
 }
 
 /**
- * The home page's archive-wide stats: the share of finished days solved,
- * solved counts per difficulty, and the current and longest streaks.
+ * The home page's stats for a window of the archive: the share of finished
+ * days solved, solved counts per difficulty, and the current and longest
+ * streaks.
  *
- * @param stats The aggregated archive stats.
+ * @param stats The aggregated stats for the window.
  * @returns The grid of stat cards.
  */
 export function StatsOverview({ stats }: StatsOverviewProps) {
@@ -108,7 +109,7 @@ export function StatsOverview({ stats }: StatsOverviewProps) {
           <p className="text-xs text-muted-foreground">
             Consecutive days without a failed or skipped one.
             <br />
-            Best run so far: {days(stats.longestStreak)}.
+            Best run in this period: {days(stats.longestStreak)}.
           </p>
         </CardContent>
       </Card>
