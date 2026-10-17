@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar maxAlternatingSum = function(nums) {\n    const arr = nums\n        .map(num => num * num)\n        .sort((a, b) => a - b);\n\n    let left = 0;\n    let right = arr.length - 1;\n    let res = 0;\n\n    while (left <= right) {\n        res += arr[right];\n        right--;\n\n        if (left <= right) {\n            res -= arr[left];\n            left++;\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Fun one.",
+    "aiExplanation": "The function `maxAlternatingSum` first builds a new array by **squaring every number** in `nums` and then **sorting those squares in ascending order**, so the smallest values sit on the left and the largest on the right. It then uses two pointers, `left` starting at the beginning and `right` at the end, and walks them toward each other: on each loop iteration it **adds** the value at `right` (the current largest remaining square) to `res` and moves `right` inward, then, if the pointers have not crossed, **subtracts** the value at `left` (the current smallest remaining square) and moves `left` inward. This pairs the biggest squares with plus signs and the smallest squares with minus signs, which is exactly how you maximize an alternating sum of the form `a - b + c - d + ...`. When the pointers meet or cross, the loop ends and `res` holds the maximum alternating sum of the squared values.",
+    "status": "DONE",
+    "cpuUsage": 89.69,
+    "memoryUsage": 29.59,
+    "date": "2026-10-13T07:16:02.000Z"
+  }
+]

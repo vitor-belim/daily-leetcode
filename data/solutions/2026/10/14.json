@@ -1,0 +1,35 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} num\n * @param {number} sum\n * @return {string}\n */\nvar maxSumOfSquares = function(num, sum) {\n    if (sum <= 0 || sum > num * 9) return '';\n\n    let res = '';\n\n    for (let i = 1; i <= num; i++) {\n        let next = Math.min(sum, 9);\n        res += next;\n        sum -= next;\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "`O(n)` solution.",
+    "aiExplanation": "This function builds a number with exactly `num` digits whose digits add up to `sum`, choosing the digits so the result is as large as possible. It first rejects impossible cases: a `sum` of zero or less, or a `sum` bigger than `num * 9` (the most you can get when every digit is a **9**), both return an empty string. Then it greedily fills the digits from left to right: on each step it picks `Math.min(sum, 9)`, meaning it takes the biggest digit it still can (a **9** while there is enough budget left, then whatever remains, then **0**s), appends it to `res`, and subtracts that digit from `sum`. Because the largest digits are placed in the most significant positions, the final string is the maximum possible number for the given constraints.",
+    "status": "DONE",
+    "cpuUsage": 35.57,
+    "memoryUsage": 52.66,
+    "date": "2026-10-14T06:51:32.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} num\n * @param {number} sum\n * @return {string}\n */\nvar maxSumOfSquares = function(num, sum) {\n    if (sum <= 0 || sum > num * 9) return '';\n\n    const times = Math.floor(sum / 9);\n\n    return '9'.repeat(times) + (sum % 9) + '0'.repeat(num - times - 1);\n};\n",
+    "language": "javascript",
+    "notes": "Noticed the pattern, but over-simplified.",
+    "aiExplanation": "This version tries to build the largest `num`-digit number whose digits add up to `sum` using arithmetic instead of a loop. After the same validity check (an empty string if `sum` is non-positive or exceeds `num * 9`), it computes `times`, the number of full **9**s that fit into `sum` using `Math.floor(sum / 9)`. The result is then assembled as that many `'9'` characters, followed by the leftover digit `sum % 9`, followed by enough `'0'` characters to pad the string out to `num` digits. The weak spot is that the leftover digit is **always** appended, even when `sum % 9` is **0** or when the nines already fill all `num` positions; in that case `num - times - 1` becomes negative and `'0'.repeat(...)` throws a `RangeError`, which is why this attempt failed.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-10-14T07:00:55.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} num\n * @param {number} sum\n * @return {string}\n */\nvar maxSumOfSquares = function(num, sum) {\n    if (sum <= 0 || sum > num * 9) return '';\n\n    const nines = Math.floor(sum / 9);\n    const remainder = nines < num ? (sum % 9).toString() : '';\n    const zeros = num - nines - remainder.length;\n\n    return '9'.repeat(nines) + remainder + '0'.repeat(zeros);\n};\n",
+    "language": "javascript",
+    "notes": "`O(1)` solution.",
+    "aiExplanation": "This is the corrected arithmetic approach for building the largest `num`-digit number whose digits sum to `sum`. After rejecting impossible inputs (a non-positive `sum` or one larger than `num * 9`), it counts how many full **9**s fit with `Math.floor(sum / 9)` and stores that in `nines`. The key fix is in `remainder`: the leftover digit `sum % 9` is only included when `nines < num`, meaning there is still an empty position left for it; if the nines already fill every slot, `remainder` is an empty string. The number of trailing **0**s is then computed as whatever positions are still unused, `num - nines - remainder.length`, so the total length always equals `num` and `repeat` never receives a negative count. Concatenating the nines, the remainder, and the zeros in that order places the biggest digits first, which yields the maximum possible number.",
+    "status": "DONE",
+    "cpuUsage": 97.48,
+    "memoryUsage": 88.45,
+    "date": "2026-10-14T07:33:37.000Z"
+  }
+]

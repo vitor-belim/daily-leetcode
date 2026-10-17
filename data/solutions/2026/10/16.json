@@ -1,0 +1,35 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar sumCounts = function(nums) {\n    const n = nums.length;\n    let res = 0;\n\n    for (let i = 0; i < n; i++) {\n        const set = new Set();\n\n        for (let j = i; j < n; j++) {\n            set.add(nums[j]);\n\n            res += set.size * set.size;\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Missed the `mod` requirement.",
+    "aiExplanation": "This is a straightforward **brute force** approach: for every possible starting index `i`, it walks forward through every ending index `j`, keeping a `Set` of the values seen so far in the subarray `nums[i..j]`. Because a `Set` only stores unique values, `set.size` is exactly the number of **distinct elements** in that subarray, so the code adds `set.size * set.size` (the distinct count squared) to the running total `res` for every subarray. After checking all `O(n^2)` subarrays it returns `res`. The logic is correct, but it never applies the required modulo `10^9 + 7`, so for large inputs the result overflows or does not match the expected answer, which is why this attempt **failed**.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-10-16T07:01:37.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar sumCounts = function(nums) {\n    const n = nums.length;\n    const mod = 10 ** 9 + 7;\n    let res = 0;\n\n    for (let i = 0; i < n; i++) {\n        const set = new Set();\n\n        for (let j = i; j < n; j++) {\n            set.add(nums[j]);\n\n            res = (res + (set.size * set.size) % mod) % mod;\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Expected TLE.",
+    "aiExplanation": "This is the same **brute force** idea as before, with the missing modulo fixed: for every starting index `i`, it expands the subarray one element at a time by moving `j` forward, adding each value to a `Set` so that `set.size` gives the number of **distinct elements** in `nums[i..j]`. For each subarray it adds the square of that distinct count to `res`, wrapping with `% mod` where `mod` is `10^9 + 7` so the number stays in range. The answer is now correct, but because it still visits every one of the `O(n^2)` subarrays and does `Set` work for each, it is too slow for the largest inputs and results in **Time Limit Exceeded**.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-10-16T07:02:47.000Z"
+  },
+  {
+    "author": "Leetcode",
+    "code": "/** By Leetcode */\nclass BIT {\n    constructor(n) {\n        this.size = n;\n        this._tree1 = new Float64Array(n + 2);\n        this._tree2 = new Float64Array(n + 2);\n    }\n\n    _lowbit(index) {\n        return index & -index;\n    }\n\n    add(left, right, delta) {\n        this._add(left, delta);\n        this._add(right + 1, -delta);\n    }\n\n    query(left, right) {\n        return this._query(right) - this._query(left - 1);\n    }\n\n    _add(index, delta) {\n        index += 1;\n        let rawIndex = index;\n        while (index <= this.size) {\n            this._tree1[index] += delta;\n            this._tree2[index] += rawIndex * delta;\n            index += this._lowbit(index);\n        }\n    }\n\n    _query(index) {\n        index += 1;\n        let rawIndex = index + 1;\n        if (index > this.size) {\n            index = this.size;\n        }\n        let res = 0;\n        while (index > 0) {\n            res += rawIndex * this._tree1[index] - this._tree2[index];\n            index -= this._lowbit(index);\n        }\n        return res;\n    }\n}\n\nvar sumCounts = function (A) {\n    let n = A.length;\n    let res = 0n,\n        cur = 0n;\n    let bit = new BIT(n + 10);\n    let seen = new Map();\n    let mod = 1000000007n;\n    for (let i = 0; i < n; i++) {\n        let a = A[i];\n        let j = (seen.has(a) ? seen.get(a) : -1) + 1;\n        let q = BigInt(bit.query(j, i));\n        cur = (cur + q * 2n + BigInt(i - j + 1)) % mod;\n        res = (res + cur) % mod;\n        bit.add(j, i, 1);\n        seen.set(a, i);\n    }\n    return Number(res);\n};",
+    "language": "javascript",
+    "notes": "I had seen some possible solutions for this the day before, and I already knew attempting to get an accepted on this one was not worth it.",
+    "aiExplanation": "This solution sweeps through the array once, maintaining `cur` as the sum of **(distinct count)²** over all subarrays that end at the current index `i`. The key insight is that when `A[i]` arrives, it only becomes a *new* distinct value for subarrays that start after its previous occurrence (tracked in the `seen` map), i.e. every start index from `j` to `i`; for those subarrays the distinct count `d` grows by one, so their squared contribution changes by `(d+1)² - d² = 2d + 1`. A **Binary Indexed Tree** (`BIT`) with two internal arrays supports both *range add* and *range sum*, and it stores the current distinct count for every possible start index, so `bit.query(j, i)` returns the sum of all those `d` values in `O(log n)`. The code then updates `cur` by `2 * sum + (i - j + 1)`, adds `cur` into the global answer `res`, increments the range `[j, i]` by one in the tree, and records `i` as the latest position of `A[i]`. Everything is done with `BigInt` and reduced modulo `1000000007` to avoid overflow, giving an overall `O(n log n)` algorithm.",
+    "status": "DONE",
+    "cpuUsage": 83.33,
+    "memoryUsage": 100,
+    "date": "2026-10-16T07:07:28.000Z"
+  }
+]

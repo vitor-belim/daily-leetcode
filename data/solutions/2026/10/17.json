@@ -1,0 +1,46 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar minSwaps = function(nums) {\n    const sorted = nums\n        .map((x, i) => [i, sum(x), x])\n        .sort((a, b) => a[1] === b[1] ? a[2] - b[2] : a[1] - b[1]);\n\n    let count = 0;\n    let last = -1;\n\n    while (count !== last) {\n        last = count;\n\n        for (let i = 0; i < nums.length; i++) {\n            if (sorted[i][0] !== i) {\n                swap(sorted, i, sorted[i][0]);\n                count++;\n            }\n        }\n    }\n\n    return count;\n};\n\nconst sum = (num) => {\n    let res = 0;\n\n    while (num > 0) {\n        res += num % 10;\n        num = Math.floor(num / 10);\n    }\n\n    return res;\n};\n\nconst swap = (arr, a, b) => {\n    const temp = arr[a];\n    arr[a] = arr[b];\n    arr[b] = temp;\n};\n",
+    "language": "javascript",
+    "notes": "Overly cautious attempt at first try acceptance.",
+    "aiExplanation": "This code counts the **minimum number of swaps** needed to reorder `nums` so the elements are sorted by their **digit sum** (ties broken by the number itself). First, each number is wrapped in a small tuple `[originalIndex, digitSum, value]` using the helper `sum`, which repeatedly peels off the last digit with `% 10` and `Math.floor(num / 10)`. The tuples are then sorted by digit sum, falling back to the raw value when sums match, so `sorted[i][0]` tells us which original position should end up at slot `i`. The outer `while (count !== last)` loop keeps making passes until a full pass performs no swaps; in each pass it walks the array and, whenever the tuple at slot `i` did not originally come from index `i`, it swaps it to the slot where it belongs via the `swap` helper and increments `count`. Each swap places at least one element in its final position, and repeating passes until nothing changes guarantees every element is settled, so `count` ends up being the minimum number of swaps required.",
+    "status": "DONE",
+    "cpuUsage": 33.33,
+    "memoryUsage": 22.22,
+    "date": "2026-10-17T08:15:03.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar minSwaps = function(nums) {\n    const sorted = nums\n        .map((x, i) => [i, sum(x), x])\n        .sort((a, b) => a[1] === b[1] ? a[2] - b[2] : a[1] - b[1]);\n\n    let count = 0;\n\n    for (let i = 0; i < nums.length; i++) {\n        while (sorted[i][0] !== i) {\n            swap(sorted, i, sorted[i][0]);\n            count++;\n        }\n    }\n\n    return count;\n};\n\nconst sum = (num) => {\n    let res = 0;\n\n    while (num > 0) {\n        res += num % 10;\n        num = Math.floor(num / 10);\n    }\n\n    return res;\n};\n\nconst swap = (arr, a, b) => {\n    const temp = arr[a];\n    arr[a] = arr[b];\n    arr[b] = temp;\n};\n",
+    "language": "javascript",
+    "notes": "Moved while mechanism to proper place for better performance, not much difference.",
+    "aiExplanation": "This solution finds the **minimum swaps** to arrange `nums` in order of each number's **digit sum** (with equal sums ordered by value). It builds an array of tuples `[originalIndex, digitSum, value]` using the `sum` helper, which adds up digits by repeatedly taking `num % 10` and dividing by ten, and sorts those tuples by digit sum, then by value. After sorting, `sorted[i][0]` is the original index of the element that belongs in slot `i`. The main loop uses the classic **cycle-sort** idea: for each position `i`, as long as the tuple sitting there did not come from index `i`, it swaps it into the slot matching its original index via `swap` and bumps `count`. Each swap permanently fixes one element, and the inner `while` keeps going until slot `i` holds the correct tuple, so a single pass over the array is enough. This is an improvement over the earlier version because it no longer needs repeated full passes to detect convergence; the total work is just the sort plus a linear number of swaps.",
+    "status": "DONE",
+    "cpuUsage": 33.33,
+    "memoryUsage": 22.22,
+    "date": "2026-10-17T08:25:01.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar minSwaps = function(nums) {\n    const sorted = nums\n        .map((x, i) => [i, sum(x), x])\n        .sort((a, b) => a[1] === b[1] ? a[2] - b[2] : a[1] - b[1]);\n\n    let count = 0;\n\n    for (let i = 0; i < nums.length; i++) {\n        while (sorted[i][0] !== i) {\n            const j = sorted[i][0];\n\n            const temp = sorted[i];\n            sorted[i] = sorted[j];\n            sorted[j] = temp;\n\n            count++;\n        }\n    }\n\n    return count;\n};\n\nconst sum = (num) => {\n    let res = 0;\n\n    while (num > 0) {\n        res += num % 10;\n        num = Math.floor(num / 10);\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Removed function call to `swap()` to get better performance, still not much difference.",
+    "aiExplanation": "This version computes the **minimum number of swaps** needed to sort `nums` by **digit sum**, breaking ties by the numeric value. Each element is first mapped to a tuple `[originalIndex, digitSum, value]`, where the `sum` helper accumulates digits using `num % 10` and `Math.floor(num / 10)`, and the tuples are sorted by digit sum and then by value. Once sorted, `sorted[i][0]` records which original position should land in slot `i`. The loop applies **cycle sort**: for every index `i`, while the tuple at `i` is not the one that belongs there, it reads the target index `j = sorted[i][0]`, swaps the tuples at `i` and `j` inline using a `temp` variable, and increments `count`. Because every swap places at least one tuple in its final position, the inner `while` terminates quickly and the total swaps equal the minimum needed. The only change from the previous solution is that the swap is done directly in place rather than through a separate `swap` helper, which removes a function call per swap.",
+    "status": "DONE",
+    "cpuUsage": 33.33,
+    "memoryUsage": 22.22,
+    "date": "2026-10-17T08:29:27.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar minSwaps = function(nums) {\n    const n = nums.length;\n    const sums = Array(n);\n    const indices = Array(n);\n\n    for (let i = 0; i < n; i++) {\n        let sum = 0;\n        let num = nums[i];\n\n        while (num > 0) {\n            sum += num % 10;\n            num = Math.floor(num / 10);\n        }\n\n        sums[i] = sum;\n        indices[i] = i;\n    }\n\n    indices.sort((a, b) => sums[a] - sums[b] || nums[a] - nums[b]);\n\n    let count = 0;\n\n    for (let i = 0; i < n; i++) {\n        while (indices[i] !== i) {\n            const j = indices[i];\n\n            const temp = indices[i];\n            indices[i] = indices[j];\n            indices[j] = temp;\n\n            count++;\n        }\n    }\n\n    return count;\n};\n",
+    "language": "javascript",
+    "notes": "Removed helper functions, made everything in one go \"by hand\" (had a look at some other solutions), finally achieved 100% performance.",
+    "aiExplanation": "This is the most memory-efficient take on finding the **minimum swaps** to sort `nums` by **digit sum** (ties broken by value). Instead of building an array of tuples, it keeps two flat arrays: `sums`, where `sums[i]` is the digit sum of `nums[i]` computed inline with `num % 10` and `Math.floor(num / 10)`, and `indices`, which starts as `[0, 1, 2, ...]`. It then sorts `indices` by looking up `sums[a] - sums[b]`, and when that is zero the `||` falls through to `nums[a] - nums[b]` as the tie-breaker, so afterwards `indices[i]` names the original position that should occupy slot `i`. The final loop is **cycle sort** on `indices`: for each `i`, while `indices[i]` is not `i`, it swaps `indices[i]` with `indices[indices[i]]` in place and increments `count`, which moves one element into its correct spot every time. The result is the same minimum swap count as the earlier versions, but with only two small numeric arrays instead of one array of three-element tuples, which is why it uses noticeably less memory.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 77.78,
+    "date": "2026-10-17T08:41:22.000Z"
+  }
+]

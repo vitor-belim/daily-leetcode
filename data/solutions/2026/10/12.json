@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Leetcode",
+    "code": "/** By Leetcode */\nvar maxSum = function (nums, k) {\n    const MOD = 1000000007;\n    const cnt = new Array(30).fill(0);\n\n    // Count the number of 1 bits at each position\n    for (const num of nums) {\n        for (let i = 0; i < 30; i++) {\n            if (num & (1 << i)) {\n                cnt[i]++;\n            }\n        }\n    }\n\n    let res = 0;\n    for (let i = 0; i < k; i++) {\n        let cur = 0;\n        // Construct the current number from the most significant bit to the least significant bit\n        for (let j = 29; j >= 0; j--) {\n            if (cnt[j] > 0) {\n                cur += Math.pow(2, j);\n                cnt[j]--;\n            }\n        }\n\n        const curBigInt = BigInt(cur);\n        res = Number((BigInt(res) + curBigInt * curBigInt) % BigInt(MOD));\n    }\n\n    return res;\n};",
+    "language": "javascript",
+    "notes": "Didn't even try, it's an obvious \"look at this little trick we can use for this thing and never reuse again\" kind of exercise.",
+    "aiExplanation": "This solution maximizes the sum of squares of `k` numbers by **greedily packing as many 1-bits as possible into each chosen number**, which works because squaring rewards concentrating bits into a few large values rather than spreading them out. It first scans every number in `nums` and, for each of the 30 bit positions, counts how many numbers have that bit set, storing the totals in the `cnt` array. Then it builds `k` numbers one at a time: for each one, it walks from the **most significant bit** (`29`) down to the least significant, and whenever a bit position still has a remaining count it adds `2^j` to the current number and decrements that count, so each new number grabs every bit that is still available. After constructing a number, it squares it using `BigInt` to avoid overflow and adds the result to `res`, taking the remainder modulo `1000000007` to keep the answer within bounds. Finally it returns `res`, the maximum possible sum of squares.",
+    "status": "DONE",
+    "cpuUsage": 14.7,
+    "memoryUsage": 50.13,
+    "date": "2026-10-12T07:17:11.000Z"
+  }
+]

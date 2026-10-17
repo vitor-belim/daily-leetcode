@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar sumCounts = function(nums) {\n    let res = 0;\n\n    for (let i = 0; i < nums.length; i++) {\n        const set = new Set();\n\n        for (let j = i; j < nums.length; j++) {\n            set.add(nums[j]);\n\n            res += set.size ** 2;\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function computes the **sum of the squares of distinct counts** over every contiguous subarray of `nums`. The outer loop fixes a starting index `i`, and for each start it creates a fresh `Set` to track which values have been seen so far. The inner loop extends the subarray one element at a time by moving `j` from `i` to the end, adding `nums[j]` to the set; because a `Set` ignores duplicates, `set.size` at any moment is exactly the number of **distinct values** in the subarray `nums[i..j]`. After each extension, the code adds `set.size ** 2` (the distinct count squared) to the running total `res`. By the time both loops finish, every possible subarray has been visited once, so `res` holds the required answer. The approach runs in **O(n²)** time with **O(n)** extra space for the set.",
+    "status": "DONE",
+    "cpuUsage": 92.57,
+    "memoryUsage": 38.23,
+    "date": "2026-10-15T07:07:28.000Z"
+  }
+]
