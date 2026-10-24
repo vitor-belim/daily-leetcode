@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Leetcode",
+    "code": "/** By Leetcode */\nvar numOfWays = function (nums) {\n    const MOD = 1_000_000_007n;\n    const n = nums.length;\n\n    const dp = Array.from({ length: n + 1 }, () => new Array(n + 1).fill(0n));\n    for (let i = 0; i <= n; i++) {\n        dp[i][0] = 1n;\n\n        for (let j = 1; j <= i; j++) {\n            dp[i][j] = (dp[i - 1][j - 1] + dp[i - 1][j]) % MOD;\n        }\n    }\n\n    const dfs = (arr) => {\n        const m = arr.length;\n        if (m <= 2) return 1n;\n\n        const left = [];\n        const right = [];\n\n        for (let i = 1; i < m; i++) {\n            if (arr[i] < arr[0]) left.push(arr[i]);\n            else right.push(arr[i]);\n        }\n\n        return dp[m - 1][left.length] * dfs(left) % MOD * dfs(right) % MOD;\n    };\n\n    return Number((dfs(nums) - 1n + MOD) % MOD);\n};",
+    "language": "javascript",
+    "notes": "You know it's hard when Leetcode's editorial solution achieves only 11% on performance.",
+    "aiExplanation": "This function counts how many different orderings of `nums` would build the **exact same binary search tree** as the original order, using `BigInt` values (the `n` suffix) so the math never overflows before taking the result modulo `1_000_000_007`. It first builds a **Pascal's triangle** table `dp`, where `dp[i][j]` is the binomial coefficient \"i choose j\", via the classic rule `dp[i][j] = dp[i-1][j-1] + dp[i-1][j]`. The recursive `dfs` then mirrors how a BST is built: the first element of `arr` becomes the root, every later element smaller than it goes to the `left` subtree and the rest go to the `right` subtree. Because the relative order within each subtree must be preserved but the two subtrees can be **interleaved** freely, the number of valid sequences for this node is the number of ways to choose which of the remaining `m - 1` positions hold left-subtree values (`dp[m - 1][left.length]`), multiplied by the counts for the left and right subtrees recursively; arrays of two or fewer elements have exactly one ordering, so they return `1n`. Finally, since the original arrangement itself is included in that count, the code subtracts one (adding `MOD` first to avoid a negative result) and converts the `BigInt` back to a regular `Number`.",
+    "status": "DONE",
+    "cpuUsage": 11.72,
+    "memoryUsage": 26.22,
+    "date": "2026-10-18T08:29:51.000Z"
+  }
+]

@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar minOperations = function(s) {\n    let min = 123;\n    let minc = 0;\n    let max = 97;\n    let maxc = 0;\n    let sorted = true;\n\n    for (let i = 0; i < s.length; i++) {\n        const code = s.charCodeAt(i);\n\n        if (code < min) {\n            min = code;\n            minc = 1;\n        } else if (code === min) {\n            minc++;\n        }\n\n        if (code > max) {\n            max = code;\n            maxc = 1;\n        } else if (code === max) {\n            maxc++;\n        }\n\n        if (i > 0 && code < s.charCodeAt(i - 1)) {\n            sorted = false;\n        }\n    }\n\n    const codeFirst = s.charCodeAt(0);\n    const codeLast = s.charCodeAt(s.length - 1);\n\n    if (sorted) return 0;\n    if (s.length <= 2) return -1;\n    if (codeFirst === min || codeLast === max) return 1;\n    if (codeFirst === max && maxc === 1 && codeLast === min && minc === 1) return 3;\n    return 2;\n};\n",
+    "language": "javascript",
+    "notes": "Very interesting and fun exercise.",
+    "aiExplanation": "This function works out how many **move operations** are needed to turn the string `s` into sorted (non-decreasing) order, where each operation moves a character to the front or back of the string. It makes a **single pass** over the characters, tracking the smallest character code (`min`) and how many times it appears (`minc`), the largest code (`max`) and its count (`maxc`), and a `sorted` flag that flips to `false` the moment a character is smaller than the one before it. After the loop it applies a small set of rules: if the string is already `sorted`, the answer is **0**; if the string has 2 or fewer characters and still isn't sorted, it's impossible, so it returns **-1**; if the first character is already the minimum or the last character is already the maximum, one end is correct and only **1** move is needed; if the first character is the *only* maximum and the last character is the *only* minimum, both ends are maximally wrong and it takes **3** moves; otherwise **2** moves suffice. The whole thing runs in `O(n)` time with constant extra memory.",
+    "status": "DONE",
+    "cpuUsage": 96.69,
+    "memoryUsage": 74.1,
+    "date": "2026-10-21T07:05:48.000Z"
+  }
+]

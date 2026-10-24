@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number[]}\n */\nvar targetIndices = function(nums, target) {\n    nums.sort((a, b) => a - b);\n    \n    const res = [];\n\n    for (let i = 0; i < nums.length; i++) {\n        if (nums[i] === target) {\n            res.push(i);\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds **where a target number would appear** in a sorted version of the array. It first sorts `nums` in ascending order using `nums.sort((a, b) => a - b)` (the comparator is needed so JavaScript sorts numerically rather than alphabetically). Then it walks through the sorted array with a simple `for` loop, and every time an element equals `target`, it pushes that element's **index** into the `res` array. Since the array is sorted, all matching values sit next to each other, so the result is a contiguous list of indices (or an empty array if `target` never appears). The sort dominates the cost at **O(n log n)** time, and the function uses **O(1)** extra space beyond the output.",
+    "status": "DONE",
+    "cpuUsage": 88.46,
+    "memoryUsage": 45.89,
+    "date": "2026-10-19T07:12:24.000Z"
+  }
+]

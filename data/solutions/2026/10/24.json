@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "const daysPerMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];\nconst prefixSum = Array(12).fill(0);\n\nfor (let i = 1; i < 12; i++) {\n    prefixSum[i] = prefixSum[i - 1] + daysPerMonth[i - 1];\n}\n\nconst convert = (date) => {\n    const [month, day] = date.split('-');\n\n    return prefixSum[Number(month) - 1] + Number(day);\n};\n\n/**\n * @param {string} arriveAlice\n * @param {string} leaveAlice\n * @param {string} arriveBob\n * @param {string} leaveBob\n * @return {number}\n */\nvar countDaysTogether = function(arriveAlice, leaveAlice, arriveBob, leaveBob) {\n    if (leaveAlice < arriveBob || leaveBob < arriveAlice) return 0;\n\n    const s1 = convert(arriveAlice);\n    const e1 = convert(leaveAlice);\n    const s2 = convert(arriveBob);\n    const e2 = convert(leaveBob);\n\n    return Math.min(e1, e2) - Math.max(s1, s2) + 1;\n};\n",
+    "language": "javascript",
+    "notes": "This was way harder than an easy exercise should be. Fun, but demotivating due stated-vs-perceived difficulty.",
+    "aiExplanation": "This code counts how many days two people, Alice and Bob, are in the same place at the same time, given their arrival and departure dates as `\"MM-DD\"` strings. It first builds a `prefixSum` array where each entry holds the total number of days in all the months before it, so the `convert` helper can turn any date string into a single **day-of-year number** by adding the day to the prefix total for its month. The main function starts with a quick **early exit**: since the strings are zero-padded, they can be compared lexicographically, and if one person leaves before the other arrives there is no overlap, so it returns `0`. Otherwise it converts all four dates to day numbers and computes the overlap as `min(end1, end2) - max(start1, start2) + 1`, which is the standard formula for the length of the intersection of two **inclusive ranges**: the shared period begins on the later arrival and ends on the earlier departure, with the `+ 1` counting both endpoints.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 29.03,
+    "date": "2026-10-24T08:57:16.000Z"
+  }
+]

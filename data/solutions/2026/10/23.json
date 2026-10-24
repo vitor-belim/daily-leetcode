@@ -1,0 +1,35 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar sortPermutation = function(nums) {\n    const n = nums.length;\n    const seen = Array.from({ length: n }, () => false);\n    let res = 65_535;\n\n    for (let i = 0; i < n; i++) {\n        if (nums[i] === i) continue;\n\n        let lookup = nums[i];\n\n        while (!seen[lookup]) {\n            seen[lookup] = true;\n            res &= lookup;\n            lookup = nums[lookup];\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Mistake #1: used 65_535 as highest all-1s-in-binary number, which is within constraints.",
+    "aiExplanation": "This function treats `nums` as a **permutation** (every value is also a valid index) and finds every element that is *not* already sitting in its correct spot. It starts with `res = 65_535`, a number whose lower 16 bits are all `1`, so that it can be narrowed down with the bitwise AND operator (`&=`). For each index `i`, it skips positions that are already correct (`nums[i] === i`); otherwise it follows the **cycle** of misplaced values by repeatedly jumping to `nums[lookup]`, marking each visited index in the `seen` array to avoid revisiting it, and folding each visited value into `res` with `res &= lookup`. The result is the bitwise AND of every value that needs to move. This version has two problems: if the array is already sorted, nothing is ever ANDed in and it returns `65_535` instead of `0`, and the 16-bit starting mask is too small for larger arrays, which is why it was marked as failed.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-10-23T07:52:44.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar sortPermutation = function(nums) {\n    const n = nums.length;\n    const seen = Array.from({ length: n }, () => false);\n    let res = 65_535;\n\n    for (let i = 0; i < n; i++) {\n        if (nums[i] === i) continue;\n\n        let lookup = nums[i];\n\n        while (!seen[lookup]) {\n            seen[lookup] = true;\n            res &= lookup;\n            lookup = nums[lookup];\n        }\n    }\n\n    return res === 65_535 ? 0 : res;\n};\n",
+    "language": "javascript",
+    "notes": "Mistake #2: hardcoded 0 exit when 65_535 - a value within acceptable solutions - is the end result.",
+    "aiExplanation": "This function walks through a **permutation** stored in `nums` and computes the bitwise AND of every value that is out of place. It begins with `res = 65_535`, a mask whose lower 16 bits are all `1`, and a `seen` array to remember which indices were already visited. For each index `i` whose value is not already correct (`nums[i] !== i`), it follows the **cycle** of misplaced elements by jumping from `lookup` to `nums[lookup]`, marking each index as seen and shrinking `res` with `res &= lookup` along the way. The final line fixes an earlier bug: if `res` is still exactly `65_535`, nothing was ever misplaced, so the function returns `0` instead. However, this attempt still fails because a 16-bit mask only covers values up to `65_535`, so any element with a higher bit set has that bit silently dropped before it can contribute to the answer.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-10-23T07:53:15.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar sortPermutation = function(nums) {\n    const n = nums.length;\n    const seen = Array.from({ length: n }, () => false);\n    let res = 131_071;\n\n    for (let i = 0; i < n; i++) {\n        if (nums[i] === i) continue;\n\n        let lookup = nums[i];\n\n        while (!seen[lookup]) {\n            seen[lookup] = true;\n            res &= lookup;\n            lookup = nums[lookup];\n        }\n    }\n\n    return res === 131_071 ? 0 : res;\n};\n",
+    "language": "javascript",
+    "notes": "The solution: finally move to 131_071, the first all-1s-in-binary number AFTER the exercise constraints.",
+    "aiExplanation": "This function takes a **permutation** `nums` and returns the bitwise AND of all the values that are not already in their sorted position. It starts `res` at `131_071`, a mask whose lower **17 bits** are all `1`, which is wide enough to cover every possible value in the input. It then scans each index `i`, skipping any element that is already correct (`nums[i] === i`). For a misplaced element it follows the **cycle** it belongs to by repeatedly jumping to `nums[lookup]`, marking each visited index in the `seen` array so no cycle is processed twice, and narrowing `res` with `res &= lookup` for each value it passes. Because every misplaced element belongs to exactly one cycle, this visits each of them once in overall `O(n)` time. Finally, if `res` is still the untouched mask `131_071`, the array was already sorted and the function returns `0`; otherwise it returns the accumulated AND.",
+    "status": "DONE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-10-23T07:55:00.000Z"
+  }
+]
