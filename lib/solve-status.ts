@@ -281,7 +281,8 @@ export function computeArchiveStats(
 
   return {
     totalDays: outcomes.length,
-    solved: counts[SolveStatus.Solved],
+    solved:
+      counts[SolveStatus.Solved] + counts[SolveStatus.FunctionallyCorrect],
     functionallyCorrect: counts[SolveStatus.FunctionallyCorrect],
     failed: counts[SolveStatus.Failed],
     pending: counts[SolveStatus.Pending],

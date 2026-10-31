@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} grid\n * @return {number}\n */\nvar minCost = function(grid) {\n    const m = grid.length;\n    const n = grid[0].length;\n\n    let stack = [[0, 0, 0]];\n    let res = Infinity;\n\n    while (stack.length > 0) {\n        const next = [];\n\n        for (let [row, col, val] of stack) {\n            if (row < 0 || row >= m || col < 0 || col >= n) continue;\n\n            val ^= grid[row][col];\n\n            if (row === m - 1 && col === n - 1) {\n                res = Math.min(res, val);\n                continue;\n            }\n\n            next.push(\n                [row + 1, col, val],\n                [row, col + 1, val],\n            );\n        }\n\n        stack = next;\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Expected TLE, 713 / 999 testcases passed.",
+    "aiExplanation": "This solution does a **brute-force breadth-first walk** of every path from the top-left corner to the bottom-right corner, where you can only move **down** or **right**, and tracks the running **XOR** of the cell values along each path. It starts with a `stack` holding a single state `[row, col, val]` of `[0, 0, 0]`, then on every round builds a fresh `next` list: for each state it first skips anything out of bounds, folds the current cell into the running value with `val ^= grid[row][col]`, and if the cell is the destination it updates `res` with `Math.min(res, val)`; otherwise it pushes two new states, one stepping down and one stepping right, carrying the same running XOR. When the list is exhausted it returns the smallest XOR seen. The logic is correct, but because every cell spawns two children the number of live states grows **exponentially** with the grid size (roughly the number of distinct monotone paths), which is why it hits **Time Limit Exceeded** on larger inputs.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-10-28T08:03:41.000Z"
+  },
+  {
+    "author": "Leetcode",
+    "code": "/** By Leetcode */\nvar minCost = function (grid) {\n    const m = grid.length;\n    const n = grid[0].length;\n\n    const dp = Array.from({ length: n }, () => new Uint8Array(1024));\n    const next = new Uint8Array(1024);\n\n    dp[0][grid[0][0]] = 1;\n\n    for (let i = 0; i < m; i++) {\n        for (let j = 0; j < n; j++) {\n            if (i === 0 && j === 0) {\n                continue;\n            }\n\n            const value = grid[i][j];\n            next.fill(0);\n\n            for (let k = 0; k < 1024; k++) {\n                if (dp[j][k] || (j > 0 && dp[j - 1][k])) {\n                    next[k ^ value] = 1;\n                }\n            }\n\n            dp[j].set(next);\n        }\n    }\n\n    return dp[n - 1].indexOf(1);\n};",
+    "language": "javascript",
+    "notes": "Bit-mask tracking solution... I'm happy with my TLE.",
+    "aiExplanation": "This is a **dynamic programming** solution that, instead of tracking individual paths, tracks the **set of XOR values reachable** at each cell. Since cell values are small, any running XOR fits in `1024` possibilities, so `dp[j]` is a `Uint8Array(1024)` acting as a boolean bitmap for column `j`: a `1` at index `k` means \"some down/right path reaches this column in the current row with XOR equal to `k`\". It seeds `dp[0][grid[0][0]] = 1` for the starting cell, then sweeps the grid row by row. For each cell it clears a scratch `next` buffer and checks every candidate `k`: if that XOR was reachable from the cell **above** (`dp[j][k]`, still holding the previous row's data) or from the cell to the **left** (`dp[j - 1][k]`, already updated for this row), it marks `next[k ^ value] = 1`, folding in the current cell. The result is copied back with `dp[j].set(next)`, so a single row of bitmaps is reused for the whole grid. At the end, `dp[n - 1].indexOf(1)` finds the **smallest reachable XOR** at the bottom-right corner. Runtime is `O(m * n * 1024)`, which is tiny compared to enumerating paths, so it passes comfortably.",
+    "status": "DONE",
+    "cpuUsage": 95.79,
+    "memoryUsage": 90.88,
+    "date": "2026-10-28T08:10:32.000Z"
+  }
+]

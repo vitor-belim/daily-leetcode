@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} grid\n * @return {number}\n */\nvar uniquePaths = function(grid) {\n    const m = grid.length;\n    const n = grid[0].length;\n    let res = 0;\n\n    const explore = (i, j, fromLeft) => {\n        if (i < 0 || i >= m || j < 0 || j >= n) return;\n\n        if (i === m - 1 && j === n - 1) {\n            res++;\n            return;\n        }\n\n        if (grid[i][j] === 1) {\n            if (i === m - 1 && fromLeft) return;\n            if (j === n - 1 && !fromLeft) return;\n\n            if (fromLeft) {\n                explore(i + 1, j, false);\n                return;\n            }\n\n            explore(i, j + 1, true);\n            return;\n        }\n\n        explore(i + 1, j, false);\n        explore(i, j + 1, true);\n    };\n\n    explore(0, 1, true);\n    explore(1, 0, false);\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Achieved TLE as expected, 406 / 521 testcases passed.",
+    "aiExplanation": "This solution counts every way to walk from the top-left corner of `grid` to the bottom-right corner using **brute-force recursion**. The helper `explore(i, j, fromLeft)` is called for a cell together with the direction you arrived from (`fromLeft` is `true` when you stepped right into it, `false` when you stepped down). It first bails out if the cell is off the grid, and increments `res` if the cell is the destination. If the cell holds a `1` it acts as a **mirror**: arriving from the left forces you to continue **down**, and arriving from above forces you to continue **right** (the two early `return`s discard moves that would push you off the last row or column). A normal `0` cell simply tries both moves, down and right. The search is kicked off with the two possible first steps, `explore(0, 1, true)` and `explore(1, 0, false)`, and `res` holds the total. Because the same cell is re-explored for every distinct path that reaches it, the number of calls grows **exponentially**, which is why this version times out on larger grids.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-10-31T09:08:53.000Z"
+  },
+  {
+    "author": "Leetcode",
+    "code": "/** By Leetcode */\nvar uniquePaths = function (grid) {\n    const MOD = 1_000_000_007;\n    const m = grid.length;\n    const n = grid[0].length;\n\n    const dp = Array.from({ length: m }, () => Array.from({ length: n }, () => [0, 0]));\n    dp[0][0][0] = 1;\n\n    for (let i = 0; i < m; i++) {\n        for (let j = 0; j < n; j++) {\n            if (i > 0) {\n                if (grid[i - 1][j] === 0) {\n                    dp[i][j][0] = (dp[i - 1][j][0] + dp[i - 1][j][1]) % MOD;\n                } else {\n                    dp[i][j][0] = dp[i - 1][j][1];\n                }\n            }\n\n            if (j > 0) {\n                if (grid[i][j - 1] === 0) {\n                    dp[i][j][1] = (dp[i][j - 1][0] + dp[i][j - 1][1]) % MOD;\n                } else {\n                    dp[i][j][1] = dp[i][j - 1][0];\n                }\n            }\n        }\n    }\n\n    return (dp[m - 1][n - 1][0] + dp[m - 1][n - 1][1]) % MOD;\n};\n",
+    "language": "javascript",
+    "notes": "I knew the solution was dp, I just didn't quite figure out how to implement it.",
+    "aiExplanation": "This is the **dynamic programming** version of the same problem: instead of re-walking every path, it stores, for each cell, how many paths arrive there **from above** (`dp[i][j][0]`) and how many arrive **from the left** (`dp[i][j][1]`), with the starting cell seeded as `dp[0][0][0] = 1`. Sweeping the grid row by row, each cell pulls its counts from its two neighbours: if the cell above is a normal `0` cell, every path that reached it (from either direction) can step down, so both of its counters are added; but if the cell above is a `1` **mirror**, only paths that entered it from the left get redirected downward, so just `dp[i-1][j][1]` carries over. The symmetric rule applies to the cell on the left: a `0` neighbour contributes both counters, while a mirror neighbour only contributes the paths that came into it from above and were bounced to the right. Every addition is reduced modulo `1_000_000_007` to keep the numbers small, and the answer is the sum of both counters at the bottom-right cell. Because each cell is computed exactly once, the whole thing runs in **O(m × n)** time.",
+    "status": "DONE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-10-31T09:18:27.000Z"
+  }
+]

@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} grid\n * @param {number} k\n * @return {number}\n */\nvar countIslands = function(grid, k) {\n    const rows = grid.length;\n    const cols = grid[0].length;\n    let res = 0;\n\n    const explore = (row, col) => {\n        if (row < 0 || row >= rows || col < 0 || col >= cols || grid[row][col] === 0) {\n            return 0;\n        }\n\n        const val = grid[row][col];\n\n        grid[row][col] = 0;\n\n        return val +\n            explore(row, col + 1) +\n            explore(row + 1, col) +\n            explore(row, col - 1) +\n            explore(row - 1, col);\n    };\n\n    for (let row = 0; row < rows; row++) {\n        for (let col = 0; col < cols; col++) {\n            if (grid[row][col] !== 0) {\n                const sum = explore(row, col);\n                if (sum % k === 0) {\n                    res++;\n                }\n            }\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Another fun exploration algorithm, simple enough.",
+    "aiExplanation": "This function counts how many **islands** in a grid have a total value divisible by `k`. An island is a group of non-zero cells connected horizontally or vertically. The code scans every cell with two nested loops, and whenever it finds a non-zero cell it calls the recursive `explore` helper, which performs a **depth-first search (DFS)** from that spot: it stops when it goes out of bounds or hits a `0`, otherwise it reads the cell's value, overwrites the cell with `0` so it is never counted twice (a \"sink the island\" trick that avoids a separate visited set), and returns that value plus the results of exploring its right, down, left, and up neighbours. The returned `sum` is the total of the whole island, and if `sum % k === 0` the result counter `res` is incremented. Because every cell is visited at most once, the solution runs in **O(rows × cols)** time, and it mutates the input grid in place.",
+    "status": "DONE",
+    "cpuUsage": 57.84,
+    "memoryUsage": 68.93,
+    "date": "2026-10-26T07:45:39.000Z"
+  }
+]

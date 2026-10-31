@@ -1,0 +1,35 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} m\n * @param {number} n\n * @return {string[]}\n */\nvar createGrid = function(m, n) {\n    return Array.from({ length: m }, (_, i) => (i === 0 ? '.' : '#').repeat(n - 1) + '.');\n};\n",
+    "language": "javascript",
+    "notes": "One-line solution.",
+    "aiExplanation": "This function builds a grid of `m` rows and `n` columns, returned as an array of strings where each string is one row. It uses `Array.from({ length: m }, ...)` to create exactly `m` rows, and the callback receives the row index `i`. For the **first row** (`i === 0`) it picks the `'.'` character, and for **every other row** it picks `'#'`; that character is repeated `n - 1` times and then a single `'.'` is appended at the end. The result is a top row made entirely of dots, while all the rows below are filled with `#` except for an open `.` cell in the last column, so the whole thing is produced in **one expression** with no loops or temporary variables.",
+    "status": "DONE",
+    "cpuUsage": 77.61,
+    "memoryUsage": 76.14,
+    "date": "2026-10-27T07:50:27.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} m\n * @param {number} n\n * @return {string[]}\n */\nvar createGrid = function(m, n) {\n    const first = '.'.repeat(n);\n    const others = '#'.repeat(n - 1) + '.';\n\n    return [first].concat(Array.from({ length: m - 1 }, () => others));\n};\n",
+    "language": "javascript",
+    "notes": "Attempt at better performance.",
+    "aiExplanation": "This version prepares the two kinds of rows **up front** instead of deciding per row. The variable `first` is a string of `n` dots, which becomes the top row, and `others` is a string of `n - 1` hash marks followed by a single `.`, which is the pattern shared by every remaining row. It then creates an array containing just `first` and uses `concat` to append `m - 1` copies of `others`, generated with `Array.from({ length: m - 1 }, () => others)`. Because the row strings are built only once and then **reused by reference**, the function avoids repeating the string construction for each row, and the final array has exactly `m` rows with the open path running down the last column.",
+    "status": "DONE",
+    "cpuUsage": 77.61,
+    "memoryUsage": 80.49,
+    "date": "2026-10-27T07:57:31.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} m\n * @param {number} n\n * @return {string[]}\n */\nvar createGrid = function(m, n) {\n    const first = '.'.repeat(n);\n    const others = '#'.repeat(n - 1) + '.';\n\n    const res = Array(m);\n    res[0] = first;\n\n    for (let i = 1; i < m; i++) {\n        res[i] = others;\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Best performance achieved when going back to basics.",
+    "aiExplanation": "This solution takes the most **explicit, loop-based** approach. Like the previous version, it first builds the two row templates: `first` is `n` dots for the top row, and `others` is `n - 1` hash marks plus a trailing `.` for all the rows below. It then **preallocates** an array of length `m` with `Array(m)`, assigns `first` to index `0`, and runs a plain `for` loop from `1` to `m - 1` that stores the same `others` string in each remaining slot. Preallocating the array and filling it directly avoids the intermediate arrays that `concat` or `Array.from` would create, so this is typically the fastest of the three while producing the identical grid: an all-dots first row and `#`-filled rows with a single open cell in the last column.",
+    "status": "DONE",
+    "cpuUsage": 97.64,
+    "memoryUsage": 80.49,
+    "date": "2026-10-27T07:59:24.000Z"
+  }
+]
