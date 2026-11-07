@@ -1,0 +1,46 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} servers\n * @param {number[]} tasks\n * @return {number[]}\n */\nvar assignTasks = function(servers, tasks) {\n    const m = tasks.length;\n    const n = servers.length;\n\n    const pqBusy = new MinPriorityQueue((elem) => elem[0]);\n    const pqFree = new MinPriorityQueue((elem) => elem[2]);\n\n    const sortedServers = servers\n        .map((w, i) => [w, i])\n        .sort((a, b) => a[0] - b[0] || a[1] - b[1]);\n\n    for (let i = 0; i < sortedServers.length; i++) {\n        pqFree.enqueue([sortedServers[i][0], sortedServers[i][1], i]);\n    }\n\n    const res = [];\n    let time = 0;\n    let taskTime = 0;\n\n    while (taskTime < tasks.length) {\n        while (!pqBusy.isEmpty() && pqBusy.front()[0] <= time) {\n            pqFree.enqueue(pqBusy.dequeue()[1]);\n        }\n\n        while (!pqFree.isEmpty() && taskTime <= time) {\n            const next = pqFree.dequeue();\n            pqBusy.enqueue([time + tasks[taskTime], next]);\n            res.push(next[1]);\n            taskTime++;\n        }\n\n        if (pqFree.isEmpty()) {\n            time = pqBusy.front()[0];\n        } else {\n            time++;\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "An obvious priority queue exercise, with less than obvious flow. Mistake made by always increasing time.",
+    "aiExplanation": "This solution simulates a scheduler that hands out tasks to servers, tick by tick. It keeps two priority queues: `pqFree` holds idle servers ordered by their **rank** (the position after sorting all servers by weight and then by index, which is stored as the third element of each tuple), and `pqBusy` holds working servers ordered by the time they will finish. At every tick it first moves any server whose finish time is `<= time` back into the free queue, then, as long as there are free servers and the next task has already arrived (`taskTime <= time`), it pops the best free server, pushes it into the busy queue with a finish time of `time + tasks[taskTime]`, and records the server index in `res`. Finally it advances the clock: if no server is free it jumps straight to the earliest finish time in `pqBusy`, otherwise it just moves forward by one unit. The loop ends when every task has been assigned, and `res` holds the server chosen for each task in order.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-11-07T10:12:15.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} servers\n * @param {number[]} tasks\n * @return {number[]}\n */\nvar assignTasks = function(servers, tasks) {\n    const m = tasks.length;\n    const n = servers.length;\n\n    const pqBusy = new MinPriorityQueue((elem) => elem[0]);\n    const pqFree = new MinPriorityQueue((elem) => elem[2]);\n\n    const sortedServers = servers\n        .map((w, i) => [w, i])\n        .sort((a, b) => a[0] - b[0] || a[1] - b[1]);\n\n    for (let i = 0; i < n; i++) {\n        pqFree.enqueue([sortedServers[i][0], sortedServers[i][1], i]);\n    }\n\n    const res = [];\n    let time = 0;\n\n    for (let i = 0; i < m; i++) {\n        time = Math.max(time, i);\n\n        if (pqFree.isEmpty()) {\n            time = Math.max(time, pqBusy.front()[0]);\n        }\n\n        while (!pqBusy.isEmpty() && pqBusy.front()[0] <= time) {\n            pqFree.enqueue(pqBusy.dequeue()[1]);\n        }\n\n        const next = pqFree.dequeue();\n        pqBusy.enqueue([time + tasks[i], next]);\n        res.push(next[1]);\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Moved to a different time counting method.",
+    "aiExplanation": "This solution assigns each task in order using two priority queues: `pqFree` keeps idle servers ordered by a precomputed **rank** (servers are sorted once by weight, then by index, and that sorted position becomes the key), while `pqBusy` keeps working servers ordered by the time they become available. For task `i`, the clock is first moved to at least `i` because the i-th task only becomes available at second `i`. If there are no free servers, the clock jumps forward to the earliest finish time in `pqBusy`, so the task waits for the first server to free up. Then every server whose finish time is `<= time` is moved back into `pqFree`. The best free server is popped, pushed into `pqBusy` with a finish time of `time + tasks[i]`, and its original index is appended to `res`. Because the sort happens once up front, each queue only needs a cheap single-number comparison, and the answer is simply the list of server indices chosen for each task.",
+    "status": "DONE",
+    "cpuUsage": 16.67,
+    "memoryUsage": 8.33,
+    "date": "2026-11-07T10:18:11.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} servers\n * @param {number[]} tasks\n * @return {number[]}\n */\nvar assignTasks = function(servers, tasks) {\n    const pqBusy = new MinPriorityQueue({ compare: (a, b) => a[0] - b[0] || a[1] - b[1] });\n    const pqFree = new MinPriorityQueue({ compare: (a, b) => a[0] - b[0] || a[1] - b[1] });\n\n    for (let i = 0; i < servers.length; i++) {\n        pqFree.enqueue([servers[i], i]);\n    }\n\n    const res = [];\n    let time = 0;\n\n    for (let i = 0; i < tasks.length; i++) {\n        time = Math.max(time, i);\n\n        if (pqFree.isEmpty()) {\n            time = Math.max(time, pqBusy.front()[0]);\n        }\n\n        while (!pqBusy.isEmpty() && pqBusy.front()[0] <= time) {\n            pqFree.enqueue(pqBusy.dequeue()[1]);\n        }\n\n        const next = pqFree.dequeue();\n        pqBusy.enqueue([time + tasks[i], next]);\n        res.push(next[1]);\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Attempted to simplify pre-processing by moving to comparator-based priority queues, performance effect was terrible.",
+    "aiExplanation": "This solution processes tasks one by one with two priority queues that use a custom comparator. `pqFree` stores idle servers as `[weight, index]` pairs and orders them by **lowest weight first, then lowest index**, which is exactly the tie-breaking rule the problem requires. `pqBusy` stores `[finishTime, server]` pairs ordered by finish time, so its front is always the server that frees up soonest. For each task `i`, the clock is raised to at least `i` since that task only arrives at second `i`; if no server is free, the clock jumps to the earliest finish time so the task waits for the first available server. Then all servers with a finish time `<= time` are moved back into `pqFree`, where they are automatically re-ranked by weight and index. The best free server is dequeued, put back into `pqBusy` with a finish time of `time + tasks[i]`, and its index is appended to `res`, which is returned once all tasks are assigned.",
+    "status": "DONE",
+    "cpuUsage": 8.33,
+    "memoryUsage": 41.67,
+    "date": "2026-11-07T10:24:17.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} servers\n * @param {number[]} tasks\n * @return {number[]}\n */\nvar assignTasks = function(servers, tasks) {\n    const n = servers.length;\n\n    const pqBusy = new MinPriorityQueue(a => a[0]);\n    const pqFree = new MinPriorityQueue(a => a[2]);\n\n    for (let i = 0; i < n; i++) {\n        pqFree.enqueue([servers[i], i, servers[i] * n + i]);\n    }\n\n    const res = [];\n    let time = 0;\n\n    for (let i = 0; i < tasks.length; i++) {\n        time = Math.max(time, i);\n\n        if (pqFree.isEmpty()) {\n            time = Math.max(time, pqBusy.front()[0]);\n        }\n\n        while (!pqBusy.isEmpty() && pqBusy.front()[0] <= time) {\n            pqFree.enqueue(pqBusy.dequeue()[1]);\n        }\n\n        const next = pqFree.dequeue();\n        pqBusy.enqueue([time + tasks[i], next]);\n        res.push(next[1]);\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Moved back to initial priority queue setup, with a much more simplified priority calculation.",
+    "aiExplanation": "This solution assigns tasks to servers using two priority queues keyed by a single number. For idle servers in `pqFree`, each entry is `[weight, index, key]` where `key = weight * n + index`; because `index` is always less than `n`, this single number sorts servers by **weight first and index second** without needing a custom comparator. Working servers go into `pqBusy` as `[finishTime, server]`, ordered by the time they become free. For each task `i`, the clock is first moved to at least `i` since the task only arrives then; if no server is free the clock jumps to the earliest finish time in `pqBusy`. All servers whose finish time is `<= time` are then released back into `pqFree`. The best free server is dequeued, re-enqueued into `pqBusy` with a finish time of `time + tasks[i]`, and its index is pushed onto `res`, which is the final answer listing the server chosen for each task.",
+    "status": "DONE",
+    "cpuUsage": 16.67,
+    "memoryUsage": 8.33,
+    "date": "2026-11-07T10:28:17.000Z"
+  }
+]

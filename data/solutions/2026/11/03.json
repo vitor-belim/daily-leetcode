@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar minMoves = function(nums) {\n    const max = Math.max(...nums);\n    let res = 0;\n\n    for (const num of nums) {\n        res += max - num;\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Intuitive double pass.",
+    "aiExplanation": "This solves the **Minimum Moves to Equal Array Elements II** problem, where a move decrements one element by 1 and the goal is to make all elements equal. Since every move lowers exactly one element, the cheapest target is the **maximum value**: elements already at the max need no moves, and every other element needs exactly `max - num` decrements. The function first finds that maximum with `Math.max(...nums)`, then loops over the array accumulating `max - num` into `res` for each element. The final sum is the total number of moves, computed in a single pass after the initial max lookup, giving **O(n)** time and **O(1)** extra space.",
+    "status": "DONE",
+    "cpuUsage": 43.08,
+    "memoryUsage": 77.34,
+    "date": "2026-11-03T08:10:24.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar minMoves = function(nums) {\n    let max = 0;\n    let res = 0;\n\n    for (const num of nums) {\n        max = Math.max(max, num);\n        res += 100 - num;\n    }\n\n    return res - (100 - max) * nums.length;\n};\n",
+    "language": "javascript",
+    "notes": "Single pass, for performance.",
+    "aiExplanation": "This is a **single-pass** variant of the same idea: the answer is the sum of `max - num` over all elements, but we don't know `max` until the loop finishes. To avoid a second pass, the code picks a fixed value `100` (the problem guarantees `nums[i] <= 100`) and accumulates `100 - num` into `res` while simultaneously tracking the running maximum in `max`. Since `100 - num` equals `(max - num) + (100 - max)`, the accumulated total overshoots the real answer by exactly `(100 - max)` **per element**. The final line subtracts that overshoot, `(100 - max) * nums.length`, leaving the true count of moves. Note that `max` starts at `0`, which only works because the problem constrains values to be non-negative, and `100` must be at least the largest possible value for the subtraction trick to hold.",
+    "status": "DONE",
+    "cpuUsage": 94.94,
+    "memoryUsage": 10.36,
+    "date": "2026-11-03T08:13:16.000Z"
+  }
+]

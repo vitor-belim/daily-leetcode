@@ -1,0 +1,35 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar minMoves = function(nums) {\n    const min = Math.min(...nums);\n    let sum = 0;\n\n    for (const num of nums) {\n        sum += num - min;\n    }\n\n    return sum;\n};\n",
+    "language": "javascript",
+    "notes": "The \"magic\" way: incrementing everything but 1 on every turn is the same as decrementing 1 every turn, in terms of equality.",
+    "aiExplanation": "This solves the **\"minimum moves to equal array elements\"** problem, where a move increments `n - 1` elements by 1. The key insight is that raising every element except one is the same as **lowering that one element by 1**, so the problem becomes: how many single decrements does it take to bring every number down to the smallest one? The code finds the smallest value with `Math.min(...nums)`, then loops over the array adding `num - min` for each element, which is exactly the number of steps that element needs to drop to the minimum. The accumulated `sum` is the answer, computed in a single pass with constant extra memory.",
+    "status": "DONE",
+    "cpuUsage": 95.19,
+    "memoryUsage": 72.12,
+    "date": "2026-11-01T08:51:57.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar minMoves = function(nums) {\n    nums.sort((a, b) => a - b);\n\n    let acc = 0;\n\n    for (let i = 1; i < nums.length; i++) {\n        acc += (nums[i] + acc) - nums[i - 1];\n    }\n\n    return acc;\n};\n",
+    "language": "javascript",
+    "notes": "Attempt at implementing \"simulation\" approach.",
+    "aiExplanation": "This is an attempt at the **\"minimum moves to equal array elements\"** problem that sorts the array ascending and then walks it from the second element, trying to track how many moves have been made so far in `acc`. On each step it computes `(nums[i] + acc) - nums[i - 1]`, treating `acc` as the amount the current element has already been raised by earlier moves, and adds that to the running total. The flaw is that `acc` is the **grand total of all moves**, and that total is folded back into the next step and then added again, so the formula effectively becomes `acc = 2 * acc + (nums[i] - nums[i - 1])` and earlier moves get **double-counted** as the array grows. It happens to produce the right answer on tiny inputs like `[1, 2, 3]`, but on `[1, 2, 3, 4]` it returns `7` instead of the correct `6`, which is why the submission failed.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-11-01T09:00:01.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar minMoves = function(nums) {\n    nums.sort((a, b) => a - b);\n\n    const n = nums.length;\n    const dp = Array(n + 1).fill(0);\n    let sum = 0;\n\n    for (let i = 1; i < n; i++) {\n        const diff = (nums[i] + dp[i]) - nums[i - 1];\n        dp[i + 1] = diff;\n        sum += diff;\n    }\n\n    return sum;\n};\n",
+    "language": "javascript",
+    "notes": "Implemented \"simulation\" approach, horrible performance when compared to the magical first approach.",
+    "aiExplanation": "This solves the **\"minimum moves to equal array elements\"** problem by sorting the array and then simulating the moves pair by pair. It keeps a `dp` array where `dp[i]` holds the number of moves that were needed to level the previous pair, and uses it as the amount by which `nums[i]` has effectively been lifted by those earlier moves. For each index it computes `diff = (nums[i] + dp[i]) - nums[i - 1]`, the moves needed to bring `nums[i - 1]` up to the adjusted `nums[i]`, stores that into `dp[i + 1]` for the next step, and adds it to `sum`. Because each `diff` telescopes into `nums[i] - nums[0]`, the final `sum` equals the sum of every element minus the minimum, which is the correct answer, though the sort makes it **O(n log n)** and the `dp` array uses extra memory compared to the simpler single-pass approach.",
+    "status": "DONE",
+    "cpuUsage": 5.85,
+    "memoryUsage": 5.21,
+    "date": "2026-11-01T09:20:47.000Z"
+  }
+]

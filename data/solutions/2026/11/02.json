@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar minMoves2 = function(nums) {\n    nums.sort((a, b) => a - b);\n\n    const mid = nums.length & 1 ?\n        nums[(nums.length - 1) / 2] :\n        Math.floor((nums[(nums.length / 2) - 1] + nums[nums.length / 2]) / 2);\n\n    let res = 0;\n\n    for (const num of nums) {\n        res += Math.abs(num - mid);\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Straightforward.",
+    "aiExplanation": "This function finds the **minimum number of moves** needed to make every element in `nums` equal, where a move changes one element by `1`. The key insight is that the best target value is the **median** of the array, because the median minimizes the total absolute distance to all other points. The code first sorts `nums` in ascending order, then picks the median: if the length is odd (checked with the bitwise `nums.length & 1`), it takes the exact middle element `nums[(nums.length - 1) / 2]`; if the length is even, it averages the two middle elements and rounds down with `Math.floor`. Finally, it loops over every number, adds `Math.abs(num - mid)` (how far each value is from the median) to `res`, and returns that total as the answer.",
+    "status": "DONE",
+    "cpuUsage": 34.29,
+    "memoryUsage": 12.67,
+    "date": "2026-11-02T08:14:12.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar minMoves2 = function(nums) {\n    nums.sort((a, b) => a - b);\n\n    const halfLen = Math.floor(nums.length / 2);\n    const median = nums.length & 1 ?\n        nums[halfLen] :\n        Math.floor((nums[halfLen - 1] + nums[halfLen]) / 2);\n\n    let res = 0;\n\n    for (const num of nums) {\n        res += Math.abs(num - median);\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Attempt at better performance.",
+    "aiExplanation": "This function computes the **fewest moves** required to make all values in `nums` identical, where each move increments or decrements a single element by `1`. It relies on the fact that moving everything toward the **median** always gives the smallest total cost. After sorting the array in ascending order, it computes `halfLen` as the floored half of the length so the middle index only needs to be calculated once. If the array length is odd (tested with `nums.length & 1`), the median is simply `nums[halfLen]`; if it is even, the median is the floored average of the two central elements `nums[halfLen - 1]` and `nums[halfLen]`. The loop then sums `Math.abs(num - median)` for every element, which is the number of single-step moves each value needs to reach the median, and that running total `res` is returned.",
+    "status": "DONE",
+    "cpuUsage": 34.29,
+    "memoryUsage": 9.59,
+    "date": "2026-11-02T08:18:30.000Z"
+  }
+]

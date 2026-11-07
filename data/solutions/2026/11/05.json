@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} arr1\n * @param {number[]} arr2\n * @param {number} d\n * @return {number}\n */\nvar findTheDistanceValue = function(arr1, arr2, d) {\n    let count = 0;\n\n    for (let i = 0; i < arr1.length; i++) {\n        count++;\n        for (let j = 0; j < arr2.length; j++) {\n            const res = Math.abs(arr1[i] - arr2[j]);\n            if (res <= d) {\n                count--;\n                break;\n            }\n        }\n    }\n\n    return count;\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function counts how many numbers in `arr1` are \"far enough\" from every number in `arr2`, where far enough means the absolute difference is greater than `d`. It starts with `count = 0` and loops over each element of `arr1`, **optimistically incrementing `count`** right away as if the current element qualifies. It then scans through `arr2` computing `Math.abs(arr1[i] - arr2[j])`; the moment it finds any value within distance `d` (i.e. `res <= d`), it **undoes the increment with `count--`** and uses `break` to stop checking the rest of `arr2`, since one close neighbor is enough to disqualify the element. If no close value is ever found, the earlier increment stands. After all elements of `arr1` are processed, `count` holds the total number of qualifying elements and is returned.",
+    "status": "DONE",
+    "cpuUsage": 6.54,
+    "memoryUsage": 100,
+    "date": "2022-10-14T16:14:35.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} arr1\n * @param {number[]} arr2\n * @param {number} d\n * @return {number}\n */\nvar findTheDistanceValue = function(arr1, arr2, d) {\n    let res = 0;\n\n    outer: for (let i = 0; i < arr1.length; i++) {\n        for (let j = 0; j < arr2.length; j++) {\n            if (Math.abs(arr1[i] - arr2[j]) <= d) continue outer;\n        }\n\n        res++;\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Easy exercise, interesting to see code difference in 4 years.",
+    "aiExplanation": "This function counts how many elements of `arr1` have no element in `arr2` within an absolute distance of `d`. It keeps a running total in `res` and uses a **labeled loop** (`outer:`) over `arr1` so that the inner loop over `arr2` can jump straight to the next `arr1` element. For each pair it checks `Math.abs(arr1[i] - arr2[j]) <= d`; if that is true, the current `arr1` element is disqualified, and `continue outer` **skips the rest of `arr2` and the `res++` line** in one step. Only when the inner loop finishes without finding any close value does execution reach `res++`, counting that element as valid. Once every element of `arr1` has been examined, the function returns `res`, the final count of elements that are at least `d + 1` away from everything in `arr2`.",
+    "status": "DONE",
+    "cpuUsage": 96.81,
+    "memoryUsage": 80.87,
+    "date": "2026-11-05T08:00:41.000Z"
+  }
+]
