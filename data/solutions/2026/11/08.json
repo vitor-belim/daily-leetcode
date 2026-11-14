@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} grid\n * @return {number}\n */\nvar countServers = function(grid) {\n    const m = grid.length;\n    const n = grid[0].length;\n\n    const rows = Array(m).fill(0);\n    const cols = Array(n).fill(0);\n\n    for (let i = 0; i < m; i++) {\n        for (let j = 0; j < n; j++) {\n            if (grid[i][j] === 1) {\n                rows[i]++;\n                cols[j]++;\n            }\n        }\n    }\n\n    let count = 0;\n\n    for (let i = 0; i < m; i++) {\n        for (let j = 0; j < n; j++) {\n            if (grid[i][j] === 1 && (rows[i] > 1 || cols[j] > 1)) {\n                count++;\n            }\n        }\n    }\n\n    return count;\n};",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function counts how many servers in a grid can **communicate** with at least one other server, where a server (a cell equal to `1`) can talk to any other server sharing its row or column. It first makes two tally arrays, `rows` and `cols`, and does one pass over the grid so that `rows[i]` holds how many servers sit in row `i` and `cols[j]` holds how many sit in column `j`. Then it does a second pass: for every cell that is a server, it checks whether its row **or** its column contains more than one server (`rows[i] > 1 || cols[j] > 1`); if so, that server is not isolated and `count` goes up by one. The final `count` is returned. Because each pass touches every cell once, the whole thing runs in **O(m × n)** time with **O(m + n)** extra space for the two tally arrays.",
+    "status": "DONE",
+    "cpuUsage": 41.29,
+    "memoryUsage": 100,
+    "date": "2025-01-23T09:17:06.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} grid\n * @return {number}\n */\nvar countServers = function(grid) {\n    const m = grid.length;\n    const n = grid[0].length;\n\n    const rows = Array(m).fill(0);\n    const cols = Array(n).fill(0);\n\n    for (let i = 0; i < m; i++) {\n        for (let j = 0; j < n; j++) {\n            if (grid[i][j] === 1) {\n                rows[i]++;\n                cols[j]++;\n            }\n        }\n    }\n\n    let res = 0;\n\n    for (let i = 0; i < m; i++) {\n        for (let j = 0; j < n; j++) {\n            if (grid[i][j] === 1 && (rows[i] > 1 || cols[j] > 1)) {\n                res++;\n            }\n        }\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "It's so funny to me how I achieved almost exactly the same code as almost 2 years ago.",
+    "aiExplanation": "The function `countServers` figures out how many servers (cells holding a `1`) in a 2D `grid` are **connected** to at least one other server, where two servers are connected if they share a row or a column. It starts by building two counters, `rows` (one slot per row) and `cols` (one slot per column), and walks the grid once, bumping `rows[i]` and `cols[j]` each time it finds a server. On a second walk it looks at every server again and asks: does my row have more than one server, **or** does my column? If either is true (`rows[i] > 1 || cols[j] > 1`), the server can communicate, so `res` is incremented. The function returns `res`, the total number of communicating servers. Both passes visit each cell exactly once, giving **O(m × n)** time, and the two counter arrays use only **O(m + n)** extra memory.",
+    "status": "DONE",
+    "cpuUsage": 81.69,
+    "memoryUsage": 47.84,
+    "date": "2026-11-08T08:52:02.000Z"
+  }
+]

@@ -1,0 +1,35 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} cost1\n * @param {number} cost2\n * @param {number} costBoth\n * @param {number} need1\n * @param {number} need2\n * @return {number}\n */\nvar minimumCost = function(cost1, cost2, costBoth, need1, need2) {\n    const totalIndividual = cost1 * need1 + cost2 * need2;\n\n    const totalBoth = costBoth * Math.max(need1, need2);\n\n    const totalSplit = costBoth * Math.min(need1, need2) + (\n        need1 < need2 ? (need2 - need1) * cost2 : (need1 - need2) * cost1\n    );\n\n    return Math.min(\n        totalIndividual,\n        totalBoth,\n        totalSplit,\n    );\n};\n",
+    "language": "javascript",
+    "notes": "Interesting math problem. Solution by intuition.",
+    "aiExplanation": "This function finds the cheapest way to buy `need1` units of item 1 and `need2` units of item 2, when you can buy each item separately (`cost1`, `cost2`) or buy one of each together as a bundle (`costBoth`). It computes **three candidate strategies** and returns the smallest: `totalIndividual` buys everything separately with no bundles; `totalBoth` buys only bundles, enough to cover the larger need (`Math.max(need1, need2)`), accepting that you end up with extra units of the other item; and `totalSplit` buys bundles only up to the smaller need (`Math.min(need1, need2)`) and then tops up the remaining difference of the more-needed item at its individual price. Since the bundle price is constant, the optimal answer always lies at one of these three extremes, so `Math.min` over them gives the minimum cost.",
+    "status": "DONE",
+    "cpuUsage": 54.05,
+    "memoryUsage": 70.45,
+    "date": "2026-11-11T08:57:07.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} cost1\n * @param {number} cost2\n * @param {number} costBoth\n * @param {number} need1\n * @param {number} need2\n * @return {number}\n */\nvar minimumCost = function(cost1, cost2, costBoth, need1, need2) {\n    const totalIndividual = cost1 * need1 + cost2 * need2;\n\n    if (cost1 + cost2 < costBoth) {\n        return totalIndividual;\n    }\n\n    let minNeed, maxNeed, added;\n\n    if (need1 < need2) {\n        minNeed = need1;\n        maxNeed = need2;\n        added = (need2 - need1) * cost2;\n    } else {\n        minNeed = need2;\n        maxNeed = need1;\n        added = (need1 - need2) * cost1;\n    }\n\n    return Math.min(costBoth * maxNeed, costBoth * minNeed + added);\n};\n",
+    "language": "javascript",
+    "notes": "Attempt at better performance by reducing operations while keeping code reusable.",
+    "aiExplanation": "This version solves the same bundle-buying problem but adds an **early exit**: if buying one of each item separately (`cost1 + cost2`) is already cheaper than the bundle (`costBoth`), the bundle is never worth it, so it immediately returns `totalIndividual`. Otherwise the bundle is at least as good as separate purchases, so the answer involves buying bundles up to at least the smaller need. The code figures out which item is needed less (`minNeed`) and which more (`maxNeed`), and computes `added` as the cost of covering the gap between them by buying the more-needed item on its own. It then returns the smaller of two options: buy `maxNeed` bundles and accept surplus of the other item, or buy only `minNeed` bundles and pay `added` to fill the difference individually.",
+    "status": "DONE",
+    "cpuUsage": 54.05,
+    "memoryUsage": 91.9,
+    "date": "2026-11-11T09:24:38.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} cost1\n * @param {number} cost2\n * @param {number} costBoth\n * @param {number} need1\n * @param {number} need2\n * @return {number}\n */\nvar minimumCost = function(cost1, cost2, costBoth, need1, need2) {\n    if (cost1 + cost2 < costBoth) {\n        return cost1 * need1 + cost2 * need2;\n    }\n    if (need1 < need2) {\n        return Math.min(costBoth * need2, costBoth * need1 + (need2 - need1) * cost2);\n    }\n    return Math.min(costBoth * need1, costBoth * need2 + (need1 - need2) * cost1);\n};\n",
+    "language": "javascript",
+    "notes": "Straightforward solution using 3 1-line return paths. No reuse, much better performance.",
+    "aiExplanation": "This is the most compact form of the solution, with the same logic expressed as **three direct returns**. First, if a bundle (`costBoth`) costs more than buying one of each separately (`cost1 + cost2`), bundles never help, so it returns the plain individual total `cost1 * need1 + cost2 * need2`. Otherwise bundles are worth using, and the only question is how many: if item 1 is needed less (`need1 < need2`), it compares buying `need2` bundles (covering everything with surplus of item 1) against buying `need1` bundles plus the leftover `(need2 - need1)` units of item 2 at `cost2`. The final return handles the mirrored case where item 2 is needed less or they are equal, comparing `need1` bundles against `need2` bundles plus the remaining item 1 units at `cost1`. In each branch `Math.min` picks the cheaper of the two.",
+    "status": "DONE",
+    "cpuUsage": 98.11,
+    "memoryUsage": 19.45,
+    "date": "2026-11-11T09:33:32.000Z"
+  }
+]

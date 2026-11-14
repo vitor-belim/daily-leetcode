@@ -1,0 +1,35 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} l\n * @param {number} r\n * @return {number}\n */\nvar minimumSumSubarray = function(nums, l, r) {\n    const n = nums.length;\n    let min = Infinity;\n\n    for (let i = l; i <= r; i++) {\n        for (let j = 0; j < n; j++) {\n            let sum = 0;\n\n            for (let k = j; k < n; k++) {\n                sum += nums[k];\n\n                if (k - j + 1 < i) continue;\n\n                if (k - j + 1 > i) {\n                    sum -= nums[k - i];\n                }\n\n                if (sum > 0) {\n                    min = Math.min(min, sum);\n                }\n            }\n        }\n    }\n\n    return min < Infinity ? min : -1;\n};\n",
+    "language": "javascript",
+    "notes": "Leet-inflation: the more problems we create, the harder they get. This would be a nightmare for many junior developers.",
+    "aiExplanation": "This function looks for the **smallest positive sum** of any contiguous slice of `nums` whose length is between `l` and `r`. The outer loop fixes a target window length `i` (every value from `l` to `r`), and the middle loop picks a starting index `j`. The inner loop then walks forward from `j`, adding each element to a running `sum`; while the window is still shorter than `i` it just keeps growing (`continue`), and once it has become longer than `i` it subtracts the element that fell off the back (`nums[k - i]`) so `sum` always covers exactly `i` elements. Whenever that window sum is **greater than zero**, it is compared against `min` with `Math.min`. After trying every length and start, the function returns `min`, or `-1` if no positive-sum subarray was ever found (meaning `min` is still `Infinity`). Because the sliding step is repeated for every starting index, the middle and inner loops together do redundant work, making this a brute-force approach.",
+    "status": "DONE",
+    "cpuUsage": 6.12,
+    "memoryUsage": 6.12,
+    "date": "2026-11-14T09:45:01.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} l\n * @param {number} r\n * @return {number}\n */\nvar minimumSumSubarray = function(nums, l, r) {\n    const n = nums.length;\n    let min = Infinity;\n\n    for (let j = 0; j < n; j++) {\n        let sum = 0;\n\n        for (let k = j; k < n; k++) {\n            sum += nums[k];\n\n            if (sum > 0) {\n                const len = k - j + 1;\n\n                if (len >= l && len <= r) {\n                    min = Math.min(min, sum);\n                }\n            }\n        }\n    }\n\n    return min < Infinity ? min : -1;\n};\n",
+    "language": "javascript",
+    "notes": "Simplified my approach because performance was not where I wanted it to be at.",
+    "aiExplanation": "This version finds the **smallest positive sum** among all contiguous subarrays of `nums` whose length falls between `l` and `r`, using a simpler two-loop scan. The outer loop picks a starting index `j`, and the inner loop extends the subarray one element at a time toward the end, keeping a running `sum` as it goes. Each time the running total is **positive**, it computes the current length as `k - j + 1` and, if that length is within the allowed range `[l, r]`, updates `min` with `Math.min`. Because every start and every end are tried exactly once, each subarray is examined a single time, which removes the redundant sliding work of the earlier approach. At the end it returns `min`, or `-1` if `min` is still `Infinity` because no valid positive-sum subarray exists.",
+    "status": "DONE",
+    "cpuUsage": 53.06,
+    "memoryUsage": 6.12,
+    "date": "2026-11-14T09:47:44.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @param {number} l\n * @param {number} r\n * @return {number}\n */\nvar minimumSumSubarray = function(nums, l, r) {\n    const n = nums.length;\n    let res = Infinity;\n    const iLen = n - l + 1;\n\n    for (let i = 0; i < iLen; i++) {\n        const jLen = Math.min(i + r, n);\n        let sum = 0;\n\n        for (let j = i; j < jLen; j++) {\n            sum += nums[j];\n\n            if (sum > 0) {\n                const len = j - i + 1;\n\n                if (len >= l && len <= r) {\n                    res = Math.min(res, sum);\n                }\n            }\n        }\n    }\n\n    return res < Infinity ? res : -1;\n};\n",
+    "language": "javascript",
+    "notes": "Refactored code for readability. Even then, it looks way too complicated to be an easy.",
+    "aiExplanation": "This is a tightened version of the two-loop scan that finds the **smallest positive sum** of a contiguous subarray of `nums` with length between `l` and `r`. It still picks a start index `i` in the outer loop and grows the subarray in the inner loop while accumulating `sum`, but it **prunes the search bounds** up front: the outer loop stops at `iLen = n - l + 1`, since any start beyond that cannot produce a subarray of at least `l` elements, and the inner loop stops at `jLen = Math.min(i + r, n)`, so it never extends past the maximum allowed length `r`. Inside, whenever `sum` is positive and the current length `j - i + 1` sits within `[l, r]`, the result `res` is updated with `Math.min`. Finally it returns `res`, or `-1` if it is still `Infinity`, meaning no qualifying positive-sum subarray was found. The pruning avoids pointless iterations without changing the answer.",
+    "status": "DONE",
+    "cpuUsage": 53.06,
+    "memoryUsage": 6.12,
+    "date": "2026-11-14T10:04:33.000Z"
+  }
+]

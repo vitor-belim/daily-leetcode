@@ -1,0 +1,46 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @param {number[]} costs\n * @return {number}\n */\nvar climbStairs = function(n, costs) {\n    const dp = Array(n + 1).fill(Infinity);\n\n    const climb = (pos, cost) => {\n        if (pos > n) return Infinity;\n        if (pos === n) return cost;\n        if (dp[pos] < Infinity && dp[pos] <= cost) return dp[pos];\n\n        const min = Math.min(\n            climb(pos + 3, cost + (costs[pos + 2] ?? Infinity) + 9),\n            climb(pos + 2, cost + (costs[pos + 1] ?? Infinity) + 4),\n            climb(pos + 1, cost + costs[pos] + 1),\n        );\n\n        dp[pos] = min;\n        return dp[pos];\n    };\n\n    return climb(0, 0);\n};\n",
+    "language": "javascript",
+    "notes": "Attempt using recursion with memoization, 492 / 1005 testcases passed.",
+    "aiExplanation": "This is a **top-down recursive** attempt at the staircase problem: starting at step `0` with a running `cost`, the helper `climb` tries jumping ahead by **1, 2, or 3 steps**, adding the landing step's cost from `costs` plus a jump penalty of `1`, `4`, or `9` (the square of the jump size), and takes the minimum of the three branches. Reaching exactly step `n` returns the accumulated cost, while overshooting returns `Infinity` so that path is discarded. A `dp` array is meant to memoize results, but it stores the *total* cost of a full path rather than the cost *from that position onward*, so the cache rarely helps and the recursion explores nearly every combination of jumps, which is why this version timed out (**TLE**).",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-11-10T08:09:08.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @param {number[]} costs\n * @return {number}\n */\nvar climbStairs = function(n, costs) {\n    const dp = Array(n + 1).fill(Infinity);\n    dp[n] = 0;\n\n    for (let i = n; i >= 1; i--) {\n        dp[i - 1] = Math.min(dp[i - 1], dp[i] + costs[i - 1] + 1);\n        if (i >= 2) dp[i - 2] = Math.min(dp[i - 2], dp[i] + costs[i - 1] + 4);\n        if (i >= 3) dp[i - 3] = Math.min(dp[i - 3], dp[i] + costs[i - 1] + 9);\n    }\n\n    return dp[0];\n};\n",
+    "language": "javascript",
+    "notes": "Full dp solution.",
+    "aiExplanation": "This is a **bottom-up dynamic programming** solution where `dp[i]` holds the cheapest cost to get from step `i` to the top (`n`), so `dp[n]` starts at `0` and everything else at `Infinity`. The loop walks **backwards** from `n` to `1`: for each step `i`, it relaxes the three steps that could jump onto it, updating `dp[i - 1]`, `dp[i - 2]`, and `dp[i - 3]` with the cost of landing on step `i` (`costs[i - 1]`) plus the squared jump penalty (`1`, `4`, or `9`), keeping whichever is smaller. Because every step is processed once with constant work, the answer at `dp[0]` is found in **O(n)** time with no recursion.",
+    "status": "DONE",
+    "cpuUsage": 61.42,
+    "memoryUsage": 71.69,
+    "date": "2026-11-10T08:15:23.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @param {number[]} costs\n * @return {number}\n */\nvar climbStairs = function(n, costs) {\n    const dp = Array(n + 1).fill(Infinity);\n    dp[n] = 0;\n\n    for (let i = n; i >= 1; i--) {\n        dp[i] += costs[i - 1];\n\n        dp[i - 1] = Math.min(dp[i - 1], dp[i] + 1);\n        if (i >= 2) dp[i - 2] = Math.min(dp[i - 2], dp[i] + 4);\n        if (i >= 3) dp[i - 3] = Math.min(dp[i - 3], dp[i] + 9);\n    }\n\n    return dp[0];\n};\n",
+    "language": "javascript",
+    "notes": "Attempt at better performance #1.",
+    "aiExplanation": "This is a small refinement of the bottom-up DP: `dp[i]` again means the cheapest cost from step `i` to the top, but now the landing cost `costs[i - 1]` is **folded into `dp[i]` once** at the start of each iteration instead of being added three separate times. After that, the three predecessor steps `dp[i - 1]`, `dp[i - 2]`, and `dp[i - 3]` are relaxed with just the jump penalties `1`, `4`, and `9`. Walking from `n` down to `1` fills the table in **O(n)** time, and `dp[0]` is the final answer.",
+    "status": "DONE",
+    "cpuUsage": 70.59,
+    "memoryUsage": 70.59,
+    "date": "2026-11-10T08:16:34.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @param {number[]} costs\n * @return {number}\n */\nvar climbStairs = function(n, costs) {\n    const dp = Array(n + 1).fill(Infinity);\n    dp[n] = 0;\n\n    for (let i = n; i >= 3; i--) {\n        dp[i] += costs[i - 1];\n\n        dp[i - 1] = Math.min(dp[i - 1], dp[i] + 1);\n        dp[i - 2] = Math.min(dp[i - 2], dp[i] + 4);\n        dp[i - 3] = Math.min(dp[i - 3], dp[i] + 9);\n    }\n\n    if (n >= 2) {\n        dp[2] += costs[1];\n        dp[1] = Math.min(dp[1], dp[2] + 1);\n        dp[0] = Math.min(dp[0], dp[2] + 4);\n    }\n\n    if (n >= 1) dp[0] = Math.min(dp[0], dp[1] + costs[0] + 1);\n\n    return dp[0];\n};\n",
+    "language": "javascript",
+    "notes": "Attempt at better performance #2.",
+    "aiExplanation": "This version keeps the same **backwards DP** idea but **unrolls the boundary cases** to remove the `if (i >= 2)` and `if (i >= 3)` checks from the hot loop: the main loop only runs while `i >= 3`, where all three jumps back (`-1`, `-2`, `-3`) are guaranteed to be in range, so it can update `dp[i - 1]`, `dp[i - 2]`, and `dp[i - 3]` unconditionally after adding `costs[i - 1]` to `dp[i]`. The remaining steps `2` and `1` are then handled explicitly: step `2` can reach back to steps `1` and `0`, and step `1` can only reach step `0`, each guarded by a check that the staircase is actually that tall. The result is the same **O(n)** answer in `dp[0]` with slightly fewer branches per iteration.",
+    "status": "DONE",
+    "cpuUsage": 61.42,
+    "memoryUsage": 69.79,
+    "date": "2026-11-10T08:46:38.000Z"
+  }
+]

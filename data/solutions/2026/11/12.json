@@ -1,0 +1,46 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar longestMonotonicSubarray = function(nums) {\n    let dir = '';\n    let count = 1;\n    let max = 1;\n\n    for (let i = 1; i < nums.length; i++) {\n        if (nums[i - 1] < nums[i]) {\n            if (dir === 'asc') {\n                count++;\n            } else {\n                count = 2;\n            }\n            dir = 'asc';\n        } else if (nums[i - 1] > nums[i]) {\n            if (dir === 'desc') {\n                count++;\n            } else {\n                count = 2;\n            }\n            dir = 'desc';\n        } else {\n            count = 1;\n            dir = '';\n        }\n\n        max = Math.max(max, count);\n    }\n\n    return max;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function finds the length of the longest stretch of an array that is either strictly increasing or strictly decreasing. It walks through `nums` once, comparing each element to the one before it, and keeps three pieces of state: `dir` (the current direction, `'asc'`, `'desc'`, or empty), `count` (the length of the current run), and `max` (the best run seen so far). When the current pair is **increasing**, it extends the run if the direction was already `'asc'`, otherwise it starts a fresh run of length **2** (the two elements being compared) and switches the direction; the **decreasing** case mirrors this with `'desc'`. If two neighbours are **equal**, the run is broken, so `count` resets to **1** and the direction is cleared. After every step `max` is updated with `Math.max`, and since a single element always counts as a monotonic subarray, both `count` and `max` start at **1**. The result is a simple **O(n)** time, **O(1)** space solution.",
+    "status": "DONE",
+    "cpuUsage": 91.5,
+    "memoryUsage": 100,
+    "date": "2025-02-03T08:47:17.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar longestMonotonicSubarray = function(nums) {\n    let count = 1;\n    let max = 1;\n\n    for (let i = 1; i < nums.length; i++) {\n        if (nums[i - 1] < nums[i]) {\n            if (count > 0) {\n                count++;\n            } else {\n                count = 2;\n            }\n        } else if (nums[i - 1] > nums[i]) {\n            if (count < 0) {\n                count--;\n            } else {\n                count = -2;\n            }\n        } else {\n            count = 0;\n        }\n\n        max = Math.max(max, Math.abs(count));\n    }\n\n    return max;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This version solves the same problem with a clever trick: instead of tracking the direction in a separate variable, it encodes it in the **sign** of `count`. A **positive** `count` means the current run is increasing and a **negative** one means it is decreasing, while `0` means the run was just broken by two equal neighbours. Scanning the array from the second element, if `nums[i - 1] < nums[i]` the code increments `count` when it is already positive (extending an increasing run) or sets it to **2** to start a new one; if `nums[i - 1] > nums[i]` it decrements `count` when already negative or sets it to **-2** to start a new decreasing run. After each step, `max` is updated with `Math.abs(count)` so the sign is stripped and only the run length matters. Both `count` and `max` begin at **1** because any single element is trivially monotonic, and the function returns `max` after a single **O(n)** pass using constant extra space.",
+    "status": "DONE",
+    "cpuUsage": 91.5,
+    "memoryUsage": 100,
+    "date": "2025-02-03T08:49:27.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar longestMonotonicSubarray = function(nums) {\n    let count = 0;\n    let max = 0;\n    let dir = '';\n\n    for (let i = 1; i < nums.length; i++) {\n        if (nums[i - 1] === nums[i]) {\n            count = 0;\n            dir = '';\n            continue;\n        }\n\n        if (nums[i - 1] < nums[i]) {\n            if (dir === 'up') {\n                count++;\n            } else {\n                count = 1;\n                dir = 'up';\n            }\n        } else {\n            if (dir === 'down') {\n                count++;\n            } else {\n                count = 1;\n                dir = 'down';\n            }\n        }\n\n        max = Math.max(max, count);\n    }\n\n    return max + 1;\n};\n",
+    "language": "javascript",
+    "notes": "Interesting puzzle, intuition solution.",
+    "aiExplanation": "This solution counts **steps** between neighbouring elements rather than elements themselves, which is why it starts `count` and `max` at **0** and returns `max + 1` at the end (a run of `k` consecutive rising or falling steps spans `k + 1` elements, and an array with no steps still has one element). Looping from index 1, it first checks whether the two neighbours are **equal**; if so the run is broken, `count` and `dir` are reset, and `continue` skips straight to the next iteration. Otherwise it determines whether the pair goes `'up'` or `'down'`: if that matches the current `dir`, the run continues and `count` grows by one, but if the direction changed, a new run starts with `count = 1` and `dir` is updated. After each non-equal pair, `max` is refreshed with `Math.max(max, count)`. The approach is a single **O(n)** pass with **O(1)** extra memory.",
+    "status": "DONE",
+    "cpuUsage": 91.5,
+    "memoryUsage": 20.04,
+    "date": "2026-11-12T07:50:48.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar longestMonotonicSubarray = function(nums) {\n    let up = 0;\n    let down = 0;\n    let max = 0;\n\n    for (let i = 1; i < nums.length; i++) {\n        if (nums[i - 1] === nums[i]) {\n            up = 0;\n            down = 0;\n        } else if (nums[i - 1] < nums[i]) {\n            down = 0;\n            up++;\n            max = Math.max(max, up);\n        } else {\n            up = 0;\n            down++;\n            max = Math.max(max, down);\n        }\n    }\n\n    return max + 1;\n};\n",
+    "language": "javascript",
+    "notes": "Simplified code approach.",
+    "aiExplanation": "This is the most compact version of the idea: it keeps two independent counters, `up` and `down`, that track how many consecutive **rising** and **falling** steps are currently in progress. For every adjacent pair, if the values are **equal** both counters reset to **0** because neither kind of run can continue through a plateau. If the pair is **increasing**, the `down` run is killed by setting it to **0**, `up` is incremented, and `max` is updated with the new `up` value; the **decreasing** case does the opposite, resetting `up` and bumping `down`. Because only one of the two counters can be non-zero at any time, there is no need for a separate direction variable. Like the previous solution, the counters measure steps rather than elements, so the function returns `max + 1` to convert the longest number of steps into the length of the subarray (and to return **1** for a single-element or all-equal array). It runs in **O(n)** time with **O(1)** space.",
+    "status": "DONE",
+    "cpuUsage": 91.5,
+    "memoryUsage": 33.2,
+    "date": "2026-11-12T07:53:34.000Z"
+  }
+]
