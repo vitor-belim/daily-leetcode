@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} parent\n * @param {string} s\n * @return {number[]}\n */\nvar findSubtreeSizes = function(parent, s) {\n    const n = parent.length;\n    const newParent = parent.slice();\n\n    for (let i = 1; i < n; i++) {\n        let p = parent[i];\n\n        while (s[i] !== s[p] && p !== -1) {\n            p = parent[p];\n        }\n\n        if (p !== -1) {\n            newParent[i] = p;\n        }\n    }\n\n    const graph = Array.from({ length: n }, () => []);\n\n    for (let i = 1; i < n; i++) {\n        graph[newParent[i]].push(i);\n    }\n\n    const dp = Array(n).fill(1);\n\n    const explore = (node) => {\n        for (const con of graph[node]) {\n            dp[node] += explore(con);\n        }\n\n        return dp[node];\n    };\n\n    explore(0);\n\n    return dp;\n};\n",
+    "language": "javascript",
+    "notes": "Expected TLE.",
+    "aiExplanation": "This solution first **rewires the tree** and then **counts subtree sizes**. For every node `i` (except the root), it walks up the original `parent` chain until it finds an ancestor `p` whose character `s[p]` matches `s[i]`; if such an ancestor exists, `newParent[i]` is set to that ancestor, otherwise the original parent is kept. It then builds an adjacency list `graph` from `newParent`, initializes `dp` with `1` for every node (each node counts itself), and runs a recursive `explore` DFS from the root that adds each child's subtree size into its parent's `dp` entry before returning it. The returned `dp` array holds the subtree size of every node in the modified tree. The drawback is the ancestor search: in a deep chain-like tree with few matching characters, each node may climb almost all the way to the root, making the first phase **O(n²)** in the worst case, which is why it times out.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-11-21T09:52:40.000Z"
+  },
+  {
+    "author": "Vitor + ChatGPT",
+    "code": "/**\n * @param {number[]} parent\n * @param {string} s\n * @return {number[]}\n */\nvar findSubtreeSizes = function(parent, s) {\n    const n = parent.length;\n    const graph = Array.from({ length: n }, () => []);\n\n    for (let i = 1; i < n; i++) {\n        graph[parent[i]].push(i);\n    }\n\n    const last = new Int32Array(26).fill(-1);\n    const res = Array(n).fill(1);\n\n    const dfs = (node) => {\n        const char = s.charCodeAt(node) - 97;\n        const prev = last[char];\n        const p = prev === -1 ? parent[node] : prev;\n\n        last[char] = node;\n        for (const child of graph[node]) {\n            dfs(child);\n        }\n        last[char] = prev;\n\n        if (p !== -1) {\n            res[p] += res[node];\n        }\n    };\n\n    dfs(0);\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Rewiring while traversing: great for performance, so much more complicated to fully grasp.",
+    "aiExplanation": "This solution finds the closest matching ancestor for every node **during a single DFS** instead of climbing the tree repeatedly. It builds a child adjacency list `graph` from the original `parent` array and keeps a 26-slot `last` array (one per lowercase letter) that records the **nearest ancestor on the current DFS path** having that character, or `-1` if none. When visiting a node, it reads `prev = last[char]` to learn its new parent `p` (falling back to the original `parent[node]` when there is no matching ancestor), temporarily sets `last[char] = node` so descendants see it, recurses into all children, and then **restores** `last[char] = prev` so siblings are not affected. Because children finish before the parent, by the time the recursion unwinds `res[node]` already holds the full subtree size, so it is added into `res[p]` in a bottom-up manner. Every node is visited once and the ancestor lookup is constant time, giving **O(n)** overall.",
+    "status": "DONE",
+    "cpuUsage": 80,
+    "memoryUsage": 20,
+    "date": "2026-11-21T10:05:22.000Z"
+  }
+]

@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @param {number} k\n * @return {string}\n */\nvar digitSum = function(s, k) {\n    while (s.length > k) {\n        const stack = Array(Math.ceil(s.length / k)).fill(0);\n\n        for (let i = 0; i < s.length; i++) {\n            const pos = Math.floor(i / k);\n            stack[pos] += Number(s[i]);\n        }\n\n        s = stack.join('');\n    }\n\n    return s;\n};\n",
+    "language": "javascript",
+    "notes": "Interesting exercise for newcomers.",
+    "aiExplanation": "This function repeatedly shrinks a digit string `s` until its length is no more than `k`. On each pass it creates a `stack` array with one slot per group of `k` consecutive characters (using `Math.ceil(s.length / k)` so a leftover partial group still gets a slot), then walks through every character, computes which group it belongs to with `Math.floor(i / k)`, and **adds that digit's numeric value** to the matching slot. Once all digits are summed, the sums are **joined back into a single string** with `stack.join('')`, which becomes the new `s`. The `while` loop repeats this grouping-and-summing process until the string is short enough, at which point the final string is returned.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 6.34,
+    "date": "2026-11-16T09:03:53.000Z"
+  }
+]

@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Leetcode",
+    "code": "/** By Leetcode */\nvar maxSelectedElements = function (nums) {\n    nums.sort((a, b) => a - b);\n    const dp = new Map();\n    let ans = 0;\n    for (const x of nums) {\n        dp.set(x + 1, Math.max(dp.get(x + 1) ?? 0, (dp.get(x) ?? 0) + 1));\n        dp.set(x, Math.max(dp.get(x) ?? 0, (dp.get(x - 1) ?? 0) + 1));\n        ans = Math.max(ans, dp.get(x), dp.get(x + 1));\n    }\n    return ans;\n};",
+    "language": "javascript",
+    "notes": "I think I was close to getting a submission ready, but I kept coming up with unhandled edge cases. Time got the better of me, had to quit.",
+    "aiExplanation": "This solution finds the longest run of **consecutive integers** you can build when each number is allowed to stay as-is or be increased by exactly one. It first **sorts** `nums` so smaller values are processed before larger ones, then uses a `Map` called `dp` where `dp.get(v)` stores the length of the longest consecutive sequence that ends with the value `v`. For each number `x`, it considers two choices: bumping it to `x + 1`, which extends whatever sequence ended at `x` (so `dp.set(x + 1, ...)` takes the max of its current value and `dp.get(x) + 1`), or keeping it as `x`, which extends the sequence that ended at `x - 1` (so `dp.set(x, ...)` takes the max of its current value and `dp.get(x - 1) + 1`). The `?? 0` fallbacks handle values that have not been seen yet, and the `x + 1` update is done first so that the \"keep\" option does not accidentally feed into the \"increase\" option for the same element. After each step, `ans` is updated with the best length ending at either `x` or `x + 1`, and the final `ans` is returned as the maximum number of selectable elements.",
+    "status": "DONE",
+    "cpuUsage": 20,
+    "memoryUsage": 20,
+    "date": "2026-11-20T10:22:00.000Z"
+  }
+]

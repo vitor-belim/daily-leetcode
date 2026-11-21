@@ -1,0 +1,57 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar minChanges = function(s) {\n    let cur = '';\n    let count = 0;\n    let swaps = 0;\n\n    for (let i = 0; i < s.length; i++) {\n        if (!cur) {\n            cur = s[i];\n            count++;\n        } else if (cur === s[i]) {\n            count++;\n        } else {\n            swaps += count % 2;\n            cur = '';\n            count = 0;\n        }\n    }\n\n    return swaps;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This first attempt walks through the binary string `s` while tracking a **run of identical characters**: `cur` holds the character of the current run and `count` how many times it has repeated. When a different character shows up, it adds `count % 2` to `swaps` (an odd-length run means one character is left without a partner and would need changing), then clears `cur` and `count` to start over. The idea is on the right track, but it has two gaps: the character that **broke** the run is discarded instead of starting the next run, and the final run is never checked after the loop ends, so some odd leftovers go uncounted and the function returns too few changes.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2024-11-05T07:23:18.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar minChanges = function(s) {\n    let cur = '';\n    let count = 0;\n    let swaps = 0;\n\n    for (let i = 0; i < s.length; i++) {\n        if (!cur) {\n            cur = s[i];\n            count++;\n        } else if (cur === s[i]) {\n            count++;\n        } else if (count % 2 === 0) {\n            cur = s[i];\n            count = 1;\n        } else {\n            swaps++;\n            cur = '';\n            count = 0;\n        }\n    }\n\n    return swaps + (count % 2);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This version fixes the earlier attempt by tracking a **run of identical characters** (`cur` is the character, `count` its length) and deciding what to do when a different character appears. If the run so far has an **even** length, everything before can already be split into matching pairs, so the new character simply starts a fresh run with `count = 1`. If the run has an **odd** length, the last character of the run is forced to pair with this new, different character, which costs one change, so `swaps` is incremented and both `cur` and `count` are reset since that pair is now resolved. After the loop, `count % 2` is added to cover a trailing odd run, and the total number of changes is returned.",
+    "status": "DONE",
+    "cpuUsage": 97.62,
+    "memoryUsage": 100,
+    "date": "2024-11-05T07:30:19.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar minChanges = function(s) {\n    let cur = '';\n    let count = 0;\n    let swaps = 0;\n\n    for (let i = 0; i < s.length; i++) {\n        if (cur && cur !== s[i] && count % 2 === 1) {\n            cur = '';\n            swaps++;\n        } else {\n            cur = s[i];\n        }\n\n        count++;\n    }\n\n    return swaps + (count % 2);\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is a tidier rewrite of the same idea where `count` now simply counts **how many characters have been processed**, not the length of a run. Because the string is split into consecutive pairs, a character at an odd position in that count (`count % 2 === 1`) must pair with the one just before it, remembered in `cur`. If that previous character exists and is **different** from `s[i]`, the pair is mismatched, so `swaps` goes up by one and `cur` is cleared; otherwise `cur` is just updated to the current character. Every iteration increments `count`, and the final result is `swaps` plus `count % 2`, which only matters for odd-length input and is zero for the even-length strings the problem guarantees.",
+    "status": "DONE",
+    "cpuUsage": 89.15,
+    "memoryUsage": 100,
+    "date": "2024-11-05T07:37:15.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar minChanges = function(s) {\n    let cur = '';\n    let swaps = 0;\n\n    for (let i = 0; i < s.length; i++) {\n        if (cur && cur !== s[i] && i % 2 === 1) {\n            cur = '';\n            swaps++;\n        } else {\n            cur = s[i];\n        }\n    }\n\n    return swaps;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This version drops the separate counter and uses the **loop index itself** to know where each pair ends: since pairs occupy positions `(0,1)`, `(2,3)`, and so on, any odd index `i` is the second half of a pair whose first half is stored in `cur`. When `i` is odd and `cur` differs from `s[i]`, the pair has two different characters and needs exactly one change, so `swaps` is incremented and `cur` is cleared; in every other case `cur` is set to the current character so the next iteration can compare against it. The function returns `swaps`, the minimum number of single-character edits required to make every consecutive pair uniform.",
+    "status": "DONE",
+    "cpuUsage": 73.63,
+    "memoryUsage": 100,
+    "date": "2024-11-05T07:41:16.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {number}\n */\nvar minChanges = function(s) {\n    let count = 0;\n\n    for (let i = 1; i < s.length; i += 2) {\n        if (s[i] !== s[i - 1]) {\n            count++;\n        }\n    }\n\n    return count;\n};\n",
+    "language": "javascript",
+    "notes": "Interesting to see code difference after 2 years.",
+    "aiExplanation": "This is the most direct solution: the string must be split into **consecutive pairs of two characters**, and a pair is only valid if both characters are the same, so the loop starts at index `1` and jumps by `2` to land on the second character of every pair. For each pair it compares `s[i]` with `s[i - 1]`, and whenever they differ it increments `count`, because fixing a mismatched pair always takes exactly **one** change (flip either character to match the other). Since each pair is independent, the total count of mismatched pairs is the minimum number of changes, and that is what the function returns in a single pass with constant extra memory.",
+    "status": "DONE",
+    "cpuUsage": 89.15,
+    "memoryUsage": 31.83,
+    "date": "2026-11-18T08:52:08.000Z"
+  }
+]

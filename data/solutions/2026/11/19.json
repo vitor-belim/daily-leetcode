@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar minimizeSum = function(nums) {\n    nums.sort((a, b) => a - b);\n\n    const n = nums.length;\n    const diff = nums[n - 1] - nums[0];\n\n    const oneLeft = nums[1] - nums[0];\n    const twoLeft = nums[2] - nums[1] + oneLeft;\n    const oneRight = nums[n - 1] - nums[n - 2];\n    const twoRight = nums[n - 2] - nums[n - 3] + oneRight;\n\n    return diff - Math.max(\n        oneLeft + oneRight,\n        twoLeft,\n        twoRight\n    );\n};\n",
+    "language": "javascript",
+    "notes": "Interesting exercise, possible to do without sort by finding lowest and highest 3 numbers. I didn't have the time.",
+    "aiExplanation": "This function finds the **smallest possible \"score\"** of an array after you are allowed to change **exactly two elements** to any value, where the score is the gap between the largest and smallest values (the other half of the score, the gap between the two closest values, can always be made `0` by setting a changed element equal to an existing one, so it is ignored). It first sorts `nums` in ascending order so the minimum sits at `nums[0]` and the maximum at `nums[n - 1]`, giving the starting spread `diff`. Changing an element effectively lets you *remove* it from the ends of the sorted array, so the question becomes which two end elements to discard to shrink the range the most. The code measures how much range is recovered in each case: `oneLeft` is the gain from dropping the smallest value, `twoLeft` is the gain from dropping the two smallest, `oneRight` is the gain from dropping the largest, and `twoRight` is the gain from dropping the two largest. The only three sensible combinations are **one from each end** (`oneLeft + oneRight`), **two from the left** (`twoLeft`), or **two from the right** (`twoRight`), so `Math.max` picks the combination that recovers the most range. Finally it returns `diff` minus that best gain, which is the minimized remaining spread.",
+    "status": "DONE",
+    "cpuUsage": 49.54,
+    "memoryUsage": 64.53,
+    "date": "2026-11-19T09:33:29.000Z"
+  }
+]

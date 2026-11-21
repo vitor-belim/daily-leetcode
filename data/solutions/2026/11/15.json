@@ -1,0 +1,46 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} arr\n * @return {number}\n */\nvar numOfSubarrays = function(arr) {\n    const MOD = 10 ** 9 + 7;\n    let count = 0;\n    let prefixSum = 0;\n    let oddCount = 0;\n    let evenCount = 1;\n\n    for (const num of arr) {\n        prefixSum += num;\n\n        if (prefixSum % 2 === 0) {\n            count += oddCount;\n            evenCount++;\n        } else {\n            count += evenCount;\n            oddCount++;\n        }\n\n        count %= MOD;\n    }\n\n    return count;\n};\n",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This function counts how many **subarrays** of `arr` have an **odd sum**, using the trick that a subarray's sum is just the difference of two **prefix sums**, and that difference is odd only when one prefix sum is even and the other is odd. As it walks through the array it keeps a running `prefixSum` plus two tallies: `evenCount` (how many earlier prefix sums were even, starting at `1` for the empty prefix) and `oddCount` (how many were odd). Whenever the current `prefixSum` is **even**, every earlier **odd** prefix pairs with it to form an odd-sum subarray, so it adds `oddCount` to `count` and bumps `evenCount`; when it is **odd**, it adds `evenCount` and bumps `oddCount`. The running `count` is reduced modulo `10^9 + 7` each step to avoid overflow, and the final total is returned after a single **O(n)** pass.",
+    "status": "DONE",
+    "cpuUsage": 97.17,
+    "memoryUsage": 99.89,
+    "date": "2025-02-25T07:45:14.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} arr\n * @return {number}\n */\nvar numOfSubarrays = function(arr) {\n    const mod = 10 ** 9 + 7;\n    let odd = 0;\n\n    for (let i = 0; i < arr.length; i++) {\n        let sum = 0;\n\n        for (let j = i; j < arr.length; j++) {\n            sum += arr[j];\n\n            if (sum & 1) {\n                odd = (odd + 1) % mod;\n            }\n        }\n    }\n\n    return odd;\n};\n",
+    "language": "javascript",
+    "notes": "Submitted brute force while deciding whether to stick with the TLE or not.",
+    "aiExplanation": "This is the **brute-force** approach to counting subarrays with an odd sum: the outer loop picks every possible starting index `i`, and the inner loop extends the subarray one element at a time to each ending index `j`, keeping a running `sum` so each extension costs only one addition. After every extension it checks `sum & 1`, a **bitwise test** that is truthy exactly when the sum is odd, and if so increments `odd` while keeping it under `10^9 + 7` with the modulo. Because it examines all **O(n²)** start/end pairs explicitly, it is simple to reason about but far too slow for large inputs, which is why it times out on LeetCode.",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-11-15T09:57:37.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} arr\n * @return {number}\n */\nvar numOfSubarrays = function(arr) {\n    const MOD = 10 ** 9 + 7;\n    let even = 0;\n    let odd = 0;\n    let res = 0;\n\n    for (const num of arr) {\n        if (num & 1) {\n            [odd, even] = [even + 1, odd];\n        } else {\n            even++;\n        }\n        res = (res + odd) % MOD;\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Cut down to basic logic.",
+    "aiExplanation": "This solution counts odd-sum subarrays in one **O(n)** pass by tracking, for each position, how many subarrays **ending at that element** have an odd sum (`odd`) and how many have an even sum (`even`). When the current `num` is **odd** (checked with the bitwise `num & 1`), appending it flips the parity of every subarray ending at the previous element, so the old `even` subarrays become odd and the old `odd` ones become even; the `+ 1` accounts for the new single-element subarray `[num]`, which is itself odd. That flip is done in one line with **array destructuring**: `[odd, even] = [even + 1, odd]`. When `num` is **even**, parities are unchanged and only the new single-element subarray is added, so `even++`. After each step it adds the current `odd` count to `res` (modulo `10^9 + 7`), and the accumulated total is the answer.",
+    "status": "DONE",
+    "cpuUsage": 26.84,
+    "memoryUsage": 10.08,
+    "date": "2026-11-15T10:18:20.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} arr\n * @return {number}\n */\nvar numOfSubarrays = function(arr) {\n    const MOD = 10 ** 9 + 7;\n    let even = 0;\n    let odd = 0;\n    let res = 0;\n\n    for (const num of arr) {\n        if (num & 1) {\n            const temp = even;\n            even = odd;\n            odd = temp + 1;\n        } else {\n            even++;\n        }\n        res = (res + odd) % MOD;\n    }\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Improved performance.",
+    "aiExplanation": "This is the same linear-time idea as the destructuring version, but it performs the swap with an explicit **temporary variable** instead of array destructuring, which avoids allocating a throwaway array on every odd element. The variables `odd` and `even` hold how many subarrays ending at the current position have an odd or even sum. When `num` is **odd** (`num & 1`), every previous subarray's parity flips, so the code saves the old `even` in `temp`, sets `even` to the old `odd`, and sets `odd` to `temp + 1`, where the extra `1` is the new one-element subarray containing just `num`. When `num` is **even**, nothing flips and only `even` grows by one. After each element it accumulates the current `odd` count into `res` modulo `10^9 + 7`, and that running total is returned as the number of odd-sum subarrays.",
+    "status": "DONE",
+    "cpuUsage": 40.32,
+    "memoryUsage": 37.94,
+    "date": "2026-11-15T10:19:43.000Z"
+  }
+]
