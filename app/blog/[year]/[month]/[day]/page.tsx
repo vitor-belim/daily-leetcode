@@ -26,8 +26,8 @@ import { getAdjacentDates, getProblem } from "@/lib/problems-repo";
 import { blogPath } from "@/lib/routes";
 import { SITE_LOCALE, SITE_NAME } from "@/lib/site";
 import { getSolutions } from "@/lib/solutions-repo";
-import { summarizeSolutions } from "@/lib/solve-status";
-import { SolutionStatus, SolveStatus } from "@/lib/types";
+import { isOwnSolution, summarizeSolutions } from "@/lib/solve-status";
+import { type Solution, SolutionStatus, SolveStatus } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Cpu, ExternalLink, HardDrive, House } from "lucide-react";
 import type { Metadata } from "next";
@@ -37,6 +37,43 @@ import { notFound } from "next/navigation";
 export const dynamicParams = false;
 
 export const revalidate = 3600;
+
+/** Tab fill and text colors for each outcome of the author's own solutions. */
+const SOLUTION_TAB_CLASSES: Record<SolutionStatus, string> = {
+  [SolutionStatus.Done]:
+    "bg-green-100 text-green-800 data-active:bg-green-200 dark:bg-green-900/30 dark:text-green-400 dark:data-active:bg-green-900/50",
+  [SolutionStatus.TimeLimitExceeded]:
+    "bg-yellow-100 text-yellow-800 data-active:bg-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:data-active:bg-yellow-900/50",
+  [SolutionStatus.MemoryLimitExceeded]:
+    "bg-yellow-100 text-yellow-800 data-active:bg-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:data-active:bg-yellow-900/50",
+  [SolutionStatus.Failed]:
+    "bg-red-100 text-red-800 data-active:bg-red-200 dark:bg-red-900/30 dark:text-red-400 dark:data-active:bg-red-900/50",
+  [SolutionStatus.FailedConstraints]:
+    "bg-orange-100 text-orange-800 data-active:bg-orange-200 dark:bg-orange-900/30 dark:text-orange-400 dark:data-active:bg-orange-900/50",
+};
+
+/**
+ * Tab fill and text colors for an accepted solution written by someone other
+ * than the site's author, such as a LeetCode editorial copy or an AI answer.
+ */
+const SOLVED_BY_OTHERS_TAB_CLASSES =
+  "bg-sky-100 text-sky-800 data-active:bg-sky-200 dark:bg-sky-900/30 dark:text-sky-400 dark:data-active:bg-sky-900/50";
+
+/**
+ * Picks a solution tab's colors: sky blue for someone else's accepted
+ * solution, otherwise the color of the solution's outcome.
+ *
+ * @param solution The solution the tab opens.
+ * @returns The tab's color classes; undefined when the solution has no
+ *   recorded status.
+ */
+function solutionTabClasses(solution: Solution): string | undefined {
+  if (solution.status === undefined) return undefined;
+  if (!isOwnSolution(solution) && solution.status === SolutionStatus.Done) {
+    return SOLVED_BY_OTHERS_TAB_CLASSES;
+  }
+  return SOLUTION_TAB_CLASSES[solution.status];
+}
 
 /**
  * Prerenders one page per archived day at build time. The archive only
@@ -227,16 +264,7 @@ export default async function ProblemPage({
                           value={`${s.author}-${index}`}
                           className={cn(
                             "shadow-sm border rounded-md px-4 transition-all flex flex-col gap-0 h-auto",
-                            s.status === SolutionStatus.Done &&
-                              "bg-green-100 text-green-800 data-active:bg-green-200 dark:bg-green-900/30 dark:text-green-400 dark:data-active:bg-green-900/50",
-                            (s.status === SolutionStatus.TimeLimitExceeded ||
-                              s.status ===
-                                SolutionStatus.MemoryLimitExceeded) &&
-                              "bg-yellow-100 text-yellow-800 data-active:bg-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:data-active:bg-yellow-900/50",
-                            s.status === SolutionStatus.Failed &&
-                              "bg-red-100 text-red-800 data-active:bg-red-200 dark:bg-red-900/30 dark:text-red-400 dark:data-active:bg-red-900/50",
-                            s.status === SolutionStatus.FailedConstraints &&
-                              "bg-orange-100 text-orange-800 data-active:bg-orange-200 dark:bg-orange-900/30 dark:text-orange-400 dark:data-active:bg-orange-900/50",
+                            solutionTabClasses(s),
                             "data-active:ring-1 data-active:ring-primary/20 data-active:border-primary/30",
                           )}
                         >
