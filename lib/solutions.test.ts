@@ -5,9 +5,9 @@ import {
   score,
   buildSolution,
   dedupeSolutions,
-  isEditorialCode,
+  authorFromCode,
 } from "./solutions";
-import { EDITORIAL_AUTHOR } from "./solve-status";
+import { OWN_AUTHOR } from "./site";
 import type { SubmissionListItem, SubmissionDetails } from "./leetcode-api";
 
 describe("statusFromDisplay", () => {
@@ -78,44 +78,80 @@ describe("buildSolution", () => {
     expect(solution.date).toBe(new Date(1753430400 * 1000).toISOString());
   });
 
-  it("attributes code carrying a 'By Leetcode' comment to the editorial author", () => {
+  it("attributes code to whoever its 'By <name>' comment names", () => {
     const sub: SubmissionListItem = {
-      id: "124",
+      id: "125",
       statusDisplay: "Accepted",
       lang: "javascript",
       runtime: "50 ms",
       memory: "40 MB",
       timestamp: "1753430400",
-      url: "/submissions/124",
+      url: "/submissions/125",
     };
     const details: SubmissionDetails = {
-      runtimePercentile: 83.33,
-      memoryPercentile: 58.33,
-      code: "/** By Leetcode */\nvar x = 1;",
+      runtimePercentile: 88.29,
+      memoryPercentile: 58.39,
+      code: "/** By ChatGPT */\nvar x = 1;",
       timestamp: "1753430400",
       statusDisplay: "Accepted",
       lang: { name: "javascript", verboseName: "JavaScript" },
     };
 
-    expect(buildSolution(sub, details).author).toBe(EDITORIAL_AUTHOR);
+    expect(buildSolution(sub, details).author).toBe("ChatGPT");
+  });
+
+  it("falls back to the site author when the code names nobody", () => {
+    const sub: SubmissionListItem = {
+      id: "126",
+      statusDisplay: "Accepted",
+      lang: "javascript",
+      runtime: "50 ms",
+      memory: "40 MB",
+      timestamp: "1753430400",
+      url: "/submissions/126",
+    };
+    const details: SubmissionDetails = {
+      runtimePercentile: 50,
+      memoryPercentile: 50,
+      code: "var x = 1;",
+      timestamp: "1753430400",
+      statusDisplay: "Accepted",
+      lang: { name: "javascript", verboseName: "JavaScript" },
+    };
+
+    expect(buildSolution(sub, details).author).toBe(OWN_AUTHOR);
   });
 });
 
-describe("isEditorialCode", () => {
-  it("detects the marker in any common comment syntax, case-insensitively", () => {
-    expect(isEditorialCode("/** By Leetcode */\nvar x = 1;")).toBe(true);
-    expect(isEditorialCode("/* by leetcode */")).toBe(true);
-    expect(isEditorialCode("// By LeetCode\nint x = 1;")).toBe(true);
-    expect(isEditorialCode("# By Leetcode\nx = 1")).toBe(true);
-    expect(isEditorialCode("-- By Leetcode\nSELECT 1;")).toBe(true);
+describe("authorFromCode", () => {
+  it("reads the name from any common comment syntax, with 'By' in any case", () => {
+    expect(authorFromCode("/** By ChatGPT */\nvar x = 1;")).toBe("ChatGPT");
+    expect(authorFromCode("/* by Claude */")).toBe("Claude");
+    expect(authorFromCode("// By ChatGPT\nint x = 1;")).toBe("ChatGPT");
+    expect(authorFromCode("# By ChatGPT\nx = 1")).toBe("ChatGPT");
+    expect(authorFromCode("-- By ChatGPT\nSELECT 1;")).toBe("ChatGPT");
   });
 
-  it("ignores code without the marker or with it outside a comment", () => {
-    expect(isEditorialCode("var x = 1;")).toBe(false);
-    // Mentioning LeetCode in a comment is not the attribution marker.
-    expect(isEditorialCode("// see Leetcode hint")).toBe(false);
+  it("keeps the name exactly as written", () => {
+    expect(authorFromCode("/** By Leetcode */")).toBe("Leetcode");
+    expect(authorFromCode("/* by leetcode */")).toBe("leetcode");
+    expect(authorFromCode("// By LeetCode\nint x = 1;")).toBe("LeetCode");
+  });
+
+  it("finds the marker anywhere in the code, taking the first one", () => {
+    expect(
+      authorFromCode("var x = 1;\n// By ChatGPT\n// By Claude\nvar y = 2;"),
+    ).toBe("ChatGPT");
+  });
+
+  it("returns null without the marker or with it outside a comment", () => {
+    expect(authorFromCode("var x = 1;")).toBeNull();
+    // Mentioning a name in a comment is not the attribution marker.
+    expect(authorFromCode("// see Leetcode hint")).toBeNull();
     // A string literal is not a comment.
-    expect(isEditorialCode('const s = "By Leetcode";')).toBe(false);
+    expect(authorFromCode('const s = "By ChatGPT";')).toBeNull();
+    // "By" with no name after it names nobody.
+    expect(authorFromCode("// By\nvar x = 1;")).toBeNull();
   });
 });
 

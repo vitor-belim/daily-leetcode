@@ -129,9 +129,9 @@ All three take the same optional date argument, and default to today if none is 
   - `fs-errors.ts`: `isMissingFileError`, the one filesystem error the readers treat as "no data".
   - `dailies-repo.ts` (server-only): joins the two archives into the home page's per-day summaries (problem + solve status) and archive-wide stats (solved counts per difficulty, streaks). It also builds the month pages served by `app/api/dailies/[before]`.
   - `dailies-client.ts`: the browser half of "Load previous month". It fetches a month page, validates its JSON, and keeps the loaded months when you navigate back to the list.
-  - `solve-status.ts`: derives a day's `SolveStatus` from its solutions — only the author's own submissions count, editorial copies (`author: "Leetcode"`) never do — plus the streak/stat aggregation.
+  - `solve-status.ts`: derives a day's `SolveStatus` from its solutions — only the author's own submissions count (an `author` containing `"Vitor"`, e.g. `"Vitor + Claude"`); editorial copies (`author: "Leetcode"`) and AI-only solutions (`author: "ChatGPT"`) never do — plus the streak/stat aggregation.
   - `dates.ts`, `paths.ts`, `archive.ts`, `types.ts`: shared between the app and the CLI scripts. `archive.ts` also lists the days and month cursors that the static routes prerender.
-  - `routes.ts` (`blogPath`, `dailiesPath`: every challenge-page and month-page URL is built here), `site.ts` (the site URL, name, title and description used by the metadata).
+  - `routes.ts` (`blogPath`, `dailiesPath`: every challenge-page and month-page URL is built here), `site.ts` (the site URL, name, title and description used by the metadata, plus `OWN_AUTHOR`, the `author` tag that marks your own solutions).
   - `leetcode-api.ts`, `problems.ts`, `solutions.ts`: CLI-only (LeetCode API client, challenge-to-`Problem` mapping, submission-to-`Solution` mapping).
   - `utils.ts` (`cn`, pinned by `components.json`), `date-display.ts` (local-time display formatting), `markdown.ts` (server-only; markdown/LaTeX-ish → HTML), `excerpt.ts` (plain-text excerpts of problem statements for meta descriptions), `shiki-languages.ts` (maps LeetCode language names to Shiki grammars, falling back to plain text).
 

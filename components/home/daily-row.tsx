@@ -56,7 +56,6 @@ function describeProgress(daily: DailySummary): string {
     case SolveStatus.Failed:
       if (daily.attempts === 0) {
         parts.push("Not attempted");
-        if (daily.hasEditorial) parts.push("editorial available");
       } else {
         parts.push(`${attempts}, none accepted`);
       }

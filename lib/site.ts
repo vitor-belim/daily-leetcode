@@ -12,6 +12,14 @@ export const SITE_NAME = "Daily LeetCode";
 /** Author credited in the site title, metadata and footer links. */
 export const SITE_AUTHOR = "Vítor Belim";
 
+/**
+ * How `SITE_AUTHOR` is tagged in the `author` field of archived solutions.
+ * Every one of the author's own solutions contains it, including
+ * collaborative and labelled variants like "Vitor + Claude" or
+ * "Vitor (simple)", and only those count toward the solve status.
+ */
+export const OWN_AUTHOR = "Vitor";
+
 /** Full site title, used for the home page and as the default `<title>`. */
 export const SITE_TITLE = `${SITE_NAME} - by ${SITE_AUTHOR}`;
 

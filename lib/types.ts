@@ -93,8 +93,6 @@ export interface SolveSummary {
   languages: string[];
   /** Best runtime percentile among the author's accepted submissions. */
   bestRuntime: number | null;
-  /** Whether an editorial (non-author) solution is archived for the day. */
-  hasEditorial: boolean;
 }
 
 /**

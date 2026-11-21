@@ -1,22 +1,23 @@
-import { SolutionStatus, type Solution } from "./types";
-import type { SubmissionListItem, SubmissionDetails } from "./leetcode-api";
-import { EDITORIAL_AUTHOR } from "./solve-status";
+import type { SubmissionDetails, SubmissionListItem } from "./leetcode-api";
+import { OWN_AUTHOR } from "./site";
+import { type Solution, SolutionStatus } from "./types";
 
 /**
- * Matches a "By Leetcode" marker written as a comment in any common syntax
- * (C-style line or block/JSDoc comments, `#` or `--`), case-insensitively.
+ * Matches a "By <name>" comment in any common syntax (`//`, `/*`, `/**`, `#`
+ * or `--`), case-insensitively, capturing the single-word name.
  */
-const EDITORIAL_MARKER = /(?:\/\/|\/\*+|#|--)\s*By\s+Leetcode\b/i;
+const AUTHOR_MARKER = /(?:\/\/|\/\*+|#|--)\s*By (\w+)/i;
 
 /**
- * Tells whether submitted code carries the "By Leetcode" comment marking it
- * as a copy of LeetCode's editorial solution rather than the author's own.
+ * Reads the author named by a "By <name>" comment in submitted code, such as
+ * `/** By ChatGPT *\/` or `// By Leetcode`.
  *
  * @param code The submitted source code.
- * @returns True when a "By Leetcode" comment appears anywhere in the code.
+ * @returns The name exactly as written in the first "By <name>" comment
+ *   anywhere in the code, or null when the code has none.
  */
-export function isEditorialCode(code: string): boolean {
-  return EDITORIAL_MARKER.test(code);
+export function authorFromCode(code: string): string | null {
+  return AUTHOR_MARKER.exec(code)?.[1] ?? null;
 }
 
 /**
@@ -58,18 +59,16 @@ export function score(solution: Solution): number {
  * @param sub The submission list entry (source of the timestamp).
  * @param details The submission details (source of code, language, status
  *   and percentiles, rounded to two decimals).
- * @returns The solution, with empty notes/aiExplanation. The author is
- *   `EDITORIAL_AUTHOR` when the code carries a "By Leetcode" comment, and
- *   otherwise comes from `LEETCODE_USERNAME` (falling back to "Vitor").
+ * @returns The solution, with empty notes/aiExplanation. The author is the
+ *   name from a "By <name>" comment in the code (see `authorFromCode`), and
+ *   otherwise `OWN_AUTHOR`.
  */
 export function buildSolution(
   sub: SubmissionListItem,
   details: SubmissionDetails,
 ): Solution {
   return {
-    author: isEditorialCode(details.code)
-      ? EDITORIAL_AUTHOR
-      : process.env["LEETCODE_USERNAME"] || "Vitor",
+    author: authorFromCode(details.code) ?? OWN_AUTHOR,
     code: details.code,
     language: details.lang.name,
     notes: "",

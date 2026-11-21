@@ -26,10 +26,14 @@ function solution(overrides: Partial<Solution>): Solution {
 }
 
 describe("isOwnSolution", () => {
-  it("treats every non-editorial author as the site's author", () => {
+  it("counts only authors that contain the site author's name", () => {
     expect(isOwnSolution(solution({ author: "Vitor" }))).toBe(true);
     expect(isOwnSolution(solution({ author: "Vitor + Claude" }))).toBe(true);
+    expect(isOwnSolution(solution({ author: "Vitor (simple)" }))).toBe(true);
     expect(isOwnSolution(solution({ author: "Leetcode" }))).toBe(false);
+    // AI-only solutions are not the author's own work.
+    expect(isOwnSolution(solution({ author: "ChatGPT" }))).toBe(false);
+    expect(isOwnSolution(solution({ author: "Claude" }))).toBe(false);
   });
 });
 
@@ -64,7 +68,6 @@ describe("summarizeSolutions", () => {
       // The best runtime percentile is taken across accepted submissions
       // only; memory percentiles aren't summarized at all.
       bestRuntime: 85,
-      hasEditorial: false,
     });
   });
 
@@ -182,7 +185,6 @@ describe("summarizeSolutions", () => {
     expect(summary.solveStatus).toBe(SolveStatus.FunctionallyCorrect);
     expect(summary.attempts).toBe(1);
     expect(summary.bestRuntime).toBeNull();
-    expect(summary.hasEditorial).toBe(true);
   });
 
   // A time limit exceeded means the approach worked but was too slow, which
@@ -262,7 +264,6 @@ describe("summarizeSolutions", () => {
         attemptsToSolve: null,
         languages: [],
         bestRuntime: null,
-        hasEditorial: false,
       });
     }
   });
@@ -274,7 +275,18 @@ describe("summarizeSolutions", () => {
       TODAY,
     );
     expect(summary.solveStatus).toBe(SolveStatus.Failed);
-    expect(summary.hasEditorial).toBe(true);
+  });
+
+  // An accepted AI-only solution is not the author's own, so it neither
+  // solves the day nor counts as an attempt.
+  it("counts an AI-only past day as failed", () => {
+    const summary = summarizeSolutions(
+      [solution({ author: "ChatGPT", status: SolutionStatus.Done })],
+      "2026-07-20",
+      TODAY,
+    );
+    expect(summary.solveStatus).toBe(SolveStatus.Failed);
+    expect(summary.attempts).toBe(0);
   });
 });
 
@@ -406,7 +418,9 @@ describe("computeArchiveStats", () => {
 
     expect(stats).toEqual({
       totalDays: 5,
-      solved: 2,
+      // The two solved days plus the functionally correct one, which the
+      // home stats show as a subset of the solved total.
+      solved: 3,
       functionallyCorrect: 1,
       failed: 1,
       pending: 1,

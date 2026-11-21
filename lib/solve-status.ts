@@ -1,4 +1,5 @@
 import { formatDateUTC, isPastDateUTC, shiftDateUTC, todayUTC } from "./dates";
+import { OWN_AUTHOR } from "./site";
 import {
   type ArchiveStats,
   Difficulty,
@@ -10,21 +11,17 @@ import {
 } from "./types";
 
 /**
- * The `author` value used for solutions copied from LeetCode's editorial
- * rather than written by the site's author.
- */
-export const EDITORIAL_AUTHOR = "Leetcode";
-
-/**
- * Tells whether a solution was submitted by the site's author. Every author
- * other than the editorial one counts, including collaborative variants like
- * "Vitor + Claude", since those were still the author's own submissions.
+ * Tells whether a solution was submitted by the site's author, i.e. whether
+ * its `author` contains `OWN_AUTHOR`. Collaborative variants like
+ * "Vitor + Claude" count, since those were still the author's own
+ * submissions; editorial copies ("Leetcode") and AI-only solutions
+ * ("ChatGPT") do not.
  *
  * @param solution The solution to classify.
- * @returns True unless the solution is an editorial copy.
+ * @returns True when the author's name appears in the solution's `author`.
  */
 export function isOwnSolution(solution: Solution): boolean {
-  return solution.author !== EDITORIAL_AUTHOR;
+  return solution.author.includes(OWN_AUTHOR);
 }
 
 /**
@@ -73,10 +70,9 @@ function countAttemptsToSolve(own: Solution[], date: string): number | null {
  * @param date The challenge day as `YYYY-MM-DD`, used to tell a failed past
  *   day from one that is still in progress.
  * @param today The reference "today" (defaults to the current UTC day).
- * @returns The solve status plus attempt counts, languages, the best
- *   accepted runtime percentile and whether an editorial solution is
- *   present. A day with no solutions file is Pending whatever its date, since
- *   its submissions have not been fetched yet.
+ * @returns The solve status plus attempt counts, languages and the best
+ *   accepted runtime percentile. A day with no solutions file is Pending
+ *   whatever its date, since its submissions have not been fetched yet.
  */
 export function summarizeSolutions(
   solutions: Solution[] | null,
@@ -101,7 +97,6 @@ export function summarizeSolutions(
     attemptsToSolve: countAttemptsToSolve(own, date),
     languages: [...new Set(own.map((s) => s.language))],
     bestRuntime,
-    hasEditorial: own.length < archived.length,
   };
 }
 

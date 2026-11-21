@@ -30,7 +30,6 @@ function summary(
     attemptsToSolve: 2,
     languages: ["javascript"],
     bestRuntime: 87.5,
-    hasEditorial: false,
     ...overrides,
   };
 }
@@ -78,7 +77,6 @@ describe("parseLatestDailies", () => {
           attemptsToSolve: null,
           languages: [],
           bestRuntime: null,
-          hasEditorial: true,
         }),
       ],
     });
@@ -169,20 +167,17 @@ describe("parseLatestDailies", () => {
     expect(() =>
       parseLatestDailies(withDaily({ bestRuntime: "fast" })),
     ).toThrow(/bestRuntime is not a number or null/);
-    expect(() => parseLatestDailies(withDaily({ hasEditorial: 0 }))).toThrow(
-      /hasEditorial is not a boolean/,
-    );
   });
 
   it("rejects missing summary fields", () => {
     const partial = Object.fromEntries(
       Object.entries(summary("2026-03-31")).filter(
-        ([key]) => key !== "hasEditorial",
+        ([key]) => key !== "bestRuntime",
       ),
     );
 
     expect(() => parseLatestDailies({ ...page(), dailies: [partial] })).toThrow(
-      /hasEditorial is not a boolean/,
+      /bestRuntime is not a number or null/,
     );
   });
 

@@ -10,11 +10,10 @@ Set these in `.env` at the project root:
 | :------------------- | :------- | :--------------------------------------------------------------------- |
 | `LEETCODE_SESSION`   | Yes      | LeetCode session cookie, used to authenticate GraphQL requests.        |
 | `LEETCODE_CSRFTOKEN` | Yes      | LeetCode CSRF token, sent alongside the session cookie.                |
-| `LEETCODE_USERNAME`  | No       | `author` field on fetched solutions. Falls back to `"Vitor"` if unset. |
 
 Both LeetCode variables expire every few weeks; `npm run refresh-auth` refills them from Chrome.
 
-A submission whose code contains a `By Leetcode` comment (e.g. `/** By Leetcode */`, `// By Leetcode`, `# By Leetcode`) is a pasted editorial solution: it is archived with `author: "Leetcode"` regardless of `LEETCODE_USERNAME`, so it never counts toward your own solve status or stats.
+A submission whose code contains a `By <name>` comment (e.g. `/** By ChatGPT */`, `// By Leetcode`, `# By Claude`) is archived with that single-word name, exactly as written, as its `author`; any other submission is archived as `"Vitor"`. Only an `author` containing `"Vitor"` counts toward your own solve status or stats, so `"Leetcode"` or `"ChatGPT"` solutions never do, while collaborative labels like `"Vitor + ChatGPT"` still count.
 
 ## Commands
 

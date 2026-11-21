@@ -124,7 +124,6 @@ function parseDailySummary(value: unknown, path: string): DailySummary {
     attemptsToSolve: readNullableCount(fields, "attemptsToSolve", path),
     languages: readStringArray(fields, "languages", path),
     bestRuntime: readNullableNumber(fields, "bestRuntime", path),
-    hasEditorial: readBoolean(fields, "hasEditorial", path),
   };
 }
 

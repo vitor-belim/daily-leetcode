@@ -149,14 +149,12 @@ describe("dailies-repo", () => {
         attempts: 2,
         attemptsToSolve: 2,
         bestRuntime: 80,
-        hasEditorial: true,
       });
       // No solutions file at all for a past day means its submissions were
       // never fetched, so it is still waiting for a submission.
       expect(previous).toMatchObject({
         solveStatus: SolveStatus.Pending,
         attempts: 0,
-        hasEditorial: false,
       });
     });
 
@@ -195,7 +193,6 @@ describe("dailies-repo", () => {
           attemptsToSolve: 1,
           languages: ["javascript"],
           bestRuntime: 80,
-          hasEditorial: false,
         },
       ]);
     });
