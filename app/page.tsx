@@ -9,6 +9,8 @@ import type { Metadata } from "next";
 const INITIAL_MONTHS = 6;
 const STATS_MONTHS = 6;
 
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   alternates: {
     canonical: "/",
