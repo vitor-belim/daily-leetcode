@@ -6,12 +6,15 @@ CLI utilities for maintaining the `data/` archive and the site's pre-rendered ic
 
 Set these in `.env` at the project root:
 
-| Variable             | Required | Purpose                                                                |
-| :------------------- | :------- | :--------------------------------------------------------------------- |
-| `LEETCODE_SESSION`   | Yes      | LeetCode session cookie, used to authenticate GraphQL requests.        |
-| `LEETCODE_CSRFTOKEN` | Yes      | LeetCode CSRF token, sent alongside the session cookie.                |
+| Variable                  | Required       | Purpose                                                         |
+| :------------------------ | :------------- | :-------------------------------------------------------------- |
+| `LEETCODE_SESSION`        | Yes            | LeetCode session cookie, used to authenticate GraphQL requests. |
+| `LEETCODE_CSRFTOKEN`      | Yes            | LeetCode CSRF token, sent alongside the session cookie.         |
+| `CLAUDE_CODE_OAUTH_TOKEN` | For `backfill` | Long-lived Claude Code token the `/explain` step runs under.    |
 
 Both LeetCode variables expire every few weeks; `npm run refresh-auth` refills them from Chrome.
+
+`CLAUDE_CODE_OAUTH_TOKEN` comes from running `claude setup-token` once in a terminal. It is tied to your Claude subscription (no API billing) and lasts about a year, unlike the CLI's interactive login, which expires without warning and would otherwise make every `claude -p` call in `backfill` fail. When it is unset, `backfill` falls back to whatever login the CLI has.
 
 A submission whose code contains a `By <name>` comment (e.g. `/** By ChatGPT */`, `// By Leetcode`, `# By Claude`) is archived with that single-word name, exactly as written, as its `author`; any other submission is archived as `"Vitor"`. Only an `author` containing `"Vitor"` counts toward your own solve status or stats, so `"Leetcode"` or `"ChatGPT"` solutions never do, while collaborative labels like `"Vitor + ChatGPT"` still count.
 
@@ -21,7 +24,7 @@ All fetch commands default to today (LeetCode's UTC day) if no date is given. Pr
 
 ### `npm run fetch-daily -- [YYYY-MM-DD]`
 
-Convenience wrapper that runs `fetch-problem` and then `fetch-solution` for the same date, stopping if the first fails. Defined in `package.json` rather than as its own script file — it's a shell function purely so the date argument reaches *both* commands; a plain `npm run fetch-problem && npm run fetch-solution` chain would pass it to the second one only.
+Convenience wrapper that runs `fetch-problem` and then `fetch-solution` for the same date, stopping if the first fails. Defined in `package.json` rather than as its own script file — it's a shell function purely so the date argument reaches _both_ commands; a plain `npm run fetch-problem && npm run fetch-solution` chain would pass it to the second one only.
 
 ### `npm run fetch-problem -- [YYYY-MM-DD | --missing]`
 
@@ -50,7 +53,7 @@ Never overwrites an existing solutions file. If you haven't solved the day yet:
 
 Note that because an existing file is never overwritten, solving a past daily after its empty file was written needs that file deleted before the solutions can be fetched.
 
-The site reads that distinction too: a day with no solutions file, whatever its date, is shown as *waiting for a submission* and doesn't count towards the solved percentage. The current streak skips the run of such days leading back from today, but one sitting behind an already-archived day (e.g. left behind by a failed `backfill` fetch) still ends the streak until its solutions are fetched. A past day with an empty `[]` file is shown as _not attempted_.
+The site reads that distinction too: a day with no solutions file, whatever its date, is shown as _waiting for a submission_ and doesn't count towards the solved percentage. The current streak skips the run of such days leading back from today, but one sitting behind an already-archived day (e.g. left behind by a failed `backfill` fetch) still ends the streak until its solutions are fetched. A past day with an empty `[]` file is shown as _not attempted_.
 
 The site is prerendered from `data/` at build time, so whatever a fetch writes shows up once its commit has been deployed.
 
@@ -67,6 +70,8 @@ Finds every day that is missing a problem (including interior gaps) or is missin
 
 A day recorded as unsolved (an empty `[]` solutions file) counts as complete and is not revisited.
 
+Before the first explain, it sends the CLI one tiny Haiku prompt to confirm it can actually authenticate; `claude auth status` cannot be used for this, because it reports any token as logged in without checking it. If the check fails, the CLI's error is printed once, every remaining explain is skipped and reported, and fetching carries on.
+
 The scan normally starts at the oldest archived day. Pass `--from YYYY-MM-DD` to start earlier and pull in history that predates the archive, e.g. `npm run backfill -- --from 2026-01-01`; days before the archive on which you never submitted get an empty `[]` solutions file, so they show up as unsolved rather than being re-fetched every run.
 
 Steps 1 and 2 are independent, so a day whose problem is already archived but whose solutions are missing is topped up without re-fetching and rewriting the problem.
@@ -81,7 +86,7 @@ It reads the cookies from Chrome's own store rather than the browser UI, because
 
 macOS specifics, all of them reasons this script is not portable as-is:
 
-- Cookie values in `~/Library/Application Support/Google/Chrome/<Profile>/Cookies` are encrypted with AES-128-CBC. The key is PBKDF2-HMAC-SHA1 over the *Chrome Safe Storage* password from the login Keychain — salt `saltysalt`, 1003 iterations, 16 bytes, IV of 16 spaces. Linux Chrome uses the same scheme with a different password and 1 iteration; Windows uses DPAPI instead.
+- Cookie values in `~/Library/Application Support/Google/Chrome/<Profile>/Cookies` are encrypted with AES-128-CBC. The key is PBKDF2-HMAC-SHA1 over the _Chrome Safe Storage_ password from the login Keychain — salt `saltysalt`, 1003 iterations, 16 bytes, IV of 16 spaces. Linux Chrome uses the same scheme with a different password and 1 iteration; Windows uses DPAPI instead.
 - Reading that password shells out to `security find-generic-password`, which raises a Keychain dialog. Choosing **Always Allow** stops it recurring.
 - The database is copied to a temp file before being queried, because Chrome holds the live one open.
 - Since Chrome 118 each decrypted value is prefixed with the SHA-256 of the cookie's `host_key`; the script strips that prefix only when it actually matches, so older rows still decrypt correctly.
@@ -112,6 +117,7 @@ These scripts are thin CLI orchestrators; shared logic lives in `lib/` alongside
 - `lib/env-file.ts` — rewrites `NAME=value` lines in `.env` without disturbing the rest of the file.
 - `lib/problems.ts` — maps a LeetCode daily challenge to the app's `Problem` shape, sanitizes its description (moving inline image sizes into `width`/`height` attributes, so images keep their aspect ratio), normalizes its link and recovers the question slug from one (CLI-only).
 - `lib/solutions.ts` — maps a LeetCode submission to the app's `Solution` shape and dedupes by code (CLI-only).
+- `lib/explainer.ts` — the AI explain step: builds and runs the explainer CLI command for a day, checks the CLI can authenticate, and reports whether every solution has an `aiExplanation` (CLI-only). The command runs through an injectable runner, so the tests never spawn the real CLI, and swapping the AI only touches this file.
 - `lib/ico.ts` — `packIco`, which wraps PNG frames in the ICO container `generate-icons` writes to `app/favicon.ico`.
 
 Note: don't add the `server-only` package to any of these — it throws when imported outside a React Server Components build, so these scripts would fail under plain `tsx`. The app-only data modules (`problems-repo.ts`, `solutions-repo.ts`, `dailies-repo.ts`, `markdown.ts`) do import it; their Vitest tests still run because `vitest.config.mts` aliases `server-only` to its no-op entry, an alias `tsx` doesn't have.

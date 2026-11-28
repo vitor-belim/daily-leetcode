@@ -1,12 +1,19 @@
 import { collectFilledDates, getMissingDates } from "@/lib/archive";
-import { parseSolutions } from "@/lib/archive-schema";
 import { isValidCalendarDate, todayUTC } from "@/lib/dates";
-import { solutionFileExists, solutionFilePath } from "@/lib/paths";
+import {
+  checkExplainerLogin,
+  EXPLAINER_LOGIN_HINT,
+  EXPLAINER_NAME,
+  explainDate,
+  isExplainComplete,
+} from "@/lib/explainer";
+import { solutionFileExists } from "@/lib/paths";
 import { execFileSync } from "child_process";
-import fs from "fs";
+import { config } from "dotenv";
+
+config();
 
 const FETCH_TIMEOUT_MS = 2 * 60 * 1000;
-const EXPLAIN_TIMEOUT_MS = 10 * 60 * 1000;
 
 function fetchProblem(date: string) {
   console.log(`\n=== ${date}: fetch-problem ===`);
@@ -22,29 +29,6 @@ function fetchSolution(date: string) {
     stdio: "inherit",
     timeout: FETCH_TIMEOUT_MS,
   });
-}
-
-function explainDate(date: string) {
-  console.log(`\n=== explain: ${date} ===`);
-  execFileSync(
-    "claude",
-    ["-p", `/explain ${date}`, "--permission-mode", "acceptEdits"],
-    { stdio: "inherit", timeout: EXPLAIN_TIMEOUT_MS },
-  );
-}
-
-function isExplainComplete(date: string): boolean {
-  if (!solutionFileExists(date)) return false;
-
-  const filePath = solutionFilePath(date);
-  try {
-    const value: unknown = JSON.parse(fs.readFileSync(filePath, "utf8"));
-    return parseSolutions(value, filePath).every(
-      (s) => (s.aiExplanation || "").trim().length > 0,
-    );
-  } catch {
-    return false;
-  }
 }
 
 function parseFromArg(args: string[]): string | undefined {
@@ -94,6 +78,7 @@ function main() {
   );
 
   const failedDates = new Set<string>();
+  let explainerLoginError: string | null | undefined;
 
   for (const date of datesToProcess) {
     if (missingSet.has(date)) {
@@ -131,7 +116,25 @@ function main() {
       continue;
     }
 
+    if (explainerLoginError === undefined) {
+      console.log(`\n=== checking ${EXPLAINER_NAME} login ===`);
+      explainerLoginError = checkExplainerLogin();
+      if (explainerLoginError !== null) {
+        console.error(
+          `\n${EXPLAINER_NAME} is not usable: ${explainerLoginError}`,
+        );
+      }
+    }
+    if (explainerLoginError !== null) {
+      console.error(
+        `\n${date}: skipping explain, ${EXPLAINER_NAME} is not usable.`,
+      );
+      failedDates.add(date);
+      continue;
+    }
+
     try {
+      console.log(`\n=== explain: ${date} ===`);
       explainDate(date);
     } catch (error) {
       console.error(
@@ -151,6 +154,9 @@ function main() {
     console.error(
       `\nBackfill incomplete: issues with ${Array.from(failedDates).sort().join(", ")}`,
     );
+    if (explainerLoginError !== undefined && explainerLoginError !== null) {
+      console.error(EXPLAINER_LOGIN_HINT);
+    }
     process.exit(1);
   }
 
