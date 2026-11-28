@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar maxLength = function (nums) {\n    let max = 0;\n\n    for (let i = 0; i < nums.length; i++) {\n        let p = nums[i];\n        let l = nums[i];\n        let g = nums[i];\n\n        for (let j = i + 1; j < nums.length; j++) {\n            p *= nums[j];\n            l = lcm(l, nums[j]);\n            g = gcd(g, nums[j]);\n\n            if (p === l * g) {\n                max = Math.max(max, j - i + 1);\n            }\n        }\n    }\n\n    return max;\n};\n\nconst map = new Map();\n\nconst gcd = (a, b) => {\n    const key = 'g:' + a + ':' + b;\n    if (map.has(key)) return map.get(key);\n\n    while (b !== 0) {\n        [a, b] = [b, a % b];\n    }\n\n    map.set(key, a);\n    return a;\n};\n\nconst lcm = (a, b) => {\n    const key = 'l:' + a + ':' + b;\n    if (map.has(key)) return map.get(key);\n\n    if (a === 0 || b === 0) {\n        map.set(key, 0);\n        return 0;\n    }\n\n    const res = Math.abs(a * b) / gcd(a, b);\n    map.set(key, res);\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Took a long time to reach this solution, attempted to include memoization on gcd and lcm for faster re-calculations.",
+    "aiExplanation": "This function finds the **longest contiguous subarray** where the product of all its elements equals the **LCM times the GCD** of those same elements. It uses two nested loops: the outer loop picks a starting index `i`, and the inner loop extends the subarray one element at a time to index `j`, keeping a running **product** (`p`), running **least common multiple** (`l`), and running **greatest common divisor** (`g`) so nothing has to be recomputed from scratch. Whenever `p === l * g` holds, the current length `j - i + 1` is compared against `max` and kept if it is larger. The helper `gcd` uses the classic **Euclidean algorithm** (repeatedly replacing the pair with `[b, a % b]` until `b` is zero), and `lcm` is derived from it with the formula `|a * b| / gcd(a, b)`, returning `0` if either input is zero. Both helpers also **memoize** their results in a shared `Map` keyed by a string like `'g:12:18'`, so repeated calls with the same arguments return instantly instead of recomputing. Note that the subarray check starts at `j = i + 1`, so single-element subarrays are never counted on their own, and the function finally returns `max`.",
+    "status": "DONE",
+    "cpuUsage": 9.31,
+    "memoryUsage": 6.44,
+    "date": "2026-11-24T08:27:56.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar maxLength = function (nums) {\n    let max = 0;\n\n    for (let i = 0; i < nums.length; i++) {\n        let p = nums[i];\n        let l = nums[i];\n        let g = nums[i];\n\n        for (let j = i + 1; j < nums.length; j++) {\n            p *= nums[j];\n            l = lcm(l, nums[j]);\n            g = gcd(g, nums[j]);\n\n            if (p === l * g) {\n                max = Math.max(max, j - i + 1);\n            }\n        }\n    }\n\n    return max;\n};\n\nconst gcd = (a, b) => {\n    while (b !== 0) {\n        [a, b] = [b, a % b];\n    }\n    return a;\n};\n\nconst lcm = (a, b) => {\n    return (a / gcd(a, b)) * b;\n};\n",
+    "language": "javascript",
+    "notes": "Simplified everything down, still got below average performance. If this is an easy exercise, I can't imagine how many years of work experience juniors need before their first job.",
+    "aiExplanation": "This is a **brute-force** solution that looks for the longest contiguous subarray whose **product** equals the **LCM multiplied by the GCD** of its elements. The outer loop fixes a start index `i` and seeds three running values from `nums[i]`: the product `p`, the least common multiple `l`, and the greatest common divisor `g`. The inner loop then grows the subarray to each later index `j`, updating all three incrementally (`p *= nums[j]`, `l = lcm(l, nums[j])`, `g = gcd(g, nums[j])`) so each extension costs only a single step. If the condition `p === l * g` is satisfied, the subarray length `j - i + 1` is recorded in `max` when it beats the previous best. The `gcd` helper implements the **Euclidean algorithm** by repeatedly swapping in `[b, a % b]` until `b` reaches zero, and `lcm` is computed as `(a / gcd(a, b)) * b`, dividing first to keep intermediate values smaller and avoid overflow. Unlike a memoized variant, this version keeps the helpers lean with no caching, relying on the small input sizes to stay fast, and it returns `max` after all starting points have been tried.",
+    "status": "DONE",
+    "cpuUsage": 31.26,
+    "memoryUsage": 19.66,
+    "date": "2026-11-24T08:32:05.000Z"
+  }
+]

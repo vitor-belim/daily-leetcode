@@ -1,0 +1,35 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} items\n * @param {number} budget\n * @return {number}\n */\nvar maximumSaleItems = function(items, budget) {\n    const n = items.length;\n    const pq = new MinPriorityQueue(el => el[0]);\n\n    for (let i = 0; i < n; i++) {\n        let units = 1;\n\n        for (let j = 0; j < n; j++) {\n            if (i !== j && items[j][0] % items[i][0] === 0) {\n                units++;\n            }\n        }\n\n        pq.enqueue([items[i][1] / units, units]);\n        pq.enqueue([items[i][1], Infinity]);\n    }\n\n    let count = 0;\n\n    while (!pq.isEmpty() && budget > 0) {\n        const [price, quantity] = pq.dequeue();\n\n        const buy = Math.min(Math.floor(budget / price), quantity);\n        count += buy;\n        budget -= buy * price;\n    }\n\n    return count;\n};\n",
+    "language": "javascript",
+    "notes": "Wrongly allowing partial purchases of bundles.",
+    "aiExplanation": "This is a **greedy** attempt at the problem. Each item is described by a `factor` and a `price`, and buying an item gives you a free unit of every other item whose factor is a multiple of yours. For every item the code counts how many `units` a single purchase yields (itself plus all items with a divisible factor), then pushes two offers into a **min-priority queue** keyed by effective price per unit: a bundle offer at `price / units` that can be taken at most `units` times, and a plain offer at full `price` with unlimited (`Infinity`) quantity. It then repeatedly dequeues the cheapest per-unit offer and buys as many units as the remaining `budget` allows, capped by the offer's `quantity`, adding them to `count` and subtracting the cost. The idea is sound in spirit, but buying a **partial** bundle at the discounted per-unit price is not actually allowed (you pay the full price to unlock the free units), which is why this solution **fails** on some test cases.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-11-27T09:03:09.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} items\n * @param {number} budget\n * @return {number}\n */\nvar maximumSaleItems = function (items, budget) {\n    const n = items.length;\n    const pq = new MinPriorityQueue(el => el[0]);\n\n    for (let i = 0; i < n; i++) {\n        let units = 1;\n\n        for (let j = 0; j < n; j++) {\n            if (i !== j && items[j][0] % items[i][0] === 0) {\n                units++;\n            }\n        }\n\n        pq.enqueue([items[i][1] / units, units]);\n        pq.enqueue([items[i][1], Infinity]);\n    }\n\n    let count = 0;\n\n    while (!pq.isEmpty() && budget > 0) {\n        const [price, quantity] = pq.dequeue();\n        let buy = 0;\n\n        if (quantity === Infinity) {\n            buy = Math.floor(budget / price);\n        } else if (budget >= quantity * price) {\n            buy = quantity;\n        }\n\n        count += buy;\n        budget -= buy * price;\n    }\n\n    return count;\n};\n",
+    "language": "javascript",
+    "notes": "Solution is not complete because choosing greedy may leave an incomplete budget spend, which might lead to better combinations when choosing less of previously seen products.",
+    "aiExplanation": "This is a refinement of the previous **greedy** approach that fixes the partial-bundle issue. As before, each item's purchase yields `units` total items (itself plus every other item whose factor is divisible by its own), and two offers go into a **min-priority queue** sorted by per-unit cost: the bundle at `price / units` for exactly `units` items, and the standalone item at full `price` with `Infinity` quantity. The key change is in the buying loop: an unlimited offer is bought as many times as `Math.floor(budget / price)` allows, but a **bundle is only taken all-or-nothing**, and only if the remaining `budget` covers its full cost of `quantity * price`; otherwise it is skipped. Each purchase adds to `count` and reduces `budget`. Although this respects the bundle rule, pure greedy by cheapest per-unit price can still skip a bundle whose leftover budget would have combined better with other purchases, so this solution also **fails** and shows that the problem needs a dynamic-programming approach rather than greedy selection.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-11-27T09:13:23.000Z"
+  },
+  {
+    "author": "Leetcode",
+    "code": "/** By Leetcode */\nvar maximumSaleItems = function (items, budget) {\n    const f = new Int32Array(budget + 1);\n    let mn = Infinity;\n    for (const [factor, price] of items) {\n        mn = Math.min(mn, price);\n        let cnt = 0;\n        for (const [otherFactor] of items) {\n            if (otherFactor % factor === 0) {\n                cnt++;\n            }\n        }\n        for (let j = budget; j >= price; j--) {\n            f[j] = Math.max(f[j], f[j - price] + cnt);\n        }\n    }\n    let ans = 0;\n    for (let j = 0; j <= budget; j++) {\n        ans = Math.max(ans, f[j] + Math.floor((budget - j) / mn));\n    }\n    return ans;\n};",
+    "language": "javascript",
+    "notes": "A dp on the budget, quite an interesting solution. Had to give up after around 2h of attempting to make priority queue work.",
+    "aiExplanation": "This solution treats the problem as a **0/1 knapsack**. For each item it first computes `cnt`, the number of items you receive when buying it once: itself plus every item whose `factor` is a multiple of its own (the divisibility check includes the item itself, so no separate `+1` is needed). The array `f`, indexed by money spent, stores the **maximum number of items obtainable by spending exactly up to that amount using each bundle at most once**; iterating `j` from `budget` down to `price` and updating `f[j] = max(f[j], f[j - price] + cnt)` is the classic backward sweep that prevents reusing the same bundle twice. Along the way it also tracks `mn`, the **cheapest single price** among all items. Finally, for every possible spend `j`, it combines the best bundle value `f[j]` with the leftover money spent greedily on the cheapest item, `Math.floor((budget - j) / mn)`, since additional copies of the cheapest item are always the best way to use spare budget. The maximum over all `j` is the answer, giving an **O(n² + n·budget)** solution that passes all tests.",
+    "status": "DONE",
+    "cpuUsage": 80,
+    "memoryUsage": 80,
+    "date": "2026-11-27T11:25:08.000Z"
+  }
+]

@@ -1,0 +1,57 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar smallestUniqueSubarray = function(nums) {\n    const n = nums.length;\n\n    for (let k = 1; k <= n; k++) {\n        let cur = nums.slice(0, k).join(',');\n\n        const map = new Map([[cur, 1]]);\n        let unique = 1;\n\n        for (let i = k; i < n; i++) {\n            cur = cur.slice(nums[i - 1].toString().length);\n            if (cur.length > 0 && cur[0] === ',') cur = cur.slice(1);\n            if (cur.length > 0) cur += ',';\n            cur += nums[i];\n\n            const count = map.get(cur) || 0;\n            if (count === 0) unique++;\n            if (count === 1) unique--;\n            map.set(cur, count + 1);\n        }\n\n        if (unique > 0) return k;\n    }\n\n    return n;\n};\n",
+    "language": "javascript",
+    "notes": "Slicing slightly wrong #1.",
+    "aiExplanation": "This first attempt looks for the shortest subarray that appears exactly once by trying every window length `k` from `1` up to `n`. For each `k`, it represents the current window as a comma-joined string (for example `\"3,1,2\"`), stores how many times each window string has been seen in a `Map`, and keeps a running counter `unique` of how many window strings have been seen exactly once (incrementing when a new string appears, decrementing when a string is seen a second time). To slide the window one step right it tries to chop the departed number off the front of the string and append `nums[i]` at the end, and as soon as some length `k` yields `unique > 0` it returns `k`. The sliding step is where it goes wrong: it strips `nums[i - 1].toString().length` characters, but the element actually leaving the window is `nums[i - k]`, not `nums[i - 1]`, and the slice does not account for the separating comma, so the window string drifts out of sync with the real subarray and the answer is **incorrect**.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-11-25T08:16:21.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar smallestUniqueSubarray = function(nums) {\n    const n = nums.length;\n\n    for (let k = 1; k <= n; k++) {\n        let cur = nums.slice(0, k).join(',');\n\n        const map = new Map([[cur, 1]]);\n        let unique = 1;\n\n        for (let i = k; i < n; i++) {\n            cur = cur.slice(nums[i - 1].toString().length + 1);\n            if (cur.length > 0 && cur[0] === ',') cur = cur.slice(1);\n            if (cur.length > 0) cur += ',';\n            cur += nums[i];\n\n            const count = map.get(cur) || 0;\n            if (count === 0) unique++;\n            if (count === 1) unique--;\n            map.set(cur, count + 1);\n        }\n\n        if (unique > 0) return k;\n    }\n\n    return n;\n};\n",
+    "language": "javascript",
+    "notes": "Slicing slightly wrong #2.",
+    "aiExplanation": "This is a small patch on the previous attempt that keeps the same overall idea: for each candidate length `k`, slide a window across `nums`, encode the window as a comma-joined string, count occurrences in a `Map`, and track with `unique` how many window strings occur exactly once, returning the first `k` where `unique > 0`. The only change is that the slice now removes `nums[i - 1].toString().length + 1` characters so the trailing comma is dropped along with the number. However, the underlying bug remains: the number leaving the window is **`nums[i - k]`**, the element `k` positions back, not `nums[i - 1]`, so whenever those two numbers have a different digit count the string is cut in the wrong place and the window encoding becomes garbage, which is why the submission still **fails**.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-11-25T08:20:26.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar smallestUniqueSubarray = function(nums) {\n    const n = nums.length;\n\n    for (let k = 1; k <= n; k++) {\n        let cur = nums.slice(0, k).join(',');\n\n        const map = new Map([[cur, 1]]);\n        let unique = 1;\n\n        for (let i = k; i < n; i++) {\n            cur = k === 1 ? '' : cur.slice(cur.indexOf(',') + 1);\n            if (cur.length > 0 && cur[0] === ',') cur = cur.slice(1);\n            if (cur.length > 0) cur += ',';\n            cur += nums[i];\n\n            const count = map.get(cur) || 0;\n            if (count === 0) unique++;\n            if (count === 1) unique--;\n            map.set(cur, count + 1);\n        }\n\n        if (unique > 0) return k;\n    }\n\n    return n;\n};\n",
+    "language": "javascript",
+    "notes": "Reached TLE.",
+    "aiExplanation": "This version fixes the sliding logic from the earlier attempts. For every window length `k` it still builds the window as a comma-joined string, counts each string in a `Map`, and tracks with `unique` how many strings have appeared exactly once, returning `k` as soon as a unique window exists. The key change is that to advance the window it now removes everything up to and including the **first comma** using `cur.indexOf(',') + 1`, which correctly drops whichever number was at the front regardless of how many digits it has, with a special case setting `cur` to an empty string when `k === 1` since there is no comma to find. The logic is now correct, but the approach is slow: it tries up to `n` lengths, and for each one it rebuilds strings and hashes them, giving roughly **O(n² · k)** work overall, so large inputs exceed the time limit (**TLE**).",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-11-25T08:28:35.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[]} nums\n * @return {number}\n */\nvar smallestUniqueSubarray = function(nums) {\n    const n = nums.length;\n\n    for (let k = 1; k <= n; k++) {\n        let cur = nums.slice(0, k).join(',');\n\n        const map = new Map([[cur, 1]]);\n        let unique = 1;\n\n        for (let i = k; i < n; i++) {\n            if (k === 1) {\n                cur = nums[i].toString();\n            } else {\n                cur = cur.slice(cur.indexOf(',') + 1) + ',' + nums[i];\n            }\n\n            const count = map.get(cur) || 0;\n            if (count === 0) unique++;\n            if (count === 1) unique--;\n            map.set(cur, count + 1);\n        }\n\n        if (unique > 0) return k;\n    }\n\n    return n;\n};\n",
+    "language": "javascript",
+    "notes": "Attempted to improve TLE, no success.",
+    "aiExplanation": "This is a tidied-up version of the previous correct-but-slow solution. It iterates over every possible subarray length `k` and slides a window across `nums`, representing the window as a comma-separated string, counting how many times each string has been seen in a `Map`, and maintaining `unique`, the number of window strings seen exactly once. The sliding step is now cleaner: when `k === 1` the window is simply `nums[i].toString()`, and otherwise it drops the first number with `cur.slice(cur.indexOf(',') + 1)` and appends `',' + nums[i]`, with no leftover edge-case checks. The first `k` where `unique > 0` is returned. The algorithm is correct, but because it checks every length sequentially and performs string slicing and concatenation for every window, the total work is still quadratic or worse, and it again runs out of time (**TLE**).",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-11-25T08:35:14.000Z"
+  },
+  {
+    "author": "Leetcode",
+    "code": "/** By Leetcode */\nvar smallestUniqueSubarray = function (nums) {\n    const BASE = 911382323;\n\n    const n = nums.length;\n    const hash = new Uint32Array(n + 1);\n    const powers = new Uint32Array(n + 1);\n    powers[0] = 1;\n\n    // Compute prefix hashes and powers of BASE\n    for (let i = 0; i < n; ++i) {\n        hash[i + 1] = (Math.imul(hash[i], BASE) + nums[i]) >>> 0;\n        powers[i + 1] = Math.imul(powers[i], BASE) >>> 0;\n    }\n\n    const check = (length) => {\n        const counts = new Map();\n\n        for (let left = 0; left + length <= n; ++left) {\n            const right = left + length;\n\n            const key =\n                (hash[right] - Math.imul(hash[left], powers[length])) >>> 0;\n            counts.set(key, (counts.get(key) ?? 0) + 1);\n        }\n\n        for (const times of counts.values()) {\n            if (times === 1) {\n                return true;\n            }\n        }\n        return false;\n    };\n\n    let lo = 1,\n        hi = n;\n    while (lo < hi) {\n        const mid = lo + Math.floor((hi - lo) / 2);\n\n        if (check(mid)) {\n            hi = mid;\n        } else {\n            lo = mid + 1;\n        }\n    }\n\n    return lo;\n};",
+    "language": "javascript",
+    "notes": "Prefix hashes and powers, plus binary search via function. #easy",
+    "aiExplanation": "The official solution uses a **polynomial rolling hash** combined with **binary search**. It first builds a `hash` array of prefix hashes, where `hash[i + 1]` equals `hash[i] * BASE + nums[i]` computed with `Math.imul` and `>>> 0` so everything stays as fast unsigned 32-bit integers, plus a `powers` array of `BASE` raised to each exponent. With these, the hash of any window `nums[left..right)` can be obtained in constant time as `hash[right] - hash[left] * powers[length]`, so the `check(length)` helper can hash every window of a given length, tally them in a `Map`, and report whether any hash occurs exactly once. Because having a unique subarray of some length guarantees a unique subarray of every longer length, the answer is monotonic, so the code binary searches between `lo = 1` and `hi = n`, shrinking `hi` when `check(mid)` succeeds and raising `lo` otherwise, and returns `lo` as the smallest unique length. This runs in about **O(n log n)** time instead of checking every length one by one.",
+    "status": "DONE",
+    "cpuUsage": 81.21,
+    "memoryUsage": 31.54,
+    "date": "2026-11-25T08:39:02.000Z"
+  }
+]

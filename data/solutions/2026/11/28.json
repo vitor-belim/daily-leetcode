@@ -1,0 +1,24 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number[][]} items\n * @param {number} budget\n * @return {number}\n */\nvar maximumSaleItems = function(items, budget) {\n    const n = items.length;\n    let res = 0;\n\n    const explore = (pos, count, remaining) => {\n        if (remaining < 0) return;\n        if (pos === n) {\n            res = Math.max(res, count);\n            return;\n        }\n\n        let free = 0;\n\n        for (let i = 0; i < n; i++) {\n            if (i !== pos && items[i][0] % items[pos][0] === 0) {\n                free++;\n            }\n        }\n\n        const max = Math.floor(remaining / items[pos][1]);\n\n        for (let i = max; i >= 0; i--) {\n            const forFree = Math.min(i, free);\n            const single = i - forFree;\n            explore(\n                pos + 1,\n                count + forFree * 2 + single,\n                remaining - i * items[pos][1]\n            );\n        }\n    };\n    explore(0, 0, budget);\n\n    return res;\n};\n",
+    "language": "javascript",
+    "notes": "Reached TLE as expected.",
+    "aiExplanation": "This is a **brute-force recursive search** over every way to spend the budget. The helper `explore(pos, count, remaining)` walks through the items one position at a time, where `count` is how many items have been collected so far and `remaining` is the budget left; if `remaining` goes negative the branch is abandoned, and once `pos` reaches the end the best `count` seen is stored in `res`. For the current item it first counts `free`, the number of **other** items whose factor is a multiple of this item's factor (`items[i][0] % items[pos][0] === 0`), since each purchase of this item can unlock one of those for free. It then computes the maximum number of copies affordable with `Math.floor(remaining / items[pos][1])` and tries every quantity `i` from that maximum down to zero: up to `free` of those purchases are paired with a free item and therefore count **double** (`forFree * 2`), while the rest count as a `single` item each, and the recursion continues to the next position with the reduced budget. Because it tries every combination of quantities for every item, the search space explodes, which is why this submission **timed out** (TLE).",
+    "status": "TLE",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-11-28T09:30:30.000Z"
+  },
+  {
+    "author": "Leetcode",
+    "code": "/** By Leetcode */\nvar maximumSaleItems = function (items, budget) {\n    items.sort((a, b) => a[1] - b[1]);\n    let mx = 0;\n    for (const [factor] of items) {\n        mx = Math.max(mx, factor);\n    }\n    const freq = new Int32Array(mx + 1);\n    for (const [factor] of items) {\n        freq[factor]++;\n    }\n    for (let i = 1; i <= mx; i++) {\n        if (freq[i] > 0) {\n            for (let j = i * 2; j <= mx; j += i) {\n                freq[i] += freq[j];\n            }\n        }\n    }\n\n    const mn = items[0][1];\n    let ans = 0;\n    for (const [factor, price] of items) {\n        if (price > mn * 2) {\n            break;\n        }\n        const cnt = freq[factor] - 1;\n        const take = Math.min(cnt, Math.floor(budget / price));\n        ans += take * 2;\n        budget -= take * price;\n    }\n    ans += Math.floor(budget / mn);\n    return ans;\n};",
+    "language": "javascript",
+    "notes": "A convoluted solution to a convoluted problem.",
+    "aiExplanation": "This is a **greedy** solution built on one key observation: buying an item that comes with a free partner yields **two** items for one price, so it is only worth doing when that price is no more than **twice** the cheapest price `mn`, otherwise two copies of the cheapest item are a better deal. The code first sorts `items` by price, then builds `freq`, a counting array indexed by factor; a sieve-style loop adds, for every factor `i`, the counts of all its multiples (`j = i * 2, 3 * i, ...`), so afterwards `freq[factor]` tells how many items have a factor divisible by that one. It then walks the items from cheapest to most expensive and stops as soon as `price > mn * 2`. For each item it computes `cnt = freq[factor] - 1`, the number of **other** items it can unlock, buys `take = Math.min(cnt, Math.floor(budget / price))` copies, adds `take * 2` to the answer and subtracts the cost from `budget`. Finally, whatever budget is left is spent on the cheapest item with `Math.floor(budget / mn)`, since at that point there are no more profitable two-for-one deals. The result is the maximum number of items obtainable.",
+    "status": "DONE",
+    "cpuUsage": 66.67,
+    "memoryUsage": 66.67,
+    "date": "2026-11-28T09:30:59.000Z"
+  }
+]

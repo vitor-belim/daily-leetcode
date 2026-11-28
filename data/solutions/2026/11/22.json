@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {string} s\n * @return {boolean}\n */\nvar checkString = function(s) {\n    let hasSeenB = false;\n\n    for (const char of s) {\n        if (char === 'b') {\n            hasSeenB = true;\n        } else if (hasSeenB) {\n            return false;\n        }\n    }\n\n    return true;\n};\n",
+    "language": "javascript",
+    "notes": "Easy one.",
+    "aiExplanation": "This function checks whether every `'a'` in the string `s` appears **before** every `'b'`, which is the same as saying no `'a'` ever comes after a `'b'`. It walks through the string one character at a time while tracking a single boolean flag, `hasSeenB`, that starts as `false` and flips to `true` the first time a `'b'` is encountered. Since the string only contains `'a'` and `'b'`, any character that is **not** `'b'` must be an `'a'`, so if the flag is already `true` when an `'a'` shows up, the order has been broken and the function immediately returns `false`. If the loop finishes without ever hitting that case, all the `'a'`s came first and it returns `true`. The approach runs in **O(n)** time with **O(1)** extra space because it makes a single pass and remembers only one flag.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 64.61,
+    "date": "2026-11-22T09:34:51.000Z"
+  }
+]

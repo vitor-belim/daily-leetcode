@@ -1,0 +1,46 @@
+[
+  {
+    "author": "Vitor",
+    "code": "\nvar ProductOfNumbers = function() {\n    this.list = [];\n};\n\n/** \n * @param {number} num\n * @return {void}\n */\nProductOfNumbers.prototype.add = function(num) {\n    this.list.push(num);\n};\n\n/** \n * @param {number} k\n * @return {number}\n */\nProductOfNumbers.prototype.getProduct = function(k) {\n    let res = 1;\n\n    for (let i = this.list.length - 1; i >= this.list.length - k; i--) {\n        res *= this.list[i];\n    }\n\n    return res;\n};\n\n/** \n * Your ProductOfNumbers object will be instantiated and called as such:\n * var obj = new ProductOfNumbers()\n * obj.add(num)\n * var param_2 = obj.getProduct(k)\n */",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This is the **brute-force** approach: the class simply keeps every number that was ever added in a plain array called `list`, so `add` is just a `push`. When `getProduct(k)` is called, it starts with `res = 1` and walks **backwards** from the last element over the final `k` entries, multiplying each one into `res`, then returns the result. It is easy to understand and always correct, but each query costs **O(k)** time because it re-multiplies the numbers from scratch on every call, which is why it ran slowly on the large test cases.",
+    "status": "DONE",
+    "cpuUsage": 8.83,
+    "memoryUsage": 100,
+    "date": "2025-02-14T09:05:25.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "\nvar ProductOfNumbers = function() {\n    this.list = [];\n    this.prod = 1;\n};\n\n/** \n * @param {number} num\n * @return {void}\n */\nProductOfNumbers.prototype.add = function(num) {\n    if (num === 0) {\n        this.list = [];\n        this.prod = 1;\n    } else {\n        this.prod *= num;\n        this.list.push(this.prod);\n    }\n};\n\n/** \n * @param {number} k\n * @return {number}\n */\nProductOfNumbers.prototype.getProduct = function(k) {\n    if (this.list.length < k) {\n        return 0;\n    }\n\n    if (this.list.length === k) {\n        return this.prod;\n    }\n\n    return this.list[this.list.length - 1] / this.list[this.list.length - 1 - k];\n};\n\n/** \n * Your ProductOfNumbers object will be instantiated and called as such:\n * var obj = new ProductOfNumbers()\n * obj.add(num)\n * var param_2 = obj.getProduct(k)\n */",
+    "language": "javascript",
+    "notes": "",
+    "aiExplanation": "This version uses **prefix products** so that every query runs in constant time. Instead of storing the raw numbers, `list` stores the **running product** of everything added since the last zero, and `prod` holds the current value of that running product. Adding a non-zero number multiplies it into `prod` and pushes the new total; adding a `0` **wipes everything** by resetting `list` to an empty array and `prod` to `1`, because any product that includes that zero must be zero. In `getProduct(k)`, if fewer than `k` numbers have been added since the last zero, the window must contain that zero, so it returns `0`; if exactly `k` numbers have been added, the answer is simply `prod`; otherwise it **divides** the latest running product by the running product from `k` positions earlier, which cancels out all the earlier factors and leaves just the product of the last `k` numbers.",
+    "status": "DONE",
+    "cpuUsage": 99.9,
+    "memoryUsage": 100,
+    "date": "2025-02-14T09:17:37.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "\nvar ProductOfNumbers = function() {\n    this.nums = [1];\n    this.lastZero = -1;\n};\n\n/** \n * @param {number} num\n * @return {void}\n */\nProductOfNumbers.prototype.add = function(num) {\n    if (num === 0) {\n        this.lastZero = 1;\n        this.nums.push(1);\n    } else {\n        this.lastZero++;\n\n        if (this.nums[this.nums.length - 1] === 0) {\n            this.nums.push(num);\n        } else {\n            this.nums.push(num * this.nums[this.nums.length - 1]);\n        }\n    }\n};\n\n/** \n * @param {number} k\n * @return {number}\n */\nProductOfNumbers.prototype.getProduct = function(k) {\n    if (k >= this.lastZero) {\n        return 0;\n    }\n    return this.nums[this.nums.length - 1] / this.nums[this.nums.length - 1 - k];\n};\n\n/** \n * Your ProductOfNumbers object will be instantiated and called as such:\n * var obj = new ProductOfNumbers()\n * obj.add(num)\n * var param_2 = obj.getProduct(k)\n */",
+    "language": "javascript",
+    "notes": "Interesting exercise, failed initialization of zero.",
+    "aiExplanation": "This is another **prefix-product** approach, but it keeps a sentinel `1` at the front of `nums` so the array never needs to be cleared. Each non-zero `add` pushes the previous running product multiplied by the new number, and a `0` pushes a fresh `1` to **restart the chain** (the zero itself is never stored, so the `=== 0` check inside `add` can never actually trigger). The counter `lastZero` is meant to track how many entries sit after the most recent zero, and `getProduct(k)` returns `0` whenever `k >= lastZero` because the window would reach back into the zero; otherwise it divides the latest running product by the one `k` positions back. The bug is the initial value `lastZero = -1`: after the very first non-zero `add` it becomes `0`, so a query like `getProduct(1)` sees `1 >= 0` and wrongly returns `0` even though no zero was ever added, which is why this submission **failed**.",
+    "status": "FAILED",
+    "cpuUsage": 0,
+    "memoryUsage": 0,
+    "date": "2026-11-23T07:47:09.000Z"
+  },
+  {
+    "author": "Vitor",
+    "code": "\nvar ProductOfNumbers = function() {\n    this.nums = [1];\n    this.lastZero = 1;\n};\n\n/** \n * @param {number} num\n * @return {void}\n */\nProductOfNumbers.prototype.add = function(num) {\n    if (num === 0) {\n        this.lastZero = 1;\n        this.nums.push(1);\n    } else {\n        this.lastZero++;\n\n        if (this.nums[this.nums.length - 1] === 0) {\n            this.nums.push(num);\n        } else {\n            this.nums.push(num * this.nums[this.nums.length - 1]);\n        }\n    }\n};\n\n/** \n * @param {number} k\n * @return {number}\n */\nProductOfNumbers.prototype.getProduct = function(k) {\n    if (k >= this.lastZero) {\n        return 0;\n    }\n    return this.nums[this.nums.length - 1] / this.nums[this.nums.length - 1 - k];\n};\n\n/** \n * Your ProductOfNumbers object will be instantiated and called as such:\n * var obj = new ProductOfNumbers()\n * obj.add(num)\n * var param_2 = obj.getProduct(k)\n */",
+    "language": "javascript",
+    "notes": "Pretty good solution, considering the best is only different by trimming nums before zeros.",
+    "aiExplanation": "This is the **fixed version** of the previous attempt, using the same prefix-product idea with a sentinel `1` at the front of `nums`. Every non-zero `add` pushes the previous running product times the new number, while a `0` pushes a fresh `1` so the chain restarts without clearing the array. The key change is that `lastZero` now starts at `1` and counts **the sentinel plus every number added since the last zero**, so when `k >= lastZero` the requested window necessarily reaches past the restart point into a zero and the method returns `0`; otherwise it **divides** the latest running product by the entry `k` positions earlier, which cancels the older factors and yields exactly the product of the last `k` numbers in **O(1)** time. The `=== 0` branch inside `add` is dead code since zeros are never stored, but it is harmless.",
+    "status": "DONE",
+    "cpuUsage": 86.16,
+    "memoryUsage": 37.29,
+    "date": "2026-11-23T07:49:27.000Z"
+  }
+]

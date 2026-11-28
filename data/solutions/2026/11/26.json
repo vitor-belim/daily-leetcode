@@ -1,0 +1,13 @@
+[
+  {
+    "author": "Vitor",
+    "code": "/**\n * @param {number} n\n * @return {boolean}\n */\nvar canAliceWin = function(n) {\n    for (let i = 10; i >= 1; i--) {\n        if (n < i) {\n            return i & 1;\n        }\n        n -= i;\n    }\n    return false;\n};\n",
+    "language": "javascript",
+    "notes": "Simulation approach. There's a very high probability a math solution is possible, but I couldn't be bothered since I was at 100% performance already.",
+    "aiExplanation": "This function simulates a turn-based game where two players take stones from a pile of size `n`: **Alice** goes first and must take **10** stones, then **Bob** takes **9**, then Alice takes **8**, and so on, with each turn removing one fewer stone than the last. The loop counts `i` down from `10` to `1`, where each value of `i` represents the number of stones required on the current turn, and the player whose turn it is alternates with the parity of `i` (even values like 10, 8, 6 are Alice's turns, odd values like 9, 7, 5 are Bob's). On each turn it checks whether the pile `n` has fewer stones than `i`; if so, the current player cannot make their move and **loses**, so the function returns `i & 1`, which is `1` (truthy) when `i` is odd, meaning Bob was stuck and Alice wins, or `0` (falsy) when `i` is even, meaning Alice was stuck and loses. Otherwise it subtracts `i` from `n` and continues to the next turn. If the loop finishes all ten turns without anyone getting stuck, the function returns `false`, since that would mean Bob made the last successful move and Alice has no valid turn left.",
+    "status": "DONE",
+    "cpuUsage": 100,
+    "memoryUsage": 44.22,
+    "date": "2026-11-26T07:56:44.000Z"
+  }
+]
